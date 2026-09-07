@@ -61,7 +61,7 @@ def part_list_view(request):
     }
     parts = parts.order_by(valid_sorts.get(sort, '-created_at'))
 
-    paginator = Paginator(parts, 20)
+    paginator = Paginator(parts, 10)
     page = request.GET.get('page')
     parts_page = paginator.get_page(page)
 

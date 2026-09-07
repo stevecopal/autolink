@@ -1,6 +1,6 @@
 /**
  * AutoLink - Recherche de mécaniciens à proximité
- * Géolocalisation, carte Leaflet, liste de résultats
+ * Géolocalisation GPS réelle (pas IP), carte Leaflet, liste de résultats
  */
 (function () {
     'use strict';
@@ -36,17 +36,22 @@
     var currentUserPosition = null;
     var isSearching = false;
 
+    // Seuil de précision : au-delà de 1000m, c'est probablement de l'IP
+    var GPS_ACCURACY_THRESHOLD_METERS = 1000;
+
     // ==========================================
     // Textes i18n (fallbacks français)
     // ==========================================
     var TEXTS = {
-        locating: findBtn.getAttribute('data-text-locating') || 'Recherche de votre position…',
+        locating: 'Recherche de votre position GPS…',
         searching: 'Recherche de mécaniciens à proximité…',
         geolocation_not_supported: 'La géolocalisation n\'est pas prise en charge par votre navigateur.',
         permission_denied: 'Nous avons besoin de votre position pour trouver les mécaniciens à proximité. Autorisez l\'accès à votre position dans les paramètres de votre navigateur.',
-        position_unavailable: 'Votre position est indisponible. Vérifiez que le GPS est activé.',
+        position_unavailable: 'Votre position est indisponible. Vérifiez que le GPS est activé sur votre appareil.',
         timeout: 'La demande de localisation a expiré. Veuillez réessayer.',
         generic_error: 'Impossible d\'obtenir votre position. Vous pouvez essayer à nouveau ou saisir votre adresse manuellement.',
+        low_accuracy: 'La précision de la position est faible (basée sur l\'IP). Activez le GPS pour un résultat plus précis.',
+        retry_with_gps: 'Réessayer avec le GPS',
         no_results: 'Aucun mécanicien trouvé dans cette zone.',
         try_radius: 'Essayez d\'élargir le rayon de recherche.',
         results_found: '{count} mécanicien(s) trouvé(s)',
@@ -60,10 +65,11 @@
         km_away: '{distance}',
         you_are_here: 'Vous êtes ici',
         error_title: 'Erreur de localisation',
+        manual_search: 'Ou recherchez par ville :',
+        search_by_city: 'Rechercher',
     };
 
     function getText(key) {
-        // Cherche un élément data-i18n correspondant
         var el = document.querySelector('[data-i18n="' + key + '"]');
         if (el) return el.textContent.trim();
         return TEXTS[key] || key;
@@ -85,7 +91,6 @@
             scrollWheelZoom: true,
         });
 
-        // Tuile OpenStreetMap
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
             maxZoom: 19,
@@ -121,7 +126,6 @@
         if (markerLayer) markerLayer.clearLayers();
         markers = [];
 
-        // Marqueur utilisateur
         if (userPos) {
             userMarker = L.marker([userPos.lat, userPos.lng], {
                 icon: createUserIcon(),
@@ -130,7 +134,6 @@
             userMarker.addTo(markerLayer);
         }
 
-        // Marqueurs garages
         garages.forEach(function (garage, index) {
             if (!garage.latitude || !garage.longitude) return;
 
@@ -192,7 +195,6 @@
         emptyState.classList.add('hidden');
         resultsList.style.display = 'block';
 
-        // Badge nombre de résultats
         resultsBadge.textContent = garages.length;
         resultsBadge.style.display = 'inline-flex';
 
@@ -245,7 +247,6 @@
                     '</div>' +
                 '</div>';
 
-            // Interaction liste → carte
             card.addEventListener('click', function () {
                 focusMarker(index);
             });
@@ -263,18 +264,15 @@
     function focusMarker(index) {
         if (!markers[index] || !map) return;
 
-        // Désactiver l'ancien highlight
         var prevActive = resultsList.querySelector('.active');
         if (prevActive) prevActive.classList.remove('active');
 
-        // Activer le nouveau
         var card = resultsList.querySelector('[data-index="' + index + '"]');
         if (card) {
             card.classList.add('active');
             card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
-        // Centrer la carte et ouvrir le popup
         var marker = markers[index];
         map.setView(marker.getLatLng(), Math.max(map.getZoom(), 15));
         marker.openPopup();
@@ -316,10 +314,32 @@
         resultsContainer.style.display = '';
     }
 
+    function showAccuracyWarning(accuracy) {
+        // Afficher un avertissement si la précision est faible (basée sur IP)
+        var warningDiv = document.getElementById('accuracy-warning');
+        if (!warningDiv) {
+            warningDiv = document.createElement('div');
+            warningDiv.id = 'accuracy-warning';
+            warningDiv.className = 'mt-3 bg-warning-50 border border-warning-500/30 rounded-lg p-3 text-sm text-warning-700 flex items-center gap-2';
+            var searchControls = document.getElementById('search-controls');
+            if (searchControls) {
+                searchControls.appendChild(warningDiv);
+            }
+        }
+        var accuracyMeters = Math.round(accuracy);
+        warningDiv.innerHTML =
+            '<svg class="w-5 h-5 flex-shrink-0 text-warning-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>' +
+            '<div>' +
+                '<span class="font-bold">' + getText('low_accuracy') + '</span>' +
+                '<span class="block text-xs mt-0.5 opacity-75">Précision : ~' + accuracyMeters + ' m (position estimée par le réseau)</span>' +
+            '</div>';
+        warningDiv.style.display = 'flex';
+    }
+
     // ==========================================
-    // Géolocalisation
+    // Géolocalisation — FORCER GPS RÉEL
     // ==========================================
-    function getUserPosition() {
+    function requestGPSPosition(options) {
         return new Promise(function (resolve, reject) {
             if (!navigator.geolocation) {
                 reject({ code: 0, message: getText('geolocation_not_supported') });
@@ -338,12 +358,42 @@
                 function (err) {
                     reject(err);
                 },
-                {
-                    enableHighAccuracy: true,
-                    timeout: 15000,
-                    maximumAge: 300000,
-                }
+                options
             );
+        });
+    }
+
+    function getUserPosition() {
+        // Tentative 1 : GPS haute précision, pas de cache
+        return requestGPSPosition({
+            enableHighAccuracy: true,   // Forcer GPS matériel
+            timeout: 15000,             // 15 secondes max
+            maximumAge: 0,              // Pas de position en cache → toujours fraîche
+        }).then(function (pos) {
+            // Vérifier la précision
+            if (pos.accuracy > GPS_ACCURACY_THRESHOLD_METERS) {
+                // Position probablement basée sur IP, retry avec force
+                return requestGPSPosition({
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0,
+                }).catch(function () {
+                    // Si le 2e échoue, accepter la 1re position avec warning
+                    showAccuracyWarning(pos.accuracy);
+                    return pos;
+                });
+            }
+            return pos;
+        }).catch(function (err) {
+            // Tentative 2 : forcer encore une fois
+            return requestGPSPosition({
+                enableHighAccuracy: true,
+                timeout: 20000,
+                maximumAge: 0,
+            }).catch(function () {
+                // Tout a échoué, propager l'erreur initiale
+                throw err;
+            });
         });
     }
 
@@ -353,19 +403,15 @@
         var showRetry = true;
 
         if (err.code === 0) {
-            // Geolocation not supported
             message = getText('geolocation_not_supported');
             showRetry = false;
         } else if (err.code === 1) {
-            // Permission denied
             message = getText('permission_denied');
             showRetry = false;
         } else if (err.code === 2) {
-            // Position unavailable
-            message = getText('position_unavailable');
+            message = getText('position_unavailable') + ' ' + getText('retry_with_gps');
         } else if (err.code === 3) {
-            // Timeout
-            message = getText('timeout');
+            message = getText('timeout') + ' ' + getText('retry_with_gps');
         } else {
             message = err.message || getText('generic_error');
         }
@@ -421,7 +467,6 @@
             fitMapBounds(position, data.results);
             renderResults(data.results);
 
-            // Mettre à jour le compteur
             resultsCount.textContent = data.total + ' résultat' + (data.total > 1 ? 's' : '');
         })
         .catch(function (error) {
@@ -457,21 +502,18 @@
             });
     });
 
-    // Changer le rayon déclenche une nouvelle recherche
     radiusSelect.addEventListener('change', function () {
         if (currentUserPosition) {
             searchNearby(currentUserPosition);
         }
     });
 
-    // Changer le filtre disponibilité
     availableFilter.addEventListener('change', function () {
         if (currentUserPosition) {
             searchNearby(currentUserPosition);
         }
     });
 
-    // Bouton réessayer
     retryBtn.addEventListener('click', function () {
         hideError();
         findBtn.click();

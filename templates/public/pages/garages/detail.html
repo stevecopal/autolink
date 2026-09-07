@@ -1,10 +1,18 @@
 {% extends 'public/base.html' %}
-{% load i18n static %}
+{% load humanize i18n static %}
 
 {% block title %}{{ garage.name }} - AutoLink{% endblock %}
 
 {% block content %}
-<div class="container-lg">
+<div class="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+    <nav class="flex items-center gap-2 text-sm text-auto-600 mb-6" aria-label="{% trans 'Fil d ariane' %}">
+        <a href="{% url 'core:home' %}" class="hover:text-auto-orange transition">{% trans "Accueil" %}</a>
+        <span aria-hidden="true">/</span>
+        <a href="{% url 'garages:garage_list' %}" class="hover:text-auto-orange transition">{% trans "Garages" %}</a>
+        <span aria-hidden="true">/</span>
+        <span class="text-auto-dark font-bold truncate">{{ garage.name }}</span>
+    </nav>
+
     {% include "public/pages/garages/partials/garage_detail_content.html" %}
 </div>
 {% endblock %}

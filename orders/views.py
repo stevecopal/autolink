@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -13,9 +15,9 @@ from catalog.models import Part
 @login_required
 def cart_view(request):
     cart, _created = Cart.objects.get_or_create(user=request.user)
-    items = cart.items.select_related('part', 'part__garage')
+    items = cart.items.select_related('part', 'part__garage', 'part__category')
     subtotal = cart.total
-    service_fee = float(subtotal * 0.05)
+    service_fee = int(subtotal * Decimal('0.05'))
     total = subtotal + service_fee
     return render(request, 'dashboard/pages/client/cart.html', {
         'cart': cart,
@@ -32,18 +34,28 @@ def cart_add_view(request, part_id):
     cart, _created = Cart.objects.get_or_create(user=request.user)
 
     if not part.is_available:
-        messages.error(request, _('This part is not available.'))
+        messages.error(request, _('Cette pièce n\'est pas disponible.'))
         return redirect('catalog:part_detail', slug=part.slug)
+
+    # Get quantity from form (detail page) or default to 1
+    try:
+        quantity = int(request.POST.get('quantity', 1))
+    except (ValueError, TypeError):
+        quantity = 1
+    quantity = max(1, min(quantity, part.stock))
 
     item, created = CartItem.objects.get_or_create(cart=cart, part=part)
     if not created:
-        if item.quantity < part.stock:
-            item.quantity += 1
+        new_qty = item.quantity + quantity
+        if new_qty <= part.stock:
+            item.quantity = new_qty
             item.save()
         else:
-            messages.warning(request, _('Maximum stock reached for this part.'))
+            messages.warning(request, _('Stock maximum atteint pour cette pièce.'))
     else:
-        messages.success(request, _('%(name)s added to cart.') % {'name': part.name})
+        item.quantity = quantity
+        item.save()
+        messages.success(request, _('%(name)s ajouté au panier.') % {'name': part.name})
     return redirect('orders:cart')
 
 
@@ -82,7 +94,7 @@ def checkout_view(request):
     items = cart.items.select_related('part', 'part__garage')
     vehicles = request.user.vehicles.all()
     subtotal = cart.total
-    service_fee = int(subtotal * 0.05)
+    service_fee = int(subtotal * Decimal('0.05'))
     total = subtotal + service_fee
 
     if request.method == 'POST':
