@@ -79,15 +79,15 @@
         <article class="card group" role="listitem">
             <a href="{% url 'garages:garage_detail' slug=garage.slug %}" class="block">
                 <div class="relative aspect-video overflow-hidden rounded-t-xl bg-auto-100">
-                    {% if garage.cover_photo %}
-                    <img src="{{ garage.cover_photo.url }}" alt="{{ garage.name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy">
-                    {% elif garage.logo %}
-                    <img src="{{ garage.logo.url }}" alt="{{ garage.name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy">
+                    {% if garage.photo %}
+                    <img src="{{ garage.photo.url }}" alt="{{ garage.name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy">
+                    {% elif garage.photo %}
+                    <img src="{{ garage.photo.url }}" alt="{{ garage.name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy">
                     {% else %}
                     <div class="w-full h-full flex items-center justify-center text-4xl text-auto-300">🔧</div>
                     {% endif %}
                     <div class="absolute top-2 left-2 flex gap-1">
-                        {% if garage.verification_status == 'VERIFIED' %}
+                        {% if garage.verification_status == 'APPROVED' %}
                         <span class="badge-success text-[10px] px-2 py-1">{% trans "Vérifié" %}</span>
                         {% endif %}
                         {% if garage.is_featured %}
@@ -97,8 +97,6 @@
                     <div class="absolute bottom-2 left-2">
                         {% if garage.availability_status == 'AVAILABLE' %}
                         <span class="badge-success text-[10px] px-2 py-1">{% trans "Disponible" %}</span>
-                        {% elif garage.availability_status == 'BUSY' %}
-                        <span class="badge-warning text-[10px] px-2 py-1">{% trans "Occupé" %}</span>
                         {% else %}
                         <span class="badge-neutral text-[10px] px-2 py-1">{% trans "Fermé" %}</span>
                         {% endif %}
@@ -116,10 +114,10 @@
                 </a>
                 <p class="text-auto-500 text-xs mt-0.5 truncate flex items-center gap-1">
                     <span>📍</span>
-                    <span>{{ garage.neighborhood|default:garage.city }}</span>
+                    <span>{{ garage.neighborhood.name|default:garage.city.name }}</span>
                     {% if garage.city and garage.neighborhood %}
                     <span class="text-auto-400">·</span>
-                    <span>{{ garage.city }}</span>
+                    <span>{{ garage.city.name }}</span>
                     {% endif %}
                 </p>
                 <div class="flex items-center gap-1.5 mt-1">

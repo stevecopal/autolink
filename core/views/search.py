@@ -20,7 +20,7 @@ def home_view(request: HttpRequest) -> HttpResponse:
     """Cached homepage view."""
     garages = Garage.objects.filter(
         is_active=True,
-        verification_status="VERIFIED",
+        verification_status="APPROVED",
     ).select_related("owner").prefetch_related("services").only(
         "id",
         "name",

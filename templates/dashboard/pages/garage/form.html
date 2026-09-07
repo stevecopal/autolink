@@ -1,28 +1,208 @@
 {% extends 'dashboard/base.html' %}
 {% load i18n %}
 
-{% block title %}{% trans "Register my garage" %}{% endblock %}
+{% block title %}{% trans "Ajouter un garage" %}{% endblock %}
 
 {% block content %}
 <div class="max-w-2xl mx-auto px-4 py-8">
-    <h1 class="text-2xl md:text-3xl font-bold text-auto-dark mb-6">{% trans "Register my garage" %}</h1>
+    <h1 class="text-2xl md:text-3xl font-bold text-auto-dark mb-6">{% trans "Ajouter un garage" %}</h1>
+
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+        <p class="text-sm text-blue-800">
+            <strong>{% trans "Important" %} :</strong>
+            {% trans "Pour enregistrer correctement votre garage, vous devez être physiquement présent sur son emplacement. AutoLink utilisera la position actuelle de votre appareil afin d'enregistrer automatiquement les coordonnées du garage." %}
+        </p>
+    </div>
+
     <div class="card p-6">
-        <form method="post" class="space-y-4">
+        <form method="post" enctype="multipart/form-data" class="space-y-4" id="garage-form">
             {% csrf_token %}
 
-            {% for field in form %}
-            <div>
-                <label class="form-label">{{ field.label }}</label>
-                {{ field }}
-                {% if field.errors %}
-                <p class="form-error">{{ field.errors.0 }}</p>
-                {% endif %}
+            {% if form.non_field_errors %}
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                {% for error in form.non_field_errors %}
+                <p class="text-sm text-red-600">{{ error }}</p>
+                {% endfor %}
             </div>
-            {% endfor %}
+            {% endif %}
 
-            <p class="text-sm text-auto-600">{% trans "Your garage will be verified by our team before publication." %}</p>
-            <button type="submit" class="btn-primary w-full">{% trans "Submit for verification" %}</button>
+            <div class="border-b border-auto-100 pb-4 mb-4">
+                <h2 class="text-lg font-bold text-auto-dark mb-3">{% trans "Identité du garage" %}</h2>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="form-label">{% trans "Nom du garage" %} *</label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                        <p class="form-error">{{ form.name.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label class="form-label">{% trans "Description" %}</label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                        <p class="form-error">{{ form.description.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label class="form-label">{% trans "Photo du garage" %} *</label>
+                        <p class="text-xs text-auto-500 mb-2">{% trans "Photo réelle du garage. Formats : JPG, PNG, WebP. Max 5 Mo." %}</p>
+                        {{ form.photo }}
+                        {% if form.photo.errors %}
+                        <p class="form-error">{{ form.photo.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-b border-auto-100 pb-4 mb-4">
+                <h2 class="text-lg font-bold text-auto-dark mb-3">{% trans "Contact" %}</h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="form-label">{% trans "Téléphone" %} *</label>
+                        {{ form.phone }}
+                        {% if form.phone.errors %}
+                        <p class="form-error">{{ form.phone.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label class="form-label">{% trans "WhatsApp" %}</label>
+                        {{ form.whatsapp }}
+                        {% if form.whatsapp.errors %}
+                        <p class="form-error">{{ form.whatsapp.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="mt-4">
+                    <label class="form-label">{% trans "Email" %}</label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                    <p class="form-error">{{ form.email.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="border-b border-auto-100 pb-4 mb-4">
+                <h2 class="text-lg font-bold text-auto-dark mb-3">{% trans "Localisation administrative" %}</h2>
+
+                <div>
+                    <label class="form-label">{% trans "Adresse" %} *</label>
+                    {{ form.address }}
+                    {% if form.address.errors %}
+                    <p class="form-error">{{ form.address.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                    <div>
+                        <label class="form-label">{% trans "Ville" %} *</label>
+                        {{ form.city }}
+                        {% if form.city.errors %}
+                        <p class="form-error">{{ form.city.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label class="form-label">{% trans "Quartier" %} *</label>
+                        {{ form.neighborhood }}
+                        {% if form.neighborhood.errors %}
+                        <p class="form-error">{{ form.neighborhood.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="border-b border-auto-100 pb-4 mb-4">
+                <h2 class="text-lg font-bold text-auto-dark mb-3">{% trans "Justificatif" %}</h2>
+
+                <div>
+                    <label class="form-label">{% trans "Type de document" %}</label>
+                    {{ doc_form.document_type }}
+                    {% if doc_form.document_type.errors %}
+                    <p class="form-error">{{ doc_form.document_type.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="mt-4">
+                    <label class="form-label">{% trans "Document justificatif" %}</label>
+                    <p class="text-xs text-auto-500 mb-2">{% trans "PDF ou Word, max 5 Mo." %}</p>
+                    {{ doc_form.document }}
+                    {% if doc_form.document.errors %}
+                    <p class="form-error">{{ doc_form.document.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="pb-4 mb-4">
+                <h2 class="text-lg font-bold text-auto-dark mb-3">{% trans "Position GPS" %}</h2>
+
+                <div id="location-status" class="text-sm text-auto-500 mb-2">
+                    {% trans "Position non encore capturée." %}
+                </div>
+
+                <button type="button" id="get-location-btn" class="btn-primary w-full">
+                    <svg class="w-5 h-5 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                    {% trans "Obtenir ma position" %}
+                </button>
+
+                <div id="location-info"></div>
+                <div id="location-map" style="display:none;" class="mt-4"></div>
+
+                <div id="location-confirm" style="display:none;" class="mt-4">
+                    <p class="text-sm text-green-700 font-medium">
+                        {% trans "Confirmez que vous êtes bien sur le lieu du garage." %}
+                    </p>
+                </div>
+
+                {{ form.latitude }}
+                {{ form.longitude }}
+                {{ form.gps_accuracy }}
+            </div>
+
+            <button type="submit" class="btn-primary w-full">
+                {% trans "Soumettre pour vérification" %}
+            </button>
         </form>
     </div>
 </div>
+
+<script>
+(function() {
+    var citySelect = document.getElementById('id_city');
+    var neighborhoodSelect = document.getElementById('id_neighborhood');
+
+    if (citySelect) {
+        citySelect.addEventListener('change', function() {
+            var cityId = this.value;
+            if (!cityId) {
+                neighborhoodSelect.innerHTML = '<option value="">{% trans "Sélectionnez un quartier" %}</option>';
+                return;
+            }
+
+            fetch('/api/neighborhoods/' + cityId + '/')
+                .then(function(response) { return response.json(); })
+                .then(function(data) {
+                    neighborhoodSelect.innerHTML = '<option value="">{% trans "Sélectionnez un quartier" %}</option>';
+                    data.forEach(function(n) {
+                        var opt = document.createElement('option');
+                        opt.value = n.slug;
+                        opt.textContent = n.name;
+                        neighborhoodSelect.appendChild(opt);
+                    });
+                })
+                .catch(function() {});
+        });
+    }
+})();
+</script>
 {% endblock %}

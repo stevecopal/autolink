@@ -38,7 +38,7 @@
             </div>
             <div class="flex-1">
                 <h2 class="text-2xl font-bold text-auto-dark">{{ user.display_name }}</h2>
-                <p class="text-sm text-auto-600 mb-3">{{ user.email|default:""—"" }}</p>
+                <p class="text-sm text-auto-600 mb-3">{{ user.email|default:"" }}</p>
                 <div class="flex items-center gap-2">
                     <span class="badge-{{ user.role|lower }} text-[10px]">{{ user.role|title }}</span>
                     {% if user.is_active %}
@@ -58,37 +58,37 @@
             <div class="grid grid-cols-2 gap-4 text-sm">
                 <div>
                     <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Nom" %}</p>
-                    <p class="font-bold text-auto-dark">{{ user.last_name|default:""—"" }}</p>
+                    <p class="font-bold text-auto-dark">{{ user.last_name|default:"" }}</p>
                 </div>
                 <div>
                     <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Prénom" %}</p>
-                    <p class="font-bold text-auto-dark">{{ user.first_name|default:""—"" }}</p>
+                    <p class="font-bold text-auto-dark">{{ user.first_name|default:"" }}</p>
                 </div>
                 <div>
                     <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Email" %}</p>
                     <a href="mailto:{{ user.email }}"
-                       class="font-bold text-auto-orange hover:underline">{{ user.email|default:""—"" }}</a>
+                       class="font-bold text-auto-orange hover:underline">{{ user.email|default:"" }}</a>
                 </div>
                 <div>
                     <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Téléphone" %}</p>
-                    <p class="font-bold text-auto-dark">{{ user.phone|default:""—"" }}</p>
+                    <p class="font-bold text-auto-dark">{{ user.phone|default:"" }}</p>
                 </div>
                 <div>
                     <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Ville" %}</p>
-                    <p class="font-bold text-auto-dark">{{ user.city|default:""—"" }}</p>
+                    <p class="font-bold text-auto-dark">{{ user.city|default:"" }}</p>
                 </div>
                 <div>
                     <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Quartier" %}</p>
-                    <p class="font-bold text-auto-dark">{{ user.neighborhood|default:""—"" }}</p>
+                    <p class="font-bold text-auto-dark">{{ user.neighborhood|default:"" }}</p>
                 </div>
                 {% if user.company %}
                 <div>
                     <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Entreprise" %}</p>
-                    <p class="font-bold text-auto-dark">{{ user.company|default:""—"" }}</p>
+                    <p class="font-bold text-auto-dark">{{ user.company|default:"" }}</p>
                 </div>
                 <div>
                     <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Poste" %}</p>
-                    <p class="font-bold text-auto-dark">{{ user.job_title|default:""—"" }}</p>
+                    <p class="font-bold text-auto-dark">{{ user.job_title|default:"" }}</p>
                 </div>
                 {% endif %}
             </div>

@@ -93,8 +93,8 @@
                 <div class="mt-3 p-4 rounded-xl bg-auto-50 border border-auto-100">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 rounded-xl bg-auto-orange/10 flex items-center justify-center flex-shrink-0">
-                            {% if ticket.garage.logo %}
-                            <img src="{{ ticket.garage.logo.url }}" class="w-full h-full object-cover rounded-xl">
+                            {% if ticket.garage.photo %}
+                            <img src="{{ ticket.garage.photo.url }}" class="w-full h-full object-cover rounded-xl">
                             {% else %}
                             <span class="text-xl">🔧</span>
                             {% endif %}

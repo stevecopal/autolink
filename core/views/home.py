@@ -9,6 +9,7 @@ from django.http import HttpRequest, HttpResponse
 
 from garages.models import Garage
 from catalog.models import Part, Category
+from core.models import City
 
 
 CACHE_KEY_HOME = "home_page_data"
@@ -23,14 +24,14 @@ def home_view(request: HttpRequest) -> HttpResponse:
 
     garages = Garage.objects.filter(
         is_active=True,
-        verification_status="VERIFIED",
-    ).select_related("owner").prefetch_related("services").only(
+        verification_status=Garage.VerificationStatus.APPROVED,
+    ).select_related("owner", "city", "neighborhood").prefetch_related("services").only(
         "id",
         "name",
         "slug",
-        "logo",
-        "city",
-        "neighborhood",
+        "photo",
+        "city_id",
+        "neighborhood_id",
         "trust_score",
         "total_reviews",
         "verification_status",
@@ -58,11 +59,10 @@ def home_view(request: HttpRequest) -> HttpResponse:
         "id", "name", "slug", "icon"
     )[:12]
 
-    cities = list(
-        Garage.objects.filter(
-            is_active=True
-        ).order_by("city").values_list("city", flat=True).distinct()[:10]
-    )
+    cities = City.objects.filter(
+        is_active=True, garages__is_active=True,
+        garages__verification_status=Garage.VerificationStatus.APPROVED,
+    ).distinct().order_by("name")[:10]
 
     context = {
         "garages": garages,

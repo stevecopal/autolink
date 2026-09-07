@@ -217,8 +217,8 @@
             card.innerHTML =
                 '<div class="flex items-start gap-3">' +
                     '<div class="w-14 h-14 rounded-xl bg-auto-100 flex items-center justify-center text-2xl flex-shrink-0 overflow-hidden">' +
-                        (garage.logo_url
-                            ? '<img src="' + garage.logo_url + '" alt="" class="w-full h-full object-cover">'
+                        (garage.photo_url
+                            ? '<img src="' + garage.photo_url + '" alt="" class="w-full h-full object-cover">'
                             : '🔧') +
                     '</div>' +
                     '<div class="flex-1 min-w-0">' +

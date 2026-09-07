@@ -82,8 +82,8 @@
                             <img src="{{ item.part.image.url }}"
                                  class="w-12 h-12 rounded-xl object-cover"
                                  alt="{{ item.part.name }}">
-                        {% elif item.part and item.part.garage and item.part.garage.logo %}
-                            <img src="{{ item.part.garage.logo.url }}"
+                        {% elif item.part and item.part.garage and item.part.garage.photo %}
+                            <img src="{{ item.part.garage.photo.url }}"
                                  class="w-12 h-12 rounded-xl object-cover"
                                  alt="{{ item.part.garage.name }}">
                         {% else %}

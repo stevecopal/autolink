@@ -29,8 +29,8 @@
             <div class="flex items-center gap-4">
                 {% if product.photo %}
                 <img src="{{ product.photo.url }}" class="w-16 h-16 rounded-xl object-cover" alt="{{ product.name }}">
-                {% elif product.garage.logo %}
-                <img src="{{ product.garage.logo.url }}" class="w-16 h-16 rounded-xl object-cover" alt="{{ product.garage.name }}">
+                {% elif product.garage.photo %}
+                <img src="{{ product.garage.photo.url }}" class="w-16 h-16 rounded-xl object-cover" alt="{{ product.garage.name }}">
                 {% else %}
                 <div class="w-16 h-16 rounded-xl bg-auto-orange/10 flex items-center justify-center text-3xl">🔩</div>
                 {% endif %}

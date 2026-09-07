@@ -131,14 +131,14 @@
             <div class="border-t border-auto-100 pt-4">
                 <h3 class="font-bold text-auto-dark mb-3">{% trans "Vendu par" %}</h3>
                 <div class="flex items-center gap-4 p-4 bg-auto-50 rounded-xl">
-                    {% if part.garage.logo %}
-                    <img src="{{ part.garage.logo.url }}" alt="" class="w-14 h-14 rounded-xl object-cover border border-auto-200 flex-shrink-0">
+                    {% if part.garage.photo %}
+                    <img src="{{ part.garage.photo.url }}" alt="" class="w-14 h-14 rounded-xl object-cover border border-auto-200 flex-shrink-0">
                     {% else %}
                     <div class="w-14 h-14 rounded-xl bg-auto-orange/10 flex items-center justify-center text-2xl flex-shrink-0">🏢</div>
                     {% endif %}
                     <div class="flex-1 min-w-0">
                         <h4 class="font-bold text-auto-dark truncate">{{ part.garage.name }}</h4>
-                        <p class="text-auto-500 text-xs mt-0.5">📍 {{ part.garage.neighborhood|default:part.garage.city }}</p>
+                        <p class="text-auto-500 text-xs mt-0.5">📍 {{ part.garage.neighborhood.name|default:part.garage.city.name }}</p>
                         <div class="flex items-center gap-2 mt-1">
                             <span class="text-auto-gold text-xs">⭐ {{ part.garage.trust_score }}</span>
                             <span class="text-auto-400 text-xs">({{ part.garage.total_reviews }} {% trans "avis" %})</span>

@@ -31,12 +31,12 @@
             <div class="card p-6">
                 <div class="flex items-start justify-between mb-4">
                     <div class="flex items-center gap-3">
-                        {% if review.garage.cover_photo %}
-                        <img src="{{ review.garage.cover_photo.url }}"
+                        {% if review.garage.photo %}
+                        <img src="{{ review.garage.photo.url }}"
                              class="w-16 h-16 rounded-xl object-cover"
                              alt="{{ review.garage.name }}">
-                        {% elif review.garage.logo %}
-                        <img src="{{ review.garage.logo.url }}"
+                        {% elif review.garage.photo %}
+                        <img src="{{ review.garage.photo.url }}"
                              class="w-16 h-16 rounded-xl object-cover"
                              alt="{{ review.garage.name }}">
                         {% else %}
@@ -47,7 +47,7 @@
                                class="font-bold text-base text-auto-dark hover:text-auto-orange transition">
                                 {{ review.garage.name }}
                             </a>
-                            <div class="text-xs text-auto-500">{{ review.garage.city }}</div>
+                            <div class="text-xs text-auto-500">{{ review.garage.city.name }}</div>
                         </div>
                     </div>
                     <div class="flex items-center gap-1">

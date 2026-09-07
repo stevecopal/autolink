@@ -29,7 +29,7 @@ class RegisterView(View):
         if form.is_valid():
             user = form.save()
             login(request, user)
-            messages.success(request, _('Welcome to AutoLink!'))
+            messages.success(request, _('Bienvenue sur AutoLink !'))
             return redirect(get_redirect_url_for_role(user))
         return render(request, 'public/pages/accounts/register.html', {'form': form})
 
@@ -46,14 +46,12 @@ class LoginView(View):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            messages.success(request, _('Welcome back, %(name)s!') % {'name': user.display_name})
-            
-            # Check for safe next parameter (GET or POST)
+            messages.success(request, _('Bienvenue, %(name)s !') % {'name': user.display_name})
+
             next_url = request.POST.get('next') or request.GET.get('next')
             if next_url and url_has_allowed_host_and_scheme(next_url, allowed_hosts=None):
                 return redirect(next_url)
-            
-            # Redirect based on role
+
             return redirect(get_redirect_url_for_role(user))
         return render(request, 'public/pages/accounts/login.html', {'form': form})
 
@@ -61,7 +59,7 @@ class LoginView(View):
 @login_required
 def logout_view(request):
     logout(request)
-    messages.info(request, _('You have been logged out.'))
+    messages.info(request, _('Vous avez été déconnecté.'))
     return redirect('core:home')
 
 
@@ -76,7 +74,7 @@ def profile_edit_view(request):
         form = UserProfileForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
             form.save()
-            messages.success(request, _('Profile updated successfully.'))
+            messages.success(request, _('Profil mis à jour avec succès.'))
             return redirect('accounts:profile')
     else:
         form = UserProfileForm(instance=request.user)
@@ -85,12 +83,15 @@ def profile_edit_view(request):
 
 @login_required
 def client_dashboard_view(request):
-    """Client dashboard - personal space."""
+    """Dashboard utilisateur — espace personnel."""
     from orders.models import Order, Cart
     from payments.models import Payment
     from vehicles.models import Vehicle
     from notifications.models import Notification
-    
+    from garages.models import Garage
+
+    user_garages = Garage.objects.filter(owner=request.user).select_related('city', 'neighborhood')
+
     context = {
         'recent_orders': Order.objects.filter(user=request.user).select_related('garage')[:5],
         'recent_payments': Payment.objects.filter(user=request.user).select_related('order')[:5],
@@ -98,5 +99,7 @@ def client_dashboard_view(request):
         'unread_notifications': Notification.objects.filter(user=request.user, is_read=False).count(),
         'total_orders': Order.objects.filter(user=request.user).count(),
         'total_payments': Payment.objects.filter(user=request.user).count(),
+        'user_garages': user_garages,
+        'has_approved_garage': user_garages.filter(verification_status='APPROVED').exists(),
     }
     return render(request, 'dashboard/pages/client/dashboard.html', context)

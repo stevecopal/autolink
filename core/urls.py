@@ -9,4 +9,5 @@ urlpatterns = [
     path('a-propos/', views.about_view, name='about'),
     path('contact/', views.contact_view, name='contact'),
     path('politique-et-regles/', views.policy_view, name='policy'),
+    path('api/neighborhoods/<int:city_id>/', views.neighborhoods_api, name='neighborhoods_api'),
 ]

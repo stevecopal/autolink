@@ -31,7 +31,7 @@ def admin_dashboard_view(request):
     # Core stats
     total_users = User.objects.count()
     total_garages = Garage.objects.count()
-    verified_garages = Garage.objects.filter(verification_status='VERIFIED').count()
+    verified_garages = Garage.objects.filter(verification_status='APPROVED').count()
     total_parts = Part.objects.filter(is_active=True).count()
     total_orders = Order.objects.count()
     total_payments = Payment.objects.filter(status='SUCCESS').count()
@@ -116,13 +116,13 @@ def admin_user_detail_view(request, user_id):
         if action == 'toggle_active':
             user_obj.is_active = not user_obj.is_active
             user_obj.save(update_fields=['is_active'])
-            messages.success(request, _('User status updated.'))
+            messages.success(request, _('Statut utilisateur mis à jour.'))
         elif action == 'change_role':
             new_role = request.POST.get('role')
-            if new_role in ['CLIENT', 'GARAGE', 'VENDEUR', 'ADMIN']:
+            if new_role in ['USER', 'CLIENT', 'ADMIN']:
                 user_obj.role = new_role
                 user_obj.save(update_fields=['role'])
-                messages.success(request, _('User role updated.'))
+                messages.success(request, _('Rôle utilisateur mis à jour.'))
         return redirect('administration:user_detail', user_id=user_obj.pk)
     
     context = {
@@ -163,24 +163,32 @@ def admin_garages_view(request):
 
 @user_passes_test(is_admin)
 def admin_garage_verify_view(request, garage_id):
-    """Admin - verify/reject garage."""
-    garage = get_object_or_404(Garage, pk=garage_id)
+    """Admin - verify/reject/suspend garage with role promotion logic."""
+    from garages.services import approve_garage, reject_garage, suspend_garage
+    garage = get_object_or_404(Garage.objects.select_related('owner'), pk=garage_id)
     
     if request.method == 'POST':
         action = request.POST.get('action')
+        
         if action == 'verify':
-            garage.verification_status = 'VERIFIED'
-            messages.success(request, _('Garage verified.'))
+            result = approve_garage(garage, admin_user=request.user)
+            messages.success(request, result['message'])
         elif action == 'reject':
-            garage.verification_status = 'REJECTED'
-            messages.info(request, _('Garage rejected.'))
+            reason = request.POST.get('rejection_reason', '').strip()
+            result = reject_garage(garage, reason=reason, admin_user=request.user)
+            messages.warning(request, result['message'])
         elif action == 'suspend':
-            garage.verification_status = 'SUSPENDED'
-            messages.warning(request, _('Garage suspended.'))
-        garage.save(update_fields=['verification_status'])
+            result = suspend_garage(garage, admin_user=request.user)
+            messages.warning(request, result['message'])
+        
         return redirect('administration:garages')
     
-    return render(request, 'dashboard/pages/admin/garages/verify.html', {'garage': garage})
+    verifications = garage.verifications.select_related('verified_by').order_by('-created_at')
+    
+    return render(request, 'dashboard/pages/admin/garages/verify.html', {
+        'garage': garage,
+        'verifications': verifications,
+    })
 
 
 @user_passes_test(is_admin)

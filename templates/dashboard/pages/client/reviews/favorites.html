@@ -28,9 +28,9 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {% for favorite in favorites %}
             <div class="card p-4 hover:shadow-lg transition-all duration-300 group">
-                {% if favorite.garage.cover_photo %}
+                {% if favorite.garage.photo %}
                 <div class="relative aspect-video rounded-xl overflow-hidden mb-3 bg-auto-100">
-                    <img src="{{ favorite.garage.cover_photo.url }}"
+                    <img src="{{ favorite.garage.photo.url }}"
                          alt="{{ favorite.garage.name }}"
                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                     <div class="absolute top-2 right-2">
@@ -47,9 +47,9 @@
                         <span class="badge-neutral text-[10px] px-2 py-1">⭐ {{ favorite.garage.trust_score }}</span>
                     </div>
                 </div>
-                {% elif favorite.garage.logo %}
+                {% elif favorite.garage.photo %}
                 <div class="relative aspect-video rounded-xl overflow-hidden mb-3 bg-auto-100">
-                    <img src="{{ favorite.garage.logo.url }}"
+                    <img src="{{ favorite.garage.photo.url }}"
                          alt="{{ favorite.garage.name }}"
                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                     <div class="absolute top-2 right-2">
@@ -78,8 +78,8 @@
                 {% endif %}
 
                 <div class="flex items-start gap-2">
-                    {% if favorite.garage.logo %}
-                    <img src="{{ favorite.garage.logo.url }}"
+                    {% if favorite.garage.photo %}
+                    <img src="{{ favorite.garage.photo.url }}"
                          class="w-8 h-8 rounded-lg object-cover flex-shrink-0"
                          alt="">
                     {% else %}
@@ -90,7 +90,7 @@
                            class="font-bold text-sm text-auto-dark hover:text-auto-orange transition block truncate">
                             {{ favorite.garage.name }}
                         </a>
-                        <div class="text-xs text-auto-500 truncate">{{ favorite.garage.city }}</div>
+                        <div class="text-xs text-auto-500 truncate">{{ favorite.garage.city.name }}</div>
                         <div class="text-xs text-auto-500">
                             {{ favorite.garage.services.count }} {% trans "services" %}
                         </div>

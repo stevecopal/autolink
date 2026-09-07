@@ -5,38 +5,66 @@ from django.utils.translation import gettext_lazy as _
 
 class Garage(models.Model):
     class VerificationStatus(models.TextChoices):
-        PENDING = 'PENDING', _('Pending')
-        VERIFIED = 'VERIFIED', _('Verified')
-        REJECTED = 'REJECTED', _('Rejected')
-        SUSPENDED = 'SUSPENDED', _('Suspended')
+        PENDING = 'PENDING', _('En attente')
+        APPROVED = 'APPROVED', _('Approuvé')
+        REJECTED = 'REJECTED', _('Rejeté')
+        SUSPENDED = 'SUSPENDED', _('Suspendu')
 
     class AvailabilityStatus(models.TextChoices):
-        AVAILABLE = 'AVAILABLE', _('Available')
-        BUSY = 'BUSY', _('Busy')
-        CLOSED = 'CLOSED', _('Closed')
-        TEMPORARY_CLOSED = 'TEMPORARY_CLOSED', _('Temporarily Closed')
+        AVAILABLE = 'AVAILABLE', _('Disponible')
+        UNAVAILABLE = 'UNAVAILABLE', _('Indisponible')
 
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='garages')
-    name = models.CharField(_('Name'), max_length=200)
+    name = models.CharField(_('Nom du garage'), max_length=200)
     slug = models.SlugField(unique=True)
     description = models.TextField(_('Description'), blank=True)
-    phone = models.CharField(_('Phone'), max_length=20)
+    phone = models.CharField(_('Téléphone'), max_length=20)
     whatsapp = models.CharField(_('WhatsApp'), max_length=20, blank=True)
     email = models.EmailField(_('Email'), blank=True)
 
-    address = models.TextField(_('Address'))
-    city = models.CharField(_('City'), max_length=100)
-    neighborhood = models.CharField(_('Neighborhood'), max_length=100, blank=True)
-    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
-    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    address = models.TextField(_('Adresse'))
+    city = models.ForeignKey(
+        'core.City', on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='garages', verbose_name=_('Ville')
+    )
+    neighborhood = models.ForeignKey(
+        'core.Neighborhood', on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='garages', verbose_name=_('Quartier')
+    )
+    latitude = models.DecimalField(
+        max_digits=9, decimal_places=6, null=True, blank=True,
+        verbose_name=_('Latitude')
+    )
+    longitude = models.DecimalField(
+        max_digits=9, decimal_places=6, null=True, blank=True,
+        verbose_name=_('Longitude')
+    )
+    gps_accuracy = models.DecimalField(
+        max_digits=8, decimal_places=2, null=True, blank=True,
+        verbose_name=_('Précision GPS (mètres)'),
+        help_text=_('Précision de la position en mètres lors de l\'enregistrement')
+    )
+    location_captured_at = models.DateTimeField(
+        null=True, blank=True,
+        verbose_name=_('Date de capture de la position')
+    )
 
-    logo = models.ImageField(upload_to='garages/logos/', blank=True, null=True)
-    cover_photo = models.ImageField(upload_to='garages/covers/', blank=True, null=True)
+    photo = models.ImageField(
+        upload_to='garages/main/',
+        verbose_name=_('Photo du garage'),
+        help_text=_('Photo réelle du garage (obligatoire)'),
+        blank=True,
+        null=True,
+    )
 
     verification_status = models.CharField(
         max_length=20,
         choices=VerificationStatus.choices,
         default=VerificationStatus.PENDING
+    )
+    rejection_reason = models.TextField(
+        _('Raison du rejet'), blank=True,
+        help_text=_('Raison du rejet du garage par l\'administrateur')
     )
     is_active = models.BooleanField(default=True)
     is_featured = models.BooleanField(default=False)
@@ -46,11 +74,11 @@ class Garage(models.Model):
         choices=AvailabilityStatus.choices,
         default=AvailabilityStatus.AVAILABLE
     )
-    availability_message = models.CharField(_('Availability message'), max_length=200, blank=True)
+    availability_message = models.CharField(_('Message de disponibilité'), max_length=200, blank=True)
 
-    opening_time = models.TimeField(_('Opening time'), null=True, blank=True)
-    closing_time = models.TimeField(_('Closing time'), null=True, blank=True)
-    open_weekends = models.BooleanField(_('Open weekends'), default=False)
+    opening_time = models.TimeField(_('Heure d\'ouverture'), null=True, blank=True)
+    closing_time = models.TimeField(_('Heure de fermeture'), null=True, blank=True)
+    open_weekends = models.BooleanField(_('Ouvert le week-end'), default=False)
 
     trust_score = models.DecimalField(max_digits=3, decimal_places=1, default=0)
     total_reviews = models.PositiveIntegerField(default=0)
@@ -64,6 +92,13 @@ class Garage(models.Model):
         ordering = ['-trust_score', '-created_at']
         verbose_name = _('Garage')
         verbose_name_plural = _('Garages')
+        indexes = [
+            models.Index(fields=['verification_status']),
+            models.Index(fields=['availability_status']),
+            models.Index(fields=['city']),
+            models.Index(fields=['neighborhood']),
+            models.Index(fields=['owner']),
+        ]
 
     def __str__(self):
         return self.name
@@ -84,6 +119,21 @@ class Garage(models.Model):
         if self.total_reviews > 0:
             return round(self.trust_score, 1)
         return 0
+
+    @property
+    def is_available_for_search(self):
+        """Visible dans la recherche uniquement si approuvé et disponible."""
+        return (
+            self.verification_status == self.VerificationStatus.APPROVED
+            and self.availability_status == self.AvailabilityStatus.AVAILABLE
+            and self.is_active
+        )
+
+    def save(self, *args, **kwargs):
+        from django.utils import timezone as tz
+        if self.latitude and self.longitude and not self.location_captured_at:
+            self.location_captured_at = tz.now()
+        super().save(*args, **kwargs)
 
 
 class GarageService(models.Model):
@@ -140,11 +190,16 @@ class GarageVerification(models.Model):
         BUSINESS_LICENSE = 'BUSINESS_LICENSE', _('Registre de commerce')
         TAX_CERTIFICATE = 'TAX_CERTIFICATE', _('Attestation fiscale')
         PROFESSIONAL_CARD = 'PROFESSIONAL_CARD', _('Carte professionnelle')
+        GARAGE_PROOF = 'GARAGE_PROOF', _('Justificatif du garage')
         OTHER = 'OTHER', _('Autre')
 
     garage = models.ForeignKey(Garage, on_delete=models.CASCADE, related_name='verifications')
     document_type = models.CharField(max_length=30, choices=DocumentType.choices)
-    document = models.FileField(upload_to='garages/verifications/')
+    document = models.FileField(
+        upload_to='garages/verifications/',
+        verbose_name=_('Document'),
+        help_text=_('PDF ou Word, max 5 Mo')
+    )
     is_verified = models.BooleanField(default=False)
     verified_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True
@@ -159,6 +214,15 @@ class GarageVerification(models.Model):
 
     def __str__(self):
         return f"{self.garage.name} - {self.get_document_type_display()}"
+
+    def clean(self):
+        from django.core.exceptions import ValidationError
+        if self.document:
+            ext = self.document.name.split('.')[-1].lower()
+            if ext not in ('pdf', 'doc', 'docx'):
+                raise ValidationError(_('Seuls les fichiers PDF et Word sont acceptés.'))
+            if self.document.size > 5 * 1024 * 1024:
+                raise ValidationError(_('La taille maximale est de 5 Mo.'))
 
 
 class GarageBrand(models.Model):

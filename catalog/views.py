@@ -150,7 +150,8 @@ def part_request_view(request):
 # ============ GARAGE MARKETPLACE VIEWS ============
 
 def is_garage_owner(user):
-    return user.is_authenticated and user.role in ['GARAGE', 'ADMIN']
+    from accounts.models import User
+    return user.is_authenticated and user.role in [User.Role.CLIENT, User.Role.ADMIN]
 
 
 @user_passes_test(is_garage_owner)

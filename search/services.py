@@ -144,19 +144,16 @@ def search_nearby_garages(
     # Construire la requête de base
     queryset = Garage.objects.filter(
         is_active=True,
-        verification_status=Garage.VerificationStatus.VERIFIED,
+        verification_status=Garage.VerificationStatus.APPROVED,
     ).exclude(
         latitude__isnull=True,
         longitude__isnull=True,
-    )
+    ).select_related('city', 'neighborhood')
 
     # Filtrer par disponibilité si demandé
     if availability_filter:
         queryset = queryset.filter(
-            availability_status__in=[
-                Garage.AvailabilityStatus.AVAILABLE,
-                Garage.AvailabilityStatus.BUSY,
-            ]
+            availability_status=Garage.AvailabilityStatus.AVAILABLE
         )
 
     # Calculer les distances et filtrer par rayon
@@ -181,8 +178,10 @@ def search_nearby_garages(
                 'name': garage.name,
                 'description': garage.description[:200] if garage.description else '',
                 'address': garage.address,
-                'city': garage.city,
-                'neighborhood': garage.neighborhood,
+                'city': garage.city.name if garage.city else '',
+                'city_slug': garage.city.slug if garage.city else '',
+                'neighborhood': garage.neighborhood.name if garage.neighborhood else '',
+                'neighborhood_slug': garage.neighborhood.slug if garage.neighborhood else '',
                 'latitude': float(garage.latitude),
                 'longitude': float(garage.longitude),
                 'distance_km': round(distance, 2),
@@ -197,8 +196,7 @@ def search_nearby_garages(
                 'total_reviews': garage.total_reviews,
                 'phone': garage.phone,
                 'whatsapp': garage.whatsapp,
-                'logo_url': garage.logo.url if garage.logo else None,
-                'cover_photo_url': garage.cover_photo.url if garage.cover_photo else None,
+                'photo_url': garage.photo.url if garage.photo else None,
                 'opening_time': garage.opening_time.strftime('%H:%M') if garage.opening_time else None,
                 'closing_time': garage.closing_time.strftime('%H:%M') if garage.closing_time else None,
                 'is_open_now': garage.is_open_now,

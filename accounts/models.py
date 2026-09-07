@@ -5,12 +5,11 @@ from django.utils.translation import gettext_lazy as _
 
 class User(AbstractUser):
     class Role(models.TextChoices):
+        USER = 'USER', _('Utilisateur')
         CLIENT = 'CLIENT', _('Client')
-        GARAGE = 'GARAGE', _('Garage')
-        VENDEUR = 'VENDEUR', _('Vendeur')
         ADMIN = 'ADMIN', _('Administrateur')
 
-    role = models.CharField(max_length=20, choices=Role.choices, default=Role.CLIENT)
+    role = models.CharField(max_length=20, choices=Role.choices, default=Role.USER)
     phone = models.CharField(_('Téléphone'), max_length=20, blank=True)
     phone_verified = models.BooleanField(default=False)
     email_verified = models.BooleanField(default=False)

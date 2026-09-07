@@ -14,6 +14,7 @@ from .services import (
     search_nearby_garages,
 )
 from garages.models import Garage
+from core.models import City, Neighborhood
 
 User = get_user_model()
 
@@ -152,10 +153,18 @@ class SearchNearbyGaragesTest(TestCase):
 
     def setUp(self):
         """Créer des données de test."""
+        self.city, _ = City.objects.get_or_create(slug='yaounde', defaults={'name': 'Yaoundé'})
+        self.neighborhood_bastos, _ = Neighborhood.objects.get_or_create(
+            city=self.city, slug='bastos', defaults={'name': 'Bastos'}
+        )
+        self.neighborhood_mimboman, _ = Neighborhood.objects.get_or_create(
+            city=self.city, slug='mimboman', defaults={'name': 'Mimboman'}
+        )
+
         self.user = User.objects.create_user(
             username='testgarage',
             password='testpass123',
-            role='GARAGE',
+            role='CLIENT',
         )
 
         # Garage à ~1 km (disponible)
@@ -165,11 +174,11 @@ class SearchNearbyGaragesTest(TestCase):
             slug='garage-proche-test',
             phone='+237600000001',
             address='Rue 1, Yaoundé',
-            city='Yaoundé',
-            neighborhood='Bastos',
+            city=self.city,
+            neighborhood=self.neighborhood_bastos,
             latitude=3.8570,
             longitude=11.5020,
-            verification_status=Garage.VerificationStatus.VERIFIED,
+            verification_status=Garage.VerificationStatus.APPROVED,
             is_active=True,
             availability_status=Garage.AvailabilityStatus.AVAILABLE,
         )
@@ -178,7 +187,7 @@ class SearchNearbyGaragesTest(TestCase):
         self.user2 = User.objects.create_user(
             username='testgarage2',
             password='testpass123',
-            role='GARAGE',
+            role='CLIENT',
         )
         self.garage_3km = Garage.objects.create(
             owner=self.user2,
@@ -186,11 +195,11 @@ class SearchNearbyGaragesTest(TestCase):
             slug='garage-moyen-test',
             phone='+237600000002',
             address='Rue 2, Yaoundé',
-            city='Yaoundé',
-            neighborhood='Bastos',
+            city=self.city,
+            neighborhood=self.neighborhood_bastos,
             latitude=3.8750,
             longitude=11.5020,
-            verification_status=Garage.VerificationStatus.VERIFIED,
+            verification_status=Garage.VerificationStatus.APPROVED,
             is_active=True,
             availability_status=Garage.AvailabilityStatus.AVAILABLE,
         )
@@ -199,7 +208,7 @@ class SearchNearbyGaragesTest(TestCase):
         self.user3 = User.objects.create_user(
             username='testgarage3',
             password='testpass123',
-            role='GARAGE',
+            role='CLIENT',
         )
         self.garage_10km = Garage.objects.create(
             owner=self.user3,
@@ -207,11 +216,11 @@ class SearchNearbyGaragesTest(TestCase):
             slug='garage-lointain-test',
             phone='+237600000003',
             address='Rue 3, Yaoundé',
-            city='Yaoundé',
-            neighborhood='Mimboman',
+            city=self.city,
+            neighborhood=self.neighborhood_mimboman,
             latitude=3.9400,
             longitude=11.5020,
-            verification_status=Garage.VerificationStatus.VERIFIED,
+            verification_status=Garage.VerificationStatus.APPROVED,
             is_active=True,
             availability_status=Garage.AvailabilityStatus.AVAILABLE,
         )
@@ -220,7 +229,7 @@ class SearchNearbyGaragesTest(TestCase):
         self.user4 = User.objects.create_user(
             username='testgarage4',
             password='testpass123',
-            role='GARAGE',
+            role='CLIENT',
         )
         self.garage_indisponible = Garage.objects.create(
             owner=self.user4,
@@ -228,20 +237,20 @@ class SearchNearbyGaragesTest(TestCase):
             slug='garage-ferme-test',
             phone='+237600000004',
             address='Rue 4, Yaoundé',
-            city='Yaoundé',
-            neighborhood='Bastos',
+            city=self.city,
+            neighborhood=self.neighborhood_bastos,
             latitude=3.8500,
             longitude=11.5020,
-            verification_status=Garage.VerificationStatus.VERIFIED,
+            verification_status=Garage.VerificationStatus.APPROVED,
             is_active=True,
-            availability_status=Garage.AvailabilityStatus.CLOSED,
+            availability_status=Garage.AvailabilityStatus.UNAVAILABLE,
         )
 
         # Garage non vérifié
         self.user5 = User.objects.create_user(
             username='testgarage5',
             password='testpass123',
-            role='GARAGE',
+            role='CLIENT',
         )
         self.garage_non_verifie = Garage.objects.create(
             owner=self.user5,
@@ -249,8 +258,8 @@ class SearchNearbyGaragesTest(TestCase):
             slug='garage-non-verifie-test',
             phone='+237600000005',
             address='Rue 5, Yaoundé',
-            city='Yaoundé',
-            neighborhood='Bastos',
+            city=self.city,
+            neighborhood=self.neighborhood_bastos,
             latitude=3.8490,
             longitude=11.5020,
             verification_status=Garage.VerificationStatus.PENDING,
@@ -280,7 +289,7 @@ class SearchNearbyGaragesTest(TestCase):
         """Les garages indisponibles ne doivent pas apparaître par défaut."""
         result = search_nearby_garages(3.8480, 11.5020, radius_km=5.0, availability_filter=True)
         for garage in result['results']:
-            self.assertIn(garage['availability_status'], ['AVAILABLE', 'BUSY'])
+            self.assertIn(garage['availability_status'], ['AVAILABLE'])
 
     def test_search_includes_unavailable_when_filter_off(self):
         """Sans filtre, tous les garages vérifiés actifs doivent apparaître."""
@@ -346,6 +355,10 @@ class NearbySearchAPITest(TestCase):
 
     def setUp(self):
         self.client = Client()
+        self.city, _ = City.objects.get_or_create(slug='yaounde', defaults={'name': 'Yaoundé'})
+        self.neighborhood_bastos, _ = Neighborhood.objects.get_or_create(
+            city=self.city, slug='bastos', defaults={'name': 'Bastos'}
+        )
         self.user = User.objects.create_user(
             username='testuser',
             password='testpass123',
@@ -354,7 +367,7 @@ class NearbySearchAPITest(TestCase):
         self.garage_user = User.objects.create_user(
             username='testgarageapi',
             password='testpass123',
-            role='GARAGE',
+            role='CLIENT',
         )
         self.garage = Garage.objects.create(
             owner=self.garage_user,
@@ -362,11 +375,11 @@ class NearbySearchAPITest(TestCase):
             slug='garage-api-test',
             phone='+237600000099',
             address='Rue API, Yaoundé',
-            city='Yaoundé',
-            neighborhood='Bastos',
+            city=self.city,
+            neighborhood=self.neighborhood_bastos,
             latitude=3.8570,
             longitude=11.5020,
-            verification_status=Garage.VerificationStatus.VERIFIED,
+            verification_status=Garage.VerificationStatus.APPROVED,
             is_active=True,
             availability_status=Garage.AvailabilityStatus.AVAILABLE,
         )

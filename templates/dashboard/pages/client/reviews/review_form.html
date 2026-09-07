@@ -35,12 +35,12 @@
     <!-- Garage info -->
     <div class="card p-6 mb-6">
         <div class="flex items-start gap-4">
-            {% if garage.cover_photo %}
-            <img src="{{ garage.cover_photo.url }}"
+            {% if garage.photo %}
+            <img src="{{ garage.photo.url }}"
                  class="w-24 h-24 rounded-xl object-cover"
                  alt="{{ garage.name }}">
-            {% elif garage.logo %}
-            <img src="{{ garage.logo.url }}"
+            {% elif garage.photo %}
+            <img src="{{ garage.photo.url }}"
                  class="w-24 h-24 rounded-xl object-cover"
                  alt="{{ garage.name }}">
             {% else %}
@@ -48,7 +48,7 @@
             {% endif %}
             <div>
                 <h2 class="text-xl font-bold text-auto-dark">{{ garage.name }}</h2>
-                <p class="text-sm text-auto-500">{{ garage.city }}</p>
+                <p class="text-sm text-auto-500">{{ garage.city.name }}</p>
                 <div class="flex items-center gap-1 mt-1">
                     {% for i in "12345" %}
                     <svg class="w-4 h-4 {% if i|add:0 <= garage.trust_score|floatformat:0 %}text-auto-gold{% else %}text-auto-300{% endif %}" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>

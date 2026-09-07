@@ -4,6 +4,7 @@ from accounts.models import User
 from vehicles.models import Brand, ModelVehicle, Vehicle
 from garages.models import Garage, GarageService
 from catalog.models import Category, Part, Compatibility
+from core.models import City, Neighborhood
 
 
 class Command(BaseCommand):
@@ -12,7 +13,36 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         self.stdout.write('Création des données de démonstration...')
 
-        # Create admin
+        cities_data = {
+            'Douala': ['Akwa', 'Bonapriso', 'Bonamoussadi', 'Bépanda', 'Deido', 'Logbessou', 'Kotto', 'Essos'],
+            'Yaoundé': ['Bastos', 'Mvan', 'Nsam', 'Essomba', 'Bastos', 'Nlongkak', 'Mokolo'],
+            'Bafoussam': ['Kamkop', 'Djeleng', 'Tyo-Ville', 'Marché A'],
+            'Bamenda': ['Commercial Avenue', 'Up Station', 'Mankon', 'Nkwen'],
+            'Garoua': ['Yelwa', 'Ketiao', 'Bouba Njida'],
+            'Maroua': ['Domayo', 'Fotokol', 'Digigué'],
+            'Kumba': ['Mbisin', 'Fiango', 'Kekpane'],
+            'Ngaoundéré': ['Plateau', 'WARDS', 'Boudour'],
+            'Bertoua': ['Centre', 'Baboua', 'Bélel'],
+            'Ebolowa': ['Centre', 'Mvog-Atangana', 'Biyang'],
+            'Kribi': ['Centre', 'Lobé', 'Ebodjé'],
+            'Limbe': ['Down Beach', 'Batoke', 'Mokundange'],
+            'Buéa': ['Molyko', 'Check Point', 'Bokwango'],
+        }
+
+        cities = {}
+        for city_name, neighborhoods in cities_data.items():
+            city, _ = City.objects.get_or_create(
+                slug=slugify(city_name),
+                defaults={'name': city_name}
+            )
+            cities[city_name] = city
+            for n_name in neighborhoods:
+                Neighborhood.objects.get_or_create(
+                    city=city,
+                    slug=slugify(n_name),
+                    defaults={'name': n_name}
+                )
+
         admin, _ = User.objects.get_or_create(
             username='admin',
             defaults={
@@ -28,7 +58,6 @@ class Command(BaseCommand):
         admin.set_password('admin123')
         admin.save()
 
-        # Create client
         client, _ = User.objects.get_or_create(
             username='client1',
             defaults={
@@ -44,23 +73,19 @@ class Command(BaseCommand):
         client.set_password('client123')
         client.save()
 
-        # Create garage owner
-        garage_owner, _ = User.objects.get_or_create(
-            username='garagiste1',
+        user, _ = User.objects.get_or_create(
+            username='user1',
             defaults={
-                'email': 'garage@example.com',
-                'first_name': 'Paul',
+                'email': 'user@example.com',
+                'first_name': 'Marie',
                 'last_name': 'Ngo',
-                'phone': '+237690000002',
-                'city': 'Douala',
-                'neighborhood': 'Bonapriso',
-                'role': 'GARAGE',
+                'phone': '+237690000003',
+                'role': 'USER',
             }
         )
-        garage_owner.set_password('garage123')
-        garage_owner.save()
+        user.set_password('user123')
+        user.save()
 
-        # Brands
         brands_data = ['Toyota', 'Hyundai', 'Honda', 'Mercedes-Benz', 'BMW', 'Renault', 'Peugeot', 'Ford', 'Nissan', 'Kia', 'Bosch', 'NGK', 'Gates', 'KYB', 'Denso']
         brands = {}
         for name in brands_data:
@@ -70,7 +95,6 @@ class Command(BaseCommand):
             )
             brands[name] = brand
 
-        # Models
         models_data = [
             ('Toyota', 'Corolla', 2015, 2023),
             ('Toyota', 'Yaris', 2010, 2023),
@@ -92,7 +116,6 @@ class Command(BaseCommand):
             )
             vehicle_models[(brand_name, model_name)] = mv
 
-        # Client vehicle
         Vehicle.objects.get_or_create(
             user=client,
             brand=brands['Toyota'],
@@ -107,7 +130,6 @@ class Command(BaseCommand):
             }
         )
 
-        # Categories
         categories_data = [
             ('Freinage', 'brakes', '🔧'),
             ('Moteur', 'engine', '⚙️'),
@@ -126,113 +148,77 @@ class Command(BaseCommand):
             )
             categories[slug] = cat
 
-        # Garage
+        douala = cities.get('Douala')
+        bonapriso = Neighborhood.objects.filter(city=douala, slug='bonapriso').first()
+
         garage, _ = Garage.objects.get_or_create(
             slug=slugify('garage-autoplus'),
             defaults={
-                'owner': garage_owner,
+                'owner': client,
                 'name': 'Garage AutoPlus',
                 'description': 'Spécialiste Toyota et Hyundai. Diagnostic professionnel, entretien et réparation.',
                 'phone': '+237690000010',
                 'whatsapp': '237690000010',
                 'address': 'Rue Joss, Bonapriso',
-                'city': 'Douala',
-                'neighborhood': 'Bonapriso',
+                'city': douala,
+                'neighborhood': bonapriso,
                 'latitude': 4.0185,
                 'longitude': 9.6935,
-                'verification_status': 'VERIFIED',
+                'verification_status': 'APPROVED',
                 'opening_time': '08:00',
                 'closing_time': '18:00',
                 'open_weekends': False,
                 'trust_score': 4.7,
                 'total_reviews': 42,
                 'total_orders': 156,
-                'total_clients': 89,
+                'is_active': True,
             }
         )
 
-        # Services
         services_data = [
-            ('Diagnostic moteur', 'DIAGNOSTIC', 5000, 15000),
-            ('Vidange complète', 'OIL_CHANGE', 15000, 35000),
-            ('Remplacement plaquettes', 'BRAKES', 10000, 25000),
-            ('Réparation climatisation', 'AIR_CONDITIONING', 20000, 80000),
-            ('Entretien périodique', 'MAINTENANCE', 25000, 60000),
+            ('Diagnostic électronique', 'DIAGNOSTIC', 'Analyse complète du véhicule', 5000, 15000, 60),
+            ('Vidange moteur', 'OIL_CHANGE', 'Vidange huile + filtre', 10000, 25000, 45),
+            ('Réparation freins', 'BRAKES', 'Plaquettes, disques, liquide', 15000, 80000, 120),
+            ('Entretien climatisation', 'AIR_CONDITIONING', 'Recharge, diagnostic, réparation', 10000, 50000, 90),
+            ('Pneumatique', 'TIRE', 'Montage, équilibrage, parallélisme', 5000, 30000, 30),
         ]
-        for name, cat, pmin, pmax in services_data:
+        for name, cat, desc, pmin, pmax, dur in services_data:
             GarageService.objects.get_or_create(
                 garage=garage,
                 name=name,
                 defaults={
                     'category': cat,
+                    'description': desc,
                     'price_min': pmin,
                     'price_max': pmax,
+                    'duration_minutes': dur,
                 }
             )
 
-        # Parts
         parts_data = [
-            ('Plaquettes de frein Bosch', categories['brakes'], brands['Bosch'], 25000, 8, '0986494387', 'Neuf'),
-            ('Disques de frein avant', categories['brakes'], brands['Bosch'], 45000, 4, '0986AB1185', 'Neuf'),
-            ('Filtre à huile Toyota', categories['oil'], brands['Toyota'], 8000, 25, '04152-31090', 'Neuf'),
-            ('Filtre à air Toyota', categories['engine'], brands['Toyota'], 12000, 15, '17801-21050', 'Neuf'),
-            ("Bougie d'allumage NGK", categories['electrical'], brands['NGK'], 5000, 30, 'BKR6E', 'Neuf'),
-            ('Amortisseur avant KYB', categories['suspension'], brands['KYB'], 35000, 6, '339012', 'Neuf'),
-            ('Courroie de distribution Gates', categories['engine'], brands['Gates'], 28000, 10, '94810-1210', 'Neuf'),
-            ('Compresseur climatisation', categories['ac'], brands['Denso'], 120000, 2, '447220-4370', 'Reconditionné'),
+            ('Plaquettes de frein avant', 'brakes', 'Bosch', 12000, 15, 'NEW'),
+            ('Filtre à huile', 'oil', 'Denso', 3500, 50, 'NEW'),
+            ('Ampoule H7', 'electrical', 'NGK', 2500, 30, 'NEW'),
+            ('Amortisseur avant', 'suspension', 'KYB', 35000, 8, 'NEW'),
+            ('Courroie trapézoïdale', 'engine', 'Gates', 8000, 20, 'NEW'),
+            ('Ventilateur climatisation', 'ac', 'Denso', 45000, 5, 'NEW'),
         ]
-
-        parts = {}
-        for name, cat, brand_obj, price, stock, ref, condition in parts_data:
-
-            part, _ = Part.objects.get_or_create(
+        for name, cat_slug, brand_name, price, stock, condition in parts_data:
+            Part.objects.get_or_create(
                 slug=slugify(name),
                 defaults={
-                    'seller': garage_owner,
-                    'category': cat,
+                    'seller': client,
+                    'category': categories[cat_slug],
+                    'brand': brands[brand_name],
+                    'garage': garage,
                     'name': name,
-                    'brand': brand_obj,
+                    'description': f'{name} de qualité professionnelle',
+                    'condition': condition,
                     'price': price,
                     'stock': stock,
-                    'reference_oem': ref,
-                    'condition': 'NEW' if condition == 'Neuf' else 'REFURBISHED',
-                    'garage': garage,
-                    'city': 'Douala',
-                    'neighborhood': 'Bonapriso',
+                    'stock_status': Part.StockStatus.IN_STOCK,
+                    'is_active': True,
                 }
             )
-            parts[name] = part
-            part.update_stock_status()
 
-        # Compatibilities for Toyota parts
-        toyota = brands['Toyota']
-        corolla = vehicle_models[('Toyota', 'Corolla')]
-        yaris = vehicle_models[('Toyota', 'Yaris')]
-
-        for part_name in ['Plaquettes de frein Bosch', 'Filtre à huile Toyota', 'Filtre à air Toyota']:
-            if part_name in parts:
-                Compatibility.objects.get_or_create(
-                    part=parts[part_name],
-                    brand=toyota,
-                    model_vehicle=corolla,
-                    defaults={
-                        'year_min': 2015,
-                        'year_max': 2023,
-                        'status': 'CONFIRMED',
-                    }
-                )
-                Compatibility.objects.get_or_create(
-                    part=parts[part_name],
-                    brand=toyota,
-                    model_vehicle=yaris,
-                    defaults={
-                        'year_min': 2010,
-                        'year_max': 2023,
-                        'status': 'CONFIRMED',
-                    }
-                )
-
-        self.stdout.write(self.style.SUCCESS('Données de démonstration créées avec succès!'))
-        self.stdout.write(f'Admin: admin / admin123')
-        self.stdout.write(f'Client: client1 / client123')
-        self.stdout.write(f'Garagiste: garagiste1 / garage123')
+        self.stdout.write(self.style.SUCCESS('Données de démonstration créées avec succès !'))

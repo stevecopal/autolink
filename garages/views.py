@@ -5,14 +5,16 @@ from django.db.models import Q, Count, Sum, F, FloatField, ExpressionWrapper, Pr
 from django.db.models.functions import Radians, Sin, Cos, ATan2, Sqrt
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET, require_POST
 from django.views.decorators.csrf import csrf_exempt
+from decimal import Decimal
 import json
 
-from .models import Garage, GarageService, GaragePhoto, GarageBrand
-from .forms import GarageForm
+from .models import Garage, GarageService, GaragePhoto, GarageBrand, GarageVerification
+from .forms import GarageForm, GarageDocumentForm
 
 
 def _haversine_distance(lat1, lon1, lat2, lon2):
@@ -34,8 +36,8 @@ def _get_base_garage_queryset():
     """Get base queryset with annotations to avoid N+1 queries."""
     return Garage.objects.filter(
         is_active=True,
-        verification_status=Garage.VerificationStatus.VERIFIED
-    ).select_related('owner').prefetch_related(
+        verification_status=Garage.VerificationStatus.APPROVED
+    ).select_related('owner', 'city', 'neighborhood').prefetch_related(
         Prefetch('services', queryset=GarageService.objects.filter(is_active=True).order_by('category', 'name')),
         Prefetch('photos', queryset=GaragePhoto.objects.order_by('-is_primary', '-created_at')),
         Prefetch('brands', queryset=GarageBrand.objects.select_related('brand').order_by('brand__name')),
@@ -60,9 +62,9 @@ def garage_list_view(request):
     page_size = int(request.GET.get('page_size', 12))
 
     if city:
-        garages = garages.filter(city__icontains=city)
+        garages = garages.filter(city__slug=city)
     if neighborhood:
-        garages = garages.filter(neighborhood__icontains=neighborhood)
+        garages = garages.filter(neighborhood__slug=neighborhood)
     if service_category:
         garages = garages.filter(services__category=service_category)
     if search:
@@ -71,7 +73,8 @@ def garage_list_view(request):
             Q(description__icontains=search) |
             Q(services__name__icontains=search) |
             Q(address__icontains=search) |
-            Q(neighborhood__icontains=search)
+            Q(neighborhood__name__icontains=search) |
+            Q(city__name__icontains=search)
         ).distinct()
     if available == '1':
         garages = garages.filter(availability_status='AVAILABLE')
@@ -108,13 +111,19 @@ def garage_list_view(request):
     if sort_field != 'distance':
         garages = garages.order_by(sort_field)
 
-    cities = Garage.objects.filter(
-        is_active=True
-    ).values_list('city', flat=True).distinct().order_by('city')
+    from core.models import City, Neighborhood
+    cities = City.objects.filter(
+        is_active=True, garages__is_active=True,
+        garages__verification_status=Garage.VerificationStatus.APPROVED
+    ).distinct().order_by('name')
 
-    neighborhoods = Garage.objects.filter(
-        is_active=True
-    ).values_list('neighborhood', flat=True).distinct().order_by('neighborhood')
+    neighborhoods = Neighborhood.objects.filter(
+        is_active=True, garages__is_active=True,
+        garages__verification_status=Garage.VerificationStatus.APPROVED
+    )
+    if city:
+        neighborhoods = neighborhoods.filter(city__slug=city)
+    neighborhoods = neighborhoods.distinct().order_by('name')
 
     paginator = Paginator(garages, page_size)
     page = request.GET.get('page', 1)
@@ -168,9 +177,9 @@ def garage_list_api(request):
     page = int(request.GET.get('page', 1))
 
     if city:
-        garages = garages.filter(city__icontains=city)
+        garages = garages.filter(city__slug=city)
     if neighborhood:
-        garages = garages.filter(neighborhood__icontains=neighborhood)
+        garages = garages.filter(neighborhood__slug=neighborhood)
     if service_category:
         garages = garages.filter(services__category=service_category)
     if search:
@@ -179,7 +188,8 @@ def garage_list_api(request):
             Q(description__icontains=search) |
             Q(services__name__icontains=search) |
             Q(address__icontains=search) |
-            Q(neighborhood__icontains=search)
+            Q(neighborhood__name__icontains=search) |
+            Q(city__name__icontains=search)
         ).distinct()
     if available == '1':
         garages = garages.filter(availability_status='AVAILABLE')
@@ -236,12 +246,13 @@ def garage_list_api(request):
             'whatsapp': garage.whatsapp,
             'email': garage.email,
             'address': garage.address,
-            'city': garage.city,
-            'neighborhood': garage.neighborhood,
+            'city': garage.city.name if garage.city else '',
+            'city_slug': garage.city.slug if garage.city else '',
+            'neighborhood': garage.neighborhood.name if garage.neighborhood else '',
+            'neighborhood_slug': garage.neighborhood.slug if garage.neighborhood else '',
             'latitude': float(garage.latitude) if garage.latitude else None,
             'longitude': float(garage.longitude) if garage.longitude else None,
-            'logo_url': garage.logo.url if garage.logo else None,
-            'cover_photo_url': garage.cover_photo.url if garage.cover_photo else None,
+            'photo_url': garage.photo.url if garage.photo else None,
             'primary_photo_url': primary_photo.image.url if primary_photo else None,
             'verification_status': garage.verification_status,
             'is_featured': garage.is_featured,
@@ -306,7 +317,7 @@ def garage_list_api(request):
 
 def garage_detail_view(request, slug):
     garage = get_object_or_404(
-        Garage.objects.select_related('owner').prefetch_related(
+        Garage.objects.select_related('owner', 'city', 'neighborhood').prefetch_related(
             Prefetch('services', queryset=GarageService.objects.filter(is_active=True).order_by('category', 'name')),
             Prefetch('photos', queryset=GaragePhoto.objects.order_by('-is_primary', '-created_at')),
             Prefetch('brands', queryset=GarageBrand.objects.select_related('brand').order_by('brand__name')),
@@ -393,12 +404,13 @@ def garage_detail_api(request, slug):
         'whatsapp': garage.whatsapp,
         'email': garage.email,
         'address': garage.address,
-        'city': garage.city,
-        'neighborhood': garage.neighborhood,
+        'city': garage.city.name if garage.city else '',
+        'city_slug': garage.city.slug if garage.city else '',
+        'neighborhood': garage.neighborhood.name if garage.neighborhood else '',
+        'neighborhood_slug': garage.neighborhood.slug if garage.neighborhood else '',
         'latitude': float(garage.latitude) if garage.latitude else None,
         'longitude': float(garage.longitude) if garage.longitude else None,
-        'logo_url': garage.logo.url if garage.logo else None,
-        'cover_photo_url': garage.cover_photo.url if garage.cover_photo else None,
+        'photo_url': garage.photo.url if garage.photo else None,
         'verification_status': garage.verification_status,
         'is_featured': garage.is_featured,
         'availability_status': garage.availability_status,
@@ -434,32 +446,80 @@ def garage_detail_api(request, slug):
     })
 
 
+GPS_ACCURACY_THRESHOLD = Decimal('50.0')
+
+
 @login_required
 def garage_create_view(request):
     if request.method == 'POST':
-        form = GarageForm(request.POST)
+        form = GarageForm(request.POST, request.FILES)
+        doc_form = GarageDocumentForm(request.POST, request.FILES)
+
         if form.is_valid():
+            latitude = form.cleaned_data.get('latitude')
+            longitude = form.cleaned_data.get('longitude')
+            accuracy = form.cleaned_data.get('gps_accuracy')
+
+            if not latitude or not longitude:
+                messages.error(request, _('La position GPS est obligatoire. Veuillez autoriser la géolocalisation.'))
+                return render(request, 'dashboard/pages/garage/form.html', {
+                    'form': form, 'doc_form': doc_form,
+                })
+
+            if accuracy and accuracy > GPS_ACCURACY_THRESHOLD:
+                messages.error(request, _(
+                    'Votre position n\'est pas suffisamment précise (%(accuracy).1f m). '
+                    'Veuillez vous rapprocher du garage et réessayer.'
+                ) % {'accuracy': accuracy})
+                return render(request, 'dashboard/pages/garage/form.html', {
+                    'form': form, 'doc_form': doc_form,
+                })
+
             garage = form.save(commit=False)
             garage.owner = request.user
-            garage.slug = slugify(garage.name)
-            base_slug = garage.slug
+            garage.latitude = latitude
+            garage.longitude = longitude
+            garage.gps_accuracy = accuracy
+            garage.location_captured_at = timezone.now()
+
+            base_slug = slugify(garage.name)
+            garage.slug = base_slug
             counter = 1
             while Garage.objects.filter(slug=garage.slug).exists():
                 garage.slug = f"{base_slug}-{counter}"
                 counter += 1
+
             garage.save()
-            messages.success(request, _('Garage created. It will be verified by our team.'))
+
+            if doc_form.is_valid():
+                GarageVerification.objects.create(
+                    garage=garage,
+                    document_type=doc_form.cleaned_data['document_type'],
+                    document=doc_form.cleaned_data['document'],
+                )
+
+            messages.success(request, _('Garage enregistré. Il sera vérifié par notre équipe.'))
             return redirect('garages:garage_detail', slug=garage.slug)
     else:
         form = GarageForm()
-    return render(request, 'dashboard/pages/garage/form.html', {'form': form})
+        doc_form = GarageDocumentForm()
+
+    return render(request, 'dashboard/pages/garage/form.html', {
+        'form': form, 'doc_form': doc_form,
+    })
 
 
-@user_passes_test(lambda u: u.is_authenticated and u.role in ['GARAGE', 'ADMIN'])
+@login_required
 def garage_dashboard_view(request):
-    garage = Garage.objects.filter(owner=request.user).first()
-    if not garage:
+    from accounts.models import User
+    if request.user.role not in [User.Role.CLIENT, User.Role.ADMIN]:
         return redirect('garages:garage_create')
+
+    garages = Garage.objects.filter(owner=request.user).select_related('city', 'neighborhood')
+    if not garages.exists():
+        return redirect('garages:garage_create')
+
+    garage = garages.first()
 
     from orders.models import Order
     from catalog.models import Part
@@ -481,6 +541,7 @@ def garage_dashboard_view(request):
 
     context = {
         'garage': garage,
+        'garages': garages,
         'orders': orders,
         'pending_orders': pending_orders,
         'products': products[:10],
@@ -493,17 +554,22 @@ def garage_dashboard_view(request):
     return render(request, 'dashboard/pages/garage/index.html', context)
 
 
-@user_passes_test(lambda u: u.is_authenticated and u.role in ['GARAGE', 'ADMIN'])
+@login_required
 def garage_availability_toggle(request):
     if request.method == 'POST':
+        from accounts.models import User
+        if request.user.role not in [User.Role.CLIENT, User.Role.ADMIN]:
+            messages.error(request, _('Accès non autorisé.'))
+            return redirect('core:home')
+
         garage = Garage.objects.filter(owner=request.user).first()
-        if garage:
+        if garage and garage.verification_status == Garage.VerificationStatus.APPROVED:
             status = request.POST.get('status', 'AVAILABLE')
             message = request.POST.get('message', '')
             garage.availability_status = status
             garage.availability_message = message
             garage.save(update_fields=['availability_status', 'availability_message'])
-            messages.success(request, _('Availability updated.'))
+            messages.success(request, _('Disponibilité mise à jour.'))
     return redirect('garages:garage_dashboard')
 
 
@@ -516,20 +582,30 @@ def garage_search_suggestions(request):
 
     garages = Garage.objects.filter(
         is_active=True,
-        verification_status=Garage.VerificationStatus.VERIFIED
+        verification_status=Garage.VerificationStatus.APPROVED
     ).filter(
         Q(name__icontains=q) |
-        Q(city__icontains=q) |
-        Q(neighborhood__icontains=q) |
+        Q(city__name__icontains=q) |
+        Q(neighborhood__name__icontains=q) |
         Q(services__name__icontains=q)
-    ).distinct().values('name', 'city', 'neighborhood', 'slug')[:10]
+    ).distinct().values(
+        'name', 'slug', 'city__name', 'city__slug',
+        'neighborhood__name', 'neighborhood__slug'
+    )[:10]
 
-    suggestions = list(garages)
+    suggestions = []
+    for g in garages:
+        suggestions.append({
+            'name': g['name'],
+            'city': g['city__name'] or '',
+            'neighborhood': g['neighborhood__name'] or '',
+            'slug': g['slug'],
+        })
 
     services = GarageService.objects.filter(
         is_active=True,
         garage__is_active=True,
-        garage__verification_status=Garage.VerificationStatus.VERIFIED
+        garage__verification_status=Garage.VerificationStatus.APPROVED
     ).filter(name__icontains=q).values('name', 'category').distinct()[:5]
 
     for s in services:

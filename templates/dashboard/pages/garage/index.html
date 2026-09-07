@@ -16,9 +16,7 @@
                 {% csrf_token %}
                 <select name="status" class="form-input text-sm py-2" onchange="this.form.submit()">
                     <option value="AVAILABLE" {% if garage.availability_status == 'AVAILABLE' %}selected{% endif %}>🟢 {% trans "Disponible" %}</option>
-                    <option value="BUSY" {% if garage.availability_status == 'BUSY' %}selected{% endif %}>🟠 {% trans "Occupé" %}</option>
-                    <option value="CLOSED" {% if garage.availability_status == 'CLOSED' %}selected{% endif %}>🔴 {% trans "Fermé" %}</option>
-                    <option value="TEMPORARY_CLOSED" {% if garage.availability_status == 'TEMPORARY_CLOSED' %}selected{% endif %}>⏸️ {% trans "Temporairement fermé" %}</option>
+                    <option value="UNAVAILABLE" {% if garage.availability_status == 'UNAVAILABLE' %}selected{% endif %}>🔴 {% trans "Indisponible" %}</option>
                 </select>
             </form>
             <a href="{% url 'garages:garage_detail' garage.slug %}" class="btn-outline btn-sm">
@@ -30,16 +28,12 @@
     <!-- Garage Status Banner -->
     <div class="bg-white rounded-xl border border-auto-100 p-4 mb-8 flex items-center justify-between shadow-card">
         <div class="flex items-center space-x-3">
-            <div class="w-3 h-3 rounded-full {% if garage.availability_status == 'AVAILABLE' %}status-available{% elif garage.availability_status == 'BUSY' %}status-busy{% elif garage.availability_status == 'CLOSED' %}status-closed{% else %}status-temporary{% endif %}"></div>
+            <div class="w-3 h-3 rounded-full {% if garage.availability_status == 'AVAILABLE' %}status-available{% else %}status-closed{% endif %}"></div>
             <span class="font-bold text-sm">
                 {% if garage.availability_status == 'AVAILABLE' %}
                     {% trans "DISPONIBLE" %}
-                {% elif garage.availability_status == 'BUSY' %}
-                    {% trans "OCCUPÉ" %}
-                {% elif garage.availability_status == 'CLOSED' %}
-                    {% trans "FERMÉ" %}
                 {% else %}
-                    {% trans "TEMPORAIREMENT FERMÉ" %}
+                    {% trans "INDISPONIBLE" %}
                 {% endif %}
             </span>
         </div>

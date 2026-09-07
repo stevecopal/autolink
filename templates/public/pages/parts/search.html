@@ -25,7 +25,7 @@
                 <div class="w-12 h-12 rounded-lg bg-auto-orange/10 flex items-center justify-center text-xl">🔧</div>
                 <div>
                     <h3 class="font-bold">{{ garage.name }}</h3>
-                    <p class="text-auto-600 text-sm">📍 {{ garage.neighborhood|default:garage.city }}</p>
+                    <p class="text-auto-600 text-sm">📍 {{ garage.neighborhood.name|default:garage.city.name }}</p>
                 </div>
             </a>
             {% endfor %}

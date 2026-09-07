@@ -22,7 +22,7 @@
                 <select name="status" class="form-input">
                     <option value="">{% trans "Tous" %}</option>
                     <option value="PENDING" {% if selected_status == 'PENDING' %}selected{% endif %}>{% trans "En attente" %}</option>
-                    <option value="VERIFIED" {% if selected_status == 'VERIFIED' %}selected{% endif %}>{% trans "Vérifié" %}</option>
+                    <option value="APPROVED" {% if selected_status == 'APPROVED' %}selected{% endif %}>{% trans "Approuvé" %}</option>
                     <option value="REJECTED" {% if selected_status == 'REJECTED' %}selected{% endif %}>{% trans "Rejeté" %}</option>
                     <option value="SUSPENDED" {% if selected_status == 'SUSPENDED' %}selected{% endif %}>{% trans "Suspendu" %}</option>
                 </select>
@@ -50,13 +50,13 @@
                         <tr class="hover:bg-auto-50">
                             <td class="px-4 py-3">
                                 <div class="font-medium">{{ garage.name }}</div>
-                                <div class="text-xs text-auto-600">{{ garage.city }}</div>
+                                <div class="text-xs text-auto-600">{{ garage.city.name }}</div>
                             </td>
                             <td class="px-4 py-3">{{ garage.owner.username }}</td>
-                            <td class="px-4 py-3">{{ garage.city }}</td>
+                            <td class="px-4 py-3">{{ garage.city.name }}</td>
                             <td class="px-4 py-3">
-                                {% if garage.verification_status == 'VERIFIED' %}
-                                    <span class="badge-success">{% trans "Vérifié" %}</span>
+                                {% if garage.verification_status == 'APPROVED' %}
+                                    <span class="badge-success">{% trans "Approuvé" %}</span>
                                 {% elif garage.verification_status == 'PENDING' %}
                                     <span class="badge-warning">{% trans "En attente" %}</span>
                                 {% elif garage.verification_status == 'REJECTED' %}
