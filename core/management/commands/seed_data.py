@@ -1,21 +1,19 @@
 from django.core.management.base import BaseCommand
-from django.utils.text import slugify
-from accounts.models import User
-from vehicles.models import Brand, ModelVehicle, Vehicle
-from garages.models import Garage, GarageService
-from catalog.models import Category, Part, Compatibility
+from django.contrib.auth import get_user_model
 from core.models import City, Neighborhood
+from garages.models import Garage
+
+User = get_user_model()
 
 
 class Command(BaseCommand):
-    help = 'Peuple la base avec des données de démonstration'
+    help = 'Peuple la base de données avec des données de démonstration'
 
     def handle(self, *args, **options):
-        self.stdout.write('Création des données de démonstration...')
-
+        self.stdout.write('Création des villes et quartiers...')
         cities_data = {
             'Douala': ['Akwa', 'Bonapriso', 'Bonamoussadi', 'Bépanda', 'Deido', 'Logbessou', 'Kotto', 'Essos'],
-            'Yaoundé': ['Bastos', 'Mvan', 'Nsam', 'Essomba', 'Bastos', 'Nlongkak', 'Mokolo'],
+            'Yaoundé': ['Bastos', 'Mvan', 'Nsam', 'Essomba', 'Nlongkak', 'Mokolo'],
             'Bafoussam': ['Kamkop', 'Djeleng', 'Tyo-Ville', 'Marché A'],
             'Bamenda': ['Commercial Avenue', 'Up Station', 'Mankon', 'Nkwen'],
             'Garoua': ['Yelwa', 'Ketiao', 'Bouba Njida'],
@@ -31,17 +29,16 @@ class Command(BaseCommand):
 
         cities = {}
         for city_name, neighborhoods in cities_data.items():
-            city, _ = City.objects.get_or_create(
-                slug=slugify(city_name),
-                defaults={'name': city_name}
-            )
+            slug = city_name.lower().replace(' ', '-').replace('é', 'e').replace('è', 'e')
+            city, _ = City.objects.get_or_create(slug=slug, defaults={'name': city_name})
             cities[city_name] = city
             for n_name in neighborhoods:
-                Neighborhood.objects.get_or_create(
-                    city=city,
-                    slug=slugify(n_name),
-                    defaults={'name': n_name}
-                )
+                n_slug = n_name.lower().replace(' ', '-').replace('é', 'e').replace('è', 'e')
+                Neighborhood.objects.get_or_create(city=city, slug=n_slug, defaults={'name': n_name})
+
+        self.stdout.write(self.style.SUCCESS(f'{len(cities)} villes créées'))
+
+        self.stdout.write('Création des utilisateurs...')
 
         admin, _ = User.objects.get_or_create(
             username='admin',
@@ -49,24 +46,20 @@ class Command(BaseCommand):
                 'email': 'admin@autolink.cm',
                 'first_name': 'Admin',
                 'last_name': 'AutoLink',
+                'role': 'ADMIN',
                 'is_staff': True,
                 'is_superuser': True,
-                'role': 'ADMIN',
-                'city': 'Douala',
             }
         )
         admin.set_password('admin123')
         admin.save()
 
         client, _ = User.objects.get_or_create(
-            username='client1',
+            username='client',
             defaults={
-                'email': 'client@example.com',
+                'email': 'client@test.com',
                 'first_name': 'Jean',
                 'last_name': 'Kamga',
-                'phone': '+237690000001',
-                'city': 'Douala',
-                'neighborhood': 'Bonamoussadi',
                 'role': 'CLIENT',
             }
         )
@@ -74,151 +67,89 @@ class Command(BaseCommand):
         client.save()
 
         user, _ = User.objects.get_or_create(
-            username='user1',
+            username='user',
             defaults={
-                'email': 'user@example.com',
+                'email': 'user@test.com',
                 'first_name': 'Marie',
                 'last_name': 'Ngo',
-                'phone': '+237690000003',
                 'role': 'USER',
             }
         )
         user.set_password('user123')
         user.save()
 
-        brands_data = ['Toyota', 'Hyundai', 'Honda', 'Mercedes-Benz', 'BMW', 'Renault', 'Peugeot', 'Ford', 'Nissan', 'Kia', 'Bosch', 'NGK', 'Gates', 'KYB', 'Denso']
-        brands = {}
-        for name in brands_data:
-            brand, _ = Brand.objects.get_or_create(
-                slug=slugify(name),
-                defaults={'name': name}
-            )
-            brands[name] = brand
+        self.stdout.write(self.style.SUCCESS('3 utilisateurs créés'))
 
-        models_data = [
-            ('Toyota', 'Corolla', 2015, 2023),
-            ('Toyota', 'Yaris', 2010, 2023),
-            ('Toyota', 'RAV4', 2013, 2023),
-            ('Hyundai', 'Tucson', 2015, 2023),
-            ('Hyundai', 'i10', 2010, 2023),
-            ('Honda', 'Civic', 2012, 2023),
-            ('Honda', 'CR-V', 2012, 2023),
-            ('Renault', 'Clio', 2010, 2023),
-            ('Peugeot', '208', 2012, 2023),
-            ('Ford', 'Ranger', 2012, 2023),
-        ]
-        vehicle_models = {}
-        for brand_name, model_name, ystart, yend in models_data:
-            mv, _ = ModelVehicle.objects.get_or_create(
-                brand=brands[brand_name],
-                slug=slugify(model_name),
-                defaults={'name': model_name, 'year_start': ystart, 'year_end': yend}
-            )
-            vehicle_models[(brand_name, model_name)] = mv
+        self.stdout.write('Création des garages...')
 
-        Vehicle.objects.get_or_create(
-            user=client,
-            brand=brands['Toyota'],
-            model=vehicle_models[('Toyota', 'Corolla')],
-            defaults={
-                'nickname': 'Ma Corolla',
-                'year': 2018,
-                'engine': '1.8',
-                'fuel_type': 'ESSENCE',
-                'transmission': 'AUTOMATIC',
-                'is_primary': True,
-            }
-        )
+        douala = cities['Douala']
+        akwa = Neighborhood.objects.get(city=douala, slug='akwa')
+        bonapriso = Neighborhood.objects.get(city=douala, slug='bonapriso')
 
-        categories_data = [
-            ('Freinage', 'brakes', '🔧'),
-            ('Moteur', 'engine', '⚙️'),
-            ('Électrique', 'electrical', '⚡'),
-            ('Suspension', 'suspension', '🔩'),
-            ('Climatisation', 'ac', '❄️'),
-            ('Pneumatique', 'tires', '🛞'),
-            ('Vidange', 'oil', '🛢️'),
-            ('Échappement', 'exhaust', '💨'),
-        ]
-        categories = {}
-        for name, slug, icon in categories_data:
-            cat, _ = Category.objects.get_or_create(
-                slug=slug,
-                defaults={'name': name, 'icon': icon}
-            )
-            categories[slug] = cat
+        yaounde = cities['Yaoundé']
+        bastos = Neighborhood.objects.get(city=yaounde, slug='bastos')
 
-        douala = cities.get('Douala')
-        bonapriso = Neighborhood.objects.filter(city=douala, slug='bonapriso').first()
-
-        garage, _ = Garage.objects.get_or_create(
-            slug=slugify('garage-autoplus'),
-            defaults={
+        garages_data = [
+            {
                 'owner': client,
-                'name': 'Garage AutoPlus',
-                'description': 'Spécialiste Toyota et Hyundai. Diagnostic professionnel, entretien et réparation.',
-                'phone': '+237690000010',
-                'whatsapp': '237690000010',
-                'address': 'Rue Joss, Bonapriso',
+                'name': 'Garage AutoPro Douala',
+                'slug': 'garage-autopro-douala',
+                'description': 'Spécialiste en réparation automobile et carrosserie.',
+                'phone': '+237690000001',
+                'whatsapp': '+237690000001',
+                'email': 'autopro@test.com',
+                'address': 'Rue de la Joie, Akwa',
+                'city': douala,
+                'neighborhood': akwa,
+                'latitude': 4.0511,
+                'longitude': 9.7679,
+                'verification_status': 'APPROVED',
+                'availability_status': 'AVAILABLE',
+                'is_active': True,
+            },
+            {
+                'owner': client,
+                'name': 'Mécanique Générale Bonapriso',
+                'slug': 'mecanique-generale-bonapriso',
+                'description': 'Entretien et réparation de tous types de véhicules.',
+                'phone': '+237690000002',
+                'whatsapp': '+237690000002',
+                'email': 'mecagen@test.com',
+                'address': 'Boulevard de la République, Bonapriso',
                 'city': douala,
                 'neighborhood': bonapriso,
                 'latitude': 4.0185,
                 'longitude': 9.6935,
                 'verification_status': 'APPROVED',
-                'opening_time': '08:00',
-                'closing_time': '18:00',
-                'open_weekends': False,
-                'trust_score': 4.7,
-                'total_reviews': 42,
-                'total_orders': 156,
+                'availability_status': 'AVAILABLE',
                 'is_active': True,
-            }
-        )
-
-        services_data = [
-            ('Diagnostic électronique', 'DIAGNOSTIC', 'Analyse complète du véhicule', 5000, 15000, 60),
-            ('Vidange moteur', 'OIL_CHANGE', 'Vidange huile + filtre', 10000, 25000, 45),
-            ('Réparation freins', 'BRAKES', 'Plaquettes, disques, liquide', 15000, 80000, 120),
-            ('Entretien climatisation', 'AIR_CONDITIONING', 'Recharge, diagnostic, réparation', 10000, 50000, 90),
-            ('Pneumatique', 'TIRE', 'Montage, équilibrage, parallélisme', 5000, 30000, 30),
+            },
+            {
+                'owner': client,
+                'name': 'Garage Express Yaoundé',
+                'slug': 'garage-express-yaounde',
+                'description': 'Réparation rapide et fiable. Pièces d\'origine.',
+                'phone': '+237690000003',
+                'whatsapp': '+237690000003',
+                'email': 'express@test.com',
+                'address': 'Avenue Bastos, Bastos',
+                'city': yaounde,
+                'neighborhood': bastos,
+                'latitude': 3.8570,
+                'longitude': 11.5020,
+                'verification_status': 'APPROVED',
+                'availability_status': 'AVAILABLE',
+                'is_active': True,
+            },
         ]
-        for name, cat, desc, pmin, pmax, dur in services_data:
-            GarageService.objects.get_or_create(
-                garage=garage,
-                name=name,
-                defaults={
-                    'category': cat,
-                    'description': desc,
-                    'price_min': pmin,
-                    'price_max': pmax,
-                    'duration_minutes': dur,
-                }
-            )
 
-        parts_data = [
-            ('Plaquettes de frein avant', 'brakes', 'Bosch', 12000, 15, 'NEW'),
-            ('Filtre à huile', 'oil', 'Denso', 3500, 50, 'NEW'),
-            ('Ampoule H7', 'electrical', 'NGK', 2500, 30, 'NEW'),
-            ('Amortisseur avant', 'suspension', 'KYB', 35000, 8, 'NEW'),
-            ('Courroie trapézoïdale', 'engine', 'Gates', 8000, 20, 'NEW'),
-            ('Ventilateur climatisation', 'ac', 'Denso', 45000, 5, 'NEW'),
-        ]
-        for name, cat_slug, brand_name, price, stock, condition in parts_data:
-            Part.objects.get_or_create(
-                slug=slugify(name),
-                defaults={
-                    'seller': client,
-                    'category': categories[cat_slug],
-                    'brand': brands[brand_name],
-                    'garage': garage,
-                    'name': name,
-                    'description': f'{name} de qualité professionnelle',
-                    'condition': condition,
-                    'price': price,
-                    'stock': stock,
-                    'stock_status': Part.StockStatus.IN_STOCK,
-                    'is_active': True,
-                }
-            )
+        for data in garages_data:
+            Garage.objects.get_or_create(slug=data['slug'], defaults=data)
 
-        self.stdout.write(self.style.SUCCESS('Données de démonstration créées avec succès !'))
+        self.stdout.write(self.style.SUCCESS(f'{len(garages_data)} garages créés'))
+        self.stdout.write(self.style.SUCCESS('Seed terminé avec succès!'))
+        self.stdout.write('')
+        self.stdout.write('Comptes de démonstration:')
+        self.stdout.write('  Admin:  admin / admin123')
+        self.stdout.write('  Client: client / client123')
+        self.stdout.write('  User:   user / user123')
