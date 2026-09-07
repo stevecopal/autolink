@@ -1,0 +1,176 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n humanize %}
+
+{% block title %}{% trans "Paiement" %} #{{ payment.id }} - AutoLink{% endblock %}
+
+{% block dashboard_header %}
+    <h1 class="text-sm font-bold text-auto-dark">{% trans "Paiement" %}</h1>
+{% endblock %}
+
+{% block dashboard_breadcrumb %}
+    <nav class="flex items-center space-x-2 text-sm text-auto-600">
+        <a href="{% url 'administration:dashboard' %}" class="hover:text-auto-orange transition">{% trans "Tableau de bord" %}</a>
+        <span class="text-auto-400">/</span>
+        <a href="{% url 'administration:payments' %}" class="hover:text-auto-orange transition">{% trans "Paiements" %}</a>
+        <span class="text-auto-400">/</span>
+        <span class="font-bold text-auto-dark">#{{ payment.id }}</span>
+    </nav>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+            <h2 class="text-xl font-bold text-auto-dark mb-1">{% trans "Paiement" %} #{{ payment.id }}</h2>
+            <p class="text-sm text-auto-500">{{ payment.created_at|date:"d/m/Y H:i" }}</p>
+        </div>
+        <div class="flex gap-2">
+            <a href="{% url 'administration:payments' %}"
+               class="btn-outline text-sm">{% trans "Retour à la liste" %}</a>
+            <a href="{% url 'orders:order_detail' payment.order.order_number %}"
+               class="btn-outline text-sm">{% trans "Voir la commande" %}</a>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Informatons du paiement -->
+        <div class="card p-6">
+            <h3 class="text-lg font-bold text-auto-dark mb-4">{% trans "Informations du paiement" %}</h3>
+            <div class="space-y-4">
+                <div class="flex justify-between items-center py-2 border-b border-auto-100">
+                    <span class="text-auto-600">{% trans "Montant" %}</span>
+                    <span class="font-bold text-lg text-auto-deep-red">{{ payment.amount|intcomma }} FCFA</span>
+                </div>
+                <div class="flex justify-between items-center py-2 border-b border-auto-100">
+                    <span class="text-auto-600">{% trans "Méthode" %}</span>
+                    <span class="font-bold">{{ payment.get_payment_method_display }}</span>
+                </div>
+                <div class="flex justify-between items-center py-2 border-b border-auto-100">
+                    <span class="text-auto-600">{% trans "Statut" %}</span>
+                    <span class="badge-{{ payment.status_color }} text-[10px]">{{ payment.status_label }}</span>
+                </div>
+                <div class="flex justify-between items-center py-2 border-b border-auto-100">
+                    <span class="text-auto-600">{% trans "Remboursement" %}</span>
+                    {% if payment.refund %}
+                        <span class="text-auto-coral">{% trans "Refondu" %} : {{ payment.refund.amount|intcomma }} FCFA</span>
+                    {% else %}
+                        <span class="text-auto-600">{% trans "Aucun" %}</span>
+                    {% endif %}
+                </div>
+                <div class="flex justify-between items-center py-2">
+                    <span class="text-auto-600">{% trans "Date du paiement" %}</span>
+                    <span class="font-bold">{{ payment.created_at|date:"d/m/Y H:i" }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Informations de la commande -->
+        <div class="card p-6">
+            <h3 class="text-lg font-bold text-auto-dark mb-4">{% trans "Commande associée" %}</h3>
+            <div class="space-y-3">
+                <a href="{% url 'orders:order_detail' payment.order.order_number %}"
+                   class="block p-3 rounded-lg bg-auto-50 hover:bg-auto-100 transition border border-auto-100">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <div class="font-bold text-sm text-auto-dark">{{ payment.order.order_number }}</div>
+                            <div class="text-xs text-auto-500">{{ payment.order.created_at|date:"d/m/Y H:i" }}</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-bold text-sm">{{ payment.order.total|intcomma }} FCFA</div>
+                            <span class="badge-{{ payment.order.status_color }} text-[10px]">{{ payment.order.status_label }}</span>
+                        </div>
+                    </div>
+                </a>
+
+                <div class="flex justify-between items-center pt-3 border-t border-auto-100">
+                    <span class="text-auto-600 text-sm">{% trans "Client" %}</span>
+                    <a href="{% url 'administration:user_detail' payment.order.user.pk %}"
+                       class="font-bold text-sm text-auto-orange hover:underline">
+                        {{ payment.order.user.display_name }}
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Informations du client -->
+        <div class="card p-6 md:col-span-2">
+            <h3 class="text-lg font-bold text-auto-dark mb-4">{% trans "Client" %}</h3>
+            <div class="flex items-center gap-4 mb-4">
+                {% if payment.order.user.avatar %}
+                    <img src="{{ payment.order.user.avatar.url }}" class="w-12 h-12 rounded-full object-cover border-2 border-auto-orange">
+                {% else %}
+                    <div class="w-12 h-12 rounded-full bg-auto-orange/10 flex items-center justify-center text-xl font-bold text-auto-dark border-2 border-auto-100">
+                        {{ payment.order.user.display_name|first|upper }}
+                    </div>
+                {% endif %}
+                <div>
+                    <div class="font-bold">{{ payment.order.user.display_name }}</div>
+                    <div class="text-sm text-auto-500">{{ payment.order.user.email }}</div>
+                    <div class="flex gap-2 mt-1">
+                        <span class="badge-{{ payment.order.user.role|lower }} text-[10px]">{{ payment.order.user.role }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                    <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Téléphone" %}</p>
+                    <p class="font-bold">{{ payment.order.user.phone|default:"—" }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Ville" %}</p>
+                    <p class="font-bold">{{ payment.order.user.city|default:"—" }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Quartier" %}</p>
+                    <p class="font-bold">{{ payment.order.user.neighborhood|default:"—" }}</p>
+                </div>
+                {% if payment.order.vehicle %}
+                <div>
+                    <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Véhicule" %}</p>
+                    <p class="font-bold">{{ payment.order.vehicle.display_name }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    {% if payment.refund %}
+    <div class="card p-6 border border-warning-500 bg-warning-50">
+        <h3 class="text-lg font-bold text-warning-700 mb-4">{% trans "Informations de remboursement" %}</h3>
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+                <p class="text-sm text-warning-600 mb-1">{% trans "Montant remboursé" %}</p>
+                <p class="text-2xl font-bold text-warning-700">{{ payment.refund.amount|intcomma }} FCFA</p>
+            </div>
+            <a href="{% url 'payments:refund_detail' payment.refund.id %}"
+               class="btn-outline text-sm">{% trans "Voir les détails du remboursement" %}</a>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if not payment.refund and payment.status == 'PAID' %}
+    <div class="card p-6 border border-warning-500 bg-warning-50">
+        <h3 class="text-lg font-bold text-warning-700 mb-4">{% trans "Créer un remboursement" %}</h3>
+        <p class="text-sm text-warning-600 mb-4">{% trans "Vous pouvez créer un remboursement pour ce paiement." %}</p>
+        <form method="post" action="{% url 'payments:refund_request' %}" class="max-w-md">
+            {% csrf_token %}
+            <input type="hidden" name="payment_id" value="{{ payment.id }}">
+            <div class="flex items-center gap-2">
+                <label class="form-label">{% trans "Montant" %}</label>
+                <input type="number" name="amount" min="0" max="{{ payment.amount }}" step="1"
+                       class="form-input flex-1"
+                       placeholder="{{ payment.amount|intcomma }} FCFA" required>
+            </div>
+            <div class="flex justify-between items-center mt-4 pt-4 border-t border-warning-500">
+                <a href="{% url 'administration:payments' %}"
+                   class="btn-outline text-sm">{% trans "Annuler" %}</a>
+                <button type="submit" class="bg-error-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-error-600 transition text-sm">
+                    {% trans "Créer le remboursement" %}
+                </button>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

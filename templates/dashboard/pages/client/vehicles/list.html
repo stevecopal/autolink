@@ -1,0 +1,130 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Mes véhicules" %} - AutoLink{% endblock %}
+
+{% block dashboard_header %}
+    <h1 class="text-sm font-bold text-auto-dark">{% trans "Mes véhicules" %}</h1>
+{% endblock %}
+
+{% block dashboard_breadcrumb %}
+    <nav class="flex items-center space-x-2 text-sm text-auto-600">
+        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-auto-orange transition">{% trans "Tableau de bord" %}</a>
+        <span class="text-auto-400">/</span>
+        <span class="font-bold text-auto-dark">{% trans "Mes véhicules" %}</span>
+    </nav>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <h2 class="text-lg font-bold text-auto-dark">{% trans "Votre parc" %}</h2>
+        <a href="{% url 'vehicles:vehicle_add' %}"
+           class="bg-auto-orange text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-auto-orange-dark transition">
+            {% trans "Ajouter un véhicule" %}
+        </a>
+    </div>
+
+    {% if vehicles %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for vehicle in vehicles %}
+            <div class="card p-6 hover:shadow-lg transition-all duration-300 group">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        {% if vehicle.photo %}
+                        <img src="{{ vehicle.photo.url }}"
+                             class="w-16 h-16 rounded-xl object-cover"
+                             alt="{{ vehicle.display_name }}">
+                        {% else %}
+                        <div class="w-16 h-16 rounded-xl bg-auto-orange/10 flex items-center justify-center text-3xl">🚗</div>
+                        {% endif %}
+                        <div>
+                            <div class="font-bold text-lg text-auto-dark">{{ vehicle.display_name }}</div>
+                            {% if vehicle.license_plate %}
+                            <div class="text-sm text-auto-500">{{ vehicle.license_plate }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    {% if vehicle.is_primary %}
+                    <span class="badge-success text-[10px] px-2 py-1">{% trans "Principal" %}</span>
+                    {% endif %}
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 text-sm mb-4">
+                    <div>
+                        <span class="text-xs text-auto-500 uppercase tracking-wider">{% trans "Marque" %}</span>
+                        <p class="font-medium text-auto-dark">{{ vehicle.make|title }}</p>
+                    </div>
+                    <div>
+                        <span class="text-xs text-auto-500 uppercase tracking-wider">{% trans "Modèle" %}</span>
+                        <p class="font-medium text-auto-dark">{{ vehicle.model|title }}</p>
+                    </div>
+                    <div>
+                        <span class="text-xs text-auto-500 uppercase tracking-wider">{% trans "Année" %}</span>
+                        <p class="font-medium text-auto-dark">{{ vehicle.year }}</p>
+                    </div>
+                    <div>
+                        <span class="text-xs text-auto-500 uppercase tracking-wider">{% trans "Motorisation" %}</span>
+                        <p class="font-medium text-auto-dark">{{ vehicle.engine|title }}</p>
+                    </div>
+                </div>
+
+                {% if vehicle.brand %}
+                <div class="flex items-center gap-2 text-xs text-auto-500 mb-4">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                    {{ vehicle.brand.name|title }}
+                </div>
+                {% endif %}
+
+                <div class="flex items-center gap-2 pt-4 border-t border-auto-100">
+                    <a href="{% url 'vehicles:vehicle_edit' vehicle.pk %}"
+                       class="text-auto-orange font-bold text-sm hover:text-auto-600 transition">
+                        {% trans "Modifier" %}
+                    </a>
+                    <span class="text-auto-300">•</span>
+                    <a href="{% url 'vehicles:vehicle_delete' vehicle.pk %}"
+                       class="text-error-500 font-bold text-sm hover:text-error-600 transition">
+                        {% trans "Supprimer" %}
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <div class="flex items-center justify-center gap-2">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}"
+                   class="btn-outline text-sm px-4 py-2">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    {% trans "Précédent" %}
+                </a>
+            {% endif %}
+
+            <span class="px-4 py-2 text-sm text-auto-600">
+                {% trans "Page" %} {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}"
+                   class="btn-outline text-sm px-4 py-2">
+                    {% trans "Suivant" %}
+                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    {% else %}
+        <div class="card p-8 text-center">
+            <div class="text-4xl mb-3">🚗</div>
+            <h3 class="text-lg font-bold text-auto-dark mb-1">{% trans "Aucun véhicule" %}</h3>
+            <p class="text-auto-600 mb-4">{% trans "Vous n'avez pas encore ajouté de véhicule." %}</p>
+            <a href="{% url 'vehicles:vehicle_add' %}"
+               class="bg-auto-orange text-white px-6 py-2 rounded-lg font-bold text-sm hover:bg-auto-orange-dark transition">
+                {% trans "Ajouter un véhicule" %}
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

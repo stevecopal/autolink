@@ -1,0 +1,43 @@
+{% load i18n %}
+<footer class="bg-auto-deep-red text-white mt-12">
+    <div class="max-w-7xl mx-auto px-4 py-12">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+                <div class="flex items-center space-x-2 mb-4">
+                    <div class="w-9 h-9 bg-auto-orange rounded-lg flex items-center justify-center">
+                        <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/>
+                        </svg>
+                    </div>
+                    <span class="text-xl font-bold text-white">Auto<span class="text-auto-gold">Link</span></span>
+                </div>
+                <p class="text-white/70 text-sm">{% trans "La plateforme automobile de confiance au Cameroun." %}</p>
+            </div>
+            <div>
+                <h4 class="font-bold mb-4 text-auto-gold">{% trans "Services" %}</h4>
+                <a href="{% url 'garages:garage_list' %}" class="block text-white/70 hover:text-white text-sm mb-2 transition">{% trans "Trouver un garage" %}</a>
+                <a href="{% url 'catalog:part_list' %}" class="block text-white/70 hover:text-white text-sm mb-2 transition">{% trans "Trouver une piece" %}</a>
+                <a href="{% url 'support:assistance' %}" class="block text-white/70 hover:text-white text-sm mb-2 transition">{% trans "Assistance routiere" %}</a>
+            </div>
+            <div>
+                <h4 class="font-bold mb-4 text-auto-gold">{% trans "Compte" %}</h4>
+                <a href="{% url 'accounts:register' %}" class="block text-white/70 hover:text-white text-sm mb-2 transition">{% trans "S'inscrire" %}</a>
+                <a href="{% url 'accounts:login' %}" class="block text-white/70 hover:text-white text-sm mb-2 transition">{% trans "Connexion" %}</a>
+                <a href="{% url 'accounts:profile' %}" class="block text-white/70 hover:text-white text-sm mb-2 transition">{% trans "Mon profil" %}</a>
+            </div>
+            <div>
+                <h4 class="font-bold mb-4 text-auto-gold">{% trans "Contact" %}</h4>
+                <a href="{% url 'core:contact' %}" class="block text-white/70 hover:text-white text-sm mb-2 transition">{% trans "Nous contacter" %}</a>
+                <a href="{% url 'core:about' %}" class="block text-white/70 hover:text-white text-sm mb-2 transition">{% trans "A propos" %}</a>
+                <p class="text-white/70 text-sm mt-3">📍 {% trans "Douala, Cameroun" %}</p>
+            </div>
+        </div>
+        <div class="border-t border-white/10 mt-10 pt-6 flex flex-col md:flex-row items-center justify-between text-sm text-white/50">
+            <p>© 2026 AutoLink. {% trans "Tous droits reserves." %}</p>
+            <div class="flex items-center space-x-4 mt-3 md:mt-0">
+                <span class="text-auto-gold">🔧</span>
+                <span>{% trans "Automobile" %} · {% trans "Technologie" %} · {% trans "Confiance" %}</span>
+            </div>
+        </div>
+    </div>
+</footer>

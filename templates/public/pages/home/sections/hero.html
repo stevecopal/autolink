@@ -1,0 +1,74 @@
+{% load i18n %}
+<section class="relative bg-auto-deep-red overflow-hidden" aria-label="{% trans 'En-tête principal' %}">
+
+    {# Gradient layers #}
+    <div class="absolute inset-0 bg-gradient-to-br from-auto-deep-red via-[#5a1a0e] to-auto-deep-red"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(205,129,53,0.15),transparent_60%)]"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(226,169,92,0.08),transparent_50%)]"></div>
+
+    {# Subtle pattern #}
+    <div class="absolute inset-0 opacity-[0.03]" aria-hidden="true">
+        <div class="absolute inset-0" style="background-image: url(&quot;data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+    </div>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-14 sm:py-20 md:py-28">
+        <div class="text-center max-w-3xl mx-auto">
+
+            {# Badge #}
+            <div class="inline-flex items-center gap-2 bg-white/[0.08] backdrop-blur-sm border border-white/[0.06] text-auto-gold px-4 py-2 rounded-full text-xs sm:text-sm font-bold mb-6 sm:mb-8 animate-fade-in">
+                <span class="w-2 h-2 rounded-full bg-success-500 animate-pulse" aria-hidden="true"></span>
+                {% trans "Plateforme automobile #1 au Cameroun" %}
+            </div>
+
+            {# Headline #}
+            <h1 class="text-3xl sm:text-4xl md:text-[3.25rem] font-bold text-white mb-8 sm:mb-6 animate-slide-up leading-[1.15] tracking-tight">
+                {% trans "Trouvez la" %}
+                <span class="relative inline-block">
+                    <span class="text-auto-gold">{% trans "bonne solution" %}</span>
+                </span>
+                {% trans "automobile" %}
+            </h1>
+
+            {# Subtitle #}
+            <p class="text-white/60 text-base sm:text-lg md:text-xl mb-8 sm:mb-10 animate-slide-up max-w-2xl mx-auto leading-relaxed" style="animation-delay: 0.1s">
+                {% trans "Garages vérifiés, pièces compatibles, prix transparents. Tout près de vous au Cameroun." %}
+            </p>
+
+            {# Search Bar #}
+            <form action="{% url 'core:search' %}" method="get" class="max-w-2xl mx-auto animate-slide-up" style="animation-delay: 0.2s" role="search" aria-label="{% trans 'Recherche' %}">
+                <label for="hero-search" class="sr-only">{% trans 'Rechercher garage, pièce, service...' %}</label>
+                <div class="relative group">
+                    <div class="absolute -inset-1 bg-gradient-to-r from-auto-orange/20 via-auto-gold/10 to-auto-orange/20 rounded-2xl blur-sm opacity-0 group-focus-within:opacity-100 transition-opacity duration-300" aria-hidden="true"></div>
+                    <div class="relative flex bg-white rounded-xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.25)]">
+                        <div class="flex items-center pl-4 sm:pl-5 text-gray-400" aria-hidden="true">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                        </div>
+                        <input
+                            type="text"
+                            id="hero-search"
+                            name="q"
+                            placeholder="{% trans 'Rechercher garage, pièce, service...' %}"
+                            class="flex-1 min-w-0 px-3 sm:px-4 py-4 sm:py-5 text-auto-dark text-base sm:text-lg outline-none font-mono bg-transparent"
+                            autocomplete="off"
+                        >
+                        <button
+                            type="submit"
+                            class="bg-auto-orange hover:bg-auto-orange-dark text-white px-5 sm:px-8 font-bold transition-all duration-200 flex items-center gap-2 shrink-0"
+                            aria-label="{% trans 'Lancer la recherche' %}"
+                        >
+                            <span class="hidden sm:inline">{% trans "Rechercher" %}</span>
+                            <svg class="w-5 h-5 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                        </button>
+                    </div>
+                </div>
+            </form>
+
+            
+        </div>
+    </div>
+
+    {# Bottom wave separator #}
+    <div class="absolute bottom-0 left-0 right-0" aria-hidden="true">
+        <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-8 sm:h-12 md:h-16"><path d="M0 60L48 53.3C96 46.7 192 33.3 288 28.3C384 23.3 480 26.7 576 31.7C672 36.7 768 43.3 864 43.3C960 43.3 1056 36.7 1152 33.3C1248 30 1344 30 1392 30L1440 30V60H1392C1344 60 1248 60 1152 60C1056 60 960 60 864 60C768 60 672 60 576 60C480 60 384 60 288 60C192 60 96 60 48 60H0Z" fill="var(--tw-bg-opacity, 1)"/><style>path{fill:rgb(235 235 235)}</style></svg>
+    </div>
+</section>

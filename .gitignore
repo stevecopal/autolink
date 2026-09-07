@@ -1,0 +1,289 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# Environment
+.env
+
+# Database
+db.sqlite3
+db.sqlite3-journal
+
+# Media uploads
+media/
+
+# Collected static files
+staticfiles/
+
+# Node
+node_modules/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Tailwind build output (generated)
+node_modules/
+__pycache__/
+media/
+
+
+# =========================================================
+# DJANGO / PYTHON
+# =========================================================
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Python compiled/debug files
+*.pyo
+*.pyd
+
+# Distribution / packaging
+build/
+dist/
+wheels/
+*.egg-info/
+.eggs/
+
+# Test / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# Type checkers
+.mypy_cache/
+.pyright/
+.ruff_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+
+# =========================================================
+# VIRTUAL ENVIRONMENTS
+# =========================================================
+
+.venv/
+venv/
+env/
+ENV/
+.env/
+.venv
+
+
+# =========================================================
+# ENVIRONMENT VARIABLES / SECRETS
+# =========================================================
+
+.env
+.env.*
+
+
+# =========================================================
+# DJANGO
+# =========================================================
+
+# SQLite database
+db.sqlite3
+db.sqlite3-journal
+
+# Django collected static files
+staticfiles/
+
+# Media uploads
+media/
+
+# Local Django files
+*.log
+
+
+# =========================================================
+# JAVASCRIPT / NODE
+# =========================================================
+
+node_modules/
+
+# npm
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Package manager caches
+.npm/
+.yarn/
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+
+# JavaScript coverage
+coverage/
+
+# Vite
+.vite/
+
+# Parcel
+.parcel-cache/
+
+
+# =========================================================
+# TAILWIND CSS
+# =========================================================
+
+
+
+# Tailwind cache
+.tailwindcss/
+
+
+# =========================================================
+# FRONTEND BUILD / GENERATED FILES
+# =========================================================
+
+*.map
+
+
+
+# =========================================================
+# IDE / EDITORS
+# =========================================================
+
+.vscode/
+.idea/
+
+# VS Code local history
+.history/
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# Vim
+*.swp
+*.swo
+
+# Emacs
+*~
+
+
+# =========================================================
+# OPERATING SYSTEM
+# =========================================================
+
+.DS_Store
+.DS_Store?
+._*
+
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+
+Desktop.ini
+
+
+# =========================================================
+# LOGS / TEMPORARY FILES
+# =========================================================
+
+*.log
+logs/
+tmp/
+temp/
+
+*.tmp
+*.temp
+
+
+
+# =========================================================
+# DATABASE / LOCAL DEVELOPMENT
+# =========================================================
+
+*.sqlite
+*.sqlite3
+*.sqlite3-journal
+
+
+# =========================================================
+# DOCKER
+# =========================================================
+
+# Docker local overrides
+docker-compose.override.yml
+
+# Docker environment files
+.env.docker
+
+
+# =========================================================
+# BACKUPS
+# =========================================================
+
+*.bak
+*.backup
+*.old
+
+# Editor backup files
+*.orig
+
+
+# =========================================================
+# SYSTEM / CACHE
+# =========================================================
+
+.cache/
+*.cache
+
+# macOS
+.AppleDouble
+.LSOverride
+
+# Windows
+$RECYCLE.BIN/
+*.stackdump
+
+
+# =========================================================
+# PROJECT-SPECIFIC GENERATED FILES
+# =========================================================
+
+# Django migrations:
+# NE PAS ignorer les migrations !
+# Elles doivent être versionnées dans Git.
+
+# Exemple :
+# */migrations/*.py
+# => NE PAS AJOUTER CETTE REGLE
+
+
+# =========================================================
+# OPTIONAL: LOCAL CONFIGURATION
+# =========================================================
+
+# Fichiers de configuration locaux
+local_settings.py
+settings_local.py
+
+# Secrets / certificats locaux
+*.pem
+*.key
+*.crt

@@ -1,0 +1,61 @@
+{% load i18n %}
+<section class="max-w-7xl mx-auto px-4 sm:px-6 -mt-8 sm:-mt-10 relative z-10" aria-label="{% trans 'Actions rapides' %}">
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4">
+
+        {# Find Garage #}
+        <a href="{% url 'garages:garage_list' %}" class="group relative bg-white rounded-2xl p-4 sm:p-5 text-center border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.1)] hover:border-auto-orange/30 transition-all duration-300 hover:-translate-y-0.5">
+            <div class="w-12 h-12 sm:w-13 sm:h-13 bg-gradient-to-br from-auto-orange/10 to-auto-orange/5 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:from-auto-orange/20 group-hover:to-auto-orange/10 transition-all duration-300">
+                <svg class="w-6 h-6 text-auto-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+            </div>
+            <h3 class="font-bold text-auto-dark group-hover:text-auto-orange transition text-xs sm:text-sm mb-0.5">{% trans "Trouver un garage" %}</h3>
+            <p class="text-gray-400 text-[10px] sm:text-xs">{% trans "Garages vérifiés" %}</p>
+        </a>
+
+        {# Find Part #}
+        <a href="{% url 'catalog:part_list' %}" class="group relative bg-white rounded-2xl p-4 sm:p-5 text-center border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.1)] hover:border-auto-orange/30 transition-all duration-300 hover:-translate-y-0.5">
+            <div class="w-12 h-12 sm:w-13 sm:h-13 bg-gradient-to-br from-auto-orange/10 to-auto-orange/5 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:from-auto-orange/20 group-hover:to-auto-orange/10 transition-all duration-300">
+                <svg class="w-6 h-6 text-auto-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            </div>
+            <h3 class="font-bold text-auto-dark group-hover:text-auto-orange transition text-xs sm:text-sm mb-0.5">{% trans "Trouver une pièce" %}</h3>
+            <p class="text-gray-400 text-[10px] sm:text-xs">{% trans "Compatible" %}</p>
+        </a>
+
+        {# Request Part #}
+        <a href="{% url 'catalog:part_request' %}" class="group relative bg-white rounded-2xl p-4 sm:p-5 text-center border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.1)] hover:border-auto-orange/30 transition-all duration-300 hover:-translate-y-0.5">
+            <div class="w-12 h-12 sm:w-13 sm:h-13 bg-gradient-to-br from-auto-gold/10 to-auto-gold/5 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:from-auto-gold/20 group-hover:to-auto-gold/10 transition-all duration-300">
+                <svg class="w-6 h-6 text-auto-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            </div>
+            <h3 class="font-bold text-auto-dark group-hover:text-auto-gold transition text-xs sm:text-sm mb-0.5">{% trans "Demander une pièce" %}</h3>
+            <p class="text-gray-400 text-[10px] sm:text-xs">{% trans "On vous aide" %}</p>
+        </a>
+
+        {# Roadside Assistance #}
+        <a href="{% url 'support:assistance' %}" class="group relative bg-white rounded-2xl p-4 sm:p-5 text-center border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.1)] hover:border-auto-coral/30 transition-all duration-300 hover:-translate-y-0.5">
+            <div class="w-12 h-12 sm:w-13 sm:h-13 bg-gradient-to-br from-auto-coral/10 to-auto-coral/5 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:from-auto-coral/20 group-hover:to-auto-coral/10 transition-all duration-300">
+                <svg class="w-6 h-6 text-auto-coral" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+            </div>
+            <h3 class="font-bold text-auto-dark group-hover:text-auto-coral transition text-xs sm:text-sm mb-0.5">{% trans "J'ai une panne" %}</h3>
+            <p class="text-gray-400 text-[10px] sm:text-xs">{% trans "Assistance rapide" %}</p>
+        </a>
+
+        {# My Vehicle or Sign Up #}
+        {% if user.is_authenticated %}
+        <a href="{% url 'vehicles:vehicle_list' %}" class="group relative bg-white rounded-2xl p-4 sm:p-5 text-center border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.1)] hover:border-auto-orange/30 transition-all duration-300 hover:-translate-y-0.5 col-span-2 sm:col-span-1">
+            <div class="w-12 h-12 sm:w-13 sm:h-13 bg-gradient-to-br from-auto-orange/10 to-auto-orange/5 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:from-auto-orange/20 group-hover:to-auto-orange/10 transition-all duration-300">
+                <svg class="w-6 h-6 text-auto-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+            </div>
+            <h3 class="font-bold text-auto-dark group-hover:text-auto-orange transition text-xs sm:text-sm mb-0.5">{% trans "Mon véhicule" %}</h3>
+            <p class="text-gray-400 text-[10px] sm:text-xs">{% trans "Gérer" %}</p>
+        </a>
+        {% else %}
+        <a href="{% url 'accounts:register' %}" class="group relative bg-gradient-to-br from-auto-gold/10 to-auto-gold/5 rounded-2xl p-4 sm:p-5 text-center border border-auto-gold/20 shadow-[0_2px_12px_rgba(226,169,92,0.1)] hover:shadow-[0_8px_30px_rgba(226,169,92,0.15)] hover:border-auto-gold/40 transition-all duration-300 hover:-translate-y-0.5 col-span-2 sm:col-span-1">
+            <div class="w-12 h-12 sm:w-13 sm:h-13 bg-gradient-to-br from-auto-gold/20 to-auto-gold/10 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:from-auto-gold/30 group-hover:to-auto-gold/15 transition-all duration-300">
+                <svg class="w-6 h-6 text-auto-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+            </div>
+            <h3 class="font-bold text-auto-dark group-hover:text-auto-gold transition text-xs sm:text-sm mb-0.5">{% trans "S'inscrire" %}</h3>
+            <p class="text-gray-400 text-[10px] sm:text-xs">{% trans "C'est gratuit" %}</p>
+        </a>
+        {% endif %}
+
+    </div>
+</section>

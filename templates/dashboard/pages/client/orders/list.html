@@ -1,0 +1,101 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Mes commandes" %} - AutoLink{% endblock %}
+
+{% block dashboard_header %}
+    <h1 class="text-sm font-bold text-auto-dark">{% trans "Mes commandes" %}</h1>
+{% endblock %}
+
+{% block dashboard_breadcrumb %}
+    <nav class="flex items-center space-x-2 text-sm text-auto-600">
+        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-auto-orange transition">{% trans "Tableau de bord" %}</a>
+        <span class="text-auto-400">/</span>
+        <span class="font-bold text-auto-dark">{% trans "Mes commandes" %}</span>
+    </nav>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <h2 class="text-lg font-bold text-auto-dark">{% trans "Vos commandes" %}</h2>
+    </div>
+
+    {% if orders %}
+        <div class="space-y-4">
+            {% for order in orders %}
+            <a href="{% url 'orders:order_detail' order.order_number %}"
+               class="block p-4 rounded-xl border border-auto-100 hover:bg-auto-50 transition">
+                <div class="flex items-start justify-between">
+                    <div class="flex items-start gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-auto-orange/10 flex items-center justify-center text-lg font-bold text-auto-orange flex-shrink-0">
+                            📦
+                        </div>
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="font-bold text-sm text-auto-dark">{{ order.order_number }}</span>
+                                <span class="badge-{{ order.status_color }} text-[10px]">{{ order.status_label }}</span>
+                            </div>
+                            <div class="text-xs text-auto-500">
+                                {% trans "Créé le" %} {{ order.created_at|date:"d/m/Y H:i" }}
+                            </div>
+                            {% if order.vehicle %}
+                            <div class="text-xs text-auto-500 mt-0.5">
+                                🚗 {{ order.vehicle.display_name }}
+                                {% if order.vehicle.license_plate %}
+                                ({{ order.vehicle.license_plate }})
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                            <div class="text-xs text-auto-500 mt-0.5">
+                                📍 {{ order.shipping_address }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-right flex-shrink-0">
+                        <div class="font-bold text-sm text-auto-dark">{{ order.total|intcomma }} FCFA</div>
+                        <div class="text-xs text-auto-500">{{ order.get_items_count }} {% trans "articles" %}</div>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <div class="flex items-center justify-center gap-2">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}"
+                   class="btn-outline text-sm px-4 py-2">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    {% trans "Précédent" %}
+                </a>
+            {% endif %}
+
+            <span class="px-4 py-2 text-sm text-auto-600">
+                {% trans "Page" %} {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}"
+                   class="btn-outline text-sm px-4 py-2">
+                    {% trans "Suivant" %}
+                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </a>
+            {% endif %}
+        </div>
+        {% endif %}
+
+    {% else %}
+        <div class="card p-8 text-center">
+            <div class="text-4xl mb-3">📦</div>
+            <h3 class="text-lg font-bold text-auto-dark mb-1">{% trans "Aucune commande" %}</h3>
+            <p class="text-auto-600 mb-4">{% trans "Vous n'avez pas encore passé de commande." %}</p>
+            <a href="{% url 'catalog:part_list' %}"
+               class="bg-auto-orange text-white px-6 py-2 rounded-lg font-bold text-sm hover:bg-auto-orange-dark transition">
+                {% trans "Parcourir les pièces" %}
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

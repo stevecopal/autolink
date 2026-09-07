@@ -1,0 +1,37 @@
+{% extends 'public/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Inscription" %}{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto px-4 py-12">
+    <div class="card p-8">
+        <div class="text-center mb-6">
+
+            <h1 class="text-2xl font-bold text-auto-dark">{% trans "Créer un compte" %}</h1>
+            <p class="text-auto-600 mt-1">{% trans "Rejoignez AutoLink gratuitement" %}</p>
+        </div>
+
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+
+            {% for field in form %}
+            <div>
+                <label class="form-label">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                <p class="form-error">{{ field.errors.0 }}</p>
+                {% endif %}
+
+            </div>
+            {% endfor %}
+
+            <button type="submit" class="btn-primary w-full">{% trans "S'inscrire" %}</button>
+        </form>
+
+        <p class="text-center text-auto-600 text-sm mt-6">
+            {% trans "Déjà un compte ?" %} <a href="{% url 'accounts:login' %}" class="text-auto-orange hover:text-auto-orange-dark font-bold transition">{% trans "Se connecter" %}</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

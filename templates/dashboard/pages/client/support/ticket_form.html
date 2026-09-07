@@ -1,0 +1,146 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Nouveau ticket" %} - AutoLink{% endblock %}
+
+{% block dashboard_header %}
+    <h1 class="text-sm font-bold text-auto-dark">{% trans "Support" %}</h1>
+{% endblock %}
+
+{% block dashboard_breadcrumb %}
+    <nav class="flex items-center space-x-2 text-sm text-auto-600">
+        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-auto-orange transition">{% trans "Tableau de bord" %}</a>
+        <span class="text-auto-400">/</span>
+        <a href="{% url 'support:ticket_list' %}" class="hover:text-auto-orange transition">{% trans "Tickets" %}</a>
+        <span class="text-auto-400">/</span>
+        <span class="font-bold text-auto-dark">{% trans "Nouveau" %}</span>
+    </nav>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    {% if error %}
+    <div class="alert alert-error p-4 mb-6 rounded-xl border border-error-100 bg-error-50">
+        <div class="flex items-center gap-2 mb-2">
+            <svg class="w-5 h-5 text-error-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span class="font-bold text-error-700">{% trans "Erreur" %}</span>
+        </div>
+        <p class="text-sm text-error-600">{{ error }}</p>
+    </div>
+    {% endif %}
+
+    <div class="card p-6 mb-6">
+        <h3 class="text-lg font-bold text-auto-dark mb-4">{% trans "Informations" %}</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+                <label class="form-label">{% trans "Sujet" %} <span class="text-error-500">*</span></label>
+                {{ form.subject }}
+                {% if form.subject.errors %}
+                <p class="form-error">{{ form.subject.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label class="form-label">{% trans "Priorité" %} <span class="text-error-500">*</span></label>
+                {{ form.priority }}
+                {% if form.priority.errors %}
+                <p class="form-error">{{ form.priority.errors.0 }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="card p-6 mb-6">
+        <h3 class="text-lg font-bold text-auto-dark mb-4">{% trans "Description" %}</h3>
+        <div class="p-4 rounded-lg bg-auto-50 border border-auto-100 mb-4">
+            <p class="text-sm text-auto-600 whitespace-pre-wrap">{{ ticket_description|default:""—"" }}</p>
+        </div>
+        {{ form.description }}
+        {% if form.description.errors %}
+        <p class="form-error">{{ form.description.errors.0 }}</p>
+        {% endif %}
+    </div>
+
+    <div class="card p-6 mb-6">
+        <h3 class="text-lg font-bold text-auto-dark mb-4">{% trans "Véhicule" %}</h3>
+        {% if vehicles %}
+        <div class="space-y-2">
+            <label class="form-label mb-2">{% trans "Associer un véhicule" %}</label>
+            <select name="vehicle"
+                    class="form-input w-full"
+                    {% if not form.vehicle.value %}required{% endif %}>
+                <option value="">— {% trans "Aucun véhicule" %} —</option>
+                {% for vehicle in vehicles %}
+                <option value="{{ vehicle.pk }}" {% if form.vehicle.value == vehicle.pk|string %}selected{% endif %}>
+                    {{ vehicle.display_name }} {% if vehicle.license_plate %}({{ vehicle.license_plate }}){% endif %}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+        {% else %}
+        <div class="p-4 rounded-lg bg-auto-50 border border-auto-100 mb-4">
+            <p class="text-sm text-auto-600">{% trans "Aucun véhicule associé. Les commandes existantes ne seront pas affectées." %}</p>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if success %}
+    <div class="alert alert-success p-4 mb-6 rounded-xl border border-success-100 bg-success-50">
+        <div class="flex items-center gap-2 mb-2">
+            <svg class="w-5 h-5 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span class="font-bold text-success-700">{% trans "Ticket créé" %}</span>
+        </div>
+        <p class="text-sm text-success-600 mb-4">{{ success_message|default:""—"" }}</p>
+        <a href="{% url 'support:ticket_list' %}"
+           class="btn-outline text-sm">{% trans "Voir la liste" %}</a>
+    </div>
+    {% endif %}
+
+    <div class="card p-6">
+        <h3 class="text-lg font-bold text-auto-dark mb-4">{% trans "Pièces jointes" %} <span class="text-auto-500 font-normal">(optionnel)</span></h3>
+        <div class="flex items-center gap-4">
+            <label class="flex-1 flex items-center gap-2 p-4 rounded-lg border-2 border-dashed border-auto-200 hover:border-auto-orange transition cursor-pointer bg-auto-50">
+                <svg class="w-6 h-6 text-auto-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                <span class="text-sm text-auto-600">{% trans "Glissez une image ou un document ici, ou cliquez pour parcourir" %}</span>
+                <input type="file"
+                       name="attachment"
+                       class="hidden"
+                       accept="image/*,application/pdf">
+            </label>
+        </div>
+        <p class="text-xs text-auto-500 mt-2">{% trans "PNG, JPG, PDF, 5MB max" %}</p>
+        {% csrf_token %}
+        {{ form.attachment }}
+        {% if form.attachment.errors %}
+        <p class="form-error">{{ form.attachment.errors.0 }}</p>
+        {% endif %}
+    </div>
+
+    <div class="flex justify-between items-center pt-6 border-t border-auto-100">
+        <a href="{% url 'support:ticket_list' %}"
+           class="btn-outline text-sm">{% trans "Annuler" %}</a>
+        <button type="submit"
+                class="bg-auto-orange text-white px-6 py-2 rounded-lg font-bold text-sm hover:bg-auto-orange-dark transition">
+            {% trans "Créer le ticket" %}
+        </button>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var fileInput = document.querySelector('input[name="attachment"]');
+    if (fileInput) {
+        fileInput.addEventListener('change', function() {
+            var fileName = this.files[0] ? this.files[0].name : '';
+            var label = this.closest('.flex.items-center.gap-2');
+            if (label) {
+                var span = label.querySelector('span');
+                if (span) {
+                    span.textContent = fileName ? '📎 ' + fileName : '{% trans "Glissez une image ou un document ici, ou cliquez pour parcourir" %}';
+                }
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n humanize %}
+
+{% block title %}{% trans "Gestion des paiements" %}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-bold text-auto-dark">{% trans "Paiements" %}</h1>
+        <a href="{% url 'administration:dashboard' %}" class="btn-outline">{% trans "Retour au tableau de bord" %}</a>
+    </div>
+
+    <!-- Filters -->
+    <div class="card p-4 mb-6">
+        <form method="get" class="flex flex-wrap gap-4 items-end">
+            <div>
+                <label class="block text-sm font-medium text-auto-800 mb-1">{% trans "Statut" %}</label>
+                <select name="status" class="form-input">
+                    <option value="">{% trans "Tous" %}</option>
+                    <option value="INITIATED" {% if selected_status == 'INITIATED' %}selected{% endif %}>{% trans "Initié" %}</option>
+                    <option value="PENDING" {% if selected_status == 'PENDING' %}selected{% endif %}>{% trans "En attente" %}</option>
+                    <option value="SUCCESS" {% if selected_status == 'SUCCESS' %}selected{% endif %}>{% trans "Succès" %}</option>
+                    <option value="FAILED" {% if selected_status == 'FAILED' %}selected{% endif %}>{% trans "Échoué" %}</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-auto-800 mb-1">{% trans "Fournisseur" %}</label>
+                <select name="provider" class="form-input">
+                    <option value="">{% trans "Tous" %}</option>
+                    <option value="MTN_MOMO" {% if selected_provider == 'MTN_MOMO' %}selected{% endif %}>MTN Mobile Money</option>
+                    <option value="ORANGE_MONEY" {% if selected_provider == 'ORANGE_MONEY' %}selected{% endif %}>Orange Money</option>
+                    <option value="CARD" {% if selected_provider == 'CARD' %}selected{% endif %}>{% trans "Carte" %}</option>
+                    <option value="CASH" {% if selected_provider == 'CASH' %}selected{% endif %}>{% trans "Espèces" %}</option>
+                </select>
+            </div>
+            <button type="submit" class="btn-primary">{% trans "Filtrer" %}</button>
+        </form>
+    </div>
+
+    <!-- Payments Table -->
+    <div class="card overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-auto-50">
+                    <tr class="text-left text-auto-700">
+                        <th class="px-4 py-3">#</th>
+                        <th class="px-4 py-3">{% trans "Utilisateur" %}</th>
+                        <th class="px-4 py-3">{% trans "Commande" %}</th>
+                        <th class="px-4 py-3">{% trans "Montant" %}</th>
+                        <th class="px-4 py-3">{% trans "Fournisseur" %}</th>
+                        <th class="px-4 py-3">{% trans "Statut" %}</th>
+                        <th class="px-4 py-3">{% trans "Date" %}</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y">
+                    {% for payment in payments %}
+                        <tr class="hover:bg-auto-50">
+                            <td class="px-4 py-3 font-mono text-xs">{{ payment.idempotency_key|truncatechars:12 }}</td>
+                            <td class="px-4 py-3">{{ payment.user.username }}</td>
+                            <td class="px-4 py-3 font-mono text-xs">{{ payment.order.order_number }}</td>
+                            <td class="px-4 py-3 font-bold">{{ payment.amount|intcomma }} {{ payment.currency }}</td>
+                            <td class="px-4 py-3">{{ payment.get_provider_display }}</td>
+                            <td class="px-4 py-3">
+                                {% if payment.status == 'SUCCESS' %}
+                                    <span class="badge-success">{% trans "Succès" %}</span>
+                                {% elif payment.status == 'FAILED' %}
+                                    <span class="badge-error">{% trans "Échoué" %}</span>
+                                {% else %}
+                                    <span class="badge-warning">{{ payment.get_status_display }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-4 py-3">{{ payment.created_at|date:"d/m/Y H:i" }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="7" class="px-4 py-8 text-center text-auto-600">{% trans "Aucun paiement trouvé." %}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if payments.has_other_pages %}
+            <div class="px-4 py-3 border-t flex justify-between items-center">
+                <span class="text-sm text-auto-600">
+                    {% trans "Page" %} {{ payments.number }} {% trans "sur" %} {{ payments.paginator.num_pages }}
+                </span>
+                <div class="flex space-x-2">
+                    {% if payments.has_previous %}
+                        <a href="?page={{ payments.previous_page_number }}" class="btn-outline text-sm py-1 px-3">{% trans "Précédent" %}</a>
+                    {% endif %}
+                    {% if payments.has_next %}
+                        <a href="?page={{ payments.next_page_number }}" class="btn-outline text-sm py-1 px-3">{% trans "Suivant" %}</a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,10 @@
+{% extends 'public/base.html' %}
+{% load i18n static %}
+
+{% block title %}{% trans "Garages" %} - AutoLink{% endblock %}
+
+{% block content %}
+<div class="container-lg" id="garages-page">
+    {% include "dashboard/includes/garage_list_items.html" %}
+</div>
+{% endblock %}

@@ -1,0 +1,110 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n humanize %}
+
+{% block title %}{% trans "Tickets de support" %} - AutoLink{% endblock %}
+
+{% block dashboard_header %}
+    <h1 class="text-sm font-bold text-auto-dark">{% trans "Tickets" %}</h1>
+{% endblock %}
+
+{% block dashboard_breadcrumb %}
+    <nav class="flex items-center space-x-2 text-sm text-auto-600">
+        <a href="{% url 'administration:dashboard' %}" class="hover:text-auto-orange transition">{% trans "Tableau de bord" %}</a>
+        <span class="text-auto-400">/</span>
+        <span class="font-bold text-auto-dark">{% trans "Tickets" %}</span>
+    </nav>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <h2 class="text-lg font-bold text-auto-dark">{% trans "Tickets de support" %}</h2>
+        <div class="flex gap-2">
+            {% for status in status_choices %}
+                <a href="?status={{ status.0 }}"
+                   class="px-3 py-1.5 rounded-lg text-sm font-medium transition
+                          {% if selected_status == status.0 %}bg-auto-orange text-white{% else %}bg-auto-50 text-auto-700 hover:bg-auto-100{% endif %}">
+                    {{ status.1 }}
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    {% if tickets %}
+        <div class="card p-6">
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>{% trans "Client" %}</th>
+                            <th>{% trans "Sujet" %}</th>
+                            <th>{% trans "Priorité" %}</th>
+                            <th>{% trans "Statut" %}</th>
+                            <th>{% trans "Date" %}</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for ticket in tickets %}
+                            <tr>
+                                <td class="font-bold text-xs">#{{ ticket.id }}</td>
+                                <td>
+                                    <div class="flex items-center gap-2">
+                                        {% if ticket.user.avatar %}
+                                            <img src="{{ ticket.user.avatar.url }}" class="w-6 h-6 rounded-full object-cover">
+                                        {% else %}
+                                            <div class="w-6 h-6 rounded-full bg-auto-orange/10 flex items-center justify-center text-xs font-bold text-auto-dark">
+                                                {{ ticket.user.display_name|first|upper }}
+                                            </div>
+                                        {% endif %}
+                                        <span class="font-medium text-sm">{{ ticket.user.display_name }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="max-w-xs truncate" title="{{ ticket.subject }}">
+                                        <span class="font-medium">{{ ticket.subject }}</span>
+                                    </div>
+                                </td>
+                                <td><span class="badge-{{ ticket.priority_color }} text-[10px]">{{ ticket.get_priority_display }}</span></td>
+                                <td><span class="badge-{{ ticket.status_color }} text-[10px]">{{ ticket.get_status_display }}</span></td>
+                                <td class="text-auto-600 text-sm">{{ ticket.created_at|date:"d/m/Y H:i" }}</td>
+                                <td class="text-right">
+                                    <a href="{% url 'support:ticket_detail' ticket.id %}?next={% url 'administration:support' %}"
+                                       class="text-auto-orange font-bold text-sm hover:text-auto-600 transition">
+                                        {% trans "Voir" %}
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if is_paginated %}
+            <div class="mt-4 flex items-center justify-between">
+                <div class="text-sm text-auto-600">
+                    {% trans "Page" %} {{ page_obj.number }} {% trans "sur" %} {{ page_obj.paginator.num_pages }}
+                </div>
+                <div class="flex gap-2">
+                    {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}{% if selected_status %}&status={{ selected_status }}{% endif %}"
+                           class="btn-outline text-sm px-3 py-1">{% trans "Précédent" %}</a>
+                    {% endif %}
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}{% if selected_status %}&status={{ selected_status }}{% endif %}"
+                           class="btn-outline text-sm px-3 py-1">{% trans "Suivant" %}</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="card p-8 text-center">
+            <div class="text-4xl mb-3">🎫</div>
+            <h3 class="text-lg font-bold text-auto-dark mb-1">{% trans "Aucun ticket" %}</h3>
+            <p class="text-auto-600">{% trans "Il n'y a pas encore de tickets de support." %}</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

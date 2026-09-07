@@ -1,0 +1,100 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Gestion des garages" %}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-bold text-auto-dark">{% trans "Garages" %}</h1>
+        <a href="{% url 'administration:dashboard' %}" class="btn-outline">{% trans "Retour au tableau de bord" %}</a>
+    </div>
+
+    <!-- Filters -->
+    <div class="card p-4 mb-6">
+        <form method="get" class="flex flex-wrap gap-4 items-end">
+            <div>
+                <label class="block text-sm font-medium text-auto-800 mb-1">{% trans "Recherche" %}</label>
+                <input type="text" name="q" value="{{ search_query }}" class="form-input" placeholder="{% trans 'Name or city...' %}">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-auto-800 mb-1">{% trans "Statut" %}</label>
+                <select name="status" class="form-input">
+                    <option value="">{% trans "Tous" %}</option>
+                    <option value="PENDING" {% if selected_status == 'PENDING' %}selected{% endif %}>{% trans "En attente" %}</option>
+                    <option value="VERIFIED" {% if selected_status == 'VERIFIED' %}selected{% endif %}>{% trans "Vérifié" %}</option>
+                    <option value="REJECTED" {% if selected_status == 'REJECTED' %}selected{% endif %}>{% trans "Rejeté" %}</option>
+                    <option value="SUSPENDED" {% if selected_status == 'SUSPENDED' %}selected{% endif %}>{% trans "Suspendu" %}</option>
+                </select>
+            </div>
+            <button type="submit" class="btn-primary">{% trans "Filtrer" %}</button>
+        </form>
+    </div>
+
+    <!-- Garages Table -->
+    <div class="card overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-auto-50">
+                    <tr class="text-left text-auto-700">
+                        <th class="px-4 py-3">{% trans "Garage" %}</th>
+                        <th class="px-4 py-3">{% trans "Propriétaire" %}</th>
+                        <th class="px-4 py-3">{% trans "Ville" %}</th>
+                        <th class="px-4 py-3">{% trans "Statut" %}</th>
+                        <th class="px-4 py-3">{% trans "Note" %}</th>
+                        <th class="px-4 py-3">{% trans "Actions" %}</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y">
+                    {% for garage in garages %}
+                        <tr class="hover:bg-auto-50">
+                            <td class="px-4 py-3">
+                                <div class="font-medium">{{ garage.name }}</div>
+                                <div class="text-xs text-auto-600">{{ garage.city }}</div>
+                            </td>
+                            <td class="px-4 py-3">{{ garage.owner.username }}</td>
+                            <td class="px-4 py-3">{{ garage.city }}</td>
+                            <td class="px-4 py-3">
+                                {% if garage.verification_status == 'VERIFIED' %}
+                                    <span class="badge-success">{% trans "Vérifié" %}</span>
+                                {% elif garage.verification_status == 'PENDING' %}
+                                    <span class="badge-warning">{% trans "En attente" %}</span>
+                                {% elif garage.verification_status == 'REJECTED' %}
+                                    <span class="badge-error">{% trans "Rejeté" %}</span>
+                                {% else %}
+                                    <span class="badge-gray">{% trans "Suspendu" %}</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-4 py-3">{{ garage.trust_score }}/5</td>
+                            <td class="px-4 py-3">
+                                <a href="{% url 'administration:garage_verify' garage.pk %}" class="text-auto-orange hover:underline">{% trans "Examiner" %}</a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="6" class="px-4 py-8 text-center text-auto-600">{% trans "Aucun garage trouvé." %}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Pagination -->
+        {% if garages.has_other_pages %}
+            <div class="px-4 py-3 border-t flex justify-between items-center">
+                <span class="text-sm text-auto-600">
+                    {% trans "Page" %} {{ garages.number }} {% trans "sur" %} {{ garages.paginator.num_pages }}
+                </span>
+                <div class="flex space-x-2">
+                    {% if garages.has_previous %}
+                        <a href="?page={{ garages.previous_page_number }}" class="btn-outline text-sm py-1 px-3">{% trans "Précédent" %}</a>
+                    {% endif %}
+                    {% if garages.has_next %}
+                        <a href="?page={{ garages.next_page_number }}" class="btn-outline text-sm py-1 px-3">{% trans "Suivant" %}</a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

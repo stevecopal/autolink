@@ -1,0 +1,87 @@
+{% load i18n %}
+{% if garages %}
+<section class="max-w-7xl mb-6 mx-auto px-4 sm:px-6 pt-12 sm:pt-16" aria-labelledby="garages-heading">
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-6 sm:mb-8">
+        <div>
+            <span class="inline-block text-auto-orange text-xs font-bold tracking-widest uppercase mb-2">{% trans "Nos partenaires" %}</span>
+            <h2 id="garages-heading" class="text-xl sm:text-2xl md:text-3xl font-bold text-auto-dark">{% trans "Garages vérifiés" %}</h2>
+        </div>
+        <a href="{% url 'garages:garage_list' %}" class="inline-flex items-center gap-1.5 text-auto-orange hover:text-auto-orange-dark font-bold text-sm transition group shrink-0">
+            {% trans "Voir tous les garages" %}
+            <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </a>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+        {% for garage in garages %}
+        <a href="{% url 'garages:garage_detail' slug=garage.slug %}" class="group bg-white rounded-2xl border border-gray-100 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] hover:border-auto-orange/20 transition-all duration-300 overflow-hidden">
+            <div class="p-4 sm:p-5">
+                <div class="flex items-start gap-3">
+                    {# Logo #}
+                    <div class="shrink-0">
+                        {% if garage.logo %}
+                        <img src="{{ garage.logo.url }}" alt="{{ garage.name }}" class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl object-cover border border-gray-100" loading="lazy">
+                        {% else %}
+                        <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-gradient-to-br from-auto-orange/10 to-auto-orange/5 flex items-center justify-center">
+                            <svg class="w-6 h-6 text-auto-orange/60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    {# Info #}
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <h3 class="font-bold text-auto-dark truncate group-hover:text-auto-orange transition text-sm sm:text-base">{{ garage.name }}</h3>
+                            {% if garage.verification_status == 'VERIFIED' %}
+                            <span class="shrink-0 inline-flex items-center gap-1 bg-success-50 text-success-700 text-[10px] font-bold px-1.5 py-0.5 rounded-md border border-success-100">
+                                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
+                                {% trans "Vérifié" %}
+                            </span>
+                            {% endif %}
+                        </div>
+
+                        <p class="text-gray-400 text-xs sm:text-sm flex items-center gap-1 mb-2">
+                            <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            <span class="truncate">{{ garage.neighborhood|default:garage.city|default:_("Non renseigné") }}</span>
+                        </p>
+
+                        {# Rating #}
+                        <div class="flex items-center gap-2">
+                            <div class="flex items-center gap-1">
+                                <svg class="w-4 h-4 text-auto-gold" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                <span class="text-sm font-bold text-auto-dark">{{ garage.trust_score|floatformat:1 }}</span>
+                            </div>
+                            <span class="text-gray-300">·</span>
+                            <span class="text-gray-400 text-xs">{{ garage.total_reviews }} {% trans "avis" %}</span>
+                        </div>
+                    </div>
+                </div>
+
+                {# Services #}
+                {% with services=garage.services.all %}
+                {% if services %}
+                <div class="flex flex-wrap gap-1.5 mt-3 pt-3 border-t border-gray-50">
+                    {% for service in services|slice:":3" %}
+                    <span class="inline-flex items-center bg-auto-light text-gray-600 text-[10px] sm:text-[11px] font-medium px-2 py-0.5 rounded-md">{{ service.name }}</span>
+                    {% endfor %}
+                    {% if services|length > 3 %}
+                    <span class="inline-flex items-center text-gray-400 text-[10px] sm:text-[11px] font-medium px-1">+{{ services|length|add:"-3" }}</span>
+                    {% endif %}
+                </div>
+                {% endif %}
+                {% endwith %}
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+
+    {% if has_more_garages %}
+    <div class="text-center mt-8">
+        <a href="{% url 'garages:garage_list' %}" class="inline-flex items-center gap-2 bg-white border-2 border-auto-orange text-auto-orange hover:bg-auto-orange hover:text-white font-bold px-6 py-2.5 rounded-xl transition-all duration-200 text-sm">
+            {% trans "Voir tous les garages" %}
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+        </a>
+    </div>
+    {% endif %}
+</section>
+{% endif %}

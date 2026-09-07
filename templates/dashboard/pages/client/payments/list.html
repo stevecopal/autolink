@@ -1,0 +1,100 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n humanize %}
+
+{% block title %}{% trans "Mes paiements" %} - AutoLink{% endblock %}
+
+{% block dashboard_header %}
+    <h1 class="text-sm font-bold text-auto-dark">{% trans "Mes paiements" %}</h1>
+{% endblock %}
+
+{% block dashboard_breadcrumb %}
+    <nav class="flex items-center space-x-2 text-sm text-auto-600">
+        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-auto-orange transition">{% trans "Tableau de bord" %}</a>
+        <span class="text-auto-400">/</span>
+        <span class="font-bold text-auto-dark">{% trans "Mes paiements" %}</span>
+    </nav>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <h2 class="text-lg font-bold text-auto-dark">{% trans "Liste des paiements" %}</h2>
+        <div class="text-sm text-auto-600">
+            {% trans "Total dépensé" %} : <strong class="text-auto-orange">{{ total_amount|intcomma }} FCFA</strong>
+        </div>
+    </div>
+
+    {% if payments %}
+        <div class="card p-6">
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>{% trans "Commande" %}</th>
+                            <th>{% trans "Montant" %}</th>
+                            <th>{% trans "Méthode" %}</th>
+                            <th>{% trans "Statut" %}</th>
+                            <th>{% trans "Date" %}</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for payment in payments %}
+                            <tr>
+                                <td class="font-bold text-xs">#{{ payment.id }}</td>
+                                <td>
+                                    <a href="{% url 'orders:order_detail' payment.order.order_number %}"
+                                       class="font-medium text-auto-orange hover:underline">
+                                        {{ payment.order.order_number }}
+                                    </a>
+                                </td>
+                                <td class="font-bold">{{ payment.amount|intcomma }} FCFA</td>
+                                <td>
+                                    <span class="badge-neutral text-[10px]">{{ payment.get_payment_method_display }}</span>
+                                </td>
+                                <td><span class="badge-{{ payment.status_color }} text-[10px]">{{ payment.status_label }}</span></td>
+                                <td class="text-auto-600 text-sm">{{ payment.created_at|date:"d/m/Y H:i" }}</td>
+                                <td class="text-right">
+                                    <a href="{% url 'payments:payment_detail' payment.id %}"
+                                       class="text-auto-orange font-bold text-sm hover:text-auto-600 transition">
+                                        {% trans "Détails" %}
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if is_paginated %}
+            <div class="mt-4 flex items-center justify-between">
+                <div class="text-sm text-auto-600">
+                    {% trans "Page" %} {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+                </div>
+                <div class="flex gap-2">
+                    {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}"
+                           class="btn-outline text-sm px-3 py-1">{% trans "Précédent" %}</a>
+                    {% endif %}
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}"
+                           class="btn-outline text-sm px-3 py-1">{% trans "Suivant" %}</a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    {% else %}
+        <div class="card p-8 text-center">
+            <div class="text-4xl mb-3">💳</div>
+            <h3 class="text-lg font-bold text-auto-dark mb-1">{% trans "Aucun paiement" %}</h3>
+            <p class="text-auto-600">{% trans "Vous n'avez pas encore effectué de paiement." %}</p>
+            <a href="{% url 'catalog:part_list' %}"
+               class="bg-auto-orange text-white px-6 py-2 rounded-lg font-bold text-sm hover:bg-auto-orange-dark transition mt-4 inline-block">
+                {% trans "Parcourez les pièces" %}
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

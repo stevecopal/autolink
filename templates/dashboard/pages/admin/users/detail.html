@@ -1,0 +1,207 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n humanize %}
+
+{% block title %}{{ user.display_name }} - AutoLink{% endblock %}
+
+{% block dashboard_header %}
+    <h1 class="text-sm font-bold text-auto-dark">{% trans "Utilisateur" %}</h1>
+{% endblock %}
+
+{% block dashboard_breadcrumb %}
+    <nav class="flex items-center space-x-2 text-sm text-auto-600">
+        <a href="{% url 'administration:dashboard' %}" class="hover:text-auto-orange transition">{% trans "Tableau de bord" %}</a>
+        <span class="text-auto-400">/</span>
+        <a href="{% url 'administration:users' %}" class="hover:text-auto-orange transition">{% trans "Utilisateurs" %}</a>
+        <span class="text-auto-400">/</span>
+        <span class="font-bold text-auto-dark">{{ user.display_name }}</span>
+    </nav>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div class="flex items-start gap-4">
+            {% if user.avatar %}
+                <img src="{{ user.avatar.url }}" class="w-16 h-16 rounded-2xl object-cover border-4 border-auto-orange shadow-card">
+            {% else %}
+                <div class="w-16 h-16 rounded-2xl bg-auto-orange/10 flex items-center justify-center text-3xl shadow-card border-4 border-auto-100">
+                    {{ user.display_name|first|upper }}
+                </div>
+            {% endif %}
+            <div>
+                <div class="flex items-center gap-2 mb-1">
+                    <h2 class="text-xl font-bold text-auto-dark">{{ user.display_name }}</h2>
+                    <span class="badge-{{ user.role|lower }} text-[10px]">{{ user.role }}</span>
+                </div>
+                <p class="text-sm text-auto-500">{{ user.email }}</p>
+                {% if user.is_active %}
+                    <span class="badge-success text-[10px]">{% trans "Compte actif" %}</span>
+                {% else %}
+                    <span class="badge-error text-[10px]">{% trans "Compte inactif" %}</span>
+                {% endif %}
+            </div>
+        </div>
+        {% if request.user.role == 'ADMIN' %}
+        <div class="flex gap-2">
+            <a href="{% url 'administration:users' %}"
+               class="btn-outline text-sm">{% trans "Retour à la liste" %}</a>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Informations personnelles -->
+        <div class="card p-6">
+            <h3 class="text-lg font-bold text-auto-dark mb-4">{% trans "Informations personnelles" %}</h3>
+            <div class="space-y-3">
+                <div>
+                    <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Nom" %}</p>
+                    <p class="font-bold">{{ user.last_name|default:"—" }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Prénom" %}</p>
+                    <p class="font-bold">{{ user.first_name|default:"—" }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Email" %}</p>
+                    <a href="mailto:{{ user.email }}" class="text-auto-orange hover:underline font-bold">{{ user.email }}</a>
+                </div>
+                <div>
+                    <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Téléphone" %}</p>
+                    <p class="font-bold">{{ user.phone|default:"—" }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Ville" %}</p>
+                    <p class="font-bold">{{ user.city|default:"—" }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Quartier" %}</p>
+                    <p class="font-bold">{{ user.neighborhood|default:"—" }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistiques -->
+        <div class="card p-6">
+            <h3 class="text-lg font-bold text-auto-dark mb-4">{% trans "Statistiques" %}</h3>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="stat-card text-center">
+                    <div class="stat-value">{{ user.vehicles.count }}</div>
+                    <div class="stat-label">{% trans "Véhicules" %}</div>
+                </div>
+                <div class="stat-card text-center">
+                    <div class="stat-value">{{ user.orders.count }}</div>
+                    <div class="stat-label">{% trans "Commandes" %}</div>
+                </div>
+                <div class="stat-card text-center">
+                    <div class="stat-value">{{ user.reviews.count }}</div>
+                    <div class="stat-label">{% trans "Avis" %}</div>
+                </div>
+                <div class="stat-card text-center">
+                    <div class="stat-value">{{ user.favorites.count }}</div>
+                    <div class="stat-label">{% trans "Favoris" %}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activité récente -->
+        <div class="card p-6 md:col-span-2">
+            <h3 class="text-lg font-bold text-auto-dark mb-4">{% trans "Activité récente" %}</h3>
+
+            <!-- Commandes récentes -->
+            {% if recent_orders %}
+            <div class="mb-6">
+                <h4 class="font-bold text-sm text-auto-700 mb-3">{% trans "Commandes récentes" %}</h4>
+                <div class="space-y-2">
+                    {% for order in recent_orders %}
+                    <a href="{% url 'orders:order_detail' order.order_number %}"
+                       class="flex items-center justify-between p-3 rounded-lg bg-auto-50 hover:bg-auto-100 transition border border-auto-100">
+                        <div>
+                            <div class="font-bold text-sm">{{ order.order_number }}</div>
+                            <div class="text-xs text-auto-500">{{ order.created_at|date:"d/m/Y H:i" }}</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="font-bold text-sm">{{ order.total|intcomma }} FCFA</div>
+                            <span class="badge-{{ order.status_color }} text-[10px]">{{ order.status_label }}</span>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Avis récents -->
+            {% if recent_reviews %}
+            <div class="mb-6">
+                <h4 class="font-bold text-sm text-auto-700 mb-3">{% trans "Avis récents" %}</h4>
+                <div class="space-y-2">
+                    {% for review in recent_reviews %}
+                    <div class="p-3 rounded-lg bg-auto-50 border border-auto-100">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="font-bold text-sm text-auto-dark">{{ review.garage.name }}</span>
+                            <span class="text-auto-gold font-bold text-sm">⭐ {{ review.rating }}/5</span>
+                        </div>
+                        <p class="text-sm text-auto-700 line-clamp-2">{{ review.comment }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Véhicules -->
+            {% if vehicles %}
+            <div class="mb-6">
+                <h4 class="font-bold text-sm text-auto-700 mb-3">{% trans "Véhicules" %}</h4>
+                <div class="space-y-2">
+                    {% for vehicle in vehicles %}
+                    <div class="flex items-center justify-between p-3 rounded-lg bg-auto-50 border border-auto-100">
+                        <div>
+                            <div class="font-bold text-sm">{{ vehicle.display_name }}</div>
+                            {% if vehicle.license_plate %}
+                            <div class="text-xs text-auto-500">{{ vehicle.license_plate }}</div>
+                            {% endif %}
+                        </div>
+                        {% if vehicle.is_primary %}
+                        <span class="badge-success text-[10px]">{% trans "Primaire" %}</span>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if not recent_orders and not recent_reviews and not vehicles %}
+            <div class="text-center py-6 text-auto-500">
+                {% trans "Aucune activité récente" %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if request.user.role == 'ADMIN' %}
+    <div class="card p-6 border border-auto-200 bg-auto-50">
+        <h3 class="text-lg font-bold text-auto-dark mb-4">{% trans "Gestion du compte" %}</h3>
+        <div class="flex flex-wrap gap-3">
+            {% if user.is_active %}
+                <form method="post" action="{% url 'administration:user_detail' user.pk %}" class="inline-flex items-center gap-2 px-4 py-2 bg-error-50 text-error-600 rounded-xl text-sm font-bold hover:bg-error-100 transition">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="deactivate">
+                    <button type="submit" class="">{% trans "Désactiver le compte" %}</button>
+                </form>
+            {% else %}
+                <form method="post" action="{% url 'administration:user_detail' user.pk %}" class="inline-flex items-center gap-2 px-4 py-2 bg-success-50 text-success-600 rounded-xl text-sm font-bold hover:bg-success-100 transition">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="activate">
+                    <button type="submit" class="">{% trans "Activer le compte" %}</button>
+                </form>
+            {% endif %}
+
+            <a href="{% url 'accounts:profile' %}"
+               class="inline-flex items-center gap-2 px-4 py-2 bg-auto-orange text-white rounded-xl text-sm font-bold hover:bg-auto-orange-dark transition">
+                {% trans "Voir mon profil" %}
+            </a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

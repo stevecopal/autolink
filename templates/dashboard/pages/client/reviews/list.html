@@ -1,0 +1,133 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n humanize %}
+
+{% block title %}{% trans "Mes avis" %} - AutoLink{% endblock %}
+
+{% block dashboard_header %}
+    <h1 class="text-sm font-bold text-auto-dark">{% trans "Mes avis" %}</h1>
+{% endblock %}
+
+{% block dashboard_breadcrumb %}
+    <nav class="flex items-center space-x-2 text-sm text-auto-600">
+        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-auto-orange transition">{% trans "Tableau de bord" %}</a>
+        <span class="text-auto-400">/</span>
+        <span class="font-bold text-auto-dark">{% trans "Mes avis" %}</span>
+    </nav>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <h2 class="text-lg font-bold text-auto-dark">{% trans "Vos avis" %}</h2>
+        <div class="text-sm text-auto-600">
+            {% trans "Total" %} : <strong class="text-auto-orange">{{ reviews.count }}</strong> •
+            {% trans "Moyenne" %} : <strong class="text-auto-gold">{{ average_rating|floatformat:1 }}</strong>/5
+        </div>
+    </div>
+
+    {% if reviews %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% for review in reviews %}
+            <div class="card p-6">
+                <div class="flex items-start justify-between mb-4">
+                    <div class="flex items-center gap-3">
+                        {% if review.garage.cover_photo %}
+                        <img src="{{ review.garage.cover_photo.url }}"
+                             class="w-16 h-16 rounded-xl object-cover"
+                             alt="{{ review.garage.name }}">
+                        {% elif review.garage.logo %}
+                        <img src="{{ review.garage.logo.url }}"
+                             class="w-16 h-16 rounded-xl object-cover"
+                             alt="{{ review.garage.name }}">
+                        {% else %}
+                        <div class="w-16 h-16 rounded-xl bg-auto-orange/10 flex items-center justify-center text-2xl">🔧</div>
+                        {% endif %}
+                        <div>
+                            <a href="{{ review.garage.get_absolute_url }}"
+                               class="font-bold text-base text-auto-dark hover:text-auto-orange transition">
+                                {{ review.garage.name }}
+                            </a>
+                            <div class="text-xs text-auto-500">{{ review.garage.city }}</div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        {% for i in "12345" %}
+                        <svg class="w-4 h-4 {% if i|add:0 <= review.rating %}text-auto-gold{% else %}text-auto-300{% endif %}" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between mb-3">
+                    <div class="flex gap-2">
+                        <span class="badge-neutral text-[10px]">{{ review.garage.services.count }} {% trans "services" %}</span>
+                        <span class="badge-{{ review.creation_status }} text-[10px]">
+                            {% if review.creation_status == 'SUBMITTED' %}{% trans 'En attente' %}
+                            {% elif review.creation_status == 'APPROVED' %}{% trans 'Approuvé' %}
+                            {% elif review.creation_status == 'REJECTED' %}{% trans 'Refusé' %}{% endif %}
+                        </span>
+                    </div>
+                    <span class="text-xs text-auto-500">{{ review.created_at|date:"d/m/Y" }}</span>
+                </div>
+
+                <div class="flex items-center gap-2 text-sm text-auto-500 mb-3">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                    {{ review.user.display_name }}
+                </div>
+
+                <div class="p-3 rounded-lg bg-auto-50 border border-auto-100 mb-3">
+                    <p class="text-sm text-auto-700 whitespace-pre-wrap">{{ review.comment }}</p>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <div class="text-xs text-auto-500">
+                        {% trans "Publié le" %} {{ review.created_at|date:"d/m/Y H:i" }}
+                    </div>
+                    {% if review.creation_status == 'SUBMITTED' %}
+                    <span class="badge-warning text-[10px] px-2 py-1">{% trans "En attente de validation" %}</span>
+                    {% elif review.creation_status == 'APPROVED' %}
+                    <span class="badge-success text-[10px] px-2 py-1">{% trans "Publié" %}</span>
+                    {% else %}
+                    <span class="badge-error text-[10px] px-2 py-1">{% trans "Refusé" %}</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <div class="flex items-center justify-center gap-2">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}"
+                   class="btn-outline text-sm px-4 py-2">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    {% trans "Précédent" %}
+                </a>
+            {% endif %}
+
+            <span class="px-4 py-2 text-sm text-auto-600">
+                {% trans "Page" %} {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}"
+                   class="btn-outline text-sm px-4 py-2">
+                    {% trans "Suivant" %}
+                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    {% else %}
+        <div class="card p-8 text-center">
+            <div class="text-4xl mb-3">⭐</div>
+            <h3 class="text-lg font-bold text-auto-dark mb-1">{% trans "Aucun avis" %}</h3>
+            <p class="text-auto-600 mb-4">{% trans "Vous n'avez pas encore publié d'avis." %}</p>
+            <a href="{% url 'reviews:review_create' %}"
+               class="bg-auto-orange text-white px-6 py-2 rounded-lg font-bold text-sm hover:bg-auto-orange-dark transition">
+                {% trans "Publier votre premier avis" %}
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

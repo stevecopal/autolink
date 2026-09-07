@@ -1,0 +1,26 @@
+{% load static i18n %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% trans "AutoLink" %}{% endblock %} - {% trans "Automotive Platform" %}</title>
+    <meta name="description" content="{% block description %}{% trans "Find garages, parts and automotive services near you in Cameroon" %}{% endblock %}">
+    <link rel="stylesheet" href="{% static 'css/output.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="bg-auto-cream min-h-screen flex flex-col">
+    {% include "public/includes/navbar.html" %}
+
+    {% include "public/includes/messages.html" %}
+
+    <main class="flex-1">
+        {% block content %}{% endblock %}
+    </main>
+
+    {% include "public/includes/footer.html" %}
+
+    <script src="{% static 'js/app.js' %}" defer></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,122 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n humanize %}
+
+{% block title %}{% trans "Détail de l'utilisateur" %}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8">
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-bold text-auto-dark">{{ user_obj.display_name }}</h1>
+        <a href="{% url 'administration:users' %}" class="btn-outline">{% trans "Retour aux utilisateurs" %}</a>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- User Info -->
+        <div class="card p-6">
+            <h2 class="font-bold text-lg mb-4">{% trans "Informations de l'utilisateur" %}</h2>
+            <div class="space-y-3">
+                <div>
+                    <label class="text-sm text-auto-600">{% trans "Nom d'utilisateur" %}</label>
+                    <div class="font-medium">{{ user_obj.username }}</div>
+                </div>
+                <div>
+                    <label class="text-sm text-auto-600">{% trans "Email" %}</label>
+                    <div class="font-medium">{{ user_obj.email|default:"-" }}</div>
+                </div>
+                <div>
+                    <label class="text-sm text-auto-600">{% trans "Téléphone" %}</label>
+                    <div class="font-medium">{{ user_obj.phone|default:"-" }}</div>
+                </div>
+                <div>
+                    <label class="text-sm text-auto-600">{% trans "Ville" %}</label>
+                    <div class="font-medium">{{ user_obj.city|default:"-" }}</div>
+                </div>
+                <div>
+                    <label class="text-sm text-auto-600">{% trans "Rôle" %}</label>
+                    <div><span class="badge-{{ user_obj.role|lower }}">{{ user_obj.role }}</span></div>
+                </div>
+                <div>
+                    <label class="text-sm text-auto-600">{% trans "Inscrit le" %}</label>
+                    <div class="font-medium">{{ user_obj.date_joined|date:"d/m/Y H:i" }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="card p-6">
+            <h2 class="font-bold text-lg mb-4">{% trans "Actions" %}</h2>
+            <div class="space-y-3">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="toggle_active">
+                    {% if user_obj.is_active %}
+                        <button type="submit" class="btn-outline w-full text-sm" onclick="return confirm('{% trans "Désactiver cet utilisateur ?" %}')">
+                            {% trans "Désactiver l'utilisateur" %}
+                        </button>
+                    {% else %}
+                        <button type="submit" class="btn-primary w-full text-sm" onclick="return confirm('{% trans "Activer cet utilisateur ?" %}')">
+                            {% trans "Activer l'utilisateur" %}
+                        </button>
+                    {% endif %}
+                </form>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="change_role">
+                    <select name="role" class="form-input mb-2">
+                        <option value="CLIENT" {% if user_obj.role == 'CLIENT' %}selected{% endif %}>{% trans "Client" %}</option>
+                        <option value="GARAGE" {% if user_obj.role == 'GARAGE' %}selected{% endif %}>{% trans "Garage" %}</option>
+                        <option value="VENDEUR" {% if user_obj.role == 'VENDEUR' %}selected{% endif %}>{% trans "Vendeur" %}</option>
+                        <option value="ADMIN" {% if user_obj.role == 'ADMIN' %}selected{% endif %}>{% trans "Admin" %}</option>
+                    </select>
+                    <button type="submit" class="btn-primary w-full text-sm">{% trans "Changer le rôle" %}</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="card p-6">
+            <h2 class="font-bold text-lg mb-4">{% trans "Activité" %}</h2>
+            <div class="space-y-3">
+                <div class="flex justify-between">
+                    <span>{% trans "Commandes" %}</span>
+                    <span class="font-bold">{{ user_orders.count }}</span>
+                </div>
+                <div class="flex justify-between">
+                    <span>{% trans "Paiements" %}</span>
+                    <span class="font-bold">{{ user_payments.count }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Orders -->
+    {% if user_orders %}
+        <div class="card p-6 mt-6">
+            <h2 class="font-bold text-lg mb-4">{% trans "Commandes récentes" %}</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="border-b text-left text-auto-600">
+                            <th class="pb-2">#</th>
+                            <th class="pb-2">{% trans "Date" %}</th>
+                            <th class="pb-2">{% trans "Statut" %}</th>
+                            <th class="pb-2">{% trans "Total" %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in user_orders %}
+                            <tr class="border-b">
+                                <td class="py-2 font-mono text-xs">{{ order.order_number }}</td>
+                                <td class="py-2">{{ order.created_at|date:"d/m/Y" }}</td>
+                                <td class="py-2"><span class="badge-{{ order.status_color }}">{{ order.status_label }}</span></td>
+                                <td class="py-2 font-bold">{{ order.total|intcomma }} FCFA</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

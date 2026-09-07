@@ -1,0 +1,87 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Demande de pièce" %} - AutoLink{% endblock %}
+
+{% block dashboard_header %}
+    <h1 class="text-sm font-bold text-auto-dark">{% trans "Demande de pièce" %}</h1>
+{% endblock %}
+
+{% block dashboard_breadcrumb %}
+    <nav class="flex items-center space-x-2 text-sm text-auto-600">
+        <a href="{% url 'garages:garage_dashboard' %}" class="hover:text-auto-orange transition">{% trans "Tableau de bord" %}</a>
+        <span class="text-auto-400">/</span>
+        <a href="{% url 'catalog:garage_products' %}" class="hover:text-auto-orange transition">{% trans "Mes produits" %}</a>
+        <span class="text-auto-400">/</span>
+        <span class="font-bold text-auto-dark">{% trans "Demande" %}</span>
+    </nav>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="card p-6 mb-6">
+        <h2 class="text-xl font-bold text-auto-dark mb-2">{% trans "Demande de pièce" %}</h2>
+        <p class="text-sm text-auto-600">
+            {% trans "Vous pouvez demander une pièce spécifique à votre garage." %}
+        </p>
+    </div>
+
+    <div class="card p-6">
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+
+            <div>
+                <label class="form-label">{% trans "Pièce recherchée" %} *</label>
+                {{ form.part_request }}
+                {% if form.part_request.errors %}
+                <p class="form-error">{{ form.part_request.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label class="form-label">{% trans "Marque" %} *</label>
+                {{ form.brand }}
+                {% if form.brand.errors %}
+                <p class="form-error">{{ form.brand.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label class="form-label">{% trans "Modèle" %} *</label>
+                {{ form.model }}
+                {% if form.model.errors %}
+                <p class="form-error">{{ form.model.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label class="form-label">{% trans "Année" %} *</label>
+                {{ form.year }}
+                {% if form.year.errors %}
+                <p class="form-error">{{ form.year.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label class="form-label">{% trans "Référence OEM" %}</label>
+                {{ form.reference_oem }}
+            </div>
+
+            <div>
+                <label class="form-label">{% trans "Description" %} *</label>
+                {{ form.description }}
+                {% if form.description.errors %}
+                <p class="form-error">{{ form.description.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div class="flex justify-between items-center pt-6 border-t border-auto-100">
+                <a href="{% url 'catalog:garage_products' %}" class="btn-outline text-sm">{% trans "Annuler" %}</a>
+                <button type="submit" class="bg-auto-orange text-white px-6 py-2 rounded-lg font-bold text-sm hover:bg-auto-orange-dark transition">
+                    {% trans "Envoyer la demande" %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

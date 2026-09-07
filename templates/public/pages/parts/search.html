@@ -1,0 +1,63 @@
+{% extends 'public/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Recherche" %}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <form action="" method="get" class="max-w-2xl mx-auto mb-8">
+        <div class="flex bg-white rounded-xl overflow-hidden shadow-lg border">
+            <input type="text" name="q" value="{{ query }}" placeholder="{% trans "Rechercher..." %}"
+                   class="flex-1 px-6 py-4 text-auto-dark outline-none" autofocus>
+            <button type="submit" class="bg-auto-orange text-white px-6 font-bold">🔍</button>
+        </div>
+    </form>
+
+    {% if query %}
+    <p class="text-auto-600 mb-6">{% blocktrans %}Resultats pour « {{ query }} »{% endblocktrans %}</p>
+
+    {% if results.garages %}
+    <div class="mb-8">
+        <h2 class="text-xl font-bold text-auto-dark mb-4">🔧 {% trans "Garages" %}</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {% for garage in results.garages %}
+            <a href="{% url 'garages:garage_detail' slug=garage.slug %}" class="card p-4 flex items-center space-x-4">
+                <div class="w-12 h-12 rounded-lg bg-auto-orange/10 flex items-center justify-center text-xl">🔧</div>
+                <div>
+                    <h3 class="font-bold">{{ garage.name }}</h3>
+                    <p class="text-auto-600 text-sm">📍 {{ garage.neighborhood|default:garage.city }}</p>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if results.parts %}
+    <div class="mb-8">
+        <h2 class="text-xl font-bold text-auto-dark mb-4">🔩 {% trans "Pieces" %}</h2>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {% for part in results.parts %}
+            <a href="{% url 'catalog:part_detail' slug=part.slug %}" class="card p-4">
+                <h3 class="font-bold text-sm">{{ part.name }}</h3>
+                <p class="text-auto-orange font-bold mt-2">{{ part.price }} FCFA</p>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    {% if not results.garages and not results.parts %}
+    <div class="text-center py-12">
+        <div class="text-5xl mb-4">🔍</div>
+        <h3 class="text-xl font-bold text-auto-dark mb-2">{% trans "Aucun resultat trouve" %}</h3>
+        <p class="text-auto-600">{% trans "Essayez avec d'autres mots-cles ou explorez nos categories." %}</p>
+        <div class="mt-6 space-x-3">
+            <a href="{% url 'garages:garage_list' %}" class="btn-primary">{% trans "Trouver un garage" %}</a>
+            <a href="{% url 'catalog:part_list' %}" class="btn-outline">{% trans "Trouver une piece" %}</a>
+        </div>
+    </div>
+    {% endif %}
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,169 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Publier un avis" %} - AutoLink{% endblock %}
+
+{% block dashboard_header %}
+    <h1 class="text-sm font-bold text-auto-dark">{% trans "Nouvel avis" %}</h1>
+{% endblock %}
+
+{% block dashboard_breadcrumb %}
+    <nav class="flex items-center space-x-2 text-sm text-auto-600">
+        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-auto-orange transition">{% trans "Tableau de bord" %}</a>
+        <span class="text-auto-400">/</span>
+        <a href="{% url 'reviews:review_list' %}" class="hover:text-auto-orange transition">{% trans "Mes avis" %}</a>
+        <span class="text-auto-400">/</span>
+        <span class="font-bold text-auto-dark">{% trans "Nouvel avis" %}</span>
+    </nav>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    {% if error %}
+    <div class="alert alert-error p-4 mb-6 rounded-xl border border-error-100 bg-error-50">
+        <div class="flex items-center gap-2 mb-2">
+            <svg class="w-5 h-5 text-error-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span class="font-bold text-error-700">{% trans "Erreur" %}</span>
+        </div>
+        <p class="text-sm text-error-600">{{ error }}</p>
+    </div>
+    {% endif %}
+
+    {% if success %}
+    <div class="alert alert-success p-4 mb-6 rounded-xl border border-success-100 bg-success-50">
+        <div class="flex items-center gap-2 mb-2">
+            <svg class="w-5 h-5 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span class="font-bold text-success-700">{% trans "Avis publié" %}</span>
+        </div>
+        <p class="text-sm text-success-600 mb-4">{% trans "Merci pour votre avis ! Il sera visible une fois validé par le garage." %}</p>
+        <a href="{% url 'reviews:review_list' %}"
+           class="btn-outline text-sm">{% trans "Voir mes avis" %}</a>
+    </div>
+    {% endif %}
+
+    <div class="card p-6">
+        <h3 class="text-lg font-bold text-auto-dark mb-4">{% trans "Informations" %}</h3>
+        <div class="flex items-center justify-between p-4 bg-auto-50 rounded-xl border border-auto-100 mb-6">
+            <div>
+                <div class="font-bold text-lg text-auto-dark">{{ garage.name }}</div>
+                <div class="text-sm text-auto-500">{{ garage.city }}</div>
+            </div>
+            <div class="text-right">
+                {% if garage.trust_score %}
+                <div class="flex items-center gap-1 text-auto-gold">
+                    {% for i in "12345" %}
+                    <svg class="w-4 h-4 {% if i|add:0 <= garage.trust_score|floatformat:0 %}text-auto-gold{% else %}text-auto-300{% endif %}" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    {% endfor %}
+                    <span class="ml-1 font-bold">{{ garage.trust_score|floatformat:1 }}</span>
+                </div>
+                {% endif %}
+                <div class="text-xs text-auto-500 mt-1">{{ garage.total_reviews }} {% trans "avis" %}</div>
+            </div>
+        </div>
+
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+            <input type="hidden" name="garage_id" value="{{ garage.pk }}">
+
+            {% if vehicle_id %}
+            <div class="p-4 rounded-lg bg-auto-50 border border-auto-100">
+                <h4 class="font-bold text-sm text-auto-700 mb-2">{% trans "Véhicule" %}</h4>
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-full bg-auto-orange/10 flex items-center justify-center text-sm">🚗</div>
+                    <span>{{ vehicle.display_name }}</span>
+                    {% if vehicle.license_plate %}
+                    <span class="text-xs text-auto-500">({{ vehicle.license_plate }})</span>
+                    {% endif %}
+                </div>
+                <input type="hidden" name="vehicle_id" value="{{ vehicle_id }}">
+            </div>
+            {% endif %}
+
+            <div class="flex items-center gap-2 mb-4">
+                <label class="form-label">{% trans "Note" %}</label>
+                <div class="flex items-center gap-1">
+                    {% for i in "54321" %}
+                    <button type="button"
+                            class="{% if not rating %}text-auto-300 hover:text-auto-gold{% elif i|add:0 <= rating %}text-auto-gold{% else %}text-auto-300{% endif %} transition p-1"
+                            onclick="setRating({{ i }})">
+                        <svg class="w-8 h-8" fill="{% if i|add:0 <= rating %}currentColor{% else %}none{% endif %}" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    </button>
+                    {% endfor %}
+                </div>
+                <input type="hidden" name="rating" id="rating-input" value="{{ rating|default:'' }}" required>
+                {% if not rating %}
+                <p class="text-xs text-error-600 ml-2">{% trans "Choisissez une note" %}</p>
+                {% endif %}
+            </div>
+
+            <div class="p-4 rounded-lg bg-auto-50 border border-auto-100">
+                <h4 class="font-bold text-sm text-auto-700 mb-2">{% trans "Commentaire" %}</h4>
+                <textarea name="comment"
+                          class="form-input w-full"
+                          rows="4"
+                          placeholder="{% trans 'Partagez votre expérience avec ce garage...' %}"
+                          required>{% if comment %}{{ comment }}{% endif %}</textarea>
+                <div class="mt-1 text-xs text-auto-500 flex justify-between">
+                    <span>{% trans "Minimum 20 caractères" %}</span>
+                    <span id="char-count">{{ comment|length|default:0 }}/{% trans "200 max" %}</span>
+                </div>
+            </div>
+
+            {% if pending_tickets %}
+            <div class="p-4 rounded-lg bg-warning-50 border border-warning-100">
+                <h4 class="font-bold text-sm text-warning-700 mb-2">{% trans "Ticket de support" %}</h4>
+                <p class="text-sm text-warning-600">{% trans "Vous avez un ticket de support en attente. Voulez-vous le lier à cet avis ?" %}</p>
+                <div class="mt-2 space-y-2">
+                    {% for ticket in pending_tickets %}
+                    <label class="flex items-center gap-2 p-2 rounded transition hover:bg-warning-100 cursor-pointer">
+                        <input type="radio" name="ticket_id" value="{{ ticket.id }}" class="text-warning-600 focus:ring-warning-500">
+                        <span class="text-sm text-auto-700 flex-1">{{ ticket.subject }}</span>
+                        <span class="text-xs text-auto-500">{{ ticket.created_at|date:"d/m/Y" }}</span>
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="flex items-center gap-3 pt-4 border-t border-auto-100">
+                <a href="{% url 'reviews:review_list' %}"
+                   class="btn-outline text-sm">{% trans "Annuler" %}</a>
+                <button type="submit"
+                        class="bg-auto-orange text-white px-6 py-2 rounded-lg font-bold text-sm hover:bg-auto-orange-dark transition">
+                    {% trans "Publier l'avis" %}
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Tips -->
+    <div class="card p-6 mt-6 border border-info-100 bg-info-50">
+        <h3 class="text-lg font-bold text-info-700 mb-4">{% trans "Conseils pour un bon avis" %}</h3>
+        <ul class="text-sm text-info-600 space-y-2">
+            <li class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-info-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                {% trans "Décrivez votre expérience de manière précise et honnête" %}
+            </li>
+            <li class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-info-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                {% trans "Mentionnez les services reçus et le personnel" %}
+            </li>
+            <li class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-info-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                {% trans "Partagez ce qui a bien fonctionné et les points à améliorer" %}
+            </li>
+            <li class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-info-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                {% trans "Évitez les informations personnelles" %}
+            </li>
+        </ul>
+    </div>
+</div>
+
+<script>
+function setRating(rating) {
+    document.getElementById('rating-input').value = rating;
+    window.location.reload();
+}
+</script>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends 'public/base.html' %}
+{% load i18n %}
+{% block title %}{% trans "À propos" %}{% endblock %}
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 py-12">
+    <h1 class="text-3xl font-bold text-auto-dark mb-6">{% trans "À propos d'AutoLink" %}</h1>
+    <div class="prose prose-lg max-w-none">
+        <p class="text-auto-700 text-lg">{% trans "AutoLink est la plateforme automobile de confiance au Cameroun. Nous connectons les automobilistes avec les garages vérifiés, les pièces compatibles et les services automobiles fiables." %}</p>
+        <h2 class="text-xl font-bold mt-8 mb-4">{% trans "Notre mission" %}</h2>
+        <p class="text-auto-700">{% trans "Résoudre simplement les problèmes automobiles : trouver le bon garage, la bonne pièce, au bon prix, avec confiance." %}</p>
+        <h2 class="text-xl font-bold mt-8 mb-4">{% trans "Nos valeurs" %}</h2>
+        <ul class="text-auto-700 space-y-2">
+            <li><strong>{% trans "Confiance" %}</strong> — {% trans "Garages vérifiés, avis authentiques" %}</li>
+            <li><strong>{% trans "Simplicité" %}</strong> — {% trans "Interface intuitive, mobile-first" %}</li>
+            <li><strong>{% trans "Transparence" %}</strong> — {% trans "Prix clairs, compatibilité vérifiée" %}</li>
+            <li><strong>{% trans "Rapidité" %}</strong> — {% trans "Trouvez rapidement ce dont vous avez besoin" %}</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

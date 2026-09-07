@@ -1,0 +1,203 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Modifier le profil" %} - AutoLink{% endblock %}
+
+{% block dashboard_header %}
+    <h1 class="text-sm font-bold text-auto-dark">{% trans "Mon profil" %}</h1>
+{% endblock %}
+
+{% block dashboard_breadcrumb %}
+    <nav class="flex items-center space-x-2 text-sm text-auto-600">
+        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-auto-orange transition">{% trans "Tableau de bord" %}</a>
+        <span class="text-auto-400">/</span>
+        <a href="{% url 'accounts:profile' %}" class="hover:text-auto-orange transition">{% trans "Mon profil" %}</a>
+        <span class="text-auto-400">/</span>
+        <span class="font-bold text-auto-dark">{% trans "Modifier" %}</span>
+    </nav>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    {% if request.GET.success %}
+    <div class="alert alert-success p-4 mb-6 rounded-xl border border-success-100 bg-success-50">
+        <div class="flex items-center gap-2">
+            <svg class="w-5 h-5 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span class="font-bold text-success-700">{% trans "Profil mis à jour" %}</span>
+        </div>
+        <p class="text-sm text-success-600 mt-2">{% trans "Vos informations ont été enregistrées avec succès." %}</p>
+    </div>
+    {% endif %}
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="md:col-span-2">
+            <!-- Profile form -->
+            <div class="card p-6 mb-6">
+                <h3 class="text-lg font-bold text-auto-dark mb-4">{% trans "Informations personnelles" %}</h3>
+
+                <form method="post" enctype="multipart/form-data" class="space-y-4">
+                    {% csrf_token %}
+
+                    <div class="flex items-center justify-between p-4 bg-auto-50 rounded-xl border border-auto-100 mb-6">
+                        <div class="flex items-center gap-3">
+                            {% if user.avatar %}
+                            <img src="{{ user.avatar.url }}"
+                                 class="w-16 h-16 rounded-xl object-cover border-2 border-auto-orange"
+                                 alt="{{ user.display_name }}">
+                            {% else %}
+                            <div class="w-16 h-16 rounded-xl bg-auto-orange/10 flex items-center justify-center text-3xl text-auto-dark border-2 border-auto-100">
+                                {{ user.display_name|first|upper }}
+                            </div>
+                            {% endif %}
+                            <div>
+                                <div class="font-bold text-lg text-auto-dark">{{ user.display_name }}</div>
+                                <div class="text-sm text-auto-600">{% trans "Cliquez pour changer" %}</div>
+                            </div>
+                        </div>
+                        {{ form.avatar }}
+                        <button type="button"
+                                class="bg-auto-orange text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-auto-orange-dark transition"
+                                onclick="document.getElementById('{{ form.avatar.id_for_label }}').click()">
+                            {% trans "Changer l'avatar" %}
+                        </button>
+                    </div>
+
+                    {% if form.avatar.errors %}
+                    <p class="form-error">{{ form.avatar.errors.0 }}</p>
+                    {% endif %}
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="form-label">{% trans "Nom" %}</label>
+                            {{ form.last_name }}
+                            {% if form.last_name.errors %}
+                            <p class="form-error">{{ form.last_name.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="form-label">{% trans "Prénom" %}</label>
+                            {{ form.first_name }}
+                            {% if form.first_name.errors %}
+                            <p class="form-error">{{ form.first_name.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="form-label">{% trans "Email" %} <span class="text-error-500">*</span></label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                            <p class="form-error">{{ form.email.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="form-label">{% trans "Téléphone" %}</label>
+                            {{ form.phone }}
+                            {% if form.phone.errors %}
+                            <p class="form-error">{{ form.phone.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="form-label">{% trans "Entreprise" %}</label>
+                            {{ form.company }}
+                            {% if form.company.errors %}
+                            <p class="form-error">{{ form.company.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="form-label">{% trans "Poste" %}</label>
+                            {{ form.job_title }}
+                            {% if form.job_title.errors %}
+                            <p class="form-error">{{ form.job_title.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="form-label">{% trans "Ville" %}</label>
+                            {{ form.city }}
+                            {% if form.city.errors %}
+                            <p class="form-error">{{ form.city.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="form-label">{% trans "Quartier" %}</label>
+                            {{ form.neighborhood }}
+                            {% if form.neighborhood.errors %}
+                            <p class="form-error">{{ form.neighborhood.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center pt-6 border-t border-auto-100">
+                        <a href="{% url 'accounts:profile' %}"
+                           class="btn-outline text-sm">{% trans "Annuler" %}</a>
+                        <button type="submit"
+                                class="bg-auto-orange text-white px-6 py-2 rounded-lg font-bold text-sm hover:bg-auto-orange-dark transition">
+                            {% trans "Enregistrer" %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="space-y-6">
+            <div class="card p-6">
+                <h3 class="text-lg font-bold text-auto-dark mb-4">{% trans "Compte" %}</h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center p-3 rounded-lg bg-auto-50 border border-auto-100">
+                        <div>
+                            <div class="font-bold text-sm text-auto-dark">{% trans "Rôle" %}</div>
+                            <div class="text-xs text-auto-500">{{ user.role|title }}</div>
+                        </div>
+                        <span class="badge-{{ user.role|lower }} text-[10px]">{{ user.role }}</span>
+                    </div>
+
+                    <div class="flex justify-between items-center p-3 rounded-lg bg-auto-50 border border-auto-100">
+                        <div>
+                            <div class="font-bold text-sm text-auto-dark">{% trans "Inscrit le" %}</div>
+                            <div class="text-xs text-auto-500">{{ user.created_at|date:"d/m/Y" }}</div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between items-center p-3 rounded-lg bg-auto-50 border border-auto-100">
+                        <div>
+                            <div class="font-bold text-sm text-auto-dark">{% trans "Mise à jour" %}</div>
+                            <div class="text-xs text-auto-500">{{ user.updated_at|date:"d/m/Y H:i" }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card p-6 border border-warning-100 bg-warning-50">
+                <h3 class="text-lg font-bold text-warning-700 mb-2">{% trans "A propos de votre profil" %}</h3>
+                <p class="text-sm text-warning-600">
+                    {% trans "Les informations que vous modifiez ici seront visibles par les autres utilisateurs de la plateforme." %}
+                </p>
+            </div>
+
+            <div class="card p-6 border border-error-100 bg-error-50">
+                <h3 class="text-lg font-bold text-error-700 mb-2">{% trans "Supprimer mon compte" %}</h3>
+                <p class="text-sm text-error-600 mb-4">
+                    {% trans "Cette action est irreversible. Votre compte et toutes vos donnees seront supprimes." %}
+                </p>
+                <a href="{% url 'accounts:delete_account' %}"
+                   class="bg-error-500 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-error-600 transition w-full text-center">
+                    {% trans "Supprimer mon compte" %}
+                </a>
+            </div>
+
+            <div class="card p-6">
+                <h3 class="text-lg font-bold text-auto-dark mb-2">{% trans "Sécurité" %}</h3>
+                <div class="space-y-2 text-sm text-auto-600">
+                    <a href="{% url 'accounts:password_change' %}" class="block p-2 rounded hover:bg-auto-50 transition">
+                        {% trans "Changer le mot de passe" %}
+                    </a>
+                    <a href="{% url 'accounts:login' %}?next={% url 'accounts:profile_edit' %}"
+                       class="block p-2 rounded hover:bg-auto-50 transition">
+                        {% trans "Déconnexion" %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

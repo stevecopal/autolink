@@ -1,0 +1,61 @@
+{% load humanize i18n %}
+{% if parts %}
+<section class="bg-white border-y border-gray-100" aria-labelledby="parts-heading mb-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-6 sm:mb-8">
+            <div>
+                <span class="inline-block text-auto-orange text-xs font-bold tracking-widest uppercase mb-2">{% trans "Marketplace" %}</span>
+                <h2 id="parts-heading" class="text-xl sm:text-2xl md:text-3xl font-bold text-auto-dark">{% trans "Pièces disponibles" %}</h2>
+            </div>
+            <a href="{% url 'catalog:part_list' %}" class="inline-flex items-center gap-1.5 text-auto-orange hover:text-auto-orange-dark font-bold text-sm transition group shrink-0">
+                {% trans "Voir le catalogue" %}
+                <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </a>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 pb-6">
+            {% for part in parts %}
+            <a href="{% url 'catalog:part_detail' slug=part.slug %}" class="group bg-white rounded-2xl border border-gray-100 shadow-[0_1px_3px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] hover:border-auto-orange/20 transition-all duration-300 overflow-hidden">
+                {# Image #}
+                <div class="relative overflow-hidden">
+                    {% if part.photo %}
+                    <img src="{{ part.photo.url }}" alt="{{ part.name }}" class="w-full h-36 sm:h-44 object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
+                    {% else %}
+                    <div class="w-full h-36 sm:h-44 bg-gradient-to-br from-auto-light to-gray-100 flex items-center justify-center">
+                        <svg class="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                    </div>
+                    {% endif %}
+
+                    {# Stock badge #}
+                    <div class="absolute top-2 right-2">
+                        <span class="{% if part.stock_status == 'IN_STOCK' %}bg-success-500{% elif part.stock_status == 'LOW_STOCK' %}bg-warning-500{% else %}bg-error-500{% endif %} text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow-sm">
+                            {{ part.stock_label }}
+                        </span>
+                    </div>
+                </div>
+
+                {# Content #}
+                <div class="p-3 sm:p-4">
+                    <h3 class="font-bold text-auto-dark text-xs sm:text-sm line-clamp-2 group-hover:text-auto-orange transition mb-1 min-h-[2.5rem]">{{ part.name }}</h3>
+                    {% if part.brand %}
+                    <p class="text-gray-400 text-[10px] sm:text-xs mb-2">{{ part.brand.name }}</p>
+                    {% endif %}
+                    <div class="flex items-end justify-between">
+                        <span class="text-auto-orange font-bold text-sm sm:text-base">{{ part.price|intcomma }} <span class="text-[10px] font-medium text-gray-400">FCFA</span></span>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+
+        {% if has_more_parts %}
+        <div class="text-center mt-8">
+            <a href="{% url 'catalog:part_list' %}" class="inline-flex items-center gap-2 bg-white border-2 border-auto-orange text-auto-orange hover:bg-auto-orange hover:text-white font-bold px-6 py-2.5 rounded-xl transition-all duration-200 text-sm">
+                {% trans "Voir toutes les pièces" %}
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endif %}

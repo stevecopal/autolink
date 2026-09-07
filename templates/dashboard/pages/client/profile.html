@@ -1,0 +1,132 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Mon profil" %} - AutoLink{% endblock %}
+
+{% block dashboard_header %}
+    <div class="flex items-center justify-between">
+        <h1 class="text-sm font-bold text-auto-dark">{% trans "Mon profil" %}</h1>
+        <a href="{% url 'accounts:profile_edit' %}"
+           class="bg-auto-orange text-white px-3 py-1.5 rounded-lg font-bold text-xs hover:bg-auto-orange-dark transition">
+            {% trans "Modifier" %}
+        </a>
+    </div>
+{% endblock %}
+
+{% block dashboard_breadcrumb %}
+    <nav class="flex items-center space-x-2 text-sm text-auto-600">
+        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-auto-orange transition">{% trans "Tableau de bord" %}</a>
+        <span class="text-auto-400">/</span>
+        <span class="font-bold text-auto-dark">{% trans "Mon profil" %}</span>
+    </nav>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Profile header -->
+    <div class="card p-6 mb-6">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+            <div class="flex-shrink-0">
+                {% if user.avatar %}
+                <img src="{{ user.avatar.url }}"
+                     class="w-24 h-24 rounded-2xl object-cover border-4 border-auto-orange shadow-lg">
+                {% else %}
+                <div class="w-24 h-24 rounded-2xl bg-auto-orange/10 flex items-center justify-center text-5xl shadow-lg border-4 border-auto-100">
+                    👤
+                </div>
+                {% endif %}
+            </div>
+            <div class="flex-1">
+                <h2 class="text-2xl font-bold text-auto-dark">{{ user.display_name }}</h2>
+                <p class="text-sm text-auto-600 mb-3">{{ user.email|default:""—"" }}</p>
+                <div class="flex items-center gap-2">
+                    <span class="badge-{{ user.role|lower }} text-[10px]">{{ user.role|title }}</span>
+                    {% if user.is_active %}
+                    <span class="badge-success text-[10px]">{% trans "Compte actif" %}</span>
+                    {% else %}
+                    <span class="badge-error text-[10px]">{% trans "Compte inactif" %}</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile info -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="card p-6">
+            <h3 class="text-lg font-bold text-auto-dark mb-4">{% trans "Informations personnelles" %}</h3>
+            <div class="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                    <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Nom" %}</p>
+                    <p class="font-bold text-auto-dark">{{ user.last_name|default:""—"" }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Prénom" %}</p>
+                    <p class="font-bold text-auto-dark">{{ user.first_name|default:""—"" }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Email" %}</p>
+                    <a href="mailto:{{ user.email }}"
+                       class="font-bold text-auto-orange hover:underline">{{ user.email|default:""—"" }}</a>
+                </div>
+                <div>
+                    <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Téléphone" %}</p>
+                    <p class="font-bold text-auto-dark">{{ user.phone|default:""—"" }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Ville" %}</p>
+                    <p class="font-bold text-auto-dark">{{ user.city|default:""—"" }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Quartier" %}</p>
+                    <p class="font-bold text-auto-dark">{{ user.neighborhood|default:""—"" }}</p>
+                </div>
+                {% if user.company %}
+                <div>
+                    <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Entreprise" %}</p>
+                    <p class="font-bold text-auto-dark">{{ user.company|default:""—"" }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Poste" %}</p>
+                    <p class="font-bold text-auto-dark">{{ user.job_title|default:""—"" }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card p-6">
+            <h3 class="text-lg font-bold text-auto-dark mb-4">{% trans "Compte" %}</h3>
+            <div class="space-y-4 text-sm">
+                <div>
+                    <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Rôle" %}</p>
+                    <p class="font-bold text-auto-dark">{{ user.role|title }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Inscrit le" %}</p>
+                    <p class="font-bold text-auto-dark">{{ user.created_at|date:"d/m/Y H:i" }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Mise à jour le" %}</p>
+                    <p class="font-bold text-auto-dark">{{ user.updated_at|date:"d/m/Y H:i" }}</p>
+                </div>
+                <div>
+                    <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Profil public" %}</p>
+                    <p class="font-bold">
+                        <a href="{{ user.get_public_profile_url }}"
+                           class="hover:underline text-auto-orange">
+                            {{ user.get_public_profile_url }}
+                        </a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Member since badge -->
+    <div class="card p-6 text-center mt-6">
+        <div class="text-xs text-auto-500 mb-2">{% trans "Membre depuis" %}</div>
+        <div class="text-3xl font-bold text-auto-deep-red">{{ user.created_at|date:"Y" }}</div>
+        <div class="text-sm text-auto-600">{% trans "AutoLink" %}</div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "public/base.html" %}
+{% load i18n static humanize %}
+
+{% block title %}{% trans "Home" %} - AutoLink{% endblock %}
+
+{% block content %}
+<div class="lg:overflow-x-hidden">
+    {% include "public/pages/home/sections/hero.html" %}
+    {% include "public/pages/home/sections/quick_actions.html" %}
+    {% include "public/pages/home/sections/garages.html" %}
+    {% include "public/pages/home/sections/parts.html" %}
+    {% include "public/pages/home/sections/categories.html" %}
+    {% include "public/pages/home/sections/cities.html" %}
+    {% include "public/pages/home/sections/why.html" %}
+    {% include "public/pages/home/sections/cta.html" %}
+</div>
+{% endblock %}

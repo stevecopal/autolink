@@ -1,0 +1,43 @@
+{% extends 'public/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Connexion" %}{% endblock %}
+
+{% block content %}
+<div class="max-w-md mx-auto px-4 py-12">
+    <div class="card p-8">
+        <div class="text-center mb-6">
+
+            <h1 class="text-2xl font-bold text-auto-dark">{% trans "Se connecter" %}</h1>
+            <p class="text-auto-600 mt-1">{% trans "Accédez à votre espace AutoLink" %}</p>
+        </div>
+
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+            {% if request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
+
+            {% if form.non_field_errors %}
+            <div class="bg-error-50 text-error-700 p-3 rounded-lg text-sm border border-error-100">
+                {% trans "Identifiant ou mot de passe incorrect." %}
+            </div>
+            {% endif %}
+
+            {% for field in form %}
+            <div>
+                <label class="form-label">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                <p class="form-error">{{ field.errors.0 }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <button type="submit" class="btn-primary w-full">{% trans "Se connecter" %}</button>
+        </form>
+
+        <p class="text-center text-auto-600 text-sm mt-6">
+            {% trans "Pas encore de compte ?" %} <a href="{% url 'accounts:register' %}" class="text-auto-orange hover:text-auto-orange-dark font-bold transition">{% trans "S'inscrire" %}</a>
+        </p>
+    </div>
+</div>
+{% endblock %}

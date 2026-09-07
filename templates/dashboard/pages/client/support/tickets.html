@@ -1,0 +1,101 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Tickets de support" %} - AutoLink{% endblock %}
+
+{% block dashboard_header %}
+    <h1 class="text-sm font-bold text-auto-dark">{% trans "Support" %}</h1>
+{% endblock %}
+
+{% block dashboard_breadcrumb %}
+    <nav class="flex items-center space-x-2 text-sm text-auto-600">
+        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-auto-orange transition">{% trans "Tableau de bord" %}</a>
+        <span class="text-auto-400">/</span>
+        <span class="font-bold text-auto-dark">{% trans "Tickets" %}</span>
+    </nav>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <h2 class="text-lg font-bold text-auto-dark">{% trans "Vos tickets" %}</h2>
+        <a href="{% url 'support:ticket_create' %}"
+           class="bg-auto-orange text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-auto-orange-dark transition">
+            {% trans "Nouveau ticket" %}
+        </a>
+    </div>
+
+    {% if tickets %}
+        <div class="space-y-3">
+            {% for ticket in tickets %}
+            <a href="{% url 'support:ticket_detail' ticket.id %}"
+               class="block p-4 rounded-xl border border-auto-100 hover:bg-auto-50 transition {% if ticket.status == 'CLOSED' %}opacity-60{% endif %}">
+                <div class="flex items-start justify-between">
+                    <div class="flex items-start gap-3">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 {% if ticket.status == 'OPEN' %}bg-auto-orange text-white{% elif ticket.status == 'PENDING' %}bg-warning-500 text-white{% elif ticket.status == 'IN_PROGRESS' %}bg-info-500 text-white{% else %}bg-auto-100 text-auto-500{% endif %}">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-sm text-auto-dark">{{ ticket.subject }}</h3>
+                            <div class="text-xs text-auto-500 mt-1">
+                                {% trans "Créé le" %} {{ ticket.created_at|date:"d/m/Y H:i" }}
+                                {% if ticket.vehicle %}
+                                • {{ ticket.vehicle.display_name }}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="badge-{{ ticket.status_color }} text-[10px]">{{ ticket.get_status_display }}</span>
+                        <svg class="w-4 h-4 text-auto-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                    </div>
+                </div>
+                <div class="mt-2 text-sm text-auto-600 line-clamp-2">{{ ticket.description|truncatewords:30 }}</div>
+                {% if ticket.messages.count > 0 %}
+                <div class="mt-2 flex items-center gap-2 text-xs text-auto-400">
+                    <span>💬 {{ ticket.messages.count }} {% trans "messages" %}</span>
+                    <span>•</span>
+                    <span>{{ ticket.last_message|date:"d/m/Y H:i" }}</span>
+                </div>
+                {% endif %}
+            </a>
+            {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <div class="flex items-center justify-center gap-2">
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}"
+                   class="btn-outline text-sm px-4 py-2">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                    {% trans "Précédent" %}
+                </a>
+            {% endif %}
+
+            <span class="px-4 py-2 text-sm text-auto-600">
+                {% trans "Page" %} {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}"
+                   class="btn-outline text-sm px-4 py-2">
+                    {% trans "Suivant" %}
+                    <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                </a>
+            {% endif %}
+        </div>
+        {% endif %}
+    {% else %}
+        <div class="card p-8 text-center">
+            <div class="text-4xl mb-3">🎫</div>
+            <h3 class="text-lg font-bold text-auto-dark mb-1">{% trans "Aucun ticket" %}</h3>
+            <p class="text-auto-600 mb-4">{% trans "Vous n'avez pas encore ouvert de ticket de support." %}</p>
+            <a href="{% url 'support:ticket_create' %}"
+               class="bg-auto-orange text-white px-6 py-2 rounded-lg font-bold text-sm hover:bg-auto-orange-dark transition">
+                {% trans "Ouvrir un ticket" %}
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

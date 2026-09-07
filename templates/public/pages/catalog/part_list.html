@@ -1,0 +1,82 @@
+{% extends 'public/base.html' %}
+{% load humanize i18n %}
+
+{% block title %}{% trans "Pièces automobiles" %}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 py-8">
+    <h1 class="text-2xl md:text-3xl font-bold text-auto-dark mb-6">{% trans "Pièces automobiles" %}</h1>
+
+    <!-- Filters -->
+    <div class="card p-4 mb-6">
+        <form method="get" class="flex flex-wrap gap-3">
+            <input type="text" name="q" value="{{ search_query }}" placeholder="{% trans 'Rechercher une pièce...' %}"
+                   class="flex-1 min-w-[200px] form-input !py-2">
+            <select name="category" class="form-input !py-2 w-auto">
+                <option value="">{% trans "Toutes catégories" %}</option>
+                {% for cat in categories %}
+                <option value="{{ cat.slug }}" {% if selected_category == cat.slug %}selected{% endif %}>{{ cat.name }}</option>
+                {% endfor %}
+            </select>
+            <select name="brand" class="form-input !py-2 w-auto">
+                <option value="">{% trans "Toutes marques" %}</option>
+                {% for brand in brands %}
+                <option value="{{ brand.pk }}" {% if selected_brand == brand.pk|stringformat:"s" %}selected{% endif %}>{{ brand.name }}</option>
+                {% endfor %}
+            </select>
+            <select name="sort" class="form-input !py-2 w-auto">
+                <option value="-created_at" {% if sort == '-created_at' %}selected{% endif %}>{% trans "Plus récent" %}</option>
+                <option value="price" {% if sort == 'price' %}selected{% endif %}>{% trans "Prix croissant" %}</option>
+                <option value="-price" {% if sort == '-price' %}selected{% endif %}>{% trans "Prix décroissant" %}</option>
+            </select>
+            <button type="submit" class="btn-primary !py-2">{% trans "Rechercher" %}</button>
+        </form>
+    </div>
+
+    {% if parts %}
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {% for part in parts %}
+        <a href="{% url 'catalog:part_detail' slug=part.slug %}" class="card">
+            {% if part.photo %}
+            <img src="{{ part.photo.url }}" class="w-full aspect-square rounded-t-xl object-cover" alt="{{ part.name }}">
+            {% else %}
+            <div class="w-full aspect-square rounded-t-xl bg-auto-100 flex items-center justify-center text-3xl">🔩</div>
+            {% endif %}
+            <div class="p-4">
+                <div class="font-bold text-auto-dark truncate">{{ part.name }}</div>
+                <div class="text-xs text-auto-500 mt-0.5">{{ part.garage.name }}</div>
+                <div class="mt-2 flex items-center justify-between">
+                    <span class="font-bold text-lg text-auto-deep-red">{{ part.price|intcomma }} FCFA</span>
+                    <span class="badge-{{ part.get_stock_status }} text-[10px]">{{ part.get_stock_display }}</span>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+
+    {% if is_paginated %}
+    <div class="mt-8 flex justify-center">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}"
+               class="btn-outline text-sm px-4 py-2">{% trans "Précédent" %}</a>
+        {% endif %}
+        <span class="px-4 py-2 text-sm text-auto-600">
+            {% trans "Page" %} {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+        </span>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}"
+               class="btn-outline text-sm px-4 py-2">{% trans "Suivant" %}</a>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="text-center py-16">
+        <div class="text-5xl mb-4">🔩</div>
+        <h2 class="text-2xl font-bold text-auto-dark mb-2">{% trans "Aucune pièce trouvée" %}</h2>
+        <p class="text-auto-600 mb-6">{% trans "Essayez de modifier vos filtres ou votre recherche" %}</p>
+        <a href="{% url 'catalog:part_list' %}" class="text-auto-orange font-bold hover:underline">{% trans "Réinitialiser les filtres" %}</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

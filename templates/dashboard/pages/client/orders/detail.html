@@ -1,0 +1,306 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n humanize %}
+
+{% block title %}{{ order.order_number }} - AutoLink{% endblock %}
+
+{% block dashboard_header %}
+    <h1 class="text-sm font-bold text-auto-dark">{% trans "Commande" %}</h1>
+{% endblock %}
+
+{% block dashboard_breadcrumb %}
+    <nav class="flex items-center space-x-2 text-sm text-auto-600">
+        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-auto-orange transition">{% trans "Tableau de bord" %}</a>
+        <span class="text-auto-400">/</span>
+        <a href="{% url 'orders:order_list' %}" class="hover:text-auto-orange transition">{% trans "Mes commandes" %}</a>
+        <span class="text-auto-400">/</span>
+        <span class="font-bold text-auto-dark">{{ order.order_number }}</span>
+    </nav>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div>
+            <h2 class="text-xl font-bold text-auto-dark mb-1">{{ order.order_number }}</h2>
+            <div class="flex items-center gap-2 text-sm text-auto-500">
+                <span>{% trans "Commande du" %} {{ order.created_at|date:"d/m/Y H:i" }}</span>
+                <span>•</span>
+                <span>{% trans "Total" %} : <strong class="text-auto-orange">{{ order.total|intcomma }} FCFA</strong></span>
+            </div>
+        </div>
+        <div class="flex gap-2">
+            <a href="{% url 'orders:order_list' %}"
+               class="btn-outline text-sm">{% trans "Retour à la liste" %}</a>
+            {% if order.status == 'PENDING' or order.status == 'PROCESSING' %}
+            <form method="post" action="{% url 'orders:cancel_order' order.order_number %}" class="inline-flex items-center gap-2">
+                {% csrf_token %}
+                <button type="submit"
+                        class="bg-error-500 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-error-600 transition">
+                    {% trans "Annuler la commande" %}
+                </button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Status Badge -->
+    <div class="card p-4 bg-auto-50 border border-auto-100 flex items-center justify-between">
+        <div>
+            <span class="font-bold text-sm">{% trans "Statut" %}</span>
+            <div class="flex items-center gap-2 mt-1">
+                <span class="badge-{{ order.status_color }} text-[10px]">{{ order.status_label }}</span>
+                {% if order.status == 'PENDING' %}
+                    <span class="text-xs text-warning-600">{% trans "En attente de confirmation." %}</span>
+                {% elif order.status == 'CONFIRMED' %}
+                    <span class="text-xs text-success-600">{% trans "Commande confirmée." %}</span>
+                {% elif order.status == 'PROCESSING' %}
+                    <span class="text-xs text-info-600">{% trans "En préparation." %}</span>
+                {% elif order.status == 'READY' %}
+                    <span class="text-xs text-auto-gold">{% trans "Prête à être livrée." %}</span>
+                {% elif order.status == 'DELIVERED' %}
+                    <span class="text-xs text-success-600">{% trans "Livrée." %}</span>
+                {% elif order.status == 'CANCELLED' %}
+                    <span class="text-xs text-error-600">{% trans "Annulée." %}</span>
+                {% endif %}
+            </div>
+        </div>
+        <div class="text-right text-sm text-auto-500">
+            <div>{% trans "CR" %} {{ order.cr_number }}</div>
+            <div>{% trans "Référence" %} : {{ order.reference }}</div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Détails de la commande -->
+        <div class="card p-6 md:col-span-2">
+            <h3 class="text-lg font-bold text-auto-dark mb-4">{% trans "Articles" %}</h3>
+            <div class="space-y-3">
+                {% for item in order.items.all %}
+                <div class="flex items-center justify-between py-3 border-b border-auto-100 last:border-0">
+                    <div class="flex items-center gap-3">
+                        {% if item.part and item.part.image %}
+                            <img src="{{ item.part.image.url }}"
+                                 class="w-12 h-12 rounded-xl object-cover"
+                                 alt="{{ item.part.name }}">
+                        {% elif item.part and item.part.garage and item.part.garage.logo %}
+                            <img src="{{ item.part.garage.logo.url }}"
+                                 class="w-12 h-12 rounded-xl object-cover"
+                                 alt="{{ item.part.garage.name }}">
+                        {% else %}
+                            <div class="w-12 h-12 rounded-xl bg-auto-orange/10 flex items-center justify-center text-xl">🔩</div>
+                        {% endif %}
+                        <div>
+                            <div class="font-bold text-sm text-auto-dark">{{ item.name }}</div>
+                            <div class="text-xs text-auto-500">
+                                {% if item.part %}
+                                    {{ item.part.garage.name|default:""—"" }}
+                                {% else %}
+                                    {{ item.service.name|default:""—"" }}
+                                {% endif %}
+                            </div>
+                            <div class="text-xs text-auto-500">{{ item.quantity }} {% trans "x" %} {{ item.unit_price|intcomma }} FCFA</div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="font-bold text-sm text-auto-dark">{{ item.total|intcomma }} FCFA</div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-auto-100 flex justify-end">
+                <div class="w-1/3 text-right">
+                    <div class="text-sm text-auto-600 mb-1">{% trans "Sous-total" %}</div>
+                    <div class="font-bold text-xl text-auto-dark">{{ order.subtotal|intcomma }} FCFA</div>
+                </div>
+            </div>
+
+            {% if order.tax > 0 %}
+            <div class="mt-4 flex justify-end">
+                <div class="w-1/3 text-right">
+                    <div class="text-sm text-auto-600 mb-1">{% trans "Taxes" %} ({{ order.tax_rate }}%)</div>
+                    <div class="text-sm text-auto-600">{{ order.tax|intcomma }} FCFA</div>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="mt-4 flex justify-end border-t border-auto-200 pt-4">
+                <div class="w-1/3 text-right">
+                    <div class="font-bold text-xl text-auto-deep-red">{{ order.total|intcomma }} FCFA</div>
+                    <div class="text-xs text-auto-500">{% trans "Total" %}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Informations -->
+        <div class="space-y-6">
+            <!-- Client -->
+            <div class="card p-6">
+                <h3 class="text-lg font-bold text-auto-dark mb-4">{% trans "Client" %}</h3>
+                <div class="flex items-center gap-3 mb-4">
+                    {% if order.user.avatar %}
+                        <img src="{{ order.user.avatar.url }}"
+                             class="w-12 h-12 rounded-full object-cover border-2 border-auto-orange">
+                    {% else %}
+                        <div class="w-12 h-12 rounded-full bg-auto-orange/10 flex items-center justify-center text-xl font-bold text-auto-dark border-2 border-auto-100">
+                            {{ order.user.display_name|first|upper }}
+                        </div>
+                    {% endif %}
+                    <div>
+                        <div class="font-bold">{{ order.user.display_name }}</div>
+                        <a href="mailto:{{ order.user.email }}"
+                           class="text-sm text-auto-orange hover:underline">{{ order.user.email }}</a>
+                    </div>
+                </div>
+                <div class="space-y-2 text-sm">
+                    <div>
+                        <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Téléphone" %}</p>
+                        <a href="tel:{{ order.user.phone }}"
+                           class="font-bold">{{ order.user.phone|default:"—" }}</a>
+                    </div>
+                    <div>
+                        <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Adresse" %}</p>
+                        <p class="font-bold">{{ order.shipping_address }}</p>
+                    </div>
+                    {% if order.user.city %}
+                    <div>
+                        <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Ville" %}</p>
+                        <p class="font-bold">{{ order.user.city }}</p>
+                    </div>
+                    {% endif %}
+                    {% if order.user.neighborhood %}
+                    <div>
+                        <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Quartier" %}</p>
+                        <p class="font-bold">{{ order.user.neighborhood }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Véhicule -->
+            {% if order.vehicle %}
+            <div class="card p-6">
+                <h3 class="text-lg font-bold text-auto-dark mb-4">{% trans "Véhicule" %}</h3>
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-xl bg-auto-coral/10 flex items-center justify-center text-xl">🚗</div>
+                    <div>
+                        <div class="font-bold">{{ order.vehicle.display_name }}</div>
+                        {% if order.vehicle.license_plate %}
+                        <div class="text-sm text-auto-500">{{ order.vehicle.license_plate }}</div>
+                        {% endif %}
+                        {% if order.vehicle.make and order.vehicle.model %}
+                        <div class="text-xs text-auto-500 mt-1">
+                            {{ order.vehicle.make|title }} {{ order.vehicle.model|title }} • {{ order.vehicle.year }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Paiement -->
+            {% if order.payment %}
+            <div class="card p-6">
+                <h3 class="text-lg font-bold text-auto-dark mb-4">{% trans "Paiement" %}</h3>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-auto-600">{% trans "Méthode" %}</span>
+                        <span class="font-bold">{{ order.payment.get_payment_method_display }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-auto-600">{% trans "Payé le" %}</span>
+                        <span class="font-bold">{{ order.payment.created_at|date:"d/m/Y H:i" }}</span>
+                    </div>
+                    {% if order.payment.transaction_id %}
+                    <div class="flex justify-between items-center">
+                        <span class="text-sm text-auto-600">{% trans "Transaction" %}</span>
+                        <span class="font-bold text-auto-orange text-xs">{{ order.payment.transaction_id }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Assistance -->
+            <div class="card p-6 border border-auto-200 bg-auto-50">
+                <h3 class="text-lg font-bold text-auto-dark mb-4">{% trans "Besoin d'aide" %}</h3>
+                <div class="space-y-3">
+                    <a href="{% url 'support:ticket_list' %}"
+                       class="block w-full p-3 bg-white rounded-lg border border-auto-100 hover:bg-auto-50 transition text-center text-sm font-bold text-auto-dark">
+                        {% trans "Contactez le support" %}
+                    </a>
+                    <a href="{% url 'support:assistance' %}"
+                       class="block w-full p-3 bg-white rounded-lg border border-auto-100 hover:bg-auto-50 transition text-center text-sm font-bold text-auto-dark">
+                        {% trans "Assistance" %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Historique des statuts -->
+    {% if order.status_history %}
+    <div class="card p-6">
+        <h3 class="text-lg font-bold text-auto-dark mb-4">{% trans "Historique des statuts" %}</h3>
+        <div class="flex flex-col">
+            {% for status_entry in order.status_history %}
+                <div class="flex items-center gap-4 {% if not forloop.last %}pb-4 border-b border-auto-100{% endif %}">
+                    <div class="flex flex-col items-center">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center {% if status_entry.is_current %}bg-auto-orange text-white{% elif status_entry.status == 'PENDING' %}bg-warning-500 text-white{% elif status_entry.status == 'CONFIRMED' %}bg-info-500 text-white{% elif status_entry.status == 'PROCESSING' %}bg-info-500 text-white{% elif status_entry.status == 'READY' %}bg-success-500 text-white{% elif status_entry.status == 'DELIVERED' %}bg-success-500 text-white{% elif status_entry.status == 'CANCELLED' %}bg-error-500 text-white{% else %}bg-auto-200 text-auto-600{% endif %}">
+                            {% if status_entry.is_current %}
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M22 6L12 17l-5-5"/></svg>
+                            {% elif status_entry.status == 'PENDING' %}
+                                🔄
+                            {% elif status_entry.status == 'CONFIRMED' %}
+                                ✅
+                            {% elif status_entry.status == 'PROCESSING' %}
+                                ⏳
+                            {% elif status_entry.status == 'READY' %}
+                                📦
+                            {% elif status_entry.status == 'DELIVERED' %}
+                                🚚
+                            {% elif status_entry.status == 'CANCELLED' %}
+                                ❌
+                            {% endif %}
+                        </div>
+                        {% if not forloop.last %}
+                        <div class="w-0.5 flex-1 bg-auto-200 mt-1"></div>
+                        {% endif %}
+                    </div>
+                    <div class="pb-1">
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-sm text-auto-dark">{{ status_entry.get_status_display }}</span>
+                            {% if status_entry.is_current %}
+                                <span class="badge-{{ order.status_color }} text-[10px]">{% trans "Actuel" %}</span>
+                            {% endif %}
+                        </div>
+                        <div class="text-xs text-auto-500">{{ status_entry.created_at|date:"d/m/Y H:i" }} • {{ status_entry.admin.display_name }}</div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Actions -->
+    {% if order.status == 'DELIVERED' %}
+    <div class="card p-6 border border-auto-200 bg-auto-50">
+        <h3 class="text-lg font-bold text-auto-dark mb-4">{% trans "Avis" %}</h3>
+        <p class="text-sm text-auto-600 mb-4">{% trans "Comment avez-vous trouvé ce service ?" %}</p>
+        <a href="{% url 'reviews:review_create' %}?order={{ order.order_number }}"
+           class="bg-auto-orange text-white px-6 py-3 rounded-lg font-bold text-sm hover:bg-auto-orange-dark transition w-full block text-center">
+            {% trans "Laisser un avis" %}
+        </a>
+    </div>
+    {% elif order.status == 'READY' %}
+    <div class="card p-6 border border-auto-200 bg-auto-50">
+        <h3 class="text-lg font-bold text-auto-dark mb-4">{% trans "Commande prête" %}</h3>
+        <p class="text-sm text-auto-600 mb-4">{% trans "Votre commande est prête à être livrée." %}</p>
+        <a href="{% url 'support:ticket_list' %}"
+           class="bg-auto-orange text-white px-6 py-3 rounded-lg font-bold text-sm hover:bg-auto-orange-dark transition w-full block text-center">
+            {% trans "Contacter le support" %}
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

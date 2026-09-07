@@ -1,0 +1,274 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Panier" %} - AutoLink{% endblock %}
+
+{% block dashboard_header %}
+    <h1 class="text-sm font-bold text-auto-dark">{% trans "Panier" %}</h1>
+{% endblock %}
+
+{% block dashboard_breadcrumb %}
+    <nav class="flex items-center space-x-2 text-sm text-auto-600">
+        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-auto-orange transition">{% trans "Tableau de bord" %}</a>
+        <span class="text-auto-400">/</span>
+        <span class="font-bold text-auto-dark">{% trans "Panier" %}</span>
+    </nav>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    {% if cart %}
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <h2 class="text-lg font-bold text-auto-dark">{% trans "Votre panier" %}</h2>
+        <div class="text-sm text-auto-600">
+            {% trans "Total" %} : <strong class="text-xl text-auto-orange">{{ cart.total|intcomma }} FCFA</strong>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Cart items -->
+        <div class="lg:col-span-2 space-y-4">
+            {% for item in cart.items.all %}
+            <div class="card p-4 flex items-start justify-between gap-4 hover:shadow-md transition-all duration-200 {% if item.is_service %}border-l-4 border-l-auto-deep-red{% else %}border-l-4 border-l-auto-gold{% endif %}">
+                <div class="flex items-start gap-3">
+                    {% if item.part and item.part.image %}
+                    <img src="{{ item.part.image.url }}"
+                         class="w-16 h-16 rounded-xl object-cover"
+                         alt="{{ item.part.name }}">
+                    {% elif item.part and item.part.garage and item.part.garage.logo %}
+                    <img src="{{ item.part.garage.logo.url }}"
+                         class="w-16 h-16 rounded-xl object-cover"
+                         alt="{{ item.part.garage.name }}">
+                    {% else %}
+                    <div class="w-16 h-16 rounded-xl bg-auto-orange/10 flex items-center justify-center text-2xl">🔩</div>
+                    {% endif %}
+
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-start justify-between gap-2">
+                            <div>
+                                <a href="{{ item.get_absolute_url }}"
+                                   class="font-bold text-sm text-auto-dark hover:text-auto-orange transition block truncate">
+                                    {{ item.name }}
+                                </a>
+                                <div class="text-xs text-auto-500 mt-0.5">
+                                    {% if item.part %}
+                                        {{ item.part.garage.name|default:""—"" }}
+                                        {% if item.service %}
+                                        • {{ item.service }}
+                                        {% endif %}
+                                    {% elif item.service %}
+                                        {{ item.service }}
+                                    {% endif %}
+                                </div>
+                                <div class="text-xs text-auto-500 mt-0.5">
+                                    {% trans "Prix unitaire" %} : {{ item.unit_price|intcomma }} FCFA
+                                </div>
+                            </div>
+                            <div class="text-right flex-shrink-0">
+                                <div class="font-bold text-sm text-auto-dark">{{ item.total|intcomma }} FCFA</div>
+                            </div>
+                        </div>
+
+                        <!-- Quantity controls -->
+                        <div class="flex items-center gap-2 mt-2">
+                            <div class="flex items-center border border-auto-200 rounded-lg overflow-hidden">
+                                <button type="button"
+                                        class="p-1.5 hover:bg-auto-100 text-auto-600 transition"
+                                        onclick="updateQuantity({{ item.id }}, {{ item.quantity|add:"-1" }})">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
+                                </button>
+                                <span class="px-3 py-1 border-x border-auto-200 font-bold text-sm text-center min-w-[2rem]">
+                                    {{ item.quantity }}
+                                </span>
+                                <button type="button"
+                                        class="p-1.5 hover:bg-auto-100 text-auto-600 transition"
+                                        onclick="updateQuantity({{ item.id }}, {{ item.quantity|add:"1" }})">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                </button>
+                            </div>
+                            <button type="button"
+                                    class="p-1.5 text-error-500 hover:text-error-600 transition"
+                                    onclick="removeItem({{ item.id }})"
+                                    aria-label="{% trans 'Retirer' %}">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-12 12m0 0l12-12M5 7l12 12"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+            <!-- Empty cart state -->
+            {% if not cart.items.exists %}
+            <div class="card p-8 text-center">
+                <div class="text-4xl mb-3">🛒</div>
+                <h3 class="text-lg font-bold text-auto-dark mb-1">{% trans "Votre panier est vide" %}</h3>
+                <p class="text-auto-600 mb-4">{% trans "Commencez vos achats pour ajouter des articles." %}</p>
+                <a href="{% url 'catalog:part_list' %}"
+                   class="bg-auto-orange text-white px-6 py-2 rounded-lg font-bold text-sm hover:bg-auto-orange-dark transition">
+                    {% trans "Parcourir les pièces" %}
+                </a>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Order summary -->
+        <div class="space-y-4">
+            <div class="card p-6">
+                <h3 class="text-lg font-bold text-auto-dark mb-4">{% trans "Résumé" %}</h3>
+
+                <div class="space-y-3 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-auto-600">{% trans "Articles" %}</span>
+                        <span class="font-bold text-auto-dark">{{ cart.quantity }} {% trans "unités" %}</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-auto-600">{% trans "Total" %}</span>
+                        <span class="font-bold text-xl text-auto-deep-red">{{ cart.total|intcomma }} FCFA</span>
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-4 border-t border-auto-100">
+                    <label class="form-label mb-2">{% trans "Code promo" %}</label>
+                    <div class="flex gap-2">
+                        <input type="text"
+                               name="promo_code"
+                               class="form-input flex-1 text-sm"
+                               placeholder="{% trans 'Entrez votre code' %}"
+                               onkeydown="if(event.key==='Enter') applyPromoCode(this.value)">
+                        <button type="button"
+                                class="bg-auto-orange text-white px-4 py-1.5 rounded-lg font-bold text-sm hover:bg-auto-orange-dark transition"
+                                onclick="applyPromoCode(this.previousElementSibling.value)">
+                            {% trans "Appliquer" %}
+                        </button>
+                    </div>
+                    {% if cart.promo_code %}
+                    <div class="mt-2 text-xs text-auto-500">
+                        {% trans "Code appliqué" %} : <strong>{{ cart.promo_code.code }}</strong>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Shipping info -->
+            {% if cart.can_checkout %}
+            <div class="card p-6 border border-auto-200 bg-auto-50">
+                <h3 class="text-lg font-bold text-auto-dark mb-4">{% trans "Livraison" %}</h3>
+                <div class="space-y-2 text-sm">
+                    <div>
+                        <span class="text-auto-500">{% trans "Livraison" %}</span>
+                        <div class="font-bold text-auto-dark">{{ cart.shipping_method|default:""—"" }}</div>
+                    </div>
+                    <div>
+                        <span class="text-auto-500">{% trans "Frais" %}</span>
+                        <div class="font-bold">{{ cart.shipping_cost|intcomma }} FCFA {% if cart.shipping_cost == 0 %}<span class="text-success-600">{% trans "(offert)" %}</span>{% endif %}</div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Checkout button -->
+            {% if cart.can_checkout %}
+            <a href="{% url 'orders:checkout' %}"
+               class="block w-full p-4 bg-auto-orange text-white rounded-xl font-bold text-center text-sm hover:bg-auto-orange-dark transition shadow-lg">
+                {% trans "Commander" %} • {{ cart.total|intcomma }} FCFA
+            </a>
+            {% endif %}
+
+            <!-- Continue shopping -->
+            <a href="{% url 'catalog:part_list' %}"
+               class="block w-full p-3 bg-auto-50 rounded-xl text-center font-bold text-sm text-auto-600 hover:bg-auto-100 transition">
+                {% trans "Continuer mes achats" %}
+            </a>
+        </div>
+    </div>
+
+    {% else %}
+    <div class="card p-8 text-center">
+        <div class="text-4xl mb-3">🛒</div>
+        <h3 class="text-lg font-bold text-auto-dark mb-1">{% trans "Votre panier est vide" %}</h3>
+        <p class="text-auto-600 mb-4">{% trans "Commencez vos achats pour ajouter des articles." %}</p>
+        <a href="{% url 'catalog:part_list' %}"
+           class="bg-auto-orange text-white px-6 py-2 rounded-lg font-bold text-sm hover:bg-auto-orange-dark transition">
+            {% trans "Parcourir les pièces" %}
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+function updateQuantity(itemId, newQuantity) {
+    if (newQuantity < 0) return;
+    fetch('/orders/cart/update/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({ item_id: itemId, quantity: newQuantity })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.reload();
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function removeItem(itemId) {
+    if (!confirm('{% trans "Retirer cet article du panier ?" %}')) return;
+    fetch('/orders/cart/remove/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({ item_id: itemId })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.reload();
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function applyPromoCode(code) {
+    if (!code) return;
+    fetch('/orders/cart/promo/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({ code: code })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.reload();
+        } else {
+            alert(data.message || '{% trans "Code promo invalide" %}');
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}
