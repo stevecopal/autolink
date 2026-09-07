@@ -1,0 +1,321 @@
+{% extends 'public/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Politique et règles" %} - AutoLink{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+    <div class="mb-8">
+        <nav class="flex items-center gap-2 text-sm text-auto-600 mb-4" aria-label="{% trans 'Fil d ariane' %}">
+            <a href="{% url 'core:home' %}" class="hover:text-auto-orange transition">{% trans "Accueil" %}</a>
+            <span aria-hidden="true">/</span>
+            <span class="text-auto-dark font-bold">{% trans "Politique et règles" %}</span>
+        </nav>
+        <h1 class="text-2xl sm:text-3xl font-bold text-auto-dark mb-2">{% trans "Politique et règles d'AutoLink" %}</h1>
+        <p class="text-auto-600 text-sm">{% trans "Dernière mise à jour : Janvier 2026" %}</p>
+    </div>
+
+    <div class="card p-6 sm:p-8 mb-6">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-xl bg-auto-orange/10 flex items-center justify-center flex-shrink-0">
+                <svg class="w-5 h-5 text-auto-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            </div>
+            <h2 class="text-xl font-bold text-auto-dark">{% trans "Sommaire" %}</h2>
+        </div>
+        <nav class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+            <a href="#presentation" class="text-auto-orange hover:underline">{% trans "1. Présentation d'AutoLink" %}</a>
+            <a href="#fonctionnement" class="text-auto-orange hover:underline">{% trans "2. Comment fonctionne AutoLink" %}</a>
+            <a href="#localisation" class="text-auto-orange hover:underline">{% trans "3. Pourquoi nous avons besoin de votre position" %}</a>
+            <a href="#compte" class="text-auto-orange hover:underline">{% trans "4. Création de compte et responsabilités" %}</a>
+            <a href="#garages" class="text-auto-orange hover:underline">{% trans "5. Règles applicables aux garages" %}</a>
+            <a href="#commandes" class="text-auto-orange hover:underline">{% trans "6. Commandes et paiements" %}</a>
+            <a href="#pieces" class="text-auto-orange hover:underline">{% trans "7. Pièces et compatibilité" %}</a>
+            <a href="#avis" class="text-auto-orange hover:underline">{% trans "8. Avis et évaluations" %}</a>
+            <a href="#donnees" class="text-auto-orange hover:underline">{% trans "9. Données personnelles et confidentialité" %}</a>
+            <a href="#interdits" class="text-auto-orange hover:underline">{% trans "10. Comportements interdits" %}</a>
+            <a href="#responsabilite" class="text-auto-orange hover:underline">{% trans "11. Limitation de responsabilité" %}</a>
+            <a href="#contact" class="text-auto-orange hover:underline">{% trans "12. Contact" %}</a>
+        </nav>
+    </div>
+
+    <div class="space-y-6">
+
+        <section id="presentation" class="card p-6 sm:p-8">
+            <h2 class="text-xl font-bold text-auto-dark mb-4">{% trans "1. Présentation d'AutoLink" %}</h2>
+            <div class="space-y-4 text-auto-700 text-sm leading-relaxed">
+                <p>
+                    {% trans "AutoLink est une plateforme numérique automobile mise en place au Cameroun, conçue pour connecter les automobilistes avec les professionnels de l'automobile : garages mécaniques, vendeurs de pièces détachées et prestataires de services automobiles." %}
+                </p>
+                <p>
+                    {% trans "Notre mission est de simplifier l'entretien automobile en offrant un accès direct et transparent aux garages vérifiés, aux pièces compatibles et aux services de qualité, le tout à des prix clairs et négociables." %}
+                </p>
+                <p>
+                    {% trans "AutoLink opère actuellement dans les principales villes du Cameroun, notamment Douala, Yaoundé, Bamenda, Bafoussam, Garoua, Maroua, Kribi et Bertoua, avec une extension continue à d'autres régions." %}
+                </p>
+            </div>
+        </section>
+
+        <section id="fonctionnement" class="card p-6 sm:p-8">
+            <h2 class="text-xl font-bold text-auto-dark mb-4">{% trans "2. Comment fonctionne AutoLink" %}</h2>
+            <div class="space-y-4 text-auto-700 text-sm leading-relaxed">
+                <p>{% trans "AutoLink repose sur un écosystème simple et efficace qui profite à trois types d'utilisateurs :" %}</p>
+
+                <div class="p-4 rounded-xl bg-auto-50 border border-auto-100">
+                    <h3 class="font-bold text-auto-dark mb-2">{% trans "Les automobilistes (clients)" %}</h3>
+                    <ul class="space-y-1.5 ml-4">
+                        <li>• {% trans "Rechercher des garages à proximité selon leur localisation" %}</li>
+                        <li>• {% trans "Consulter les services proposés par chaque garage" %}</li>
+                        <li>• {% trans "Commander des pièces automobiles compatibles avec leur véhicule" %}</li>
+                        <li>• {% trans "Passer commande et payer de manière sécurisée (Mobile Money, carte, espèces)" %}</li>
+                        <li>• {% trans "Laisser des avis et évaluations sur les garages et pièces" %}</li>
+                        <li>• {% trans "Demander une assistance routière en cas de panne" %}</li>
+                        <li>• {% trans "Signaler tout problème rencontré via le système de support intégré" %}</li>
+                    </ul>
+                </div>
+
+                <div class="p-4 rounded-xl bg-auto-50 border border-auto-100">
+                    <h3 class="font-bold text-auto-dark mb-2">{% trans "Les garages professionnels" %}</h3>
+                    <ul class="space-y-1.5 ml-4">
+                        <li>• {% trans "Créer un profil professionnel vérifié par l'équipe AutoLink" %}</li>
+                        <li>• {% trans "Publier leurs services et tarifs" %}</li>
+                        <li>• {% trans "Mettre en vente des pièces automobiles avec photos et descriptions" %}</li>
+                        <li>• {% trans "Gérer les commandes et le stock en temps réel" %}</li>
+                        <li>• {% trans "Recevoir des avis clients pour asseoir leur réputation" %}</li>
+                        <li>• {% trans "Gérer leur disponibilité en temps réel" %}</li>
+                    </ul>
+                </div>
+
+                <div class="p-4 rounded-xl bg-auto-50 border border-auto-100">
+                    <h3 class="font-bold text-auto-dark mb-2">{% trans "L'administration AutoLink" %}</h3>
+                    <ul class="space-y-1.5 ml-4">
+                        <li>• {% trans "Vérifier l'identité et les qualifications des garages" %}</li>
+                        <li>• {% trans "Assurer le support client et la résolution des litiges" %}</li>
+                        <li>• {% trans "Garantir la sécurité des transactions" %}</li>
+                        <li>• {% trans "Modérer les avis et les contenus publiés" %}</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="localisation" class="card p-6 sm:p-8">
+            <h2 class="text-xl font-bold text-auto-dark mb-4">{% trans "3. Pourquoi nous avons besoin de votre position" %}</h2>
+            <div class="space-y-4 text-auto-700 text-sm leading-relaxed">
+                <p>
+                    {% trans "AutoLink utilise les données de localisation de votre appareil uniquement pour vous offrir une meilleure expérience. Voici précisément pourquoi nous en avons besoin :" %}
+                </p>
+
+                <div class="p-4 rounded-xl bg-auto-orange/5 border border-auto-orange/10">
+                    <h3 class="font-bold text-auto-dark mb-2 flex items-center gap-2">
+                        <span class="text-auto-orange">📍</span> {% trans "Trouver les garages les plus proches" %}
+                    </h3>
+                    <p>{% trans "Lorsque vous recherchez un garage, votre position nous permet de vous afficher en priorité les établissements situés à proximité, classés par distance. Cela vous évite de parcourir inutilement des kilomètres pour un service disponible dans votre quartier." %}</p>
+                </div>
+
+                <div class="p-4 rounded-xl bg-auto-orange/5 border border-auto-orange/10">
+                    <h3 class="font-bold text-auto-dark mb-2 flex items-center gap-2">
+                        <span class="text-auto-orange">🗺️</span> {% trans "Calculer les distances et itinéraires" %}
+                    </h3>
+                    <p>{% trans "Votre position nous permet de calculer la distance exacte entre vous et le garage sélectionné, et de vous fournir un itinéraire pour vous y rendre. Le calcul se fait en kilomètres en utilisant la formule de Haversine." %}</p>
+                </div>
+
+                <div class="p-4 rounded-xl bg-auto-orange/5 border border-auto-orange/10">
+                    <h3 class="font-bold text-auto-dark mb-2 flex items-center gap-2">
+                        <span class="text-auto-orange">🔧</span> {% trans "Assistance routière en cas de panne" %}
+                    </h3>
+                    <p>{% trans "En cas de panne, votre position exacte est transmise au garage le plus proche afin qu'il puisse intervenir rapidement. Sans cette information, l'assistance routière ne pourrait pas fonctionner efficacement." %}</p>
+                </div>
+
+                <div class="p-4 rounded-xl bg-auto-orange/5 border border-auto-orange/10">
+                    <h3 class="font-bold text-auto-dark mb-2 flex items-center gap-2">
+                        <span class="text-auto-orange">📦</span> {% trans "Livraison de pièces" %}
+                    </h3>
+                    <p>{% trans "Si vous commandez une pièce pour livraison, votre position permet d'estimer les frais de livraison et le délai estimé d'acheminement." %}</p>
+                </div>
+
+                <div class="p-4 rounded-xl bg-success-50 border border-success-100">
+                    <h3 class="font-bold text-success-700 mb-2 flex items-center gap-2">
+                        <span class="text-success-600">🔒</span> {% trans "Engagement de confidentialité" %}
+                    </h3>
+                    <ul class="space-y-1.5 ml-4 text-success-700">
+                        <li>• {% trans "Votre position n'est jamais partagée avec des tiers à des fins commerciales" %}</li>
+                        <li>• {% trans "Les données de localisation sont utilisées uniquement pendant votre session active" %}</li>
+                        <li>• {% trans "Vous pouvez révoquer l'accès à votre position à tout moment via les paramètres de votre appareil" %}</li>
+                        <li>• {% trans "Nous ne stockons pas votre historique de localisation de manière permanente" %}</li>
+                        <li>• {% trans "Aucune donnée de localisation n'est vendue ou partagée à des fins publicitaires" %}</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="compte" class="card p-6 sm:p-8">
+            <h2 class="text-xl font-bold text-auto-dark mb-4">{% trans "4. Création de compte et responsabilités" %}</h2>
+            <div class="space-y-4 text-auto-700 text-sm leading-relaxed">
+                <p>{% trans "L'utilisation d'AutoLink nécessite la création d'un compte. En créant un compte, vous vous engagez à :" %}</p>
+                <ul class="space-y-1.5 ml-4">
+                    <li>• {% trans "Fournir des informations exactes et à jour" %}</li>
+                    <li>• {% trans "Maintenir la confidentialité de vos identifiants de connexion" %}</li>
+                    <li>• {% trans "Ne pas créer de comptes multiples pour manipuler les avis ou les transactions" %}</li>
+                    <li>• {% trans "Signaler immédiatement tout accès non autorisé à votre compte" %}</li>
+                    <li>• {% trans "Respecter les conditions d'utilisation de la plateforme" %}</li>
+                </ul>
+                <p>{% trans "AutoLink se réserve le droit de suspendre ou supprimer tout compte en cas de manquement grave à ces obligations." %}</p>
+            </div>
+        </section>
+
+        <section id="garages" class="card p-6 sm:p-8">
+            <h2 class="text-xl font-bold text-auto-dark mb-4">{% trans "5. Règles applicables aux garages" %}</h2>
+            <div class="space-y-4 text-auto-700 text-sm leading-relaxed">
+                <p>{% trans "Les garages souhaitant opérer sur AutoLink doivent respecter les règles suivantes :" %}</p>
+                <ul class="space-y-1.5 ml-4">
+                    <li>• {% trans "Fournir les documents de vérification nécessaires (registre de commerce, pièce d'identité, photo du local)" %}</li>
+                    <li>• {% trans "Maintenir des informations exactes sur leurs services et tarifs" %}</li>
+                    <li>• {% trans "Répondre aux demandes des clients dans des délais raisonnables" %}</li>
+                    <li>• {% trans "Assurer la qualité des pièces vendues et des services rendus" %}</li>
+                    <li>• {% trans "Respecter les statuts de disponibilité (Disponible, Occupé, Fermé)" %}</li>
+                    <li>• {% trans "Gérer les commandes de manière professionnelle et dans les délais annoncés" %}</li>
+                    <li>• {% trans "Ne pas publier de faux avis ou de contenus trompeurs" %}</li>
+                </ul>
+                <p>{% trans "Tout garage ne respectant pas ces règles verra son profil suspendu ou supprimé après mise en demeure." %}</p>
+            </div>
+        </section>
+
+        <section id="commandes" class="card p-6 sm:p-8">
+            <h2 class="text-xl font-bold text-auto-dark mb-4">{% trans "6. Commandes et paiements" %}</h2>
+            <div class="space-y-4 text-auto-700 text-sm leading-relaxed">
+                <p>{% trans "AutoLink facilite les transactions entre clients et garages tout en garantissant la sécurité :" %}</p>
+                <ul class="space-y-1.5 ml-4">
+                    <li>• {% trans "Les paiements sont sécurisés via Mobile Money (MTN MoMo, Orange Money) ou à la livraison" %}</li>
+                    <li>• {% trans "Le code de retrait à 4 chiffres est généré automatiquement pour sécuriser le retrait en magasin" %}</li>
+                    <li>• {% trans "Les annulations sont possibles tant que la commande n'a pas été confirmée par le garage" %}</li>
+                    <li>• {% trans "En cas de litige, l'administration AutoLink intervient comme médiateur" %}</li>
+                    <li>• {% trans "Les demandes de remboursement sont traitées sous 48 à 72 heures ouvrées" %}</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="pieces" class="card p-6 sm:p-8">
+            <h2 class="text-xl font-bold text-auto-dark mb-4">{% trans "7. Pièces et compatibilité" %}</h2>
+            <div class="space-y-4 text-auto-700 text-sm leading-relaxed">
+                <p>{% trans "AutoLink met l'accent sur la compatibilité des pièces pour éviter les achats inutiles :" %}</p>
+                <ul class="space-y-1.5 ml-4">
+                    <li>• {% trans "Chaque pièce est associée aux véhicules compatibles (marque, modèle, année)" %}</li>
+                    <li>• {% trans "Les références OEM sont affichées pour faciliter la vérification" %}</li>
+                    <li>• {% trans "L'état de la pièce (Neuf, Occasion, Reconditionné) est clairement indiqué" %}</li>
+                    <li>• {% trans "Le stock et la disponibilité sont mis à jour en temps réel par le garage" %}</li>
+                    <li>• {% trans "Les photos des pièces doivent être réelles et correspondre à l'objet vendu" %}</li>
+                </ul>
+                <p>{% trans "AutoLink ne garantit pas la compatibilité lorsque le client sélectionne manuellement un véhicule non référencé dans la fiche produit." %}</p>
+            </div>
+        </section>
+
+        <section id="avis" class="card p-6 sm:p-8">
+            <h2 class="text-xl font-bold text-auto-dark mb-4">{% trans "8. Avis et évaluations" %}</h2>
+            <div class="space-y-4 text-auto-700 text-sm leading-relaxed">
+                <p>{% trans "Les avis jouent un rôle essentiel dans la confiance entre les utilisateurs. Les règles suivantes s'appliquent :" %}</p>
+                <ul class="space-y-1.5 ml-4">
+                    <li>• {% trans "Seuls les utilisateurs ayant interactué avec un garage ou une pièce peuvent laisser un avis" %}</li>
+                    <li>• {% trans "Les avis doivent être honnêtes, pertinents et respectueux" %}</li>
+                    <li>• {% trans "Les avis frauduleux, copiés ou fictifs seront supprimés" %}</li>
+                    <li>• {% trans "Les garages peuvent répondre publiquement aux avis laissés sur leur établissement" %}</li>
+                    <li>• {% trans "Un score de confiance (trust score) est calculé automatiquement en fonction de la qualité du service" %}</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="donnees" class="card p-6 sm:p-8">
+            <h2 class="text-xl font-bold text-auto-dark mb-4">{% trans "9. Données personnelles et confidentialité" %}</h2>
+            <div class="space-y-4 text-auto-700 text-sm leading-relaxed">
+                <p>{% trans "AutoLink s'engage à protéger vos données personnelles conformément à la réglementation en vigueur :" %}</p>
+
+                <div class="p-4 rounded-xl bg-auto-50 border border-auto-100">
+                    <h3 class="font-bold text-auto-dark mb-2">{% trans "Données collectées" %}</h3>
+                    <ul class="space-y-1.5 ml-4">
+                        <li>• {% trans "Nom, prénom, adresse email, numéro de téléphone" %}</li>
+                        <li>• {% trans "Photo de profil (optionnelle)" %}</li>
+                        <li>• {% trans "Informations sur les véhicules enregistrés" %}</li>
+                        <li>• {% trans "Historique des commandes et des transactions" %}</li>
+                        <li>• {% trans "Données de localisation (avec consentement explicite)" %}</li>
+                        <li>• {% trans "Avis et évaluations publiés" %}</li>
+                    </ul>
+                </div>
+
+                <div class="p-4 rounded-xl bg-auto-50 border border-auto-100">
+                    <h3 class="font-bold text-auto-dark mb-2">{% trans "Utilisation des données" %}</h3>
+                    <ul class="space-y-1.5 ml-4">
+                        <li>• {% trans "Fourniture et amélioration des services de la plateforme" %}</li>
+                        <li>• {% trans "Personnalisation de votre expérience (garages à proximité, pièces compatibles)" %}</li>
+                        <li>• {% trans "Gestion des commandes, paiements et livraisons" %}</li>
+                        <li>• {% trans "Communication relative à vos transactions (confirmations, mises à jour)" %}</li>
+                        <li>• {% trans "Prévention de la fraude et sécurisation des comptes" %}</li>
+                    </ul>
+                </div>
+
+                <div class="p-4 rounded-xl bg-auto-50 border border-auto-100">
+                    <h3 class="font-bold text-auto-dark mb-2">{% trans "Vos droits" %}</h3>
+                    <ul class="space-y-1.5 ml-4">
+                        <li>• {% trans "Accéder à vos données personnelles stockées" %}</li>
+                        <li>• {% trans "Demander la rectification de données inexactes" %}</li>
+                        <li>• {% trans "Demander la suppression de votre compte et de vos données" %}</li>
+                        <li>• {% trans "Vous opposer au traitement de vos données à des fins commerciales" %}</li>
+                        <li>• {% trans "Exporter vos données dans un format lisible" %}</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="interdits" class="card p-6 sm:p-8">
+            <h2 class="text-xl font-bold text-auto-dark mb-4">{% trans "10. Comportements interdits" %}</h2>
+            <div class="space-y-4 text-auto-700 text-sm leading-relaxed">
+                <p>{% trans "Les comportements suivants sont strictement interdits sur AutoLink :" %}</p>
+                <ul class="space-y-1.5 ml-4">
+                    <li>• {% trans "Publier des contenus offensants, discriminatoires ou illégaux" %}</li>
+                    <li>• {% trans "Créer de faux comptes ou usurper l'identité d'un tiers" %}</li>
+                    <li>• {% trans "Manipuler les avis ou les évaluations (faux avis, achat d'avis)" %}</li>
+                    <li>• {% trans "Tenter de pirater, compromettre ou surcharger la plateforme" %}</li>
+                    <li>• {% trans "Utiliser des robots, scripts ou automatisations non autorisés" %}</li>
+                    <li>• {% trans "Revendre ou transférer un compte à un tiers" %}</li>
+                    <li>• {% trans "Violer les droits de propriété intellectuelle d'AutoLink ou des tiers" %}</li>
+                    <li>• {% trans "Diffuser des spams ou des sollicitations non sollicitées" %}</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="responsabilite" class="card p-6 sm:p-8">
+            <h2 class="text-xl font-bold text-auto-dark mb-4">{% trans "11. Limitation de responsabilité" %}</h2>
+            <div class="space-y-4 text-auto-700 text-sm leading-relaxed">
+                <p>{% trans "AutoLink agit en tant qu'intermédiaire technique entre les automobilistes et les garages. Notre responsabilité se limite à :" %}</p>
+                <ul class="space-y-1.5 ml-4">
+                    <li>• {% trans "La mise à disposition de la plateforme et de ses fonctionnalités" %}</li>
+                    <li>• {% trans "La vérification des garages inscrits" %}</li>
+                    <li>• {% trans "La médiation en cas de litige signalé" %}</li>
+                </ul>
+                <p>{% trans "AutoLink ne peut être tenu responsable de :" %}</p>
+                <ul class="space-y-1.5 ml-4">
+                    <li>• {% trans "La qualité réelle des pièces vendues par les garages" %}</li>
+                    <li>• {% trans "Les dommages causés lors de l'installation de pièces" %}</li>
+                    <li>• {% trans "Les retards de livraison imputables aux transporteurs" %}</li>
+                    <li>• {% trans "Les litiges entre clients et garages résolus en dehors de la plateforme" %}</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="contact" class="card p-6 sm:p-8">
+            <h2 class="text-xl font-bold text-auto-dark mb-4">{% trans "12. Contact" %}</h2>
+            <div class="space-y-4 text-auto-700 text-sm leading-relaxed">
+                <p>{% trans "Pour toute question relative à ces politiques ou pour exercer vos droits, contactez-nous :" %}</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
+                    <div class="p-4 rounded-xl bg-auto-50 border border-auto-100">
+                        <div class="font-bold text-auto-dark mb-1">{% trans "Email" %}</div>
+                        <a href="mailto:contact@autolink.cm" class="text-auto-orange hover:underline">contact@autolink.cm</a>
+                    </div>
+                    <div class="p-4 rounded-xl bg-auto-50 border border-auto-100">
+                        <div class="font-bold text-auto-dark mb-1">{% trans "Page de contact" %}</div>
+                        <a href="{% url 'core:contact' %}" class="text-auto-orange hover:underline">{% trans "Nous contacter" %}</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+</div>
+{% endblock %}

@@ -1,106 +1,146 @@
 {% extends 'dashboard/base.html' %}
 {% load i18n %}
 
-{% block title %}{% trans "Tickets de support" %}{% endblock %}
+{% block title %}{% trans "Tickets de support" %} - AutoLink{% endblock %}
+
+{% block dashboard_header %}
+    <h1 class="text-sm font-bold text-auto-dark">{% trans "Support" %}</h1>
+{% endblock %}
+
+{% block dashboard_breadcrumb %}
+    <nav class="flex items-center space-x-2 text-sm text-auto-600">
+        <a href="{% url 'administration:dashboard' %}" class="hover:text-auto-orange transition">{% trans "Tableau de bord" %}</a>
+        <span class="text-auto-400">/</span>
+        <span class="font-bold text-auto-dark">{% trans "Tickets de support" %}</span>
+    </nav>
+{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 py-8">
-    <div class="flex items-center justify-between mb-6">
-        <h1 class="text-2xl font-bold text-auto-dark">{% trans "Tickets de support" %}</h1>
-        <a href="{% url 'administration:dashboard' %}" class="btn-outline">{% trans "Retour au tableau de bord" %}</a>
+<div class="space-y-6">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <h2 class="text-lg font-bold text-auto-dark">{% trans "Tickets de support" %}</h2>
+        <a href="{% url 'administration:dashboard' %}" class="btn-outline text-sm">{% trans "Retour au tableau de bord" %}</a>
     </div>
 
-    <!-- Filters -->
-    <div class="card p-4 mb-6">
-        <form method="get" class="flex flex-wrap gap-4 items-end">
-            <div>
-                <label class="block text-sm font-medium text-auto-800 mb-1">{% trans "Statut" %}</label>
-                <select name="status" class="form-input">
-                    <option value="">{% trans "Tous" %}</option>
-                    <option value="OPEN" {% if selected_status == 'OPEN' %}selected{% endif %}>{% trans "Ouvert" %}</option>
-                    <option value="IN_PROGRESS" {% if selected_status == 'IN_PROGRESS' %}selected{% endif %}>{% trans "En cours" %}</option>
-                    <option value="RESOLVED" {% if selected_status == 'RESOLVED' %}selected{% endif %}>{% trans "Résolu" %}</option>
-                    <option value="CLOSED" {% if selected_status == 'CLOSED' %}selected{% endif %}>{% trans "Fermé" %}</option>
-                </select>
+    <div class="card p-4">
+        <form method="get" class="space-y-3">
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg class="w-5 h-5 text-auto-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </div>
+                <input type="text" name="q" value="{{ search_query }}"
+                       placeholder="{% trans 'Rechercher par numéro, sujet, utilisateur...' %}"
+                       class="w-full pl-10 pr-4 py-2.5 border border-auto-200 rounded-xl text-sm focus:ring-2 focus:ring-auto-orange focus:border-auto-orange outline-none">
             </div>
-            <div>
-                <label class="block text-sm font-medium text-auto-800 mb-1">{% trans "Catégorie" %}</label>
-                <select name="category" class="form-input">
-                    <option value="">{% trans "Tous" %}</option>
-                    <option value="DISPUTE" {% if selected_category == 'DISPUTE' %}selected{% endif %}>{% trans "Litige" %}</option>
-                    <option value="RETURN" {% if selected_category == 'RETURN' %}selected{% endif %}>{% trans "Retour" %}</option>
-                    <option value="REFUND" {% if selected_category == 'REFUND' %}selected{% endif %}>{% trans "Remboursement" %}</option>
-                    <option value="PAYMENT_ISSUE" {% if selected_category == 'PAYMENT_ISSUE' %}selected{% endif %}>{% trans "Problème de paiement" %}</option>
-                    <option value="OTHER" {% if selected_category == 'OTHER' %}selected{% endif %}>{% trans "Autre" %}</option>
-                </select>
+            <div class="flex flex-wrap gap-3 items-end">
+                <div>
+                    <label class="block text-xs font-bold text-auto-700 mb-1">{% trans "Statut" %}</label>
+                    <select name="status" class="form-input text-sm py-2">
+                        <option value="">{% trans "Tous" %}</option>
+                        <option value="OPEN" {% if selected_status == 'OPEN' %}selected{% endif %}>{% trans "Ouvert" %}</option>
+                        <option value="IN_PROGRESS" {% if selected_status == 'IN_PROGRESS' %}selected{% endif %}>{% trans "En cours" %}</option>
+                        <option value="WAITING_CLIENT" {% if selected_status == 'WAITING_CLIENT' %}selected{% endif %}>{% trans "En attente du client" %}</option>
+                        <option value="RESOLVED" {% if selected_status == 'RESOLVED' %}selected{% endif %}>{% trans "Résolu" %}</option>
+                        <option value="CLOSED" {% if selected_status == 'CLOSED' %}selected{% endif %}>{% trans "Fermé" %}</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-auto-700 mb-1">{% trans "Catégorie" %}</label>
+                    <select name="category" class="form-input text-sm py-2">
+                        <option value="">{% trans "Toutes" %}</option>
+                        <option value="PART" {% if selected_category == 'PART' %}selected{% endif %}>{% trans "Pièce" %}</option>
+                        <option value="GARAGE" {% if selected_category == 'GARAGE' %}selected{% endif %}>{% trans "Garage" %}</option>
+                        <option value="ORDER" {% if selected_category == 'ORDER' %}selected{% endif %}>{% trans "Commande" %}</option>
+                        <option value="SERVICE" {% if selected_category == 'SERVICE' %}selected{% endif %}>{% trans "Prestation" %}</option>
+                        <option value="PLATFORM" {% if selected_category == 'PLATFORM' %}selected{% endif %}>{% trans "Plateforme" %}</option>
+                        <option value="OTHER" {% if selected_category == 'OTHER' %}selected{% endif %}>{% trans "Autre" %}</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary text-sm py-2">{% trans "Filtrer" %}</button>
+                {% if search_query or selected_status or selected_category %}
+                <a href="{% url 'administration:support' %}" class="btn-outline text-sm py-2">{% trans "Réinitialiser" %}</a>
+                {% endif %}
             </div>
-            <button type="submit" class="btn-primary">{% trans "Filtrer" %}</button>
         </form>
     </div>
 
-    <!-- Tickets Table -->
     <div class="card overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead class="bg-auto-50">
                     <tr class="text-left text-auto-700">
-                        <th class="px-4 py-3">#</th>
-                        <th class="px-4 py-3">{% trans "Sujet" %}</th>
-                        <th class="px-4 py-3">{% trans "Utilisateur" %}</th>
-                        <th class="px-4 py-3">{% trans "Catégorie" %}</th>
-                        <th class="px-4 py-3">{% trans "Statut" %}</th>
-                        <th class="px-4 py-3">{% trans "Assigné" %}</th>
-                        <th class="px-4 py-3">{% trans "Date" %}</th>
+                        <th class="px-4 py-3 font-bold">{% trans "Numéro" %}</th>
+                        <th class="px-4 py-3 font-bold">{% trans "Sujet" %}</th>
+                        <th class="px-4 py-3 font-bold">{% trans "Client" %}</th>
+                        <th class="px-4 py-3 font-bold">{% trans "Catégorie" %}</th>
+                        <th class="px-4 py-3 font-bold">{% trans "Statut" %}</th>
+                        <th class="px-4 py-3 font-bold">{% trans "Assigné" %}</th>
+                        <th class="px-4 py-3 font-bold">{% trans "Date" %}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y">
                     {% for ticket in tickets %}
-                        <tr class="hover:bg-auto-50">
-                            <td class="px-4 py-3 font-mono text-xs">{{ ticket.ticket_number }}</td>
-                            <td class="px-4 py-3">
-                                <a href="{% url 'administration:ticket_detail' ticket.pk %}" class="text-auto-orange hover:underline">
-                                    {{ ticket.subject|truncatewords:10 }}
-                                </a>
-                            </td>
-                            <td class="px-4 py-3">{{ ticket.user.username }}</td>
-                            <td class="px-4 py-3">{{ ticket.get_category_display }}</td>
-                            <td class="px-4 py-3">
-                                {% if ticket.status == 'OPEN' %}
-                                    <span class="badge-warning">{% trans "Ouvert" %}</span>
-                                {% elif ticket.status == 'IN_PROGRESS' %}
-                                    <span class="badge-info">{% trans "En cours" %}</span>
-                                {% elif ticket.status == 'RESOLVED' %}
-                                    <span class="badge-success">{% trans "Résolu" %}</span>
-                                {% else %}
-                                    <span class="badge-gray">{% trans "Fermé" %}</span>
-                                {% endif %}
-                            </td>
-                            <td class="px-4 py-3">{{ ticket.assigned_to.username|default:"-" }}</td>
-                            <td class="px-4 py-3">{{ ticket.created_at|date:"d/m/Y" }}</td>
-                        </tr>
+                    <tr class="hover:bg-auto-50">
+                        <td class="px-4 py-3 font-mono text-xs">{{ ticket.ticket_number }}</td>
+                        <td class="px-4 py-3">
+                            <a href="{% url 'administration:ticket_detail' ticket.pk %}" class="text-auto-orange hover:underline font-medium">
+                                {{ ticket.subject|truncatewords:8 }}
+                            </a>
+                            {% if ticket.order %}
+                            <div class="text-xs text-auto-400 mt-0.5">{{ ticket.order.order_number }}</div>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3">
+                            <div class="font-medium">{{ ticket.user.display_name }}</div>
+                            <div class="text-xs text-auto-400">{{ ticket.user.email }}</div>
+                        </td>
+                        <td class="px-4 py-3">
+                            <span class="badge-neutral text-[10px]">{{ ticket.get_category_display }}</span>
+                        </td>
+                        <td class="px-4 py-3">
+                            {% if ticket.status == 'OPEN' %}
+                                <span class="badge-warning text-[10px]">{% trans "Ouvert" %}</span>
+                            {% elif ticket.status == 'IN_PROGRESS' %}
+                                <span class="badge-info text-[10px]">{% trans "En cours" %}</span>
+                            {% elif ticket.status == 'WAITING_CLIENT' %}
+                                <span class="badge-warning text-[10px]">{% trans "En attente" %}</span>
+                            {% elif ticket.status == 'RESOLVED' %}
+                                <span class="badge-success text-[10px]">{% trans "Résolu" %}</span>
+                            {% else %}
+                                <span class="badge-neutral text-[10px]">{% trans "Fermé" %}</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3 text-auto-500">{{ ticket.assigned_to.username|default:"—" }}</td>
+                        <td class="px-4 py-3 text-auto-500">{{ ticket.created_at|date:"d/m/Y" }}</td>
+                    </tr>
                     {% empty %}
-                        <tr>
-                            <td colspan="7" class="px-4 py-8 text-center text-auto-600">{% trans "Aucun ticket trouvé." %}</td>
-                        </tr>
+                    <tr>
+                        <td colspan="7" class="px-4 py-12 text-center text-auto-500">
+                            <div class="text-3xl mb-2">🔍</div>
+                            {% trans "Aucun ticket trouvé." %}
+                        </td>
+                    </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
 
         {% if tickets.has_other_pages %}
-            <div class="px-4 py-3 border-t flex justify-between items-center">
-                <span class="text-sm text-auto-600">
-                    {% trans "Page" %} {{ tickets.number }} {% trans "sur" %} {{ tickets.paginator.num_pages }}
-                </span>
-                <div class="flex space-x-2">
-                    {% if tickets.has_previous %}
-                        <a href="?page={{ tickets.previous_page_number }}" class="btn-outline text-sm py-1 px-3">{% trans "Précédent" %}</a>
-                    {% endif %}
-                    {% if tickets.has_next %}
-                        <a href="?page={{ tickets.next_page_number }}" class="btn-outline text-sm py-1 px-3">{% trans "Suivant" %}</a>
-                    {% endif %}
-                </div>
+        <div class="px-4 py-3 border-t flex justify-between items-center">
+            <span class="text-sm text-auto-600">
+                {% trans "Page" %} {{ tickets.number }} {% trans "sur" %} {{ tickets.paginator.num_pages }}
+            </span>
+            <div class="flex gap-2">
+                {% if tickets.has_previous %}
+                <a href="?page={{ tickets.previous_page_number }}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}"
+                   class="btn-outline text-sm py-1 px-3">{% trans "Précédent" %}</a>
+                {% endif %}
+                {% if tickets.has_next %}
+                <a href="?page={{ tickets.next_page_number }}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}"
+                   class="btn-outline text-sm py-1 px-3">{% trans "Suivant" %}</a>
+                {% endif %}
             </div>
+        </div>
         {% endif %}
     </div>
 </div>

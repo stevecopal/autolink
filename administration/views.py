@@ -237,47 +237,90 @@ def admin_payments_view(request):
 @user_passes_test(is_admin)
 def admin_support_view(request):
     """Admin - manage support tickets."""
-    tickets = Ticket.objects.all().select_related('user', 'assigned_to').order_by('-created_at')
-    
+    tickets = Ticket.objects.all().select_related('user', 'assigned_to', 'order', 'garage', 'part').order_by('-created_at')
+
     status = request.GET.get('status', '')
     category = request.GET.get('category', '')
-    
+    search = request.GET.get('q', '').strip()
+
     if status:
         tickets = tickets.filter(status=status)
     if category:
         tickets = tickets.filter(category=category)
-    
+    if search:
+        tickets = tickets.filter(
+            Q(ticket_number__icontains=search) |
+            Q(subject__icontains=search) |
+            Q(user__username__icontains=search) |
+            Q(user__email__icontains=search) |
+            Q(description__icontains=search)
+        )
+
     paginator = Paginator(tickets, 20)
     page = request.GET.get('page')
     tickets_page = paginator.get_page(page)
-    
+
     return render(request, 'dashboard/pages/admin/support/tickets/list.html', {
         'tickets': tickets_page,
         'selected_status': status,
         'selected_category': category,
+        'search_query': search,
     })
 
 
 @user_passes_test(is_admin)
 def admin_ticket_detail_view(request, ticket_id):
-    """Admin - view/assign ticket."""
-    ticket = get_object_or_404(Ticket, pk=ticket_id)
-    
+    """Admin - view/assign/reply to ticket."""
+    from support.models import TicketMessage
+    ticket = get_object_or_404(
+        Ticket.objects.select_related('user', 'order', 'garage', 'part', 'assigned_to'),
+        pk=ticket_id
+    )
+    ticket_messages = ticket.messages.select_related('sender').order_by('created_at')
+
     if request.method == 'POST':
         action = request.POST.get('action')
+
         if action == 'assign':
             ticket.assigned_to = request.user
-            ticket.status = 'IN_PROGRESS'
-            ticket.save(update_fields=['assigned_to', 'status'])
-            messages.success(request, _('Ticket assigned to you.'))
+            ticket.status = Ticket.Status.IN_PROGRESS
+            ticket.save(update_fields=['assigned_to', 'status', 'updated_at'])
+            messages.success(request, _('Ticket pris en charge.'))
+
         elif action == 'resolve':
-            ticket.status = 'RESOLVED'
+            ticket.status = Ticket.Status.RESOLVED
             ticket.resolved_at = timezone.now()
-            ticket.save(update_fields=['status', 'resolved_at'])
-            messages.success(request, _('Ticket resolved.'))
+            ticket.save(update_fields=['status', 'resolved_at', 'updated_at'])
+            messages.success(request, _('Ticket résolu.'))
+
+        elif action == 'close':
+            ticket.status = Ticket.Status.CLOSED
+            ticket.save(update_fields=['status', 'updated_at'])
+            messages.success(request, _('Ticket fermé.'))
+
+        elif action == 'waiting':
+            ticket.status = Ticket.Status.WAITING_CLIENT
+            ticket.save(update_fields=['status', 'updated_at'])
+            messages.success(request, _('Statut mis à jour : en attente du client.'))
+
+        elif action == 'reply':
+            content = request.POST.get('content', '').strip()
+            if content:
+                TicketMessage.objects.create(
+                    ticket=ticket,
+                    sender=request.user,
+                    message=content,
+                    is_internal=False,
+                )
+                ticket.save(update_fields=['updated_at'])
+                messages.success(request, _('Réponse envoyée.'))
+
         return redirect('administration:ticket_detail', ticket_id=ticket.pk)
-    
-    return render(request, 'dashboard/pages/admin/tickets/detail.html', {'ticket': ticket})
+
+    return render(request, 'dashboard/pages/admin/support/tickets/detail.html', {
+        'ticket': ticket,
+        'ticket_messages': ticket_messages,
+    })
 
 
 @user_passes_test(is_admin)

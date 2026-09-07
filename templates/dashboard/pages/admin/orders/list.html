@@ -57,7 +57,7 @@
                             <td class="px-4 py-3">{{ order.user.username }}</td>
                             <td class="px-4 py-3">{{ order.garage.name|default:"-" }}</td>
                             <td class="px-4 py-3"><span class="badge-{{ order.status_color }}">{{ order.status_label }}</span></td>
-                            <td class="px-4 py-3 font-bold">{{ order.total|intcomma }} FCFA</td>
+                            <td class="px-4 py-3 font-bold">{{ order.total }} FCFA</td>
                             <td class="px-4 py-3">{{ order.created_at|date:"d/m/Y" }}</td>
                         </tr>
                     {% empty %}

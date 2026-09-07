@@ -310,17 +310,17 @@
         </a>
 
         <!-- Support -->
-        <a href="{% url 'support:ticket_list' %}"
+        <a href="{% url 'support:ticket_create' %}"
            class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
-                  {% if request.resolver_match.url_name == 'ticket_list' %}
+                  {% if request.resolver_match.url_name == 'ticket_create' %}
                       bg-auto-light text-auto-orange font-bold
                   {% endif %}">
             <svg class="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24"
                  stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414A1 1 0 0119 6.707V19a2 2 0 01-2 2z"/>
+                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/>
             </svg>
-            {% trans "Support" %}
+            {% trans "Signaler un problème" %}
         </a>
 
     {% endif %}
@@ -350,18 +350,5 @@
         {% trans "Mon profil" %}
     </a>
 
-    <!-- Assistance -->
-    <a href="{% url 'support:assistance' %}"
-       class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
-              {% if request.resolver_match.url_name == 'assistance' %}
-                  bg-auto-light text-auto-orange font-bold
-              {% endif %}">
-        <svg class="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24"
-             stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9 11a4 4 0 118 0"/>
-        </svg>
-        {% trans "Assistance" %}
-    </a>
 
 </nav>

@@ -17,7 +17,7 @@
                 <h4 class="font-bold mb-4 text-auto-gold">{% trans "Services" %}</h4>
                 <a href="{% url 'garages:garage_list' %}" class="block text-white/70 hover:text-white text-sm mb-2 transition">{% trans "Trouver un garage" %}</a>
                 <a href="{% url 'catalog:part_list' %}" class="block text-white/70 hover:text-white text-sm mb-2 transition">{% trans "Trouver une piece" %}</a>
-                <a href="{% url 'support:assistance' %}" class="block text-white/70 hover:text-white text-sm mb-2 transition">{% trans "Assistance routiere" %}</a>
+                <a href="{% url 'support:ticket_create' %}" class="block text-white/70 hover:text-white text-sm mb-2 transition">{% trans "Signaler un probleme" %}</a>
             </div>
             <div>
                 <h4 class="font-bold mb-4 text-auto-gold">{% trans "Compte" %}</h4>
@@ -29,6 +29,7 @@
                 <h4 class="font-bold mb-4 text-auto-gold">{% trans "Contact" %}</h4>
                 <a href="{% url 'core:contact' %}" class="block text-white/70 hover:text-white text-sm mb-2 transition">{% trans "Nous contacter" %}</a>
                 <a href="{% url 'core:about' %}" class="block text-white/70 hover:text-white text-sm mb-2 transition">{% trans "A propos" %}</a>
+                <a href="{% url 'core:policy' %}" class="block text-white/70 hover:text-white text-sm mb-2 transition">{% trans "Politique et regles" %}</a>
                 <p class="text-white/70 text-sm mt-3">📍 {% trans "Douala, Cameroun" %}</p>
             </div>
         </div>

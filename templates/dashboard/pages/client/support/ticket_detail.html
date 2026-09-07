@@ -1,7 +1,7 @@
 {% extends 'dashboard/base.html' %}
 {% load i18n %}
 
-{% block title %}{% trans "Ticket" %} #{{ ticket.id }} - AutoLink{% endblock %}
+{% block title %}{{ ticket.ticket_number }} - {{ ticket.subject }} - AutoLink{% endblock %}
 
 {% block dashboard_header %}
     <h1 class="text-sm font-bold text-auto-dark">{% trans "Ticket" %}</h1>
@@ -11,212 +11,230 @@
     <nav class="flex items-center space-x-2 text-sm text-auto-600">
         <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-auto-orange transition">{% trans "Tableau de bord" %}</a>
         <span class="text-auto-400">/</span>
-        <a href="{% url 'support:ticket_list' %}" class="hover:text-auto-orange transition">{% trans "Tickets" %}</a>
+        <a href="{% url 'support:ticket_list' %}" class="hover:text-auto-orange transition">{% trans "Mes tickets" %}</a>
         <span class="text-auto-400">/</span>
-        <span class="font-bold text-auto-dark">#{{ ticket.id }}</span>
+        <span class="font-bold text-auto-dark">{{ ticket.ticket_number }}</span>
     </nav>
 {% endblock %}
 
 {% block content %}
 <div class="space-y-6">
-    <!-- Header -->
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-            <h2 class="text-xl font-bold text-auto-dark mb-1">{{ ticket.subject }}</h2>
-            <div class="flex items-center gap-2 text-sm text-auto-500">
-                <span class="badge-{{ ticket.priority_color }} text-[10px]">{{ ticket.get_priority_display }}</span>
-                <span class="badge-{{ ticket.status_color }} text-[10px]">{{ ticket.get_status_display }}</span>
-                <span>#{{ ticket.id }}</span>
-                <span>•</span>
-                <span>{{ ticket.created_at|date:"d/m/Y H:i" }}</span>
+            <div class="flex items-center gap-2 mb-1">
+                <span class="font-mono text-sm text-auto-500">{{ ticket.ticket_number }}</span>
+                <span class="badge-info text-[10px]">{{ ticket.get_status_display }}</span>
+                <span class="badge-neutral text-[10px]">{{ ticket.get_category_display }}</span>
+            </div>
+            <h2 class="text-xl font-bold text-auto-dark">{{ ticket.subject }}</h2>
+            <div class="text-sm text-auto-500 mt-1">
+                {% trans "Créé le" %} {{ ticket.created_at|date:"d/m/Y à H:i" }}
+                {% if ticket.resolved_at %}
+                · {% trans "Résolu le" %} {{ ticket.resolved_at|date:"d/m/Y à H:i" }}
+                {% endif %}
             </div>
         </div>
-        {% if ticket.status != 'CLOSED' %}
         <a href="{% url 'support:ticket_list' %}"
-           class="btn-outline text-sm">{% trans "Retour à la liste" %}</a>
-        {% endif %}
+           class="btn-outline text-sm flex-shrink-0">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+            {% trans "Retour" %}
+        </a>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Conversation -->
-        <div class="card p-6 md:col-span-2">
-            <h3 class="text-lg font-bold text-auto-dark mb-4">{% trans "Conversation" %}</h3>
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 space-y-6">
+            <div class="card p-6">
+                <h3 class="font-bold text-sm text-auto-700 mb-4">{% trans "Description" %}</h3>
+                <div class="p-4 rounded-xl bg-auto-50 border border-auto-100">
+                    <p class="text-sm text-auto-700 whitespace-pre-wrap leading-relaxed">{{ ticket.description }}</p>
+                </div>
 
-            {% if ticket.messages %}
-            <div class="space-y-4">
-                {% for message in ticket.messages %}
-                <div class="p-4 rounded-xl {% if message.user == ticket.user %}bg-auto-50 border-l-4 border-l-auto-orange{% else %}bg-auto-orange/5 border-l-4 border-l-auto-deep-red ml-auto{% endif %}">
-                    <div class="flex items-center gap-2 mb-2">
-                        {% if message.user.avatar %}
-                        <img src="{{ message.user.avatar.url }}" class="w-6 h-6 rounded-full object-cover">
-                        {% else %}
-                        <div class="w-6 h-6 rounded-full bg-auto-orange/10 flex items-center justify-center text-xs font-bold text-auto-dark">
-                            {{ message.user.display_name|first|upper }}
+                {% if ticket.order %}
+                <div class="mt-4 p-4 rounded-xl bg-auto-50 border border-auto-100">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-auto-orange/10 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-5 h-5 text-auto-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/></svg>
                         </div>
-                        {% endif %}
-                        <span class="font-bold text-sm text-auto-dark">{{ message.user.display_name }}</span>
-                        <span class="text-xs text-auto-500">{{ message.created_at|date:"d/m/Y H:i" }}</span>
-                    </div>
-                    <div class="text-sm text-auto-700 whitespace-pre-wrap">{{ message.content }}</div>
-                    {% if message.attachment %}
-                    <div class="mt-2">
-                        <a href="{{ message.attachment.url }}" target="_blank" rel="noopener noreferrer"
-                           class="inline-flex items-center gap-1 text-auto-orange font-medium text-sm hover:underline">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586-6.586a2 2 0 112.828-2.828l6.414 6.414a4 4 0 00-5.656-5.656l-6.415-6.414a6 6 0 118.486 8.486L20.5 13"/></svg>
-                            {{ message.attachment.name }}
+                        <div class="min-w-0">
+                            <div class="text-xs text-auto-500">{% trans "Commande" %}</div>
+                            <div class="font-bold text-sm text-auto-dark">{{ ticket.order.order_number }}</div>
+                        </div>
+                        <a href="{% url 'orders:order_detail' order_number=ticket.order.order_number %}"
+                           class="btn-outline text-xs px-3 py-1.5 flex-shrink-0 ml-auto">
+                            {% trans "Voir" %}
                         </a>
                     </div>
-                    {% endif %}
                 </div>
-                {% endfor %}
-            </div>
-            {% else %}
-            <div class="p-6 text-center text-auto-500">
-                {% trans "Aucun message pour le moment." %}
-            </div>
-            {% endif %}
+                {% endif %}
 
-            <!-- Reply form (only for open tickets) -->
-            {% if ticket.status != 'CLOSED' %}
-            <form method="post" action="{% url 'support:ticket_detail' ticket.id %}"
-                  class="mt-6 p-4 rounded-xl bg-auto-50 border border-auto-100">
-                {% csrf_token %}
-                <div class="flex items-center gap-2 mb-2">
-                    <label class="form-label">{% trans "Votre réponse" %}</label>
+                {% if ticket.part %}
+                <div class="mt-3 p-4 rounded-xl bg-auto-50 border border-auto-100">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-auto-orange/10 flex items-center justify-center flex-shrink-0">
+                            {% if ticket.part.photo %}
+                            <img src="{{ ticket.part.photo.url }}" class="w-full h-full object-cover rounded-xl">
+                            {% else %}
+                            <span class="text-xl">🔩</span>
+                            {% endif %}
+                        </div>
+                        <div class="min-w-0">
+                            <div class="text-xs text-auto-500">{% trans "Pièce" %}</div>
+                            <div class="font-bold text-sm text-auto-dark truncate">{{ ticket.part.name }}</div>
+                        </div>
+                        <a href="{% url 'catalog:part_detail' slug=ticket.part.slug %}"
+                           class="btn-outline text-xs px-3 py-1.5 flex-shrink-0 ml-auto">
+                            {% trans "Voir" %}
+                        </a>
+                    </div>
                 </div>
-                <textarea name="content"
-                          class="form-input w-full"
-                          rows="3"
-                          placeholder="{% trans 'Écrivez votre réponse ici...' %}"
-                          required></textarea>
-                <div class="flex justify-between items-center mt-2">
-                    <a href="#"
-                       class="text-xs text-auto-400 hover:text-auto-600">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586-6.586a2 2 0 112.828-2.828l6.414 6.414a4 4 0 00-5.656-5.656l-6.415-6.414a6 6 0 118.486 8.486L20.5 13"/></svg>
-                        {% trans "Joindre un fichier" %}
-                    </a>
-                    <button type="submit"
-                            class="bg-auto-orange text-white px-4 py-1.5 rounded-lg font-bold text-xs hover:bg-auto-orange-dark transition">
-                        {% trans "Envoyer" %}
-                    </button>
+                {% endif %}
+
+                {% if ticket.garage %}
+                <div class="mt-3 p-4 rounded-xl bg-auto-50 border border-auto-100">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-auto-orange/10 flex items-center justify-center flex-shrink-0">
+                            {% if ticket.garage.logo %}
+                            <img src="{{ ticket.garage.logo.url }}" class="w-full h-full object-cover rounded-xl">
+                            {% else %}
+                            <span class="text-xl">🔧</span>
+                            {% endif %}
+                        </div>
+                        <div class="min-w-0">
+                            <div class="text-xs text-auto-500">{% trans "Garage" %}</div>
+                            <div class="font-bold text-sm text-auto-dark truncate">{{ ticket.garage.name }}</div>
+                        </div>
+                        <a href="{% url 'garages:garage_detail' slug=ticket.garage.slug %}"
+                           class="btn-outline text-xs px-3 py-1.5 flex-shrink-0 ml-auto">
+                            {% trans "Voir" %}
+                        </a>
+                    </div>
                 </div>
-            </form>
-            {% endif %}
+                {% endif %}
+            </div>
+
+            <div class="card p-6">
+                <h3 class="font-bold text-sm text-auto-700 mb-4">{% trans "Conversation" %}</h3>
+
+                {% if messages %}
+                <div class="space-y-4">
+                    {% for message in messages %}
+                    <div class="p-4 rounded-xl {% if message.sender == ticket.user %}bg-auto-50 border-l-4 border-l-auto-orange{% else %}bg-auto-orange/5 border-l-4 border-l-auto-deep-red{% endif %}">
+                        <div class="flex items-center gap-2 mb-2">
+                            {% if message.sender.avatar %}
+                            <img src="{{ message.sender.avatar.url }}" class="w-6 h-6 rounded-full object-cover">
+                            {% else %}
+                            <div class="w-6 h-6 rounded-full bg-auto-orange/10 flex items-center justify-center text-xs font-bold text-auto-dark">
+                                {{ message.sender.display_name|first|upper }}
+                            </div>
+                            {% endif %}
+                            <span class="font-bold text-sm text-auto-dark">{{ message.sender.display_name }}</span>
+                            {% if message.sender == ticket.user %}
+                            <span class="badge-neutral text-[10px]">{% trans "Vous" %}</span>
+                            {% else %}
+                            <span class="badge-info text-[10px]">{% trans "Support AutoLink" %}</span>
+                            {% endif %}
+                            <span class="text-xs text-auto-500">{{ message.created_at|date:"d/m/Y H:i" }}</span>
+                        </div>
+                        <div class="text-sm text-auto-700 whitespace-pre-wrap leading-relaxed">{{ message.message }}</div>
+                        {% if message.attachment %}
+                        <div class="mt-3">
+                            <a href="{{ message.attachment.url }}" target="_blank" rel="noopener noreferrer"
+                               class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-auto-100 hover:bg-auto-50 transition text-sm">
+                                <svg class="w-4 h-4 text-auto-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586-6.586a2 2 0 112.828-2.828l6.414 6.414a4 4 0 00-5.656-5.656l-6.415-6.414a6 6 0 118.486 8.486L20.5 13"/></svg>
+                                <span class="text-auto-dark font-medium truncate max-w-[200px]">{{ message.attachment.name|cut:"tickets/attachments/" }}</span>
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="p-8 text-center text-auto-500">
+                    <svg class="w-12 h-12 mx-auto mb-3 text-auto-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg>
+                    <p>{% trans "Aucun message pour le moment." %}</p>
+                </div>
+                {% endif %}
+
+                {% if ticket.status != 'CLOSED' %}
+                <form method="post" action="{% url 'support:ticket_detail' ticket.ticket_number %}"
+                      class="mt-6 p-4 rounded-xl bg-auto-50 border border-auto-100">
+                    {% csrf_token %}
+                    <label class="form-label mb-2">{% trans "Votre réponse" %}</label>
+                    <textarea name="message"
+                              class="form-input w-full"
+                              rows="3"
+                              placeholder="{% trans 'Écrivez votre réponse ici...' %}"
+                              required></textarea>
+                    <div class="flex justify-between items-center mt-3">
+                        <label class="inline-flex items-center gap-2 text-xs text-auto-400 hover:text-auto-600 cursor-pointer">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586-6.586a2 2 0 112.828-2.828l6.414 6.414a4 4 0 00-5.656-5.656l-6.415-6.414a6 6 0 118.486 8.486L20.5 13"/></svg>
+                            {% trans "Joindre un fichier" %}
+                            <input type="file" name="attachment" class="hidden" accept="image/*,application/pdf,.doc,.docx">
+                        </label>
+                        <button type="submit"
+                                class="bg-auto-orange text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-auto-orange-dark transition">
+                            {% trans "Envoyer" %}
+                        </button>
+                    </div>
+                </form>
+                {% endif %}
+            </div>
         </div>
 
-        <!-- Sidebar -->
         <div class="space-y-6">
-            <!-- Ticket info -->
-            <div class="card p-4 border border-auto-100">
-                <h4 class="font-bold text-sm text-auto-700 mb-3">{% trans "Informations" %}</h4>
-                <div class="space-y-2 text-sm">
-                    <div>
+            <div class="card p-5">
+                <h4 class="font-bold text-sm uppercase tracking-wider text-auto-700 mb-3">{% trans "Informations" %}</h4>
+                <div class="space-y-3 text-sm">
+                    <div class="flex justify-between">
                         <span class="text-auto-500">{% trans "Statut" %}</span>
-                        <div class="flex items-center gap-2">
-                            <span class="badge-{{ ticket.status_color }} text-[10px]">{{ ticket.get_status_display }}</span>
-                        </div>
+                        <span class="badge-info text-[10px]">{{ ticket.get_status_display }}</span>
                     </div>
-                    <div>
-                        <span class="text-auto-500">{% trans "Priorité" %}</span>
-                        <div class="flex items-center gap-2">
-                            <span class="badge-{{ ticket.priority_color }} text-[10px]">{{ ticket.get_priority_display }}</span>
-                        </div>
+                    <div class="flex justify-between">
+                        <span class="text-auto-500">{% trans "Catégorie" %}</span>
+                        <span class="font-medium text-auto-dark">{{ ticket.get_category_display }}</span>
                     </div>
-                    <div>
+                    <div class="flex justify-between">
                         <span class="text-auto-500">{% trans "Créé le" %}</span>
-                        <div>{{ ticket.created_at|date:"d/m/Y H:i" }}</div>
+                        <span class="font-medium text-auto-dark">{{ ticket.created_at|date:"d/m/Y" }}</span>
                     </div>
-                    {% if ticket.updated_at %}
-                    <div>
-                        <span class="text-auto-500">{% trans "Dernière réponse" %}</span>
-                        <div>{{ ticket.updated_at|date:"d/m/Y H:i" }}</div>
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- Vehicle info -->
-            {% if ticket.vehicle %}
-            <div class="card p-4 border border-auto-100">
-                <h4 class="font-bold text-sm text-auto-700 mb-3">{% trans "Véhicule" %}</h4>
-                <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-auto-coral/10 flex items-center justify-center">🚗</div>
-                    <div>
-                        <div class="font-bold text-sm">{{ ticket.vehicle.display_name }}</div>
-                        <div class="text-xs text-auto-500">{{ ticket.vehicle.license_plate|default:""—"" }}</div>
+                    <div class="flex justify-between">
+                        <span class="text-auto-500">{% trans "Dernière mise à jour" %}</span>
+                        <span class="font-medium text-auto-dark">{{ ticket.updated_at|date:"d/m/Y" }}</span>
                     </div>
                 </div>
-                <a href="{% url 'vehicles:vehicle_detail' ticket.vehicle_id %}"
-                   class="mt-2 inline-block text-xs text-auto-orange hover:underline">
-                    {% trans "Voir les détails" %}
-                </a>
-            </div>
-            {% endif %}
-
-            <!-- Client info -->
-            <div class="card p-4 border border-auto-100">
-                <h4 class="font-bold text-sm text-auto-700 mb-3">{% trans "Client" %}</h4>
-                <div class="flex items-center gap-3">
-                    {% if ticket.user.avatar %}
-                    <img src="{{ ticket.user.avatar.url }}" class="w-10 h-10 rounded-full object-cover border-2 border-auto-orange">
-                    {% else %}
-                    <div class="w-10 h-10 rounded-full bg-auto-orange/10 flex items-center justify-center text-lg font-bold text-auto-dark border-2 border-auto-100">
-                        {{ ticket.user.display_name|first|upper }}
-                    </div>
-                    {% endif %}
-                    <div>
-                        <div class="font-bold text-sm">{{ ticket.user.display_name }}</div>
-                        <div class="text-xs text-auto-500">{{ ticket.user.email }}</div>
-                    </div>
-                </div>
-                <a href="{% url 'accounts:profile_edit' %}?view={{ ticket.user.pk }}"
-                   class="mt-2 inline-block text-xs text-auto-orange hover:underline">
-                    {% trans "Voir le profil" %}
-                </a>
             </div>
 
-            <!-- Actions -->
-            {% if ticket.status != 'CLOSED' %}
-            <div class="card p-4 border border-auto-100">
-                <a href="{% url 'support:ticket_list' %}"
-                   class="block w-full p-3 bg-auto-orange/10 text-auto-orange rounded-lg font-bold text-sm text-center hover:bg-auto-orange/20 transition">
-                    {% trans "Retour aux tickets" %}
-                </a>
-            </div>
-            {% else %}
-            <div class="card p-4 border border-success-100 bg-success-50 text-center">
-                <svg class="w-8 h-8 mx-auto mb-2 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                <p class="text-sm font-bold text-success-700">{% trans "Ticket résolu" %}</p>
-                <p class="text-xs text-success-600">{% trans "Ce ticket a été clôturé." %}</p>
-            </div>
-            {% endif %}
-
-            <!-- Reopen option -->
             {% if ticket.status == 'CLOSED' %}
-            <div class="card p-4 border border-warning-100 bg-warning-50">
-                <h4 class="font-bold text-sm text-warning-700 mb-2">{% trans "Rouvrir le ticket" %}</h4>
-                <p class="text-xs text-warning-600 mb-3">{% trans "Besoin d'aide supplémentaire ?" %}</p>
-                <form method="post" action="{% url 'support:ticket_detail' ticket.id %}">
+            <div class="card p-5 border border-success-100 bg-success-50 text-center">
+                <svg class="w-10 h-10 mx-auto mb-2 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <p class="text-sm font-bold text-success-700">{% trans "Ticket résolu" %}</p>
+                <p class="text-xs text-success-600 mt-1">{% trans "Ce ticket a été clôturé." %}</p>
+            </div>
+
+            <div class="card p-5 border border-warning-100 bg-warning-50">
+                <h4 class="font-bold text-sm text-warning-700 mb-2">{% trans "Besoin d'aide supplémentaire ?" %}</h4>
+                <p class="text-xs text-warning-600 mb-3">{% trans "Vous pouvez rouvrir ce ticket si votre problème n'est pas résolu." %}</p>
+                <form method="post" action="{% url 'support:ticket_detail' ticket.ticket_number %}">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="reopen">
                     <button type="submit"
-                            class="bg-warning-500 text-white px-4 py-1.5 rounded-lg font-bold text-xs hover:bg-warning-600 transition">
-                        {% trans "Rouvrir" %}
+                            class="bg-warning-500 text-white px-4 py-2 rounded-lg font-bold text-xs hover:bg-warning-600 transition w-full">
+                        {% trans "Rouvrir le ticket" %}
                     </button>
                 </form>
             </div>
             {% endif %}
 
-            <!-- Delete option -->
-            <div class="card p-4 border border-error-100 bg-error-50">
-                <h4 class="font-bold text-sm text-error-700 mb-2">{% trans "Supprimer" %}</h4>
-                <form method="post" action="{% url 'support:ticket_detail' ticket.id %}">
+            <div class="card p-5 border border-error-100 bg-error-50">
+                <h4 class="font-bold text-sm text-error-700 mb-2">{% trans "Supprimer ce ticket" %}</h4>
+                <p class="text-xs text-error-600 mb-3">{% trans "Cette action est irréversible." %}</p>
+                <form method="post" action="{% url 'support:ticket_detail' ticket.ticket_number %}">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="delete">
                     <button type="submit"
-                            class="bg-error-500 text-white px-4 py-1.5 rounded-lg font-bold text-xs hover:bg-error-600 transition text-center w-full"
+                            class="bg-error-500 text-white px-4 py-2 rounded-lg font-bold text-xs hover:bg-error-600 transition w-full"
                             onclick="return confirm('{% trans 'Supprimer ce ticket ? Cette action est irréversible.' %}')">
-                        {% trans "Supprimer le ticket" %}
+                        {% trans "Supprimer" %}
                     </button>
                 </form>
             </div>

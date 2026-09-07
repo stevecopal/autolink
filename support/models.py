@@ -14,20 +14,17 @@ class Ticket(models.Model):
         CLOSED = 'CLOSED', _('Fermé')
 
     class Category(models.TextChoices):
-        DISPUTE = 'DISPUTE', _('Litige')
-        RETURN = 'RETURN', _('Retour')
-        REFUND = 'REFUND', _('Remboursement')
-        WRONG_PART = 'WRONG_PART', _('Mauvaise pièce')
-        DAMAGED_PART = 'DAMAGED_PART', _('Pièce endommagée')
-        INCOMPATIBLE = 'INCOMPATIBLE', _('Pièce incompatible')
-        INCOMPLETE_ORDER = 'INCOMPLETE_ORDER', _('Commande incomplète')
-        WRONG_PRICE = 'WRONG_PRICE', _('Mauvais prix')
-        PAYMENT_ISSUE = 'PAYMENT_ISSUE', _('Problème de paiement')
+        PART = 'PART', _('Problème avec une pièce')
+        GARAGE = 'GARAGE', _('Problème avec un garage')
+        ORDER = 'ORDER', _('Problème avec une commande')
+        SERVICE = 'SERVICE', _('Problème avec une prestation')
+        PLATFORM = 'PLATFORM', _('Problème avec la plateforme')
         OTHER = 'OTHER', _('Autre')
 
     ticket_number = models.CharField(max_length=20, unique=True, editable=False)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='tickets')
     order = models.ForeignKey('orders.Order', on_delete=models.SET_NULL, null=True, blank=True, related_name='tickets')
+    part = models.ForeignKey('catalog.Part', on_delete=models.SET_NULL, null=True, blank=True, related_name='tickets')
     garage = models.ForeignKey('garages.Garage', on_delete=models.SET_NULL, null=True, blank=True, related_name='tickets')
 
     category = models.CharField(max_length=30, choices=Category.choices, default=Category.OTHER)
