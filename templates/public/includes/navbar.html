@@ -12,6 +12,7 @@
             </a>
 
             <div class="hidden md:flex items-center space-x-6">
+                <a href="{% url 'search:nearby_page' %}" class="nav-link text-white">{% trans "Mécaniciens" %}</a>
                 <a href="{% url 'garages:garage_list' %}" class="nav-link text-white">{% trans "Garages" %}</a>
                 <a href="{% url 'catalog:part_list' %}" class="nav-link text-white">{% trans "Pieces" %}</a>
                 
@@ -40,6 +41,7 @@
         </div>
 
         <div id="mobile-menu" class="hidden md:hidden pb-4 border-t border-white/10 mt-2 pt-3">
+            <a href="{% url 'search:nearby_page' %}" class="block py-2.5 nav-link text-white">{% trans "Mécaniciens" %}</a>
             <a href="{% url 'garages:garage_list' %}" class="block py-2.5 nav-link text-white">{% trans "Garages" %}</a>
             <a href="{% url 'catalog:part_list' %}" class="block py-2.5 nav-link text-white">{% trans "Pieces" %}</a>
             <a href="{% url 'support:assistance' %}" class="block py-2.5 nav-link text-white">{% trans "Assistance" %}</a>

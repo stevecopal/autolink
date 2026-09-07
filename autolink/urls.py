@@ -16,6 +16,7 @@ urlpatterns = [
     path('', include('reviews.urls')),
     path('notifications/', include('notifications.urls')),
     path('', include('support.urls')),
+    path('', include('search.urls')),
 ]
 
 if settings.DEBUG:

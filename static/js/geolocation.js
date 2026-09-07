@@ -14,39 +14,39 @@
     locationBtn.addEventListener('click', function() {
         if (!navigator.geolocation) {
             if (locationStatus) {
-                locationStatus.textContent = 'Geolocation is not supported by your browser.';
+                locationStatus.textContent = 'La géolocalisation n\'est pas prise en charge par votre navigateur.';
             }
             return;
         }
 
         locationBtn.disabled = true;
-        locationBtn.textContent = 'Locating...';
+        locationBtn.textContent = 'Localisation…';
 
         navigator.geolocation.getCurrentPosition(
             function(pos) {
                 if (latInput) latInput.value = pos.coords.latitude;
                 if (lngInput) lngInput.value = pos.coords.longitude;
                 if (locationStatus) {
-                    locationStatus.textContent = 'Position recorded successfully.';
+                    locationStatus.textContent = 'Position enregistrée avec succès.';
                     locationStatus.className = 'text-sm text-green-600';
                 }
-                locationBtn.textContent = 'Position recorded ✓';
+                locationBtn.textContent = 'Position enregistrée ✓';
                 locationBtn.disabled = false;
             },
             function(err) {
-                var msg = 'Unable to get your position.';
+                var msg = 'Impossible d\'obtenir votre position.';
                 if (err.code === 1) {
-                    msg = 'Position access denied. Please enter your address manually.';
+                    msg = 'Accès à la position refusé. Veuillez saisir votre adresse manuellement.';
                 } else if (err.code === 2) {
-                    msg = 'Position unavailable. Please enter your address manually.';
+                    msg = 'Position indisponible. Veuillez saisir votre adresse manuellement.';
                 } else if (err.code === 3) {
-                    msg = 'Position request timed out. Please try again.';
+                    msg = 'La demande de position a expiré. Veuillez réessayer.';
                 }
                 if (locationStatus) {
                     locationStatus.textContent = msg;
                     locationStatus.className = 'text-sm text-red-600';
                 }
-                locationBtn.textContent = 'Try again';
+                locationBtn.textContent = 'Réessayer';
                 locationBtn.disabled = false;
             },
             { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }

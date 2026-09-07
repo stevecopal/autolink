@@ -1141,6 +1141,14 @@ h4 {
   z-index: 50;
 }
 
+.order-1 {
+  order: 1;
+}
+
+.order-2 {
+  order: 2;
+}
+
 .col-span-2 {
   grid-column: span 2 / span 2;
 }
@@ -1390,6 +1398,10 @@ h4 {
   height: 100vh;
 }
 
+.max-h-\[600px\] {
+  max-height: 600px;
+}
+
 .min-h-\[2\.5rem\] {
   min-height: 2.5rem;
 }
@@ -1484,6 +1496,10 @@ h4 {
 
 .w-full {
   width: 100%;
+}
+
+.\!w-auto {
+  width: auto !important;
 }
 
 .min-w-0 {
@@ -1775,6 +1791,10 @@ h4 {
   white-space: nowrap;
 }
 
+.whitespace-nowrap {
+  white-space: nowrap;
+}
+
 .whitespace-pre-wrap {
   white-space: pre-wrap;
 }
@@ -1956,6 +1976,10 @@ h4 {
 .border-yellow-300 {
   --tw-border-opacity: 1;
   border-color: rgb(253 224 71 / var(--tw-border-opacity, 1));
+}
+
+.border-auto-100\/50 {
+  border-color: rgb(250 224 216 / 0.5);
 }
 
 .border-l-auto-deep-red {
@@ -2423,6 +2447,10 @@ h4 {
   padding-top: 0px;
 }
 
+.pt-1 {
+  padding-top: 0.25rem;
+}
+
 .pt-12 {
   padding-top: 3rem;
 }
@@ -2443,8 +2471,8 @@ h4 {
   padding-top: 1.5rem;
 }
 
-.pt-1 {
-  padding-top: 0.25rem;
+.pr-2 {
+  padding-right: 0.5rem;
 }
 
 .text-left {
@@ -2825,6 +2853,10 @@ h4 {
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
 }
 
+.filter {
+  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
+}
+
 .backdrop-blur-sm {
   --tw-backdrop-blur: blur(4px);
   backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
@@ -2870,6 +2902,10 @@ h4 {
 
 .duration-500 {
   transition-duration: 500ms;
+}
+
+.ease-in-out {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .line-clamp-2 {
@@ -3111,6 +3147,12 @@ h4 {
 
 .hover\:shadow-md:hover {
   --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
+  box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+
+.hover\:shadow-card-hover:hover {
+  --tw-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.08);
   --tw-shadow-colored: 0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
@@ -3383,6 +3425,10 @@ h4 {
     padding: 2rem;
   }
 
+  .sm\:p-6 {
+    padding: 1.5rem;
+  }
+
   .sm\:px-10 {
     padding-left: 2.5rem;
     padding-right: 2.5rem;
@@ -3426,6 +3472,11 @@ h4 {
   .sm\:py-5 {
     padding-top: 1.25rem;
     padding-bottom: 1.25rem;
+  }
+
+  .sm\:py-8 {
+    padding-top: 2rem;
+    padding-bottom: 2rem;
   }
 
   .sm\:pb-16 {
@@ -3587,8 +3638,20 @@ h4 {
 }
 
 @media (min-width: 1024px) {
+  .lg\:order-1 {
+    order: 1;
+  }
+
+  .lg\:order-2 {
+    order: 2;
+  }
+
   .lg\:col-span-2 {
     grid-column: span 2 / span 2;
+  }
+
+  .lg\:col-span-3 {
+    grid-column: span 3 / span 3;
   }
 
   .lg\:grid-cols-2 {
@@ -3601,6 +3664,10 @@ h4 {
 
   .lg\:grid-cols-4 {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .lg\:grid-cols-5 {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 
   .lg\:overflow-x-hidden {
