@@ -1,0 +1,121 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Notifications" %} - AutoLink{% endblock %}
+
+{% block dashboard_header %}
+    <h1 class="text-sm font-bold text-auto-dark">{% trans "Communication" %}</h1>
+{% endblock %}
+
+{% block dashboard_breadcrumb %}
+    <nav class="flex items-center space-x-2 text-sm text-auto-600">
+        <a href="{% url 'administration:dashboard' %}" class="hover:text-auto-orange transition">{% trans "Tableau de bord" %}</a>
+        <span class="text-auto-400">/</span>
+        <span class="font-bold text-auto-dark">{% trans "Notifications" %}</span>
+    </nav>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-auto-dark">{% trans "Notifications" %}</h1>
+            <p class="text-sm text-auto-600 mt-1">{% trans "Gérez les notifications envoyées aux utilisateurs." %}</p>
+        </div>
+    </div>
+
+    <div class="card p-4">
+        <form method="get" class="flex flex-wrap items-end gap-4">
+            <div>
+                <label class="form-label">{% trans "Catégorie" %}</label>
+                <select name="category" class="form-input">
+                    <option value="">{% trans "Toutes" %}</option>
+                    <option value="ORDER" {% if selected_category == 'ORDER' %}selected{% endif %}>{% trans "Commande" %}</option>
+                    <option value="PAYMENT" {% if selected_category == 'PAYMENT' %}selected{% endif %}>{% trans "Paiement" %}</option>
+                    <option value="APPOINTMENT" {% if selected_category == 'APPOINTMENT' %}selected{% endif %}>{% trans "Rendez-vous" %}</option>
+                    <option value="REVIEW" {% if selected_category == 'REVIEW' %}selected{% endif %}>{% trans "Avis" %}</option>
+                    <option value="SYSTEM" {% if selected_category == 'SYSTEM' %}selected{% endif %}>{% trans "Système" %}</option>
+                    <option value="SUPPORT" {% if selected_category == 'SUPPORT' %}selected{% endif %}>{% trans "Support" %}</option>
+                </select>
+            </div>
+            <div>
+                <label class="form-label">{% trans "Statut" %}</label>
+                <select name="read" class="form-input">
+                    <option value="">{% trans "Tous" %}</option>
+                    <option value="unread" {% if selected_read == 'unread' %}selected{% endif %}>{% trans "Non lus" %}</option>
+                    <option value="read" {% if selected_read == 'read' %}selected{% endif %}>{% trans "Lu(s)" %}</option>
+                </select>
+            </div>
+            <div>
+                <label class="form-label">{% trans "Recherche" %}</label>
+                <input type="text" name="q" value="{{ search_query }}" class="form-input" placeholder="{% trans 'Utilisateur, titre...' %}">
+            </div>
+            <button type="submit" class="btn-primary text-sm">{% trans "Filtrer" %}</button>
+            {% if search_query or selected_category or selected_read %}
+                <a href="{% url 'administration:notifications_admin' %}" class="btn-outline text-sm">{% trans "Réinitialiser" %}</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <div class="card overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-auto-50">
+                    <tr class="text-left text-auto-700">
+                        <th class="px-4 py-3">{% trans "Utilisateur" %}</th>
+                        <th class="px-4 py-3">{% trans "Catégorie" %}</th>
+                        <th class="px-4 py-3">{% trans "Titre" %}</th>
+                        <th class="px-4 py-3">{% trans "Date" %}</th>
+                        <th class="px-4 py-3">{% trans "Statut" %}</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y">
+                    {% for notification in notifications %}
+                        <tr class="hover:bg-auto-50">
+                            <td class="px-4 py-3">
+                                <div class="font-medium">{{ notification.user.username }}</div>
+                                <div class="text-xs text-auto-500">{{ notification.user.email|default:" — " }}</div>
+                            </td>
+                            <td class="px-4 py-3"><span class="badge-neutral text-[10px]">{{ notification.get_category_display }}</span></td>
+                            <td class="px-4 py-3">
+                                <div class="font-medium">{{ notification.title }}</div>
+                                <div class="text-xs text-auto-500 line-clamp-2">{{ notification.message }}</div>
+                            </td>
+                            <td class="px-4 py-3 text-auto-500">{{ notification.created_at|date:"d/m/Y H:i" }}</td>
+                            <td class="px-4 py-3">
+                                {% if notification.is_read %}
+                                    <span class="badge-success text-[10px]">{% trans "Lu" %}</span>
+                                {% else %}
+                                    <span class="badge-warning text-[10px]">{% trans "Non lu" %}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="5" class="px-4 py-8 text-center text-auto-600">{% trans "Aucune notification." %}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if notifications.has_other_pages %}
+            <div class="px-4 py-3 border-t flex justify-between items-center flex-wrap gap-2">
+                <span class="text-sm text-auto-600">
+                    {% trans "Page" %} {{ notifications.number }} {% trans "sur" %} {{ notifications.paginator.num_pages }}
+                </span>
+                <div class="flex gap-2">
+                    {% if notifications.has_previous %}
+                        <a href="?page={{ notifications.previous_page_number }}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_read %}&read={{ selected_read }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}"
+                           class="btn-outline text-sm py-1 px-3">{% trans "Précédent" %}</a>
+                    {% endif %}
+                    {% if notifications.has_next %}
+                        <a href="?page={{ notifications.next_page_number }}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_read %}&read={{ selected_read }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}"
+                           class="btn-outline text-sm py-1 px-3">{% trans "Suivant" %}</a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

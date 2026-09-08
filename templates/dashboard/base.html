@@ -7,6 +7,7 @@
     <title>{% block title %}{% trans "Administration" %} - AutoLink{% endblock %}</title>
     <meta name="description" content="{% block description %}{% trans "Administration AutoLink" %}{% endblock %}">
     <link rel="stylesheet" href="{% static 'css/output.css' %}">
+    <link rel="stylesheet" href="{% static 'administration/css/admin.css' %}">
     {% block extra_css %}{% endblock %}
 </head>
 <body class="bg-auto-cream h-screen flex flex-col">
@@ -94,11 +95,12 @@
 
         </div>
     </div>
-    
+
 
     {% include "dashboard/includes/messages.html" %}
 
     <script src="{% static 'js/app.js' %}" defer></script>
+    <script src="{% static 'administration/js/admin.js' %}" defer></script>
     {% block extra_js %}{% endblock %}
 
     <script>

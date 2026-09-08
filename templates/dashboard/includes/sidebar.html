@@ -1,15 +1,13 @@
 {% load i18n %}
-
 <nav class="flex-1 overflow-y-auto p-3 space-y-1 scrollbar-thin">
-
-    <!-- ========================================================= -->
-    <!-- ADMINISTRATEUR -->
-    <!-- ========================================================= -->
+    <!-- ========================================== -->
+    <!-- ADMINISTRATEUR                             -->
+    <!-- ========================================== -->
     {% if user.role == 'ADMIN' %}
 
         <div class="pt-1 pb-2">
             <p class="px-3 py-1 text-xs font-bold text-auto-600 uppercase tracking-wider">
-                {% trans "Administration" %}
+                {% trans "Plateforme" %}
             </p>
         </div>
 
@@ -24,6 +22,36 @@
             </svg>
             {% trans "Tableau de bord" %}
         </a>
+
+        <a href="{% url 'administration:monitoring' %}"
+           class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
+                  {% if request.resolver_match.url_name == 'monitoring' %}
+                      bg-auto-light text-auto-orange font-bold
+                  {% endif %}">
+            <svg class="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+            {% trans "Monitoring" %}
+        </a>
+
+        <a href="{% url 'administration:geography' %}"
+           class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
+                  {% if request.resolver_match.url_name == 'geography' %}
+                      bg-auto-light text-auto-orange font-bold
+                  {% endif %}">
+            <svg class="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            {% trans "Géographie" %}
+        </a>
+
+        <div class="pt-4 pb-1">
+            <p class="px-3 py-1 text-xs font-bold text-auto-600 uppercase tracking-wider">
+                {% trans "Gestion" %}
+            </p>
+        </div>
 
         <a href="{% url 'administration:users' %}"
            class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
@@ -49,6 +77,32 @@
             {% trans "Garages" %}
         </a>
 
+        <a href="{% url 'administration:cities' %}"
+           class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
+                  {% if request.resolver_match.url_name == 'cities' or request.resolver_match.url_name == 'city_detail' %}
+                      bg-auto-light text-auto-orange font-bold
+                  {% endif %}">
+            <svg class="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 11-2 0v3a1 1 0 112 0z"/>
+            </svg>
+            {% trans "Villes" %}
+        </a>
+
+        <a href="{% url 'administration:neighborhoods' %}"
+           class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
+                  {% if request.resolver_match.url_name == 'neighborhoods' or request.resolver_match.url_name == 'neighborhood_detail' %}
+                      bg-auto-light text-auto-orange font-bold
+                  {% endif %}">
+            <svg class="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            {% trans "Quartiers" %}
+        </a>
+
         <a href="{% url 'administration:orders' %}"
            class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
                   {% if request.resolver_match.url_name == 'orders' %}
@@ -59,6 +113,18 @@
                       d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
             </svg>
             {% trans "Commandes" %}
+        </a>
+
+        <a href="{% url 'administration:payments' %}"
+           class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
+                  {% if request.resolver_match.url_name == 'payments' %}
+                      bg-auto-light text-auto-orange font-bold
+                  {% endif %}">
+            <svg class="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+            </svg>
+            {% trans "Paiements" %}
         </a>
 
         <a href="{% url 'administration:support' %}"
@@ -73,9 +139,23 @@
             {% trans "Support" %}
         </a>
 
-        <a href="{% url 'notifications:notification_list' %}"
+        <a href="{% url 'administration:announcements' %}"
            class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
-                  {% if request.resolver_match.url_name == 'notification_list' %}
+                  {% if request.resolver_match.url_name == 'announcements' or request.resolver_match.url_name == 'announcement_detail' %}
+                      bg-auto-light text-auto-orange font-bold
+                  {% endif %}">
+            <svg class="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.458a1.76 1.76 0 00-.592-3.417V5.882a1.76 1.76 0 013.417-.592l2.147 6.458a1.76 1.76 0 00.592 3.417z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            {% trans "Annonces" %}
+        </a>
+
+        <a href="{% url 'administration:notifications_admin' %}"
+           class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
+                  {% if request.resolver_match.url_name == 'notifications_admin' %}
                       bg-auto-light text-auto-orange font-bold
                   {% endif %}">
             <svg class="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -85,9 +165,21 @@
             {% trans "Notifications" %}
         </a>
 
-    <!-- ========================================================= -->
-    <!-- CLIENT (a au moins un garage approuvé) -->
-    <!-- ========================================================= -->
+        <a href="{% url 'administration:reviews' %}"
+           class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
+                  {% if request.resolver_match.url_name == 'reviews' %}
+                      bg-auto-light text-auto-orange font-bold
+                  {% endif %}">
+            <svg class="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682"/>
+            </svg>
+            {% trans "Avis" %}
+        </a>
+
+    <!-- ========================================== -->
+    <!-- CLIENT (a au moins un garage approuve)    -->
+    <!-- ========================================== -->
     {% elif user.role == 'CLIENT' %}
 
         <div class="pt-1 pb-2">
@@ -162,9 +254,9 @@
             {% trans "Notifications" %}
         </a>
 
-    <!-- ========================================================= -->
-    <!-- UTILISATEUR (rôle par défaut) -->
-    <!-- ========================================================= -->
+    <!-- ========================================== -->
+    <!-- UTILISATEUR (role par defaut)             -->
+    <!-- ========================================== -->
     {% else %}
 
         <div class="pt-1 pb-2">
@@ -308,9 +400,9 @@
 
     {% endif %}
 
-    <!-- ========================================================= -->
-    <!-- COMMUN À TOUS LES UTILISATEURS CONNECTÉS -->
-    <!-- ========================================================= -->
+    <!-- ========================================== -->
+    <!-- COMMUN A TOUS LES UTILISATEURS CONNECTES   -->
+    <!-- ========================================== -->
 
     <div class="pt-4 pb-1">
         <p class="px-3 py-1 text-xs font-bold text-auto-600 uppercase tracking-wider">

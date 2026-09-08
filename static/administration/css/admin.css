@@ -1,0 +1,165 @@
+/* ============================================================
+   Administration - Modal + UI additions
+   (complements Tailwind output + existing app.js modal system)
+   ============================================================ */
+
+/* Modal Backdrop (shared with app.js expectations) */
+.al-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9998;
+}
+
+.al-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: opacity 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    backdrop-filter: blur(2px);
+}
+
+.al-modal-panel {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    opacity: 0;
+    transform: scale(0.95) translateY(10px);
+    transition: opacity 250ms cubic-bezier(0.4, 0, 0.2, 1),
+                transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.al-modal-dialog {
+    width: 100%;
+    max-width: 24rem;
+    background: #ffffff;
+    border-radius: 0.75rem;
+    border: 1px solid rgb(250 224 216 / 0.5);
+    box-shadow: 0 20px 60px -12px rgba(0, 0, 0, 0.25);
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100vh - 2rem);
+    overflow: hidden;
+}
+
+.al-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid rgb(250 224 216 / 0.5);
+    flex-shrink: 0;
+}
+
+.al-modal-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: rgb(118 32 17 / 1);
+    margin: 0;
+}
+
+.al-modal-close {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 0.375rem;
+    color: rgb(181 112 45 / 1);
+    transition: background-color 150ms ease;
+}
+
+.al-modal-close:hover {
+    background-color: rgb(250 224 216 / 1);
+}
+
+.al-modal-body {
+    padding: 1.25rem;
+    overflow-y: auto;
+    flex: 1 1 auto;
+}
+
+.al-modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    border-top: 1px solid rgb(250 224 216 / 0.5);
+    flex-shrink: 0;
+}
+
+/* Form inside modals */
+.al-modal-body .form-input {
+    border-color: rgb(244 187 164 / 1);
+}
+
+.al-modal-body .form-input:focus {
+    border-color: rgb(205 129 53 / 1);
+    box-shadow: 0 0 0 2px rgb(205 129 53 / 0.25);
+}
+
+.al-modal-body .form-error {
+    color: rgb(220 38 38 / 1);
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* Spinner for modal submit buttons */
+.al-spinner {
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid rgb(255 255 255 / 0.4);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: al-spin 0.6s linear infinite;
+}
+
+@keyframes al-spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Small helpers for admin tables */
+.admin-table-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+/* Confirmation prompt styling consistency */
+.admin-confirm-banner {
+    background-color: rgb(254 243 199 / 1);
+    border: 1px solid rgb(245 158 11 / 1);
+    color: rgb(180 83 9 / 1);
+    padding: 0.625rem 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* Inline loading indicator for async delete buttons */
+.admin-delete-loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Scrollable modal content */
+.al-modal-body > :last-child {
+    margin-bottom: 0;
+}
+
+/* Responsive: small modals stay readable */
+@media (max-width: 640px) {
+    .al-modal-dialog {
+        max-width: 100%;
+        margin: 0.5rem;
+        border-radius: 0.75rem;
+    }
+
+    .al-modal-body {
+        padding: 1rem;
+    }
+}

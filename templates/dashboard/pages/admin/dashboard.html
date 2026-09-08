@@ -4,198 +4,214 @@
 {% block title %}{% trans "Tableau d'administration" %} - AutoLink{% endblock %}
 
 {% block dashboard_header %}
-    <h1 class="text-sm font-bold text-auto-dark">{% trans "Tableau de bord" %}</h1>
+    <h1 class="text-sm font-bold text-auto-dark">{% trans "Plateforme" %}</h1>
 {% endblock %}
 
 {% block dashboard_breadcrumb %}
     <nav class="flex items-center space-x-2 text-sm text-auto-600">
-        <a href="{% url 'administration:dashboard' %}" class="hover:text-auto-orange transition">{% trans "Tableau de bord" %}</a>
-        <span class="text-auto-400">/</span>
         <span class="font-bold text-auto-dark">{% trans "Vue d'ensemble" %}</span>
     </nav>
 {% endblock %}
 
 {% block content %}
 <div class="space-y-6">
-    <!-- Header -->
-
-            <!-- Stats Grid -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                <div class="stat-card">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-10 h-10 bg-auto-orange/10 rounded-lg flex items-center justify-center">
-                            <svg class="w-5 h-5 text-auto-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
-                        </div>
-                        <div>
-                            <div class="stat-value">{{ total_users }}</div>
-                            <div class="stat-label">{% trans "Utilisateurs" %}</div>
-                        </div>
-                    </div>
-                    <div class="text-xs text-success-600 mt-2 font-bold">+{{ users_this_month }} {% trans "ce mois" %}</div>
+    {% if alerts %}
+        {% for alert in alerts %}
+            <div class="flex items-start gap-3 p-4 rounded-xl border border-warning-500 bg-warning-50 text-warning-800 animate-slide-up">
+                <div class="w-8 h-8 bg-warning-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 text-warning-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
                 </div>
-                <div class="stat-card">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-10 h-10 bg-auto-gold/10 rounded-lg flex items-center justify-center">
-                            <svg class="w-5 h-5 text-auto-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                        </div>
-                        <div>
-                            <div class="stat-value">{{ total_garages }}</div>
-                            <div class="stat-label">{% trans "Garages" %}</div>
-                        </div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 flex-wrap">
+                        <span class="font-bold text-sm">{{ alert.title }}</span>
+                        <a href="{{ alert.link }}"
+                           class="text-auto-orange hover:underline text-sm font-medium">
+                            {% trans "Voir" %}
+                        </a>
                     </div>
-                    <div class="text-xs text-warning-600 mt-2 font-bold">{{ pending_garages }} {% trans "en attente" %}</div>
-                </div>
-                <div class="stat-card">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-10 h-10 bg-auto-coral/10 rounded-lg flex items-center justify-center">
-                            <svg class="w-5 h-5 text-auto-coral" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-                        </div>
-                        <div>
-                            <div class="stat-value">{{ total_orders }}</div>
-                            <div class="stat-label">{% trans "Commandes" %}</div>
-                        </div>
-                    </div>
-                    <div class="text-xs text-info-600 mt-2 font-bold">{{ orders_this_month }} {% trans "ce mois" %}</div>
-                </div>
-                <div class="stat-card">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-10 h-10 bg-success-100 rounded-lg flex items-center justify-center">
-                            <svg class="w-5 h-5 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        </div>
-                        <div>
-                            <div class="stat-value">{{ total_revenue|intcomma }}</div>
-                            <div class="stat-label">{% trans "Revenus (FCFA)" %}</div>
-                        </div>
-                    </div>
-                    <div class="text-xs text-success-600 mt-2 font-bold">{{ revenue_this_month|intcomma }} {% trans "ce mois" %}</div>
+                    <p class="text-sm text-warning-700 mt-0.5">{{ alert.message }}</p>
                 </div>
             </div>
+        {% endfor %}
+    {% endif %}
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Management Links -->
-                <div class="card p-6">
-                    <h2 class="font-bold text-lg mb-4">{% trans "Gestion" %}</h2>
-                    <div class="space-y-2">
-                        <a href="{% url 'administration:users' %}" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-auto-light transition group">
-                            <div class="w-8 h-8 bg-auto-orange/10 rounded-lg flex items-center justify-center group-hover:bg-auto-orange/20 transition">👥</div>
-                            <span class="font-bold text-sm">{% trans "Utilisateurs" %}</span>
-                        </a>
-                        <a href="{% url 'administration:garages' %}" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-auto-light transition group">
-                            <div class="w-8 h-8 bg-auto-gold/10 rounded-lg flex items-center justify-center group-hover:bg-auto-gold/20 transition">🏪</div>
-                            <span class="font-bold text-sm">{% trans "Garages" %}</span>
-                        </a>
-                        <a href="{% url 'administration:orders' %}" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-auto-light transition group">
-                            <div class="w-8 h-8 bg-auto-coral/10 rounded-lg flex items-center justify-center group-hover:bg-auto-coral/20 transition">📦</div>
-                            <span class="font-bold text-sm">{% trans "Commandes" %}</span>
-                        </a>
-                        <a href="{% url 'administration:payments' %}" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-auto-light transition group">
-                            <div class="w-8 h-8 bg-success-100 rounded-lg flex items-center justify-center group-hover:bg-success-50 transition">💰</div>
-                            <span class="font-bold text-sm">{% trans "Paiements" %}</span>
-                        </a>
-                        <a href="{% url 'administration:support' %}" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-auto-light transition group">
-                            <div class="w-8 h-8 bg-info-100 rounded-lg flex items-center justify-center group-hover:bg-info-200 transition">🎫</div>
-                            <span class="font-bold text-sm">{% trans "Support" %}</span>
-                        </a>
-                        <a href="{% url 'administration:reviews' %}" class="flex items-center space-x-3 p-3 rounded-lg hover:bg-auto-light transition group">
-                            <div class="w-8 h-8 bg-warning-100 rounded-lg flex items-center justify-center group-hover:bg-warning-50 transition">⭐</div>
-                            <span class="font-bold text-sm">{% trans "Avis" %}</span>
-                        </a>
+    <!-- KPIs -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div class="stat-card">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-auto-orange/10 rounded-lg flex items-center justify-center">
+                    <svg class="w-5 h-5 text-auto-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+                </div>
+                <div>
+                    <div class="stat-value">{{ total_users }}</div>
+                    <div class="stat-label">{% trans "Utilisateurs" %}</div>
+                </div>
+            </div>
+            <div class="text-xs text-success-600 mt-2 font-bold">+{{ users_this_month }} {% trans "ce mois" %}</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-auto-gold/10 rounded-lg flex items-center justify-center">
+                    <svg class="w-5 h-5 text-auto-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                </div>
+                <div>
+                    <div class="stat-value">{{ total_garages }}</div>
+                    <div class="stat-label">{% trans "Garages" %}</div>
+                </div>
+            </div>
+            <div class="text-xs text-warning-600 mt-2 font-bold">{{ pending_garages }} {% trans "en attente" %}</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-auto-coral/10 rounded-lg flex items-center justify-center">
+                    <svg class="w-5 h-5 text-auto-coral" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                </div>
+                <div>
+                    <div class="stat-value">{{ total_orders }}</div>
+                    <div class="stat-label">{% trans "Commandes" %}</div>
+                </div>
+            </div>
+            <div class="text-xs text-info-600 mt-2 font-bold">{{ orders_this_month }} {% trans "ce mois" %}</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-success-100 rounded-lg flex items-center justify-center">
+                    <svg class="w-5 h-5 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <div>
+                    <div class="stat-value">{{ total_revenue|intcomma }}</div>
+                    <div class="stat-label">{% trans "Revenus (FCFA)" %}</div>
+                </div>
+            </div>
+            <div class="text-xs text-success-600 mt-2 font-bold">{{ revenue_this_month|intcomma }} {% trans "ce mois" %}</div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Sidebar-free dashboard-only block: activité récente + alertes -->
+        <div class="card p-6">
+            <h2 class="font-bold text-lg mb-4">{% trans "Activité récente" %}</h2>
+            <div class="space-y-3">
+                {% for user in recent_users %}
+                    <a href="{% url 'administration:user_detail' user.pk %}" class="block p-3 rounded-lg border border-auto-100 hover:bg-auto-light transition">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="font-bold text-sm">{{ user.display_name }}</div>
+                                <div class="text-xs text-auto-600">{{ user.email }}</div>
+                            </div>
+                            <span class="badge-{{ user.role|lower }} text-[10px]">{{ user.role }}</span>
+                        </div>
+                    </a>
+                {% empty %}
+                    <div class="text-center py-8 text-auto-600">
+                        <p>{% trans "Pas encore d'utilisateurs." %}</p>
                     </div>
-                </div>
+                {% endfor %}
+            </div>
+        </div>
 
-                <!-- Recent Orders -->
-                <div class="card p-6 lg:col-span-2">
-                    <h2 class="font-bold text-lg mb-4">{% trans "Commandes récentes" %}</h2>
-                    {% if recent_orders %}
-                        <div class="table-container">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>{% trans "Utilisateur" %}</th>
-                                        <th>{% trans "Statut" %}</th>
-                                        <th>{% trans "Total" %}</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for order in recent_orders %}
-                                        <tr>
-                                            <td class="font-bold text-xs">{{ order.order_number }}</td>
-                                            <td>{{ order.user.username }}</td>
-                                            <td><span class="badge-{{ order.status_color }} text-[10px]">{{ order.status_label }}</span></td>
-                                            <td class="font-bold">{{ order.total|intcomma }} FCFA</td>
-                                        </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    {% else %}
-                        <div class="text-center py-8 text-auto-600">
-                            <p>{% trans "Pas encore de commandes." %}</p>
-                        </div>
-                    {% endif %}
-                </div>
-
-                <!-- Recent Users -->
-                <div class="card p-6">
-                    <h2 class="font-bold text-lg mb-4">{% trans "Utilisateurs récents" %}</h2>
-                    {% if recent_users %}
-                        <div class="space-y-3">
-                            {% for user in recent_users %}
-                                <a href="{% url 'administration:user_detail' user.pk %}" class="block p-3 rounded-lg border border-auto-100 hover:bg-auto-light transition">
-                                    <div class="flex items-center justify-between">
-                                        <div>
-                                            <div class="font-bold text-sm">{{ user.display_name }}</div>
-                                            <div class="text-xs text-auto-600">{{ user.email }}</div>
-                                        </div>
-                                        <span class="badge-{{ user.role|lower }} text-[10px]">{{ user.role }}</span>
-                                    </div>
-                                </a>
+        <!-- Commandes récentes -->
+        <div class="card p-6 lg:col-span-2">
+            <h2 class="font-bold text-lg mb-4">{% trans "Commandes récentes" %}</h2>
+            {% if recent_orders %}
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>{% trans "Utilisateur" %}</th>
+                                <th>{% trans "Statut" %}</th>
+                                <th>{% trans "Total" %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order in recent_orders %}
+                                <tr>
+                                    <td class="font-bold text-xs">{{ order.order_number }}</td>
+                                    <td>{{ order.user.username }}</td>
+                                    <td><span class="badge-{{ order.status_color }} text-[10px]">{{ order.status_label }}</span></td>
+                                    <td class="font-bold">{{ order.total|intcomma }} FCFA</td>
+                                </tr>
                             {% endfor %}
-                        </div>
-                    {% else %}
-                        <div class="text-center py-8 text-auto-600">
-                            <p>{% trans "Pas encore d'utilisateurs." %}</p>
-                        </div>
-                    {% endif %}
+                        </tbody>
+                    </table>
                 </div>
+            {% else %}
+                <div class="text-center py-8 text-auto-600">
+                    <p>{% trans "Pas encore de commandes." %}</p>
+                </div>
+            {% endif %}
+        </div>
 
-                <!-- Pending Items -->
-                <div class="card p-6 lg:col-span-2">
-                    <h2 class="font-bold text-lg mb-4">{% trans "Actions en attente" %}</h2>
-                    <div class="space-y-3">
-                        {% if pending_garages > 0 %}
-                            <a href="{% url 'administration:garages' %}?status=PENDING" class="block p-4 rounded-lg border border-warning-500 bg-warning-50 hover:bg-warning-100 transition">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center space-x-3">
-                                        <div class="w-8 h-8 bg-warning-500/10 rounded-lg flex items-center justify-center">🏪</div>
-                                        <span class="font-bold text-sm">{% trans "Garages en attente de verification" %}</span>
-                                    </div>
-                                    <span class="badge-warning">{{ pending_garages }}</span>
-                                </div>
-                            </a>
-                        {% endif %}
-                        {% if pending_tickets > 0 %}
-                            <a href="{% url 'administration:support' %}" class="block p-4 rounded-lg border border-error-500 bg-error-50 hover:bg-error-100 transition">
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center space-x-3">
-                                        <div class="w-8 h-8 bg-error-500/10 rounded-lg flex items-center justify-center">🎫</div>
-                                        <span class="font-bold text-sm">{% trans "Tickets de support ouverts" %}</span>
-                                    </div>
-                                    <span class="badge-error">{{ pending_tickets }}</span>
-                                </div>
-                            </a>
-                        {% endif %}
-                        {% if not pending_garages and not pending_tickets %}
-                            <div class="text-center py-8 text-auto-600">
-                                <div class="text-3xl mb-2">✅</div>
-                                <p>{% trans "Aucune action en attente." %}</p>
+        <!-- Répartition géographique -->
+        <div class="card p-6">
+            <h2 class="font-bold text-lg mb-4">{% trans "Couverture géographique" %}</h2>
+            {% if garage_cities %}
+                <div class="space-y-3">
+                    {% for city in garage_cities %}
+                        {% if city.garage_count %}
+                            <div class="flex items-center justify-between p-2 rounded-lg bg-auto-50">
+                                <span class="font-medium text-sm">{{ city.name }}</span>
+                                <span class="badge-neutral text-[10px]">{{ city.garage_count }} {% trans "garages" %}</span>
                             </div>
                         {% endif %}
-                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-8 text-auto-600">
+                    <p>{% trans "Aucune ville avec garage approuvé." %}</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Monitoring preview -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div class="card p-6">
+            <h2 class="font-bold text-lg mb-4">{% trans "État de la plateforme" %}</h2>
+            <div class="grid grid-cols-2 gap-4 text-sm">
+                <div class="p-3 rounded-lg bg-auto-50">
+                    <div class="text-auto-600">{% trans "Villes" %}</div>
+                    <div class="font-bold text-lg">{{ total_garages }}</div>
+                </div>
+                <div class="p-3 rounded-lg bg-auto-50">
+                    <div class="text-auto-600">{% trans "Pièces actives" %}</div>
+                    <div class="font-bold text-lg">{{ total_parts }}</div>
+                </div>
+                <div class="p-3 rounded-lg bg-auto-50">
+                    <div class="text-auto-600">{% trans "Paiements ce mois" %}</div>
+                    <div class="font-bold text-lg">{{ payments_30d }}</div>
+                </div>
+                <div class="p-3 rounded-lg bg-auto-50">
+                    <div class="text-auto-600">{% trans "Avis récents" %}</div>
+                    <div class="font-bold text-lg">{{ recent_reviews }}</div>
                 </div>
             </div>
         </div>
-    </main>
+
+        <div class="card p-6">
+            <h2 class="font-bold text-lg mb-4">{% trans "Monitoring" %}</h2>
+            <div class="space-y-3">
+                <a href="{% url 'administration:monitoring' %}"
+                   class="block p-4 rounded-lg border border-auto-100 hover:bg-auto-light transition">
+                    <div class="flex items-center justify-between">
+                        <span class="font-bold text-sm">{% trans "Vue détaillée" %}</span>
+                        <svg class="w-5 h-5 text-auto-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </div>
+                </a>
+                <div class="text-xs text-auto-600 space-y-1">
+                    <p>{% trans "Statistiques, activité, alertes et répartition saisonnière." %}</p>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}

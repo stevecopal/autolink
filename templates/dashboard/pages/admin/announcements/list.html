@@ -1,0 +1,181 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Annonces" %} - AutoLink{% endblock %}
+
+{% block dashboard_header %}
+    <h1 class="text-sm font-bold text-auto-dark">{% trans "Communication" %}</h1>
+{% endblock %}
+
+{% block dashboard_breadcrumb %}
+    <nav class="flex items-center space-x-2 text-sm text-auto-600">
+        <a href="{% url 'administration:dashboard' %}" class="hover:text-auto-orange transition">{% trans "Tableau de bord" %}</a>
+        <span class="text-auto-400">/</span>
+        <span class="font-bold text-auto-dark">{% trans "Annonces" %}</span>
+    </nav>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-auto-dark">{% trans "Annonces" %}</h1>
+            <p class="text-sm text-auto-600 mt-1">{% trans "Annonces système destinées aux utilisateurs." %}</p>
+        </div>
+        <button type="button"
+                data-modal-open="modal-announcement"
+                class="btn-primary text-sm flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            {% trans "Créer une annonce" %}
+        </button>
+    </div>
+
+    <div class="card p-4">
+        <form method="get" class="flex flex-wrap items-end gap-4">
+            <div>
+                <label class="form-label">{% trans "Recherche" %}</label>
+                <input type="text" name="q" value="{{ search_query }}" class="form-input" placeholder="{% trans 'Titre ou message...' %}">
+            </div>
+            <button type="submit" class="btn-primary text-sm">{% trans "Filtrer" %}</button>
+            {% if search_query %}
+                <a href="{% url 'administration:announcements' %}" class="btn-outline text-sm">{% trans "Réinitialiser" %}</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <div class="card overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-auto-50">
+                    <tr class="text-left text-auto-700">
+                        <th class="px-4 py-3">{% trans "Titre" %}</th>
+                        <th class="px-4 py-3">{% trans "Date" %}</th>
+                        <th class="px-4 py-3">{% trans "Statut" %}</th>
+                        <th class="px-4 py-3">{% trans "Actions" %}</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y">
+                    {% for announcement in announcements %}
+                        <tr class="hover:bg-auto-50">
+                            <td class="px-4 py-3">
+                                <div class="font-medium">{{ announcement.title }}</div>
+                                <div class="text-xs text-auto-600 mt-1 line-clamp-2">{{ announcement.message }}</div>
+                            </td>
+                            <td class="px-4 py-3 text-auto-500">{{ announcement.created_at|date:"d/m/Y H:i" }}</td>
+                            <td class="px-4 py-3">
+                                {% if announcement.is_read %}
+                                    <span class="badge-success text-[10px]">{% trans "Publiée" %}</span>
+                                {% else %}
+                                    <span class="badge-warning text-[10px]">{% trans "Brouillon" %}</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-4 py-3">
+                                <button type="button"
+                                        data-modal-open="modal-announcement"
+                                        data-announcement-id="{{ announcement.id }}"
+                                        class="text-auto-orange font-medium hover:underline text-sm mr-3">
+                                    {% trans "Modifier" %}
+                                </button>
+                                <form method="post" action="{% url 'administration:announcement_delete' announcement.id %}" class="inline">
+                                    {% csrf_token %}
+                                    <button type="submit"
+                                            class="text-error-600 hover:text-error-700 text-sm"
+                                            onclick="return confirm('{% trans "Supprimer cette annonce ?" %}')">
+                                        {% trans "Supprimer" %}
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="4" class="px-4 py-8 text-center text-auto-600">{% trans "Aucune annonce." %}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if announcements.has_other_pages %}
+            <div class="px-4 py-3 border-t flex justify-between items-center flex-wrap gap-2">
+                <span class="text-sm text-auto-600">
+                    {% trans "Page" %} {{ announcements.number }} {% trans "sur" %} {{ announcements.paginator.num_pages }}
+                </span>
+                <div class="flex gap-2">
+                    {% if announcements.has_previous %}
+                        <a href="?page={{ announcements.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}"
+                           class="btn-outline text-sm py-1 px-3">{% trans "Précédent" %}</a>
+                    {% endif %}
+                    {% if announcements.has_next %}
+                        <a href="?page={{ announcements.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}"
+                           class="btn-outline text-sm py-1 px-3">{% trans "Suivant" %}</a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script defer>
+document.addEventListener('click', function(e) {
+    var btn = e.target.closest('[data-announcement-id]');
+    if (btn && !e.target.closest('form')) {
+        e.preventDefault();
+        var id = btn.getAttribute('data-announcement-id');
+        window.AutoLink.openModal('modal-announcement');
+        if (id) {
+            loadAnnouncementForm(id);
+        }
+    }
+});
+
+function loadAnnouncementForm(id) {
+    var spinner = document.getElementById('announcement-form-spinner');
+    var formEl = document.getElementById('announcement-form-body');
+
+    if (spinner) spinner.classList.remove('hidden');
+    if (formEl) formEl.innerHTML = '';
+
+    fetch('{% url "administration:announcement_edit" 0 %}'.replace('/0/', '/' + id + '/') + '?format=json', {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        if (data && data.form) {
+            var f = data.form;
+            var html = '';
+            html += '<input type="hidden" name="announcement_id" value="' + id + '">';
+            html += '<div class="mb-4">';
+            html += '<label class="form-label">Titre</label>';
+            html += '<input type="text" name="title" class="form-input" value="' + (f.title || '') + '" required>';
+            html += '<p class="form-error"></p>';
+            html += '</div>';
+            html += '<div class="mb-4">';
+            html += '<label class="form-label">Message</label>';
+            html += '<textarea name="message" class="form-input" rows="4" required>' + (f.message || '') + '</textarea>';
+            html += '<p class="form-error"></p>';
+            html += '</div>';
+            html += '<div class="mb-4">';
+            html += '<label class="form-label">{% trans "Lien (optionnel)" %}</label>';
+            html += '<input type="url" name="link" class="form-input" value="' + (f.link || '') + '">';
+            html += '</div>';
+            html += '<div class="flex items-center gap-3 mb-4">';
+            html += '<label class="inline-flex items-center gap-2 cursor-pointer">';
+            html += '<input type="checkbox" name="is_active" class="rounded border-auto-200 text-auto-orange focus:ring-auto-orange" ' + (f.is_active ? 'checked' : '') + '>';
+            html += '<span class="text-sm font-medium">{% trans "Publier" %}</span>';
+            html += '</label>';
+            html += '</div>';
+            html += '<input type="hidden" name="csrfmiddlewaretoken" value="' + window.AutoLink.getCSRFToken() + '">';
+            formEl.innerHTML = html;
+        }
+        if (spinner) spinner.classList.add('hidden');
+    })
+    .catch(function() {
+        if (spinner) spinner.classList.add('hidden');
+    });
+}
+</script>
+{% endblock %}

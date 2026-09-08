@@ -1,0 +1,48 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Quartier" %} - AutoLink{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto px-4 py-8">
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-xl font-bold text-auto-dark">
+            {% if is_new %}{% trans "Ajouter un quartier" %}{% else %}{% trans "Modifier le quartier" %}{% endif %}
+        </h1>
+        <a href="{% url 'administration:neighborhoods' %}" class="btn-outline">{% trans "Retour" %}</a>
+    </div>
+
+    <div class="card p-6">
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-4">
+                <label class="form-label">{% trans "Ville" %}</label>
+                <select name="city" class="form-input" required>
+                    <option value="">{% trans "Sélectionnez une ville" %}</option>
+                    {% for city in cities %}
+                        <option value="{{ city.id }}" {% if neighborhood.city_id == city.id %}selected{% endif %}>{{ city.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="form-label">Nom</label>
+                <input type="text" name="name" class="form-input" value="{{ neighborhood.name|default:'' }}" required>
+            </div>
+            <div class="mb-4">
+                <label class="form-label">Slug</label>
+                <input type="text" name="slug" class="form-input" value="{{ neighborhood.slug|default:'' }}" required>
+            </div>
+            <div class="flex items-center gap-3 mb-6">
+                <label class="inline-flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" name="is_active" class="rounded border-auto-200 text-auto-orange focus:ring-auto-orange" {% if neighborhood.is_active %}checked{% endif %}>
+                    <span class="text-sm font-medium">{% trans "Actif" %}</span>
+                </label>
+            </div>
+            <div class="flex justify-end gap-3">
+                <a href="{% url 'administration:neighborhoods' %}" class="btn-outline">{% trans "Annuler" %}</a>
+                <button type="submit" class="btn-primary">{% trans "Enregistrer" %}</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
