@@ -31,7 +31,7 @@
                         <a href="{% url 'accounts:client_dashboard' %}" class="nav-link text-white">{% trans "Tableau de bord" %}</a>
                     {% endif %}
                 {% else %}
-                    <a href="{% url 'accounts:login' %}" class="nav-link text-white">{% trans "Connexion" %}</a>
+                    <a href="{% url 'accounts:login' %}" class="nav-link bg-auto-orange  px-5 py-2 hover:bg-auto-600 text-white rounded-lg transition-all duration-200 text-sm">{% trans "Connexion" %}</a>
                     <a href="{% url 'accounts:register' %}" class="bg-auto-orange hover:bg-auto-600 text-white font-bold px-5 py-2 rounded-lg transition-all duration-200 text-sm">{% trans "S'inscrire" %}</a>
                 {% endif %}
             </div>
@@ -69,7 +69,7 @@
                 <a href="{% url 'accounts:logout' %}" class="block py-2.5 text-error-400 font-bold">{% trans "Deconnexion" %}</a>
             {% else %}
                 <div class="border-t border-white/10 my-2"></div>
-                <a href="{% url 'accounts:login' %}" class="block py-2.5 nav-link text-white">{% trans "Connexion" %}</a>
+                <a href="{% url 'accounts:login' %}" class="block py-2.5 text-auto-gold font-bold">{% trans "Connexion" %}</a>
                 <a href="{% url 'accounts:register' %}" class="block py-2.5 text-auto-gold font-bold">{% trans "S'inscrire" %}</a>
             {% endif %}
         </div>
