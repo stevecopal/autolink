@@ -13,24 +13,10 @@ class CustomUserCreationForm(UserCreationForm):
             'placeholder': 'Ex: +237 6XX XXX XXX'
         })
     )
-    city = forms.ModelChoiceField(
-        queryset=City.objects.filter(is_active=True),
-        required=True,
-        empty_label='Choisir une ville',
-        widget=forms.Select(attrs={'class': 'form-input'})
-    )
-    neighborhood = forms.CharField(
-        max_length=100,
-        required=False,
-        widget=forms.TextInput(attrs={
-            'class': 'form-input',
-            'placeholder': 'Ex: Bonamoussadi'
-        })
-    )
 
     class Meta:
         model = User
-        fields = ['username', 'email', 'phone', 'city', 'neighborhood', 'password1', 'password2']
+        fields = ['username', 'email', 'phone', 'password1', 'password2']
         widgets = {
             'username': forms.TextInput(attrs={
                 'class': 'form-input',

@@ -1197,6 +1197,11 @@ h4 {
   margin-bottom: 0.5rem;
 }
 
+.my-6 {
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
 .-mt-0\.5 {
   margin-top: -0.125rem;
 }
@@ -2105,6 +2110,10 @@ h4 {
   border-left-color: rgb(205 129 53 / var(--tw-border-opacity, 1));
 }
 
+.border-t-transparent {
+  border-top-color: transparent;
+}
+
 .bg-auto-100 {
   --tw-bg-opacity: 1;
   background-color: rgb(250 224 216 / var(--tw-bg-opacity, 1));
@@ -2974,6 +2983,11 @@ h4 {
 .text-yellow-600 {
   --tw-text-opacity: 1;
   color: rgb(202 138 4 / var(--tw-text-opacity, 1));
+}
+
+.text-auto-gray {
+  --tw-text-opacity: 1;
+  color: rgb(61 24 16 / var(--tw-text-opacity, 1));
 }
 
 .opacity-0 {
