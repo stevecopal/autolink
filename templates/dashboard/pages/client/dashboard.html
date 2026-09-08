@@ -17,13 +17,7 @@
 
 {% block content %}
 <div class="space-y-6">
-    <!-- Header -->
-    <div class="bg-gradient-to-r from-auto-deep-red to-auto-gray text-white rounded-2xl p-6 md:p-8">
-        <h1 class="text-2xl md:text-3xl font-bold text-white">
-            {% trans "Bonjour" } {{ user.first_name|default:user.username }} 👋
-        </h1>
-        <p class="text-white/70 mt-1">{% trans "Welcome to your personal space" %}</p>
-    </div>
+    
 
     <!-- Quick Action Cards -->
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
