@@ -9,78 +9,92 @@
     <link rel="stylesheet" href="{% static 'css/output.css' %}">
     {% block extra_css %}{% endblock %}
 </head>
-<body class="bg-auto-cream min-h-screen flex">
+<body class="bg-auto-cream h-screen flex flex-col">
 
     <!-- Mobile Drawer Overlay (mobile only) -->
     <div id="admin-drawer-overlay"
          class="fixed inset-0 bg-black/50 z-40 hidden md:hidden"
          onclick="window.CloseAdminDrawer()"></div>
 
-    <!-- Sidebar -->
-    <aside id="admin-sidebar"
-           class="fixed md:sticky top-0 left-0 h-screen w-64 bg-white border-r border-auto-100 z-50
-                  flex flex-col overflow-hidden
-                  md:overflow-y-auto md:overflow-x-hidden
-                  shadow-sm
-                  transition-transform duration-300 md:translate-x-0 -translate-x-full">
-        <!-- Sidebar Header -->
-        <div class="flex items-center justify-between p-4 border-b border-auto-100">
-            <!-- Close button (mobile only) -->
-            <button onclick="window.CloseAdminDrawer()"
-                    class="md:hidden p-1.5 rounded-lg hover:bg-auto-light text-auto-600 transition"
-                    aria-label="{% trans 'Close menu' %}">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
-            </button>
-        </div>
+    <!-- Two-column layout: Sidebar + Right column -->
+    <div class="flex flex-1 overflow-hidden">
 
-        <!-- User Badge -->
-        <div class="px-4 py-3 border-b border-auto-100 bg-auto-50">
-            <div class="flex items-center space-x-3">
-                <div class="w-9 h-9 bg-auto-orange rounded-full flex items-center justify-center text-white font-bold text-sm">
-                    {{ user.display_name|first|upper }}
+        <!-- Sidebar -->
+        <aside id="admin-sidebar"
+               class="fixed md:sticky top-0 left-0 h-screen w-64 bg-white border-r border-auto-100 z-50
+                      flex flex-col overflow-hidden
+                      md:overflow-y-auto md:overflow-x-hidden
+                      shadow-sm
+                      transition-transform duration-300 md:translate-x-0 -translate-x-full">
+            <!-- Sidebar Header -->
+            <div class="flex items-center justify-between p-4 border-b border-auto-100">
+                <!-- Close button (mobile only) -->
+                <button onclick="window.CloseAdminDrawer()"
+                        class="md:hidden p-1.5 rounded-lg hover:bg-auto-light text-auto-600 transition"
+                        aria-label="{% trans 'Close menu' %}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- User Badge -->
+            <div class="px-4 py-3 border-b border-auto-100 bg-auto-50">
+                <div class="flex items-center space-x-3">
+                    <div class="w-9 h-9 bg-auto-orange rounded-full flex items-center justify-center text-white font-bold text-sm">
+                        {{ user.display_name|first|upper }}
+                    </div>
+                    <div class="min-w-0">
+                        <p class="font-bold text-sm truncate">{{ user.display_name }}</p>
+                        <p class="text-xs text-auto-600 truncate">{{ user.email }}</p>
+                    </div>
                 </div>
-                <div class="min-w-0">
-                    <p class="font-bold text-sm truncate">{{ user.display_name }}</p>
-                    <p class="text-xs text-auto-600 truncate">{{ user.email }}</p>
+            </div>
+
+            <!-- Navigation -->
+            {% include "dashboard/includes/sidebar.html" %}
+
+        </aside>
+
+        <!-- Right column: Header + Content + Footer -->
+        <div class="flex-1 flex flex-col min-h-0">
+
+            <!-- Header bar (mobile only: with hamburger) -->
+            <header class="sticky top-0 z-30 bg-white border-b border-auto-100 px-4 py-3 flex items-center gap-3 md:hidden shrink-0">
+                <!-- Hamburger button (mobile only) -->
+                <button id="sidebar-toggle-btn"
+                        onclick="window.OpenAdminDrawer()"
+                        class="p-2 rounded-xl bg-auto-500 text-white hover:bg-auto-600 shadow-card transition-colors"
+                        aria-label="Ouvrir le menu">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                    </svg>
+                </button>
+
+                <!-- Page title area -->
+                <div class="flex-1 min-w-0">
+                    {% block dashboard_header %}{% endblock %}
+                    {% block dashboard_breadcrumb %}{% endblock %}
                 </div>
-            </div>
+            </header>
+
+            <!-- Main Content (scrollable) -->
+            <main class="flex-1 overflow-y-auto">
+                <div class="p-4 md:p-6 max-w-7xl mx-auto">
+                    {% block content %}{% endblock %}
+                </div>
+            </main>
+
+            <!-- Footer (always at bottom of right column) -->
+            <footer class="border-t border-auto-100 bg-white py-4 shrink-0">
+                <div class="px-4 md:px-6 max-w-7xl mx-auto text-center">
+                    <p class="text-xs text-auto-600">&copy; 2026 AutoLink. Tous droits réservés.</p>
+                </div>
+            </footer>
+
         </div>
-
-        <!-- Navigation -->
-        {% include "dashboard/includes/sidebar.html" %}
-
-    </aside>
-
-    <!-- Page Wrapper -->
-    <div class="flex-1 flex flex-col min-h-screen">
-        <!-- Header bar (mobile only: with hamburger) -->
-        <header class="sticky top-0 z-30 bg-white border-b border-auto-100 px-4 py-3 flex items-center gap-3 md:hidden">
-            <!-- Hamburger button (mobile only) -->
-            <button id="sidebar-toggle-btn"
-                    onclick="window.OpenAdminDrawer()"
-                    class="p-2 rounded-xl bg-auto-500 text-white hover:bg-auto-600 shadow-card transition-colors"
-                    aria-label="Ouvrir le menu">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                </svg>
-            </button>
-
-            <!-- Page title area -->
-            <div class="flex-1 min-w-0">
-                {% block dashboard_header %}{% endblock %}
-                {% block dashboard_breadcrumb %}{% endblock %}
-            </div>
-        </header>
-
-        <!-- Main Content (scrollable independently below sticky header) -->
-        <main class="flex-1 overflow-y-auto">
-            <div class="p-4 md:p-6 max-w-7xl mx-auto">
-                {% block content %}{% endblock %}
-            </div>
-        </main>
     </div>
+    
 
     {% include "dashboard/includes/messages.html" %}
 
@@ -117,4 +131,5 @@
         });
     </script>
 </body>
+
 </html>
