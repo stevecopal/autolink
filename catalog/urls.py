@@ -12,7 +12,7 @@ urlpatterns = [
     # Garage Marketplace
     path('garage/produits/', views.garage_product_list_view, name='garage_products'),
     path('garage/produits/ajouter/', views.garage_product_add_view, name='garage_product_add'),
-    path('garage/produits/<int:pk>/modifier/', views.garage_product_edit_view, name='garage_product_edit'),
-    path('garage/produits/<int:pk>/supprimer/', views.garage_product_delete_view, name='garage_product_delete'),
-    path('garage/produits/<int:pk>/stock/', views.garage_stock_update_view, name='garage_stock_update'),
+    path('garage/produits/<uuid:pk>/modifier/', views.garage_product_edit_view, name='garage_product_edit'),
+    path('garage/produits/<uuid:pk>/supprimer/', views.garage_product_delete_view, name='garage_product_delete'),
+    path('garage/produits/<uuid:pk>/stock/', views.garage_stock_update_view, name='garage_stock_update'),
 ]

@@ -170,7 +170,7 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 # Si vous utilisez django-allauth, force le HTTPS pour les redirections
-ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
+# ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
 
 # Cache configuration
 CACHES = {

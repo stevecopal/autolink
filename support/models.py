@@ -5,6 +5,8 @@ from django.utils.translation import gettext_lazy as _
 
 
 class Ticket(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     class Status(models.TextChoices):
         OPEN = 'OPEN', _('Ouvert')
         IN_PROGRESS = 'IN_PROGRESS', _('En cours')
@@ -56,6 +58,8 @@ class Ticket(models.Model):
 
 
 class TicketMessage(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='messages')
     sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     message = models.TextField()
@@ -73,6 +77,8 @@ class TicketMessage(models.Model):
 
 
 class AssistanceRequest(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     class IssueType(models.TextChoices):
         BATTERY = 'BATTERY', _('Batterie')
         TIRE = 'TIRE', _('Pneu crevé')

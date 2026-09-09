@@ -1,9 +1,12 @@
+import uuid
 from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
 
 class Garage(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     class VerificationStatus(models.TextChoices):
         PENDING = 'PENDING', _('En attente')
         APPROVED = 'APPROVED', _('Approuvé')
@@ -137,6 +140,8 @@ class Garage(models.Model):
 
 
 class GarageService(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     class Category(models.TextChoices):
         DIAGNOSTIC = 'DIAGNOSTIC', _('Diagnostic')
         MAINTENANCE = 'MAINTENANCE', _('Entretien')
@@ -171,6 +176,8 @@ class GarageService(models.Model):
 
 
 class GaragePhoto(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     garage = models.ForeignKey(Garage, on_delete=models.CASCADE, related_name='photos')
     image = models.ImageField(upload_to='garages/photos/')
     caption = models.CharField(max_length=200, blank=True)
@@ -185,6 +192,8 @@ class GaragePhoto(models.Model):
 
 
 class GarageVerification(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     class DocumentType(models.TextChoices):
         IDENTITY = 'IDENTITY', _('Pièce d\'identité')
         BUSINESS_LICENSE = 'BUSINESS_LICENSE', _('Registre de commerce')
@@ -226,6 +235,8 @@ class GarageVerification(models.Model):
 
 
 class GarageBrand(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     garage = models.ForeignKey(Garage, on_delete=models.CASCADE, related_name='brands')
     brand = models.ForeignKey('vehicles.Brand', on_delete=models.CASCADE)
 

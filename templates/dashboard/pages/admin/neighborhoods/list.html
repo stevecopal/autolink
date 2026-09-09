@@ -25,7 +25,7 @@
             <p class="text-sm text-auto-600 mt-1">{% trans "Gérez les quartiers par ville." %}</p>
         </div>
         <button type="button"
-                data-modal-open="modal-neighborhood"
+                onclick="openNeighborhoodModal()"
                 class="btn-primary text-sm flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -83,16 +83,14 @@
                             </td>
                             <td class="px-4 py-3">
                                 <button type="button"
-                                        data-modal-open="modal-neighborhood"
-                                        data-neighborhood-id="{{ neighborhood.id }}"
+                                        onclick="editNeighborhoodModal({{ neighborhood.id }})"
                                         class="text-auto-orange font-medium hover:underline text-sm mr-3">
                                     {% trans "Modifier" %}
                                 </button>
-                                <form method="post" action="{% url 'administration:neighborhood_delete' neighborhood.id %}" class="inline">
+                                <form method="post" action="{% url 'administration:neighborhood_delete' neighborhood.id %}" class="inline delete-neighborhood-form" data-neighborhood-name="{{ neighborhood.name }}">
                                     {% csrf_token %}
                                     <button type="submit"
-                                            class="text-error-600 hover:text-error-700 text-sm"
-                                            onclick="return confirm('{% trans "Supprimer ce quartier ?" %}')">
+                                            class="text-error-600 hover:text-error-700 text-sm">
                                         {% trans "Supprimer" %}
                                     </button>
                                 </form>
@@ -126,75 +124,168 @@
         {% endif %}
     </div>
 </div>
+
+<!-- Modal Quartier -->
+<div id="modal-neighborhood" class="al-modal hidden">
+    <div class="al-modal-backdrop"></div>
+    <div class="al-modal-panel">
+        <div class="al-modal-dialog">
+            <div class="al-modal-header">
+                <h2 class="al-modal-title" id="neighborhood-modal-title">{% trans "Ajouter un quartier" %}</h2>
+                <button type="button" class="al-modal-close" data-modal-close>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="al-modal-body">
+                <div id="neighborhood-form-spinner" class="hidden text-center py-8">
+                    <div class="animate-spin w-8 h-8 border-4 border-auto-orange border-t-transparent rounded-full mx-auto"></div>
+                </div>
+                <form id="neighborhood-form" method="post" action="" data-async="true">
+                    {% csrf_token %}
+                    <div id="neighborhood-form-body">
+                        <div class="mb-4">
+                            <label class="form-label">{% trans "Ville" %}</label>
+                            <select name="city" class="form-input" required>
+                                <option value="">{% trans "Sélectionnez une ville" %}</option>
+                                {% for city in cities %}
+                                    <option value="{{ city.id }}">{{ city.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <p class="form-error"></p>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">{% trans "Nom" %}</label>
+                            <input type="text" name="name" class="form-input" required>
+                            <p class="form-error"></p>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">{% trans "Slug" %}</label>
+                            <input type="text" name="slug" class="form-input" required>
+                            <p class="form-error"></p>
+                        </div>
+                        <div class="flex items-center gap-3 mb-4">
+                            <label class="inline-flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" name="is_active" class="rounded border-auto-200 text-auto-orange focus:ring-auto-orange" checked>
+                                <span class="text-sm font-medium">{% trans "Actif" %}</span>
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="al-modal-footer">
+                <button type="button" class="btn-outline text-sm" data-modal-close>{% trans "Annuler" %}</button>
+                <button type="submit" form="neighborhood-form" class="btn-primary text-sm">{% trans "Enregistrer" %}</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
 <script defer>
-document.addEventListener('click', function(e) {
-    var btn = e.target.closest('[data-neighborhood-id]');
-    if (btn && !e.target.closest('form')) {
-        e.preventDefault();
-        var id = btn.getAttribute('data-neighborhood-id');
-        window.AutoLink.openModal('modal-neighborhood');
-        if (id) {
-            loadNeighborhoodForm(id);
-        }
-    }
-});
+function openNeighborhoodModal() {
+    var form = document.getElementById('neighborhood-form');
+    form.reset();
+    form.action = '{% url "administration:neighborhood_create" %}';
+    document.getElementById('neighborhood-modal-title').textContent = '{% trans "Ajouter un quartier" %}';
+    document.getElementById('neighborhood-form-body').querySelector('input[name="is_active"]').checked = true;
+    clearNeighborhoodErrors();
+    window.AutoLink.openModal('modal-neighborhood');
+}
 
-function loadNeighborhoodForm(id) {
+function editNeighborhoodModal(id) {
     var spinner = document.getElementById('neighborhood-form-spinner');
-    var formEl = document.getElementById('neighborhood-form-body');
+    var formBody = document.getElementById('neighborhood-form-body');
+    var form = document.getElementById('neighborhood-form');
 
-    if (spinner) spinner.classList.remove('hidden');
-    if (formEl) formEl.innerHTML = '';
+    spinner.classList.remove('hidden');
+    formBody.innerHTML = '';
 
-    fetch('{% url "administration:neighborhood_edit" 0 %}'.replace('/0/', '/' + id + '/') + '?format=json', {
+    fetch('/administration/neighborhoods/' + id + '/edit/', {
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
     })
     .then(function(r) { return r.json(); })
     .then(function(data) {
+        spinner.classList.add('hidden');
         if (data && data.form) {
             var f = data.form;
-            var citiesHtml = '';
+            form.action = '/administration/neighborhoods/' + id + '/edit/';
+            document.getElementById('neighborhood-modal-title').textContent = '{% trans "Modifier le quartier" %}';
+
+            var citiesHtml = '<option value="">{% trans "Sélectionnez une ville" %}</option>';
             if (data.cities) {
                 data.cities.forEach(function(c) {
                     citiesHtml += '<option value="' + c.id + '" ' + (f.city === String(c.id) ? 'selected' : '') + '>' + c.name + '</option>';
                 });
-            } else if (data.initial && data.initial.city) {
-                citiesHtml = '<option value="' + data.initial.city + '" selected>...</option>';
             }
-            var html = '';
-            html += '<input type="hidden" name="neighborhood_id" value="' + id + '">';
-            html += '<div class="mb-4">';
-            html += '<label class="form-label">{% trans "Ville" %}</label>';
-            html += '<select name="city" class="form-input" required><option value="">{% trans "Sélectionnez une ville" %}</option>' + citiesHtml + '</select>';
-            html += '<p class="form-error"></p>';
-            html += '</div>';
-            html += '<div class="mb-4">';
-            html += '<label class="form-label">Nom</label>';
-            html += '<input type="text" name="name" class="form-input" value="' + (f.name || '') + '" required>';
-            html += '<p class="form-error"></p>';
-            html += '</div>';
-            html += '<div class="mb-4">';
-            html += '<label class="form-label">Slug</label>';
-            html += '<input type="text" name="slug" class="form-input" value="' + (f.slug || '') + '" required>';
-            html += '<p class="form-error"></p>';
-            html += '</div>';
-            html += '<div class="flex items-center gap-3 mb-4">';
-            html += '<label class="inline-flex items-center gap-2 cursor-pointer">';
-            html += '<input type="checkbox" name="is_active" class="rounded border-auto-200 text-auto-orange focus:ring-auto-orange" ' + (f.is_active ? 'checked' : '') + '>';
-            html += '<span class="text-sm font-medium">{% trans "Actif" %}</span>';
-            html += '</label>';
-            html += '</div>';
-            html += '<input type="hidden" name="csrfmiddlewaretoken" value="' + window.AutoLink.getCSRFToken() + '">';
-            formEl.innerHTML = html;
+
+            formBody.innerHTML =
+                '<input type="hidden" name="neighborhood_id" value="' + id + '">' +
+                '<div class="mb-4">' +
+                '<label class="form-label">{% trans "Ville" %}</label>' +
+                '<select name="city" class="form-input" required>' + citiesHtml + '</select>' +
+                '<p class="form-error"></p>' +
+                '</div>' +
+                '<div class="mb-4">' +
+                '<label class="form-label">{% trans "Nom" %}</label>' +
+                '<input type="text" name="name" class="form-input" value="' + (f.name || '') + '" required>' +
+                '<p class="form-error"></p>' +
+                '</div>' +
+                '<div class="mb-4">' +
+                '<label class="form-label">{% trans "Slug" %}</label>' +
+                '<input type="text" name="slug" class="form-input" value="' + (f.slug || '') + '" required>' +
+                '<p class="form-error"></p>' +
+                '</div>' +
+                '<div class="flex items-center gap-3 mb-4">' +
+                '<label class="inline-flex items-center gap-2 cursor-pointer">' +
+                '<input type="checkbox" name="is_active" class="rounded border-auto-200 text-auto-orange focus:ring-auto-orange" ' + (f.is_active ? 'checked' : '') + '>' +
+                '<span class="text-sm font-medium">{% trans "Actif" %}</span>' +
+                '</label>' +
+                '</div>';
+            clearNeighborhoodErrors();
+            window.AutoLink.openModal('modal-neighborhood');
         }
-        if (spinner) spinner.classList.add('hidden');
     })
     .catch(function() {
-        if (spinner) spinner.classList.add('hidden');
+        spinner.classList.add('hidden');
+        window.AutoLink.showToast('Erreur de chargement.', 'error');
     });
 }
+
+function clearNeighborhoodErrors() {
+    var formBody = document.getElementById('neighborhood-form-body');
+    formBody.querySelectorAll('.form-error').forEach(function(el) { el.textContent = ''; });
+    formBody.querySelectorAll('.border-error-500').forEach(function(el) { el.classList.remove('border-error-500'); });
+}
+
+document.querySelectorAll('.delete-neighborhood-form').forEach(function(form) {
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var name = form.getAttribute('data-neighborhood-name');
+        window.Admin.confirmDelete('{% trans "Supprimer le quartier" %} \u00AB ' + name + ' \u00BB ?', function() {
+            fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': window.AutoLink.getCSRFToken(),
+                    'X-Requested-With': 'XMLHttpRequest',
+                }
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    window.AutoLink.showToast(data.message, 'success');
+                    if (data.redirect) window.location.href = data.redirect;
+                } else {
+                    window.AutoLink.showToast(data.message, 'error');
+                }
+            })
+            .catch(function() {
+                window.AutoLink.showToast('Erreur lors de la suppression.', 'error');
+            });
+        });
+    });
+});
 </script>
 {% endblock %}

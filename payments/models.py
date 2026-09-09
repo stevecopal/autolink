@@ -5,6 +5,8 @@ from django.utils.translation import gettext_lazy as _
 
 
 class Payment(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     class Status(models.TextChoices):
         INITIATED = 'INITIATED', _('Initié')
         PENDING = 'PENDING', _('En attente')
@@ -55,6 +57,8 @@ class Payment(models.Model):
 
 
 class Refund(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     class Status(models.TextChoices):
         PENDING = 'PENDING', _('En attente')
         PROCESSING = 'PROCESSING', _('En cours')

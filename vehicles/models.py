@@ -1,9 +1,12 @@
+import uuid
 from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
 
 class Brand(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     name = models.CharField(_('Marque'), max_length=100, unique=True)
     slug = models.SlugField(unique=True)
     logo = models.ImageField(upload_to='brands/', blank=True, null=True)
@@ -19,6 +22,8 @@ class Brand(models.Model):
 
 
 class ModelVehicle(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name='models')
     name = models.CharField(_('Modèle'), max_length=100)
     slug = models.SlugField()
@@ -37,6 +42,8 @@ class ModelVehicle(models.Model):
 
 
 class Vehicle(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     class FuelType(models.TextChoices):
         ESSENCE = 'ESSENCE', _('Essence')
         DIESEL = 'DIESEL', _('Diesel')

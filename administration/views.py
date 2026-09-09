@@ -19,6 +19,8 @@ from reviews.models import Review
 from support.models import Ticket
 from core.models import City, Neighborhood
 from notifications.models import Notification
+from .models import Announcement
+from .forms import CityForm, NeighborhoodForm, AnnouncementForm
 
 
 def is_admin(user):
@@ -100,8 +102,6 @@ def admin_dashboard_view(request):
             'link': reverse('administration:support'),
         })
 
-    from django.urls import reverse
-
     context = {
         'total_users': total_users,
         'total_garages': total_garages,
@@ -138,39 +138,31 @@ def admin_monitoring_view(request):
     thirty_days_ago = now - timedelta(days=30)
     seven_days_ago = now - timedelta(days=7)
 
-    # Statistiques globales
     total_users = User.objects.count()
     total_garages = Garage.objects.count()
     total_orders = Order.objects.count()
     total_revenue = Payment.objects.filter(status='SUCCESS').aggregate(total=Sum('amount'))['total'] or 0
 
-    # Progression 30j
     orders_30d = Order.objects.filter(created_at__gte=thirty_days_ago).count()
     users_30d = User.objects.filter(date_joined__gte=thirty_days_ago).count()
     revenue_30d = Payment.objects.filter(
-        status='SUCCESS',
-        created_at__gte=thirty_days_ago
+        status='SUCCESS', created_at__gte=thirty_days_ago
     ).aggregate(total=Sum('amount'))['total'] or 0
     payments_30d = Payment.objects.filter(
-        status='SUCCESS',
-        created_at__gte=thirty_days_ago
+        status='SUCCESS', created_at__gte=thirty_days_ago
     ).count()
 
-    # Activite recente (audit-style overview via existing models)
     recent_users = User.objects.order_by('-date_joined')[:10]
     recent_orders = Order.objects.select_related('user', 'garage').order_by('-created_at')[:15]
     recent_payments = Payment.objects.select_related('order', 'user').order_by('-created_at')[:15]
 
-    # Alertes et fonds de bilan
     pending_garages = Garage.objects.filter(verification_status='PENDING').count()
     pending_tickets = Ticket.objects.filter(status__in=['OPEN', 'IN_PROGRESS']).count()
     failed_payments_7d = Payment.objects.filter(
-        status__in=['FAILED', 'PENDING'],
-        created_at__gte=seven_days_ago
+        status__in=['FAILED', 'PENDING'], created_at__gte=seven_days_ago
     ).count()
     hidden_reviews = Review.objects.filter(is_hidden=True).count()
 
-    # Répartition géographique rapide
     garage_cities = City.objects.annotate(
         garage_count=Count('garages', filter=Q(garages__verification_status='APPROVED'))
     ).order_by('-garage_count')[:8]
@@ -343,7 +335,7 @@ def admin_garage_verify_view(request, garage_id):
 
 
 # ======================================================================
-# Villes
+# Villes - CRUD Complet avec Modals
 # ======================================================================
 
 @user_passes_test(is_admin)
@@ -369,50 +361,60 @@ def admin_cities_view(request):
 
 
 @user_passes_test(is_admin)
-def admin_city_edit_view(request, city_id):
-    """Admin - create/edit a city via JSON-friendly form."""
-    city = get_object_or_404(City, pk=city_id) if city_id else None
-    is_new = city is None
+def admin_city_create_view(request):
+    """Admin - create a city via modal."""
+    if request.method == 'POST':
+        form = CityForm(request.POST)
+        if form.is_valid():
+            city = form.save()
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': True,
+                    'message': _('Ville créée avec succès.'),
+                    'redirect': reverse('administration:cities'),
+                })
+            messages.success(request, _('Ville créée avec succès.'))
+            return redirect('administration:cities')
+        else:
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': False,
+                    'errors': {field: str(errs[0]) for field, errs in form.errors.items()},
+                }, status=400)
+    else:
+        form = CityForm()
 
-    if is_new:
-        city = City()
+    return render(request, 'dashboard/pages/admin/cities/form.html', {
+        'form': form,
+        'is_new': True,
+    })
+
+
+@user_passes_test(is_admin)
+def admin_city_edit_view(request, city_id):
+    """Admin - edit a city via modal."""
+    city = get_object_or_404(City, pk=city_id)
 
     if request.method == 'POST':
-        name = request.POST.get('name', '').strip()
-        slug = request.POST.get('slug', '').strip()
-        is_active = request.POST.get('is_active') == 'on'
-
-        errors = {}
-        if not name:
-            errors['name'] = _('Le nom est obligatoire.')
-        if not slug:
-            errors['slug'] = _('Le slug est obligatoire.')
-
-        if errors:
-            return JsonResponse({
-                'success': False,
-                'errors': errors,
-                'form': {
-                    'name': name,
-                    'slug': slug,
-                    'is_active': is_active,
-                }
-            })
-
-        city.name = name
-        city.slug = slug
-        city.is_active = is_active
-        city.save()
-
-        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            return JsonResponse({
-                'success': True,
-                'message': _('Ville enregistrée.'),
-                'redirect': reverse('administration:cities'),
-            })
-
-        messages.success(request, _('Ville enregistrée.'))
-        return redirect('administration:cities')
+        form = CityForm(request.POST, instance=city)
+        if form.is_valid():
+            city = form.save()
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': True,
+                    'message': _('Ville mise à jour avec succès.'),
+                    'redirect': reverse('administration:cities'),
+                })
+            messages.success(request, _('Ville mise à jour avec succès.'))
+            return redirect('administration:cities')
+        else:
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': False,
+                    'errors': {field: str(errs[0]) for field, errs in form.errors.items()},
+                }, status=400)
+    else:
+        form = CityForm(instance=city)
 
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return JsonResponse({
@@ -422,31 +424,27 @@ def admin_city_edit_view(request, city_id):
                 'slug': city.slug,
                 'is_active': city.is_active,
             },
-            'initial': {
-                'name': city.name,
-                'slug': city.slug,
-                'is_active': city.is_active,
-            }
         })
 
     return render(request, 'dashboard/pages/admin/cities/form.html', {
+        'form': form,
         'city': city,
-        'is_new': is_new,
+        'is_new': False,
     })
 
 
 @user_passes_test(is_admin)
 @require_POST
 def admin_city_delete_view(request, city_id):
-    """Admin - delete a city via POST (AJAX-friendly)."""
+    """Admin - delete a city."""
     city = get_object_or_404(City, pk=city_id)
     city_name = city.name
 
     garage_count = Garage.objects.filter(city=city).count()
     if garage_count > 0:
-        msg = _('Impossible de supprimer cette ville : %(count)s garage(x) y est(are) associé(s).') % {'count': garage_count}
+        msg = _('Impossible de supprimer cette ville : %(count)s garage(x) associé(s).') % {'count': garage_count}
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            return JsonResponse({'success': False, 'message': msg})
+            return JsonResponse({'success': False, 'message': msg}, status=400)
         messages.error(request, msg)
         return redirect('administration:cities')
 
@@ -464,7 +462,7 @@ def admin_city_delete_view(request, city_id):
 
 
 # ======================================================================
-# Quartiers
+# Quartiers - CRUD Complet avec Modals
 # ======================================================================
 
 @user_passes_test(is_admin)
@@ -476,8 +474,7 @@ def admin_neighborhoods_view(request):
     city_id = request.GET.get('city', '')
     if search:
         neighborhoods = neighborhoods.filter(
-            Q(name__icontains=search) |
-            Q(city__name__icontains=search)
+            Q(name__icontains=search) | Q(city__name__icontains=search)
         )
     if city_id:
         neighborhoods = neighborhoods.filter(city_id=city_id)
@@ -497,67 +494,67 @@ def admin_neighborhoods_view(request):
 
 
 @user_passes_test(is_admin)
-def admin_neighborhood_edit_view(request, neighborhood_id):
-    """Admin - create/edit a neighborhood via JSON-friendly form."""
-    neighborhood = get_object_or_404(Neighborhood, pk=neighborhood_id) if neighborhood_id else None
-    is_new = neighborhood is None
+def admin_neighborhood_create_view(request):
+    """Admin - create a neighborhood via modal."""
+    if request.method == 'POST':
+        form = NeighborhoodForm(request.POST)
+        if form.is_valid():
+            neighborhood = form.save()
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': True,
+                    'message': _('Quartier créé avec succès.'),
+                    'redirect': reverse('administration:neighborhoods'),
+                })
+            messages.success(request, _('Quartier créé avec succès.'))
+            return redirect('administration:neighborhoods')
+        else:
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': False,
+                    'errors': {field: str(errs[0]) for field, errs in form.errors.items()},
+                }, status=400)
+    else:
+        form = NeighborhoodForm()
 
-    if is_new:
-        neighborhood = Neighborhood()
+    cities = City.objects.order_by('name')
+    return render(request, 'dashboard/pages/admin/neighborhoods/form.html', {
+        'form': form,
+        'cities': cities,
+        'is_new': True,
+    })
+
+
+@user_passes_test(is_admin)
+def admin_neighborhood_edit_view(request, neighborhood_id):
+    """Admin - edit a neighborhood via modal."""
+    neighborhood = get_object_or_404(Neighborhood, pk=neighborhood_id)
 
     if request.method == 'POST':
-        name = request.POST.get('name', '').strip()
-        slug = request.POST.get('slug', '').strip()
-        city_id = request.POST.get('city', '').strip()
-        is_active = request.POST.get('is_active') == 'on'
-
-        errors = {}
-        if not name:
-            errors['name'] = _('Le nom est obligatoire.')
-        if not slug:
-            errors['slug'] = _('Le slug est obligatoire.')
-        if not city_id:
-            errors['city'] = _('La ville est obligatoire.')
-
-        if errors:
-            return JsonResponse({
-                'success': False,
-                'errors': errors,
-                'form': {
-                    'name': name,
-                    'slug': slug,
-                    'city': city_id,
-                    'is_active': is_active,
-                }
-            })
-
-        city = get_object_or_404(City, pk=city_id)
-        neighborhood.name = name
-        neighborhood.slug = slug
-        neighborhood.city = city
-        neighborhood.is_active = is_active
-        neighborhood.save()
-
-        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            return JsonResponse({
-                'success': True,
-                'message': _('Quartier enregistré.'),
-                'redirect': reverse('administration:neighborhoods'),
-            })
-
-        messages.success(request, _('Quartier enregistré.'))
-        return redirect('administration:neighborhoods')
+        form = NeighborhoodForm(request.POST, instance=neighborhood)
+        if form.is_valid():
+            neighborhood = form.save()
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': True,
+                    'message': _('Quartier mis à jour avec succès.'),
+                    'redirect': reverse('administration:neighborhoods'),
+                })
+            messages.success(request, _('Quartier mis à jour avec succès.'))
+            return redirect('administration:neighborhoods')
+        else:
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': False,
+                    'errors': {field: str(errs[0]) for field, errs in form.errors.items()},
+                }, status=400)
+    else:
+        form = NeighborhoodForm(instance=neighborhood)
 
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return JsonResponse({
             'success': True,
             'form': {
-                'name': neighborhood.name,
-                'slug': neighborhood.slug,
-                'city': str(neighborhood.city_id) if neighborhood.city_id else '',
-                'is_active': neighborhood.is_active,
-            },
-            'initial': {
                 'name': neighborhood.name,
                 'slug': neighborhood.slug,
                 'city': str(neighborhood.city_id) if neighborhood.city_id else '',
@@ -569,25 +566,27 @@ def admin_neighborhood_edit_view(request, neighborhood_id):
             ]
         })
 
+    cities = City.objects.order_by('name')
     return render(request, 'dashboard/pages/admin/neighborhoods/form.html', {
+        'form': form,
         'neighborhood': neighborhood,
-        'is_new': is_new,
-        'cities': City.objects.order_by('name'),
+        'cities': cities,
+        'is_new': False,
     })
 
 
 @user_passes_test(is_admin)
 @require_POST
 def admin_neighborhood_delete_view(request, neighborhood_id):
-    """Admin - delete a neighborhood via POST (AJAX-friendly)."""
+    """Admin - delete a neighborhood."""
     neighborhood = get_object_or_404(Neighborhood, pk=neighborhood_id)
     name = neighborhood.name
 
     garage_count = Garage.objects.filter(neighborhood=neighborhood).count()
     if garage_count > 0:
-        msg = _('Impossible de supprimer ce quartier : %(count)s garage(x) y est(are) associé(s).') % {'count': garage_count}
+        msg = _('Impossible de supprimer ce quartier : %(count)s garage(x) associé(s).') % {'count': garage_count}
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            return JsonResponse({'success': False, 'message': msg})
+            return JsonResponse({'success': False, 'message': msg}, status=400)
         messages.error(request, msg)
         return redirect('administration:neighborhoods')
 
@@ -757,18 +756,13 @@ def admin_ticket_detail_view(request, ticket_id):
 
 
 # ======================================================================
-# Annonces / Notifications (Communication)
+# Annonces - CRUD Complet avec Modals (UUID)
 # ======================================================================
 
 @user_passes_test(is_admin)
 def admin_announcements_view(request):
     """Admin - manage platform announcements."""
-    announcements = (
-        Notification.objects
-        .filter(category='SYSTEM')
-        .select_related('user')
-        .order_by('-created_at')
-    )
+    announcements = Announcement.objects.select_related('created_by').order_by('-created_at')
 
     search = request.GET.get('q', '')
     if search:
@@ -787,54 +781,85 @@ def admin_announcements_view(request):
 
 
 @user_passes_test(is_admin)
-def admin_announcement_edit_view(request, announcement_id):
-    """Admin - create/edit a system announcement."""
-    announcement = get_object_or_404(Notification, pk=announcement_id) if announcement_id else None
-    is_new = announcement is None
+def admin_announcement_detail_view(request, announcement_id):
+    """Admin - view announcement details."""
+    announcement = get_object_or_404(Announcement, pk=announcement_id)
 
-    if is_new:
-        announcement = Notification(category='SYSTEM')
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        return JsonResponse({
+            'success': True,
+            'announcement': {
+                'title': announcement.title,
+                'message': announcement.message,
+                'link': announcement.link,
+                'status': announcement.status,
+                'created_by': announcement.created_by.display_name if announcement.created_by else '-',
+                'created_at': announcement.created_at.strftime('%d/%m/%Y %H:%M'),
+            }
+        })
+
+    return render(request, 'dashboard/pages/admin/announcements/detail.html', {
+        'announcement': announcement,
+    })
+
+
+@user_passes_test(is_admin)
+def admin_announcement_create_view(request):
+    """Admin - create an announcement via modal."""
+    if request.method == 'POST':
+        form = AnnouncementForm(request.POST)
+        if form.is_valid():
+            announcement = form.save(commit=False)
+            announcement.created_by = request.user
+            announcement.save()
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': True,
+                    'message': _('Annonce créée avec succès.'),
+                    'redirect': reverse('administration:announcements'),
+                })
+            messages.success(request, _('Annonce créée avec succès.'))
+            return redirect('administration:announcements')
+        else:
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': False,
+                    'errors': {field: str(errs[0]) for field, errs in form.errors.items()},
+                }, status=400)
+    else:
+        form = AnnouncementForm()
+
+    return render(request, 'dashboard/pages/admin/announcements/form.html', {
+        'form': form,
+        'is_new': True,
+    })
+
+
+@user_passes_test(is_admin)
+def admin_announcement_edit_view(request, announcement_id):
+    """Admin - edit an announcement via modal."""
+    announcement = get_object_or_404(Announcement, pk=announcement_id)
 
     if request.method == 'POST':
-        title = request.POST.get('title', '').strip()
-        message = request.POST.get('message', '').strip()
-        link = request.POST.get('link', '').strip()
-        is_active = request.POST.get('is_active') == 'on'
-
-        errors = {}
-        if not title:
-            errors['title'] = _('Le titre est obligatoire.')
-        if not message:
-            errors['message'] = _('Le message est obligatoire.')
-
-        if errors:
-            return JsonResponse({
-                'success': False,
-                'errors': errors,
-                'form': {
-                    'title': title,
-                    'message': message,
-                    'link': link,
-                    'is_active': is_active,
-                }
-            })
-
-        announcement.title = title
-        announcement.message = message
-        announcement.link = link
-        announcement.category = 'SYSTEM'
-        announcement.is_read = False
-        announcement.save()
-
-        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-            return JsonResponse({
-                'success': True,
-                'message': _('Annonce enregistrée.'),
-                'redirect': reverse('administration:announcements'),
-            })
-
-        messages.success(request, _('Annonce enregistrée.'))
-        return redirect('administration:announcements')
+        form = AnnouncementForm(request.POST, instance=announcement)
+        if form.is_valid():
+            form.save()
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': True,
+                    'message': _('Annonce mise à jour avec succès.'),
+                    'redirect': reverse('administration:announcements'),
+                })
+            messages.success(request, _('Annonce mise à jour avec succès.'))
+            return redirect('administration:announcements')
+        else:
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+                return JsonResponse({
+                    'success': False,
+                    'errors': {field: str(errs[0]) for field, errs in form.errors.items()},
+                }, status=400)
+    else:
+        form = AnnouncementForm(instance=announcement)
 
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         return JsonResponse({
@@ -843,43 +868,37 @@ def admin_announcement_edit_view(request, announcement_id):
                 'title': announcement.title,
                 'message': announcement.message,
                 'link': announcement.link,
-                'is_active': not announcement.is_read or announcement.pk is None,
+                'status': announcement.status,
             },
-            'initial': {
-                'title': announcement.title,
-                'message': announcement.message,
-                'link': announcement.link,
-                'is_active': not announcement.is_read or announcement.pk is None,
-            }
         })
 
     return render(request, 'dashboard/pages/admin/announcements/form.html', {
+        'form': form,
         'announcement': announcement,
-        'is_new': is_new,
+        'is_new': False,
     })
 
 
 @user_passes_test(is_admin)
 @require_POST
 def admin_announcement_delete_view(request, announcement_id):
-    """Admin - delete a system announcement via POST (AJAX-friendly)."""
-    announcement = get_object_or_404(Notification, pk=announcement_id)
+    """Admin - delete an announcement."""
+    announcement = get_object_or_404(Announcement, pk=announcement_id)
+    announcement.delete()
 
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
-        announcement.delete()
         return JsonResponse({
             'success': True,
             'message': _('Annonce supprimée.'),
             'redirect': reverse('administration:announcements'),
         })
 
-    announcement.delete()
     messages.success(request, _('Annonce supprimée.'))
     return redirect('administration:announcements')
 
 
 # ======================================================================
-# Notifications admin (gestion des notifications utilisateurs)
+# Notifications admin
 # ======================================================================
 
 @user_passes_test(is_admin)

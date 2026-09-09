@@ -1,9 +1,12 @@
+import uuid
 from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
 
 class Category(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     name = models.CharField(_('Catégorie'), max_length=200)
     slug = models.SlugField(unique=True)
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
@@ -22,6 +25,8 @@ class Category(models.Model):
 
 
 class Part(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     class Condition(models.TextChoices):
         NEW = 'NEW', _('Neuf')
         USED = 'USED', _('Occasion')
@@ -101,6 +106,8 @@ class Part(models.Model):
 
 
 class PartPhoto(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     part = models.ForeignKey(Part, on_delete=models.CASCADE, related_name='photos')
     image = models.ImageField(upload_to='parts/photos/')
     caption = models.CharField(max_length=200, blank=True)
@@ -115,6 +122,8 @@ class PartPhoto(models.Model):
 
 
 class Compatibility(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     class Status(models.TextChoices):
         CONFIRMED = 'CONFIRMED', _('Compatible')
         PROBABLE = 'PROBABLE', _('Probablement compatible')
@@ -157,6 +166,8 @@ class Compatibility(models.Model):
 
 
 class PartRequest(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     class Urgency(models.TextChoices):
         LOW = 'LOW', _('Pas urgent')
         MEDIUM = 'MEDIUM', _('Modéré')

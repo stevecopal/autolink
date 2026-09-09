@@ -25,7 +25,7 @@
             <p class="text-sm text-auto-600 mt-1">{% trans "Gérez les villes et quartiers de la plateforme." %}</p>
         </div>
         <button type="button"
-                data-modal-open="modal-city"
+                onclick="openCityModal()"
                 class="btn-primary text-sm flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -76,16 +76,14 @@
                             </td>
                             <td class="px-4 py-3">
                                 <button type="button"
-                                        data-modal-open="modal-city"
-                                        data-city-id="{{ city.id }}"
+                                        onclick="editCityModal({{ city.id }})"
                                         class="text-auto-orange font-medium hover:underline text-sm mr-3">
                                     {% trans "Modifier" %}
                                 </button>
-                                <form method="post" action="{% url 'administration:city_delete' city.id %}" class="inline">
+                                <form method="post" action="{% url 'administration:city_delete' city.id %}" class="inline delete-city-form" data-city-name="{{ city.name }}">
                                     {% csrf_token %}
                                     <button type="submit"
-                                            class="text-error-600 hover:text-error-700 text-sm"
-                                            onclick="return confirm('{% trans "Supprimer cette ville ?" %}')">
+                                            class="text-error-600 hover:text-error-700 text-sm">
                                         {% trans "Supprimer" %}
                                     </button>
                                 </form>
@@ -119,62 +117,145 @@
         {% endif %}
     </div>
 </div>
+
+<!-- Modal Ville -->
+<div id="modal-city" class="al-modal hidden">
+    <div class="al-modal-backdrop"></div>
+    <div class="al-modal-panel">
+        <div class="al-modal-dialog">
+            <div class="al-modal-header">
+                <h2 class="al-modal-title" id="city-modal-title">{% trans "Ajouter une ville" %}</h2>
+                <button type="button" class="al-modal-close" data-modal-close>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="al-modal-body">
+                <div id="city-form-spinner" class="hidden text-center py-8">
+                    <div class="animate-spin w-8 h-8 border-4 border-auto-orange border-t-transparent rounded-full mx-auto"></div>
+                </div>
+                <form id="city-form" method="post" action="" data-async="true">
+                    {% csrf_token %}
+                    <div id="city-form-body">
+                        <div class="mb-4">
+                            <label class="form-label">{% trans "Nom" %}</label>
+                            <input type="text" name="name" class="form-input" required>
+                            <p class="form-error"></p>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">{% trans "Slug" %}</label>
+                            <input type="text" name="slug" class="form-input" required>
+                            <p class="form-error"></p>
+                        </div>
+                        <div class="flex items-center gap-3 mb-4">
+                            <label class="inline-flex items-center gap-2 cursor-pointer">
+                                <input type="checkbox" name="is_active" class="rounded border-auto-200 text-auto-orange focus:ring-auto-orange" checked>
+                                <span class="text-sm font-medium">{% trans "Actif" %}</span>
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="al-modal-footer">
+                <button type="button" class="btn-outline text-sm" data-modal-close>{% trans "Annuler" %}</button>
+                <button type="submit" form="city-form" class="btn-primary text-sm">{% trans "Enregistrer" %}</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
 <script defer>
-document.addEventListener('click', function(e) {
-    var btn = e.target.closest('[data-city-id]');
-    if (btn && !e.target.closest('form')) {
-        e.preventDefault();
-        var id = btn.getAttribute('data-city-id');
-        window.AutoLink.openModal('modal-city');
-        if (id) {
-            loadCityForm(id);
-        }
-    }
-});
+function openCityModal() {
+    var form = document.getElementById('city-form');
+    form.reset();
+    form.action = '{% url "administration:city_create" %}';
+    document.getElementById('city-modal-title').textContent = '{% trans "Ajouter une ville" %}';
+    document.getElementById('city-form-body').querySelector('input[name="is_active"]').checked = true;
+    clearCityErrors();
+    window.AutoLink.openModal('modal-city');
+}
 
-function loadCityForm(id) {
+function editCityModal(id) {
     var spinner = document.getElementById('city-form-spinner');
-    var formEl = document.getElementById('city-form-body');
+    var formBody = document.getElementById('city-form-body');
+    var form = document.getElementById('city-form');
 
-    if (spinner) spinner.classList.remove('hidden');
-    if (formEl) formEl.innerHTML = '';
+    spinner.classList.remove('hidden');
+    formBody.innerHTML = '';
 
-    fetch('{% url "administration:city_edit" 0 %}'.replace('/0/', '/' + id + '/') + '?format=json', {
+    fetch('/administration/cities/' + id + '/edit/', {
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
     })
     .then(function(r) { return r.json(); })
     .then(function(data) {
+        spinner.classList.add('hidden');
         if (data && data.form) {
             var f = data.form;
-            var html = '';
-            html += '<input type="hidden" name="city_id" value="' + id + '">';
-            html += '<div class="mb-4">';
-            html += '<label class="form-label">Nom</label>';
-            html += '<input type="text" name="name" class="form-input" value="' + (f.name || '') + '" required>';
-            html += '<p class="form-error"></p>';
-            html += '</div>';
-            html += '<div class="mb-4">';
-            html += '<label class="form-label">Slug</label>';
-            html += '<input type="text" name="slug" class="form-input" value="' + (f.slug || '') + '" required>';
-            html += '<p class="form-error"></p>';
-            html += '</div>';
-            html += '<div class="flex items-center gap-3 mb-4">';
-            html += '<label class="inline-flex items-center gap-2 cursor-pointer">';
-            html += '<input type="checkbox" name="is_active" class="rounded border-auto-200 text-auto-orange focus:ring-auto-orange" ' + (f.is_active ? 'checked' : '') + '>';
-            html += '<span class="text-sm font-medium">{% trans "Actif" %}</span>';
-            html += '</label>';
-            html += '</div>';
-            html += '<input type="hidden" name="csrfmiddlewaretoken" value="' + window.AutoLink.getCSRFToken() + '">';
-            formEl.innerHTML = html;
+            form.action = '/administration/cities/' + id + '/edit/';
+            document.getElementById('city-modal-title').textContent = '{% trans "Modifier la ville" %}';
+            formBody.innerHTML =
+                '<input type="hidden" name="city_id" value="' + id + '">' +
+                '<div class="mb-4">' +
+                '<label class="form-label">{% trans "Nom" %}</label>' +
+                '<input type="text" name="name" class="form-input" value="' + (f.name || '') + '" required>' +
+                '<p class="form-error"></p>' +
+                '</div>' +
+                '<div class="mb-4">' +
+                '<label class="form-label">{% trans "Slug" %}</label>' +
+                '<input type="text" name="slug" class="form-input" value="' + (f.slug || '') + '" required>' +
+                '<p class="form-error"></p>' +
+                '</div>' +
+                '<div class="flex items-center gap-3 mb-4">' +
+                '<label class="inline-flex items-center gap-2 cursor-pointer">' +
+                '<input type="checkbox" name="is_active" class="rounded border-auto-200 text-auto-orange focus:ring-auto-orange" ' + (f.is_active ? 'checked' : '') + '>' +
+                '<span class="text-sm font-medium">{% trans "Actif" %}</span>' +
+                '</label>' +
+                '</div>';
+            clearCityErrors();
+            window.AutoLink.openModal('modal-city');
         }
-        if (spinner) spinner.classList.add('hidden');
     })
     .catch(function() {
-        if (spinner) spinner.classList.add('hidden');
+        spinner.classList.add('hidden');
+        window.AutoLink.showToast('Erreur de chargement.', 'error');
     });
 }
+
+function clearCityErrors() {
+    var formBody = document.getElementById('city-form-body');
+    formBody.querySelectorAll('.form-error').forEach(function(el) { el.textContent = ''; });
+    formBody.querySelectorAll('.border-error-500').forEach(function(el) { el.classList.remove('border-error-500'); });
+}
+
+document.querySelectorAll('.delete-city-form').forEach(function(form) {
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var name = form.getAttribute('data-city-name');
+        window.Admin.confirmDelete('{% trans "Supprimer la ville" %} \u00AB ' + name + ' \u00BB ?', function() {
+            fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': window.AutoLink.getCSRFToken(),
+                    'X-Requested-With': 'XMLHttpRequest',
+                }
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    window.AutoLink.showToast(data.message, 'success');
+                    if (data.redirect) window.location.href = data.redirect;
+                } else {
+                    window.AutoLink.showToast(data.message, 'error');
+                }
+            })
+            .catch(function() {
+                window.AutoLink.showToast('Erreur lors de la suppression.', 'error');
+            });
+        });
+    });
+});
 </script>
 {% endblock %}

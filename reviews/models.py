@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.conf import settings
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -5,6 +6,8 @@ from django.utils.translation import gettext_lazy as _
 
 
 class Review(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     class ReviewType(models.TextChoices):
         GARAGE = 'GARAGE', _('Garage')
         PART = 'PART', _('Pièce')
@@ -61,6 +64,8 @@ class Review(models.Model):
 
 
 class Favorite(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     class ObjectType(models.TextChoices):
         GARAGE = 'GARAGE', _('Garage')
         PART = 'PART', _('Pièce')

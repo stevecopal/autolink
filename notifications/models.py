@@ -1,9 +1,12 @@
+import uuid
 from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
 
 class Notification(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     class Category(models.TextChoices):
         ORDER = 'ORDER', _('Commande')
         PAYMENT = 'PAYMENT', _('Paiement')

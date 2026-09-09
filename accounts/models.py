@@ -1,9 +1,12 @@
+import uuid
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
 class User(AbstractUser):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     class Role(models.TextChoices):
         USER = 'USER', _('Utilisateur')
         CLIENT = 'CLIENT', _('Client')
@@ -38,6 +41,8 @@ class User(AbstractUser):
 
 
 class UserActivity(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     class ActionType(models.TextChoices):
         LOGIN = 'LOGIN', _('Connexion')
         LOGOUT = 'LOGOUT', _('Déconnexion')

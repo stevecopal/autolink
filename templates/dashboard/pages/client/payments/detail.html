@@ -76,12 +76,12 @@
                     <span class="text-auto-600">{% trans "Paiement" %}</span>
                     <span class="font-bold">{{ payment.created_at|date:"d/m/Y H:i" }}</span>
                 </div>
-                {% if payment.refund %}
+                {% if payment.refunds.first %}
                 <div class="flex justify-between items-center py-2 border-b border-auto-100">
                     <span class="text-auto-600">{% trans "Remboursement" %}</span>
-                    <a href="{% url 'payments:refund_detail' payment.refund.id %}"
+                    <a href="{% url 'payments:refund_detail' payment.refunds.first.id %}"
                        class="font-bold text-auto-coral hover:underline text-sm">
-                        {{ payment.refund.amount|intcomma }} FCFA
+                        {{ payment.refunds.first.amount|intcomma }} FCFA
                     </a>
                 </div>
                 {% endif %}
@@ -181,20 +181,20 @@
     </div>
 
     <!-- Remboursement -->
-    {% if payment.refund %}
+    {% if payment.refunds.first %}
     <div class="card p-6 border border-warning-500 bg-warning-50">
         <h3 class="text-lg font-bold text-warning-700 mb-4">{% trans "Remboursement" %}</h3>
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
                 <div class="text-sm text-warning-600 mb-1">{% trans "Montant remboursé" %}</div>
-                <div class="text-2xl font-bold text-warning-700">{{ payment.refund.amount|intcomma }} FCFA</div>
-                <div class="text-xs text-warning-600 mt-1">{% trans "le" %} {{ payment.refund.created_at|date:"d/m/Y H:i" }}</div>
+                <div class="text-2xl font-bold text-warning-700">{{ payment.refunds.first.amount|intcomma }} FCFA</div>
+                <div class="text-xs text-warning-600 mt-1">{% trans "le" %} {{ payment.refunds.first.created_at|date:"d/m/Y H:i" }}</div>
             </div>
-            <a href="{% url 'payments:refund_detail' payment.refund.id %}"
+            <a href="{% url 'payments:refund_detail' payment.refunds.first.id %}"
                class="btn-outline text-sm">{% trans "Voir les détails" %}</a>
         </div>
     </div>
-    {% elif payment.status == 'SUCCESS' %}
+    {% elif payment.status == 'SUCCESS' and not payment.refunds.first %}
     <div class="card p-6 border border-warning-500 bg-warning-50">
         <h3 class="text-lg font-bold text-warning-700 mb-4">{% trans "Demander un remboursement" %}</h3>
         <p class="text-sm text-warning-600 mb-4">{% trans "Vous pouvez demander un remboursement pour ce paiement." %}</p>

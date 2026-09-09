@@ -72,11 +72,20 @@
         toast.innerHTML =
             '<div style="background:' + c.iconBg + ';border-radius:0.5rem;padding:0.375rem;flex-shrink:0;">' + icon + '</div>' +
             '<div style="flex:1;word-break:break-word;">' + message + '</div>' +
-            '<button onclick="this.closest(\'[role=alert]\').remove()" style="flex-shrink:0;opacity:0.6;transition:opacity 0.2s;cursor:pointer;background:none;border:none;color:inherit;padding:0;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6" aria-label="Close">' +
+            '<button style="flex-shrink:0;opacity:0.6;transition:opacity 0.2s;cursor:pointer;background:none;border:none;color:inherit;padding:0;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.6" aria-label="Close">' +
                 '<svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>' +
             '</button>';
 
         container.appendChild(toast);
+
+        // Close button: remove only this toast
+        var closeBtn = toast.querySelector('button');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function() {
+                clearTimeout(timeout);
+                dismissToast(toast);
+            });
+        }
 
         // Trigger animation
         requestAnimationFrame(function() {
@@ -169,18 +178,21 @@
     // Close modal on backdrop click
     document.addEventListener('click', function(e) {
         if (e.target.classList.contains('al-modal-backdrop')) {
-            var modalId = activeModal ? activeModal.id : null;
-            window.AutoLink.closeModal(modalId);
-            var form = activeModal && activeModal.querySelector('form');
-            if (form) form.reset();
+            var modal = activeModal;
+            if (modal) {
+                var form = modal.querySelector('form');
+                window.AutoLink.closeModal(modal.id);
+                if (form) form.reset();
+            }
         }
     });
 
     // Close modal on Escape
     document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape' && activeModal) {
+            var modal = activeModal;
+            var form = modal && modal.querySelector('form');
             window.AutoLink.closeModal();
-            var form = activeModal && activeModal.querySelector('form');
             if (form) form.reset();
         }
     });
@@ -215,7 +227,6 @@
             submitBtn.innerHTML = '<svg class="animate-spin h-4 w-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 4.373 0 12h4z"></path></svg> Envoi...';
         }
 
-        var formData = new FormData(form);
         var csrfToken = window.AutoLink.getCSRFToken();
 
         fetch(form.action, {
@@ -227,19 +238,42 @@
             body: new URLSearchParams(new FormData(form)).toString(),
         })
         .then(function(response) {
-            return response.json().catch(function() {
-                // Fallback for non-JSON responses (redirects, etc.)
+            return response.json().then(function(data) {
+                return { data: data, ok: response.ok, status: response.status };
+            }).catch(function() {
                 return response.text().then(function(text) {
-                    return { html: text, redirect: response.url !== window.location.href };
+                    return {
+                        data: { html: text, redirect: response.url !== window.location.href },
+                        ok: response.ok,
+                        status: response.status
+                    };
                 });
             });
         })
-        .then(function(data) {
-            if (data && data.message) {
-                var msgType = data.type || 'info';
+        .then(function(result) {
+            var data = result.data || {};
+
+            // Handle validation errors (400 status or success=false with errors)
+            if (!result.ok || data.success === false) {
+                if (data.errors && window.Admin && window.Admin.handleFormResponse) {
+                    window.Admin.handleFormResponse(data);
+                }
+                if (data.message) {
+                    window.AutoLink.showToast(data.message, 'error');
+                }
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = originalText;
+                }
+                return;
+            }
+
+            // Success path
+            if (data.message) {
+                var msgType = data.type || 'success';
                 window.AutoLink.showToast(data.message, msgType);
             }
-            if (data && data.redirect) {
+            if (data.redirect) {
                 window.location.href = data.redirect;
             } else {
                 // Close modal on success

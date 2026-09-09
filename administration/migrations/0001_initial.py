@@ -16,21 +16,20 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Notification',
+            name='Announcement',
             fields=[
                 ('id', models.UUIDField(default=uuid.uuid4, editable=False, primary_key=True, serialize=False)),
-                ('category', models.CharField(choices=[('ORDER', 'Commande'), ('PAYMENT', 'Paiement'), ('APPOINTMENT', 'Rendez-vous'), ('QUOTE', 'Devis'), ('STOCK', 'Stock'), ('PRICE', 'Prix'), ('REVIEW', 'Avis'), ('SYSTEM', 'Système'), ('SUPPORT', 'Support')], max_length=20)),
                 ('title', models.CharField(max_length=200, verbose_name='Titre')),
                 ('message', models.TextField(verbose_name='Message')),
-                ('link', models.URLField(blank=True)),
-                ('is_read', models.BooleanField(default=False)),
-                ('metadata', models.JSONField(blank=True, default=dict)),
+                ('link', models.URLField(blank=True, verbose_name='Lien')),
+                ('status', models.CharField(choices=[('DRAFT', 'Brouillon'), ('PUBLISHED', 'Publiée'), ('ARCHIVED', 'Archivée')], default='DRAFT', max_length=10)),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='notifications', to=settings.AUTH_USER_MODEL)),
+                ('updated_at', models.DateTimeField(auto_now=True)),
+                ('created_by', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='announcements_created', to=settings.AUTH_USER_MODEL, verbose_name='Créé par')),
             ],
             options={
-                'verbose_name': 'Notification',
-                'verbose_name_plural': 'Notifications',
+                'verbose_name': 'Annonce',
+                'verbose_name_plural': 'Annonces',
                 'ordering': ['-created_at'],
             },
         ),

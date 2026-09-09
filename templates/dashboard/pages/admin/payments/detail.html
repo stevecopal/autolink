@@ -51,8 +51,8 @@
                 </div>
                 <div class="flex justify-between items-center py-2 border-b border-auto-100">
                     <span class="text-auto-600">{% trans "Remboursement" %}</span>
-                    {% if payment.refund %}
-                        <span class="text-auto-coral">{% trans "Refondu" %} : {{ payment.refund.amount|intcomma }} FCFA</span>
+                    {% if payment.refunds.first %}
+                        <span class="text-auto-coral">{% trans "Refondu" %} : {{ payment.refunds.first.amount|intcomma }} FCFA</span>
                     {% else %}
                         <span class="text-auto-600">{% trans "Aucun" %}</span>
                     {% endif %}
@@ -135,21 +135,21 @@
         </div>
     </div>
 
-    {% if payment.refund %}
+    {% if payment.refunds.first %}
     <div class="card p-6 border border-warning-500 bg-warning-50">
         <h3 class="text-lg font-bold text-warning-700 mb-4">{% trans "Informations de remboursement" %}</h3>
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
                 <p class="text-sm text-warning-600 mb-1">{% trans "Montant remboursé" %}</p>
-                <p class="text-2xl font-bold text-warning-700">{{ payment.refund.amount|intcomma }} FCFA</p>
+                <p class="text-2xl font-bold text-warning-700">{{ payment.refunds.first.amount|intcomma }} FCFA</p>
             </div>
-            <a href="{% url 'payments:refund_detail' payment.refund.id %}"
+            <a href="{% url 'payments:refund_detail' payment.refunds.first.id %}"
                class="btn-outline text-sm">{% trans "Voir les détails du remboursement" %}</a>
         </div>
     </div>
     {% endif %}
 
-    {% if not payment.refund and payment.status == 'PAID' %}
+    {% if not payment.refunds.first and payment.status == 'PAID' %}
     <div class="card p-6 border border-warning-500 bg-warning-50">
         <h3 class="text-lg font-bold text-warning-700 mb-4">{% trans "Créer un remboursement" %}</h3>
         <p class="text-sm text-warning-600 mb-4">{% trans "Vous pouvez créer un remboursement pour ce paiement." %}</p>

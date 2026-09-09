@@ -112,7 +112,7 @@
             <h4 class="font-bold text-sm text-auto-700 mb-3">{% trans "Vos tickets récents" %}</h4>
             <div class="space-y-2">
                 {% for ticket in tickets %}
-                <a href="{% url 'support:ticket_detail' ticket.id %}"
+                <a href="{% url 'support:ticket_detail' ticket.ticket_number %}"
                    class="flex items-center justify-between p-3 rounded-lg bg-white border border-auto-100 hover:bg-auto-50 transition">
                     <div>
                         <div class="font-bold text-sm text-auto-dark">{{ ticket.subject }}</div>

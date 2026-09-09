@@ -23,7 +23,7 @@
             <p class="text-sm text-auto-600 mt-1">{% trans "Annonces système destinées aux utilisateurs." %}</p>
         </div>
         <button type="button"
-                data-modal-open="modal-announcement"
+                onclick="openAnnouncementModal()"
                 class="btn-primary text-sm flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -65,24 +65,29 @@
                             </td>
                             <td class="px-4 py-3 text-auto-500">{{ announcement.created_at|date:"d/m/Y H:i" }}</td>
                             <td class="px-4 py-3">
-                                {% if announcement.is_read %}
+                                {% if announcement.status == 'PUBLISHED' %}
                                     <span class="badge-success text-[10px]">{% trans "Publiée" %}</span>
-                                {% else %}
+                                {% elif announcement.status == 'DRAFT' %}
                                     <span class="badge-warning text-[10px]">{% trans "Brouillon" %}</span>
+                                {% else %}
+                                    <span class="badge-gray text-[10px]">{% trans "Archivée" %}</span>
                                 {% endif %}
                             </td>
                             <td class="px-4 py-3">
                                 <button type="button"
-                                        data-modal-open="modal-announcement"
-                                        data-announcement-id="{{ announcement.id }}"
+                                        onclick="viewAnnouncementModal('{{ announcement.id }}')"
+                                        class="text-info-600 hover:text-info-700 text-sm mr-3">
+                                    {% trans "Voir" %}
+                                </button>
+                                <button type="button"
+                                        onclick="editAnnouncementModal('{{ announcement.id }}')"
                                         class="text-auto-orange font-medium hover:underline text-sm mr-3">
                                     {% trans "Modifier" %}
                                 </button>
-                                <form method="post" action="{% url 'administration:announcement_delete' announcement.id %}" class="inline">
+                                <form method="post" action="{% url 'administration:announcement_delete' announcement.id %}" class="inline delete-announcement-form" data-announcement-title="{{ announcement.title }}">
                                     {% csrf_token %}
                                     <button type="submit"
-                                            class="text-error-600 hover:text-error-700 text-sm"
-                                            onclick="return confirm('{% trans "Supprimer cette annonce ?" %}')">
+                                            class="text-error-600 hover:text-error-700 text-sm">
                                         {% trans "Supprimer" %}
                                     </button>
                                 </form>
@@ -116,66 +121,257 @@
         {% endif %}
     </div>
 </div>
+
+<!-- Modal Annonce (Créer/Modifier) -->
+<div id="modal-announcement" class="al-modal hidden">
+    <div class="al-modal-backdrop"></div>
+    <div class="al-modal-panel">
+        <div class="al-modal-dialog" style="max-width: 32rem;">
+            <div class="al-modal-header">
+                <h2 class="al-modal-title" id="announcement-modal-title">{% trans "Créer une annonce" %}</h2>
+                <button type="button" class="al-modal-close" data-modal-close>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="al-modal-body">
+                <div id="announcement-form-spinner" class="hidden text-center py-8">
+                    <div class="animate-spin w-8 h-8 border-4 border-auto-orange border-t-transparent rounded-full mx-auto"></div>
+                </div>
+                <form id="announcement-form" method="post" action="" data-async="true">
+                    {% csrf_token %}
+                    <div id="announcement-form-body">
+                        <div class="mb-4">
+                            <label class="form-label">{% trans "Titre" %}</label>
+                            <input type="text" name="title" class="form-input" required>
+                            <p class="form-error"></p>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">{% trans "Message" %}</label>
+                            <textarea name="message" class="form-input" rows="4" required></textarea>
+                            <p class="form-error"></p>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">{% trans "Lien (optionnel)" %}</label>
+                            <input type="url" name="link" class="form-input" placeholder="https://...">
+                            <p class="form-error"></p>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">{% trans "Statut" %}</label>
+                            <select name="status" class="form-input">
+                                <option value="DRAFT">{% trans "Brouillon" %}</option>
+                                <option value="PUBLISHED">{% trans "Publiée" %}</option>
+                                <option value="ARCHIVED">{% trans "Archivée" %}</option>
+                            </select>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="al-modal-footer">
+                <button type="button" class="btn-outline text-sm" data-modal-close>{% trans "Annuler" %}</button>
+                <button type="submit" form="announcement-form" class="btn-primary text-sm">{% trans "Enregistrer" %}</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Annonce (Détail) -->
+<div id="modal-announcement-detail" class="al-modal hidden">
+    <div class="al-modal-backdrop"></div>
+    <div class="al-modal-panel">
+        <div class="al-modal-dialog" style="max-width: 32rem;">
+            <div class="al-modal-header">
+                <h2 class="al-modal-title">{% trans "Détails de l'annonce" %}</h2>
+                <button type="button" class="al-modal-close" data-modal-close>
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="al-modal-body">
+                <div id="announcement-detail-spinner" class="text-center py-8">
+                    <div class="animate-spin w-8 h-8 border-4 border-auto-orange border-t-transparent rounded-full mx-auto"></div>
+                </div>
+                <div id="announcement-detail-content" class="hidden space-y-4">
+                    <div>
+                        <label class="form-label font-bold">{% trans "Titre" %}</label>
+                        <p id="detail-title" class="text-auto-dark"></p>
+                    </div>
+                    <div>
+                        <label class="form-label font-bold">{% trans "Message" %}</label>
+                        <p id="detail-message" class="text-auto-gray whitespace-pre-wrap"></p>
+                    </div>
+                    <div id="detail-link-wrapper" class="hidden">
+                        <label class="form-label font-bold">{% trans "Lien" %}</label>
+                        <a id="detail-link" href="#" target="_blank" class="text-auto-orange hover:underline"></a>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="form-label font-bold">{% trans "Statut" %}</label>
+                            <p id="detail-status"></p>
+                        </div>
+                        <div>
+                            <label class="form-label font-bold">{% trans "Créé par" %}</label>
+                            <p id="detail-created-by"></p>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="form-label font-bold">{% trans "Créé le" %}</label>
+                        <p id="detail-created-at" class="text-auto-600"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="al-modal-footer">
+                <button type="button" class="btn-outline text-sm" data-modal-close>{% trans "Fermer" %}</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
 <script defer>
-document.addEventListener('click', function(e) {
-    var btn = e.target.closest('[data-announcement-id]');
-    if (btn && !e.target.closest('form')) {
-        e.preventDefault();
-        var id = btn.getAttribute('data-announcement-id');
-        window.AutoLink.openModal('modal-announcement');
-        if (id) {
-            loadAnnouncementForm(id);
-        }
-    }
-});
+var STATUS_LABELS = {
+    'DRAFT': '{% trans "Brouillon" %}',
+    'PUBLISHED': '{% trans "Publiée" %}',
+    'ARCHIVED': '{% trans "Archivée" %}'
+};
 
-function loadAnnouncementForm(id) {
+function openAnnouncementModal() {
+    var form = document.getElementById('announcement-form');
+    form.reset();
+    form.action = '{% url "administration:announcement_create" %}';
+    document.getElementById('announcement-modal-title').textContent = '{% trans "Créer une annonce" %}';
+    document.getElementById('announcement-form-body').querySelector('select[name="status"]').value = 'DRAFT';
+    clearAnnouncementErrors();
+    window.AutoLink.openModal('modal-announcement');
+}
+
+function editAnnouncementModal(id) {
     var spinner = document.getElementById('announcement-form-spinner');
-    var formEl = document.getElementById('announcement-form-body');
+    var formBody = document.getElementById('announcement-form-body');
+    var form = document.getElementById('announcement-form');
 
-    if (spinner) spinner.classList.remove('hidden');
-    if (formEl) formEl.innerHTML = '';
+    spinner.classList.remove('hidden');
+    formBody.innerHTML = '';
 
-    fetch('{% url "administration:announcement_edit" 0 %}'.replace('/0/', '/' + id + '/') + '?format=json', {
+    fetch('/administration/announcements/' + id + '/edit/', {
         headers: { 'X-Requested-With': 'XMLHttpRequest' }
     })
     .then(function(r) { return r.json(); })
     .then(function(data) {
+        spinner.classList.add('hidden');
         if (data && data.form) {
             var f = data.form;
-            var html = '';
-            html += '<input type="hidden" name="announcement_id" value="' + id + '">';
-            html += '<div class="mb-4">';
-            html += '<label class="form-label">Titre</label>';
-            html += '<input type="text" name="title" class="form-input" value="' + (f.title || '') + '" required>';
-            html += '<p class="form-error"></p>';
-            html += '</div>';
-            html += '<div class="mb-4">';
-            html += '<label class="form-label">Message</label>';
-            html += '<textarea name="message" class="form-input" rows="4" required>' + (f.message || '') + '</textarea>';
-            html += '<p class="form-error"></p>';
-            html += '</div>';
-            html += '<div class="mb-4">';
-            html += '<label class="form-label">{% trans "Lien (optionnel)" %}</label>';
-            html += '<input type="url" name="link" class="form-input" value="' + (f.link || '') + '">';
-            html += '</div>';
-            html += '<div class="flex items-center gap-3 mb-4">';
-            html += '<label class="inline-flex items-center gap-2 cursor-pointer">';
-            html += '<input type="checkbox" name="is_active" class="rounded border-auto-200 text-auto-orange focus:ring-auto-orange" ' + (f.is_active ? 'checked' : '') + '>';
-            html += '<span class="text-sm font-medium">{% trans "Publier" %}</span>';
-            html += '</label>';
-            html += '</div>';
-            html += '<input type="hidden" name="csrfmiddlewaretoken" value="' + window.AutoLink.getCSRFToken() + '">';
-            formEl.innerHTML = html;
+            form.action = '/administration/announcements/' + id + '/edit/';
+            document.getElementById('announcement-modal-title').textContent = '{% trans "Modifier l\'annonce" %}';
+            formBody.innerHTML =
+                '<input type="hidden" name="announcement_id" value="' + id + '">' +
+                '<div class="mb-4">' +
+                '<label class="form-label">{% trans "Titre" %}</label>' +
+                '<input type="text" name="title" class="form-input" value="' + (f.title || '').replace(/"/g, '&quot;') + '" required>' +
+                '<p class="form-error"></p>' +
+                '</div>' +
+                '<div class="mb-4">' +
+                '<label class="form-label">{% trans "Message" %}</label>' +
+                '<textarea name="message" class="form-input" rows="4" required>' + (f.message || '') + '</textarea>' +
+                '<p class="form-error"></p>' +
+                '</div>' +
+                '<div class="mb-4">' +
+                '<label class="form-label">{% trans "Lien (optionnel)" %}</label>' +
+                '<input type="url" name="link" class="form-input" value="' + (f.link || '') + '">' +
+                '<p class="form-error"></p>' +
+                '</div>' +
+                '<div class="mb-4">' +
+                '<label class="form-label">{% trans "Statut" %}</label>' +
+                '<select name="status" class="form-input">' +
+                '<option value="DRAFT" ' + (f.status === 'DRAFT' ? 'selected' : '') + '>{% trans "Brouillon" %}</option>' +
+                '<option value="PUBLISHED" ' + (f.status === 'PUBLISHED' ? 'selected' : '') + '>{% trans "Publiée" %}</option>' +
+                '<option value="ARCHIVED" ' + (f.status === 'ARCHIVED' ? 'selected' : '') + '>{% trans "Archivée" %}</option>' +
+                '</select>' +
+                '</div>';
+            clearAnnouncementErrors();
+            window.AutoLink.openModal('modal-announcement');
         }
-        if (spinner) spinner.classList.add('hidden');
     })
     .catch(function() {
-        if (spinner) spinner.classList.add('hidden');
+        spinner.classList.add('hidden');
+        window.AutoLink.showToast('Erreur de chargement.', 'error');
     });
 }
+
+function viewAnnouncementModal(id) {
+    var spinner = document.getElementById('announcement-detail-spinner');
+    var content = document.getElementById('announcement-detail-content');
+    spinner.classList.remove('hidden');
+    content.classList.add('hidden');
+
+    window.AutoLink.openModal('modal-announcement-detail');
+
+    fetch('/administration/announcements/' + id + '/', {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+        spinner.classList.add('hidden');
+        if (data && data.announcement) {
+            var a = data.announcement;
+            document.getElementById('detail-title').textContent = a.title;
+            document.getElementById('detail-message').textContent = a.message;
+            document.getElementById('detail-status').innerHTML = '<span class="badge-' + (a.status === 'PUBLISHED' ? 'success' : a.status === 'DRAFT' ? 'warning' : 'gray') + ' text-[10px]">' + (STATUS_LABELS[a.status] || a.status) + '</span>';
+            document.getElementById('detail-created-by').textContent = a.created_by;
+            document.getElementById('detail-created-at').textContent = a.created_at;
+            var linkWrapper = document.getElementById('detail-link-wrapper');
+            var linkEl = document.getElementById('detail-link');
+            if (a.link) {
+                linkEl.href = a.link;
+                linkEl.textContent = a.link;
+                linkWrapper.classList.remove('hidden');
+            } else {
+                linkWrapper.classList.add('hidden');
+            }
+            content.classList.remove('hidden');
+        }
+    })
+    .catch(function() {
+        spinner.classList.add('hidden');
+        window.AutoLink.showToast('Erreur de chargement.', 'error');
+    });
+}
+
+function clearAnnouncementErrors() {
+    var formBody = document.getElementById('announcement-form-body');
+    formBody.querySelectorAll('.form-error').forEach(function(el) { el.textContent = ''; });
+    formBody.querySelectorAll('.border-error-500').forEach(function(el) { el.classList.remove('border-error-500'); });
+}
+
+document.querySelectorAll('.delete-announcement-form').forEach(function(form) {
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var title = form.getAttribute('data-announcement-title');
+        window.Admin.confirmDelete('{% trans "Supprimer l\u2019annonce" %} \u00AB ' + title + ' \u00BB ?', function() {
+            fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': window.AutoLink.getCSRFToken(),
+                    'X-Requested-With': 'XMLHttpRequest',
+                }
+            })
+            .then(function(r) { return r.json(); })
+            .then(function(data) {
+                if (data.success) {
+                    window.AutoLink.showToast(data.message, 'success');
+                    if (data.redirect) window.location.href = data.redirect;
+                } else {
+                    window.AutoLink.showToast(data.message, 'error');
+                }
+            })
+            .catch(function() {
+                window.AutoLink.showToast('Erreur lors de la suppression.', 'error');
+            });
+        });
+    });
+});
 </script>
 {% endblock %}

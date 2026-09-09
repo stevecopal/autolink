@@ -5,6 +5,8 @@ from django.utils.translation import gettext_lazy as _
 
 
 class Cart(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='cart')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -26,6 +28,8 @@ class Cart(models.Model):
 
 
 class CartItem(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
     part = models.ForeignKey('catalog.Part', on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
@@ -45,6 +49,8 @@ class CartItem(models.Model):
 
 
 class Order(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     class Status(models.TextChoices):
         PENDING = 'PENDING', _('En attente')
         CONFIRMED = 'CONFIRMED', _('Confirmée')
@@ -148,6 +154,8 @@ class Order(models.Model):
 
 
 class OrderItem(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
     part = models.ForeignKey('catalog.Part', on_delete=models.SET_NULL, null=True)
     part_name = models.CharField(max_length=300)

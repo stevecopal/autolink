@@ -162,4 +162,36 @@
     .al-modal-body {
         padding: 1rem;
     }
+
+    .al-modal-header {
+        padding: 0.75rem 1rem;
+    }
+
+    .al-modal-footer {
+        padding: 0.75rem 1rem;
+        flex-wrap: wrap;
+    }
+
+    .al-modal-footer button {
+        flex: 1;
+        min-width: 0;
+    }
+}
+
+/* Responsive: tables on mobile */
+@media (max-width: 768px) {
+    .card table {
+        font-size: 0.75rem;
+    }
+
+    .card table th,
+    .card table td {
+        padding: 0.5rem 0.625rem;
+        white-space: nowrap;
+    }
+
+    .card table th:last-child,
+    .card table td:last-child {
+        white-space: normal;
+    }
 }

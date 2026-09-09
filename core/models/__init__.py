@@ -1,8 +1,11 @@
+import uuid
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
 class City(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     name = models.CharField(_('Nom de la ville'), max_length=150, unique=True)
     slug = models.SlugField(unique=True)
     is_active = models.BooleanField(_('Active'), default=True)
@@ -18,6 +21,8 @@ class City(models.Model):
 
 
 class Neighborhood(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     city = models.ForeignKey(
         City, on_delete=models.CASCADE,
         related_name='neighborhoods', verbose_name=_('Ville')
@@ -38,6 +43,8 @@ class Neighborhood(models.Model):
 
 
 class ContactMessage(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
     class Status(models.TextChoices):
         PENDING = 'PENDING', _('En attente')
         READ = 'READ', _('Lu')
