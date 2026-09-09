@@ -83,7 +83,7 @@ def admin_dashboard_view(request):
         alerts.append(
             {
                 "type": "warning",
-                "title": _("Garages en attente de vérification"),
+                "title": _("Garages en attente de verification"),
                 "message": f"{pending_garages} garage{pending_garages > 1 and 's' or ''} en attente",
                 "link": reverse("administration:garages") + "?status=PENDING",
             }
@@ -97,6 +97,12 @@ def admin_dashboard_view(request):
                 "link": reverse("administration:support"),
             }
         )
+
+    latest_payments = (
+        Payment.objects.filter(status="SUCCESS")
+        .select_related("garage", "user")
+        .order_by("-created_at")[:8]
+    )
 
     context = {
         "total_users": total_users,
@@ -114,6 +120,7 @@ def admin_dashboard_view(request):
         "garage_cities": garage_cities,
         "recent_payments": recent_payments,
         "recent_reviews": recent_reviews,
+        "latest_payments": latest_payments,
         "alerts": alerts,
     }
     return render(request, "dashboard/pages/admin/dashboard.html", context)
@@ -878,3 +885,45 @@ def admin_reviews_view(request):
     return render(
         request, "dashboard/pages/admin/reviews/list.html", {"reviews": reviews_page}
     )
+
+
+@user_passes_test(is_admin)
+@require_POST
+def admin_send_urgent_message_view(request, user_id):
+    """Send an urgent direct message from admin to a user (garage owner)."""
+    from support.services import get_or_create_conversation, send_message
+    from accounts.models import Notification
+
+    target_user = get_object_or_404(User, pk=user_id)
+    subject = request.POST.get("subject", "").strip()
+    content = request.POST.get("content", "").strip()
+
+    if not content:
+        messages.error(request, _("Le message ne peut pas etre vide."))
+        return redirect("administration:user_detail", user_id=user_id)
+
+    try:
+        conversation = get_or_create_conversation(
+            request.user, target_user, subject or "Message urgent de l'administration"
+        )
+        send_message(conversation, request.user, content)
+
+        Notification.objects.create(
+            user=target_user,
+            notif_type=Notification.Type.ADMIN_MESSAGE,
+            title=subject or "Message urgent de l'administration",
+            message=content,
+            link="/messages/%s/" % conversation.pk,
+        )
+
+        messages.success(
+            request,
+            _("Message urgent envoye a %(user)s.") % {"user": target_user.display_name},
+        )
+    except Exception as e:
+        messages.error(
+            request,
+            _("Erreur lors de l'envoi : %(error)s") % {"error": str(e)},
+        )
+
+    return redirect("administration:user_detail", user_id=user_id)

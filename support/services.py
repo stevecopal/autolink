@@ -18,7 +18,25 @@ def get_or_create_ticket_conversation(ticket):
         if admins.exists():
             conversation.participants.add(*admins)
         else:
-            print("[WARNING] Aucun ADMIN trouvé pour notifier le ticket.")
+            print("[WARNING] Aucun ADMIN trouve pour notifier le ticket.")
+    return conversation
+
+
+def get_or_create_conversation(user1, user2, subject="Conversation"):
+    """Get or create a direct conversation between two users."""
+    existing = Conversation.objects.filter(
+        participants=user1
+    ).filter(
+        participants=user2
+    ).filter(
+        ticket__isnull=True
+    ).first()
+
+    if existing:
+        return existing
+
+    conversation = Conversation.objects.create(subject=subject)
+    conversation.participants.add(user1, user2)
     return conversation
 
 

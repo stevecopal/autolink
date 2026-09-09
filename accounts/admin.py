@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User, UserActivity
+from .models import User, UserActivity, Notification
 
 
 @admin.register(User)
@@ -23,3 +23,11 @@ class UserActivityAdmin(admin.ModelAdmin):
     list_filter = ['action', 'created_at']
     search_fields = ['user__username']
     readonly_fields = ['user', 'action', 'ip_address', 'user_agent', 'details', 'created_at']
+
+
+@admin.register(Notification)
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ['user', 'notif_type', 'title', 'is_read', 'created_at']
+    list_filter = ['notif_type', 'is_read', 'created_at']
+    search_fields = ['user__username', 'title', 'message']
+    readonly_fields = ['user', 'notif_type', 'title', 'message', 'link', 'metadata', 'created_at']

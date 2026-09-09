@@ -1,0 +1,84 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n humanize %}
+
+{% block title %}{% trans "Notifications" %} - AutoLink{% endblock %}
+
+{% block dashboard_header %}
+    <h1 class="text-sm font-bold text-auto-dark">{% trans "Notifications" %}</h1>
+{% endblock %}
+
+{% block dashboard_breadcrumb %}
+    <nav class="flex items-center space-x-2 text-sm text-auto-600">
+        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-auto-orange transition">{% trans "Tableau de bord" %}</a>
+        <span class="text-auto-400">/</span>
+        <span class="font-bold text-auto-dark">{% trans "Notifications" %}</span>
+    </nav>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between flex-wrap gap-3">
+        <div>
+            <h2 class="text-lg font-bold text-auto-deep-red">{% trans "Centre de notifications" %}</h2>
+            <p class="text-sm text-auto-600 mt-1">{% trans "Restez informe des activites de votre compte." %}</p>
+        </div>
+        <form method="post" action="{% url 'accounts:notification_mark_all_read' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn-outline text-sm">
+                <svg class="w-4 h-4 inline mr-1 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                {% trans "Tout marquer comme lu" %}
+            </button>
+        </form>
+    </div>
+
+    <div class="space-y-3">
+        {% for notif in notifications %}
+        <div class="card p-4 {% if not notif.is_read %}border-l-4 border-l-auto-orange bg-auto-50/50{% endif %} transition-all duration-200 hover:shadow-md">
+            <div class="flex items-start gap-3">
+                <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0
+                    {% if notif.notif_type == 'PAYMENT_SUCCESS' %}bg-success-100 text-success-600
+                    {% elif notif.notif_type == 'PAYMENT_FAILED' %}bg-error-100 text-error-600
+                    {% elif notif.notif_type == 'GARAGE_APPROVED' %}bg-info-100 text-info-600
+                    {% elif notif.notif_type == 'GARAGE_REJECTED' %}bg-warning-100 text-warning-600
+                    {% elif notif.notif_type == 'GARAGE_ACTIVATED' %}bg-success-100 text-success-600
+                    {% elif notif.notif_type == 'ADMIN_MESSAGE' %}bg-auto-orange/10 text-auto-orange
+                    {% else %}bg-auto-100 text-auto-600{% endif %}">
+                    {% if notif.notif_type == 'PAYMENT_SUCCESS' %}
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                    {% elif notif.notif_type == 'PAYMENT_FAILED' %}
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    {% elif notif.notif_type == 'GARAGE_APPROVED' or notif.notif_type == 'GARAGE_ACTIVATED' %}
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                    {% elif notif.notif_type == 'ADMIN_MESSAGE' %}
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+                    {% else %}
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                    {% endif %}
+                </div>
+                <div class="flex-1 min-w-0">
+                    <div class="flex items-center justify-between gap-2">
+                        <h3 class="font-bold text-sm text-auto-dark">{{ notif.title }}</h3>
+                        <span class="text-xs text-auto-500 flex-shrink-0">{{ notif.created_at|timesince }} {% trans "il y a" %}</span>
+                    </div>
+                    <p class="text-sm text-auto-700 mt-1 leading-relaxed">{{ notif.message }}</p>
+                    <div class="flex items-center gap-3 mt-2">
+                        {% if notif.link %}
+                        <a href="{{ notif.link }}" class="text-xs font-bold text-auto-orange hover:underline">{% trans "Voir" %}</a>
+                        {% endif %}
+                        {% if not notif.is_read %}
+                        <a href="{% url 'accounts:notification_mark_read' notif.pk %}?next={% url 'accounts:notifications' %}" class="text-xs text-auto-500 hover:text-auto-dark transition">{% trans "Marquer comme lu" %}</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="card p-12 text-center">
+            <svg class="w-16 h-16 text-auto-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+            <h3 class="font-bold text-auto-dark mb-2">{% trans "Aucune notification" %}</h3>
+            <p class="text-sm text-auto-600">{% trans "Vous n'avez pas encore de notifications." %}</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,17 +1,142 @@
 {% extends 'dashboard/base.html' %}
-{% load i18n %}
+{% load i18n humanize %}
 
-{% block title %}{% trans "Paiement d'activation" %}{% endblock %}
+{% block title %}{% trans "Paiement d'activation" %} - AutoLink{% endblock %}
+
+{% block dashboard_header %}
+    <h1 class="text-sm font-bold text-auto-dark">{% trans "Paiement d'activation" %}</h1>
+{% endblock %}
+
+{% block dashboard_breadcrumb %}
+    <nav class="flex items-center space-x-2 text-sm text-auto-600">
+        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-auto-orange transition">{% trans "Tableau de bord" %}</a>
+        <span class="text-auto-400">/</span>
+        <a href="{% url 'payments:payment_list' %}" class="hover:text-auto-orange transition">{% trans "Paiements" %}</a>
+        <span class="text-auto-400">/</span>
+        <span class="font-bold text-auto-dark">{% trans "Detail" %}</span>
+    </nav>
+{% endblock %}
 
 {% block content %}
-<div class="max-w-xl mx-auto px-4 py-8">
-    <div class="card p-6 space-y-4">
-        <h1 class="text-xl font-bold text-auto-dark">{% trans "Activation du garage" %}</h1>
-        <p class="text-auto-700">{{ payment.garage.name }}</p>
-        <div class="flex items-center justify-between border-t border-auto-100 pt-4"><span>{% trans "Montant" %}</span><strong>{{ payment.amount }} {{ payment.currency }}</strong></div>
-        <div class="flex items-center justify-between"><span>{% trans "Statut" %}</span><strong>{{ payment.get_status_display }}</strong></div>
-        {% if payment.status == 'PENDING' %}<p class="text-sm text-auto-600">{% trans "La confirmation sera effectuée par le prestataire de paiement." %}</p>{% elif payment.status == 'SUCCESS' %}<p class="text-sm text-success-600">{% trans "Votre garage est activé." %}</p>{% endif %}
-        <a href="{% url 'garages:garage_dashboard' %}" class="btn-outline text-center">{% trans "Retour au garage" %}</a>
+<div class="max-w-xl mx-auto space-y-6">
+    <!-- Payment Status Card -->
+    <div class="card p-6">
+        <div class="flex items-center gap-3 mb-6">
+            {% if payment.status == 'SUCCESS' %}
+            <div class="w-12 h-12 bg-success-100 rounded-xl flex items-center justify-center">
+                <svg class="w-6 h-6 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            </div>
+            {% elif payment.status == 'FAILED' %}
+            <div class="w-12 h-12 bg-error-100 rounded-xl flex items-center justify-center">
+                <svg class="w-6 h-6 text-error-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </div>
+            {% else %}
+            <div class="w-12 h-12 bg-warning-100 rounded-xl flex items-center justify-center">
+                <svg class="w-6 h-6 text-warning-600 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
+            </div>
+            {% endif %}
+            <div>
+                <h1 class="text-xl font-bold text-auto-dark">{% trans "Activation du garage" %}</h1>
+                <p class="text-sm text-auto-600">{{ payment.garage.name }}</p>
+            </div>
+        </div>
+
+        <div class="space-y-3">
+            <div class="flex items-center justify-between p-3 rounded-lg bg-auto-50">
+                <span class="text-sm text-auto-600">{% trans "Montant" %}</span>
+                <span class="font-bold text-lg text-auto-dark">{{ payment.amount|intcomma }} {{ payment.currency }}</span>
+            </div>
+            <div class="flex items-center justify-between p-3 rounded-lg bg-auto-50">
+                <span class="text-sm text-auto-600">{% trans "Statut" %}</span>
+                {% if payment.status == 'SUCCESS' %}
+                <span class="badge-success">{% trans "Paye" %}</span>
+                {% elif payment.status == 'PENDING' or payment.status == 'PROCESSING' %}
+                <span class="badge-warning">{% trans "En cours" %}</span>
+                {% elif payment.status == 'FAILED' %}
+                <span class="badge-danger">{% trans "Echoue" %}</span>
+                {% else %}
+                <span class="badge-neutral">{{ payment.get_status_display }}</span>
+                {% endif %}
+            </div>
+            <div class="flex items-center justify-between p-3 rounded-lg bg-auto-50">
+                <span class="text-sm text-auto-600">{% trans "Provider" %}</span>
+                <span class="font-bold text-sm">{{ payment.get_provider_display }}</span>
+            </div>
+            <div class="flex items-center justify-between p-3 rounded-lg bg-auto-50">
+                <span class="text-sm text-auto-600">{% trans "Reference" %}</span>
+                <span class="font-mono text-xs text-auto-700">{{ payment.idempotency_key|truncatechars:24 }}</span>
+            </div>
+            {% if payment.paid_at %}
+            <div class="flex items-center justify-between p-3 rounded-lg bg-auto-50">
+                <span class="text-sm text-auto-600">{% trans "Paye le" %}</span>
+                <span class="text-sm font-bold">{{ payment.paid_at|date:"d/m/Y H:i" }}</span>
+            </div>
+            {% endif %}
+        </div>
+
+        {% if payment.status == 'PENDING' %}
+        <div class="mt-6 p-4 rounded-xl bg-warning-50 border border-warning-200">
+            <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-warning-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <p class="text-sm text-warning-800">{% trans "La confirmation sera effectuee par le prestataire de paiement. Vous recevrez une notification une fois confirme." %}</p>
+            </div>
+        </div>
+        {% elif payment.status == 'SUCCESS' %}
+        <div class="mt-6 p-4 rounded-xl bg-success-50 border border-success-200">
+            <div class="flex items-center gap-2">
+                <svg class="w-5 h-5 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                <p class="text-sm text-success-800">{% trans "Votre garage est maintenant actif et visible dans les recherches." %}</p>
+            </div>
+        </div>
+        {% elif payment.status == 'FAILED' %}
+        <div class="mt-6 p-4 rounded-xl bg-error-50 border border-error-200">
+            <p class="text-sm text-error-800">{% trans "Le paiement a echoue. Veuillez reessayer." %}</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Receipt (if payment successful) -->
+    {% if payment.status == 'SUCCESS' and receipt %}
+    <div class="card p-6 border border-success-200">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="font-bold text-auto-dark">{% trans "Recu de paiement" %}</h2>
+            <span class="badge-success text-[10px]">{% trans "Valide" %}</span>
+        </div>
+        <div class="space-y-2 text-sm">
+            <div class="flex justify-between">
+                <span class="text-auto-600">{% trans "Reference" %}</span>
+                <span class="font-mono font-bold">{{ receipt.reference }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-auto-600">{% trans "Montant" %}</span>
+                <span class="font-bold">{{ receipt.amount|intcomma }} {{ receipt.currency }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-auto-600">{% trans "Garage" %}</span>
+                <span class="font-bold">{{ receipt.garage.name }}</span>
+            </div>
+            <div class="flex justify-between">
+                <span class="text-auto-600">{% trans "Date" %}</span>
+                <span>{{ receipt.created_at|date:"d/m/Y H:i" }}</span>
+            </div>
+        </div>
+        <div class="mt-4 pt-4 border-t border-auto-100 flex flex-col sm:flex-row gap-3">
+            <a href="{% url 'payments:receipt_download' receipt.pk %}" class="btn-primary text-center text-sm flex-1">
+                <svg class="w-4 h-4 inline mr-1 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                {% trans "Telecharger le recu" %}
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Actions -->
+    <div class="flex flex-col sm:flex-row gap-3">
+        <a href="{% url 'garages:garage_dashboard' %}" class="btn-outline text-center text-sm flex-1">
+            {% trans "Retour au garage" %}
+        </a>
+        <a href="{% url 'payments:payment_list' %}" class="btn-outline text-center text-sm flex-1">
+            {% trans "Mes paiements" %}
+        </a>
     </div>
 </div>
 {% endblock %}

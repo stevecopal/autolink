@@ -14,7 +14,7 @@ class GarageForm(forms.ModelForm):
         required=True,
     )
     neighborhood = forms.ModelChoiceField(
-        queryset=Neighborhood.objects.none(),
+        queryset=Neighborhood.objects.filter(is_active=True),
         label=_("Quartier"),
         empty_label=_("Sélectionnez un quartier"),
         required=True,

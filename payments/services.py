@@ -3,6 +3,7 @@ from decimal import Decimal, InvalidOperation
 from django.db import transaction
 from django.utils import timezone
 
+from accounts.models import User
 from garages.models import Garage
 
 from .constants import GARAGE_ACTIVATION_AMOUNT, GARAGE_ACTIVATION_CURRENCY
@@ -37,6 +38,25 @@ def _validate_garage_payment(payment, amount, currency):
         raise PaymentWebhookError("currency_mismatch")
 
 
+def _upgrade_user_to_client(user):
+    """Upgrade a USER role to CLIENT upon successful payment."""
+    try:
+        if user.role == User.Role.USER:
+            user.role = User.Role.CLIENT
+            user.save(update_fields=["role", "updated_at"])
+    except Exception as e:
+        print(f"[ERROR] Impossible de mettre a jour le role USER -> CLIENT : {e}")
+
+
+def _create_payment_notification(user, garage, payment):
+    """Create an in-app notification for successful payment."""
+    try:
+        from accounts.models import Notification
+        Notification.create_payment_success(user, garage, payment)
+    except Exception as e:
+        print(f"[ERROR] Impossible de creer la notification de paiement : {e}")
+
+
 def confirm_payment(
     payment,
     *,
@@ -50,7 +70,7 @@ def confirm_payment(
     with transaction.atomic():
         payment = (
             Payment.objects.select_for_update()
-            .select_related("garage")
+            .select_related("garage", "user")
             .get(pk=payment.pk)
         )
         _validate_garage_payment(payment, amount, currency)
@@ -94,6 +114,10 @@ def confirm_payment(
             garage.save(
                 update_fields=["payment_status", "activation_status", "updated_at"]
             )
+
+            _upgrade_user_to_client(payment.user)
+            _create_payment_notification(payment.user, garage, payment)
+
         create_or_update_receipt(payment)
     return payment
 

@@ -12,7 +12,12 @@ urlpatterns = [
     path(
         "garages/<uuid:garage_id>/activation/",
         views.garage_activation_payment_view,
-        name="garage_activation_payment",
+        name="garage_activation",
     ),
     path("webhook/", views.payment_webhook_view, name="payment_webhook"),
+    path(
+        "recu/<uuid:receipt_id>/",
+        views.receipt_download_view,
+        name="receipt_download",
+    ),
 ]

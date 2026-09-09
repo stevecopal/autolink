@@ -19,11 +19,6 @@ class Payment(models.Model):
 
     class Provider(models.TextChoices):
         PAYUNIT = "PAYUNIT", _("PayUnit")
-        CAMPAY = "CAMPAY", _("CamPay")
-        MTN_MOMO = "MTN_MOMO", _("MTN Mobile Money")
-        ORANGE_MONEY = "ORANGE_MONEY", _("Orange Money")
-        CARD = "CARD", _("Carte bancaire")
-        CASH = "CASH", _("Espèces")
 
     idempotency_key = models.CharField(max_length=64, unique=True, editable=False)
     garage = models.ForeignKey(

@@ -98,7 +98,7 @@
                     {% endif %}
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 py-5">
                     <div>
                         <label class="form-label">{% trans "Ville" %} *</label>
                         {{ form.city }}
@@ -195,12 +195,92 @@
                     neighborhoodSelect.innerHTML = '<option value="">{% trans "Sélectionnez un quartier" %}</option>';
                     data.forEach(function(n) {
                         var opt = document.createElement('option');
-                        opt.value = n.slug;
+                        opt.value = n.id;
                         opt.textContent = n.name;
                         neighborhoodSelect.appendChild(opt);
                     });
                 })
                 .catch(function() {});
+        });
+    }
+
+    var locationBtn = document.getElementById('get-location-btn');
+    var locationStatus = document.getElementById('location-status');
+    var locationInfo = document.getElementById('location-info');
+    var locationConfirm = document.getElementById('location-confirm');
+    var latInput = document.getElementById('id_latitude');
+    var lngInput = document.getElementById('id_longitude');
+    var accInput = document.getElementById('id_gps_accuracy');
+
+    if (locationBtn) {
+        locationBtn.addEventListener('click', function() {
+            if (!navigator.geolocation) {
+                locationStatus.textContent = "{% trans "La géolocalisation n'est pas supportée par votre navigateur." %}";
+                locationStatus.className = 'text-sm text-red-600 mb-2';
+                return;
+            }
+
+            locationBtn.disabled = true;
+            locationBtn.innerHTML = '<svg class="w-5 h-5 mr-2 inline animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> {% trans "Localisation en cours..." %}';
+            locationStatus.textContent = '{% trans "Recherche de votre position..." %}';
+            locationStatus.className = 'text-sm text-auto-500 mb-2';
+
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    var lat = position.coords.latitude;
+                    var lng = position.coords.longitude;
+                    var accuracy = position.coords.accuracy;
+
+                    latInput.value = lat.toFixed(6);
+                    lngInput.value = lng.toFixed(6);
+                    accInput.value = accuracy.toFixed(2);
+
+                    locationStatus.textContent = '{% trans "Localisation effectuée avec succès." %}';
+                    locationStatus.className = 'text-sm text-green-600 font-medium mb-2';
+
+                    locationInfo.innerHTML =
+                        '<p class="text-sm text-auto-600 mt-2">' +
+                        '{% trans "Latitude" %} : ' + lat.toFixed(6) + '<br>' +
+                        '{% trans "Longitude" %} : ' + lng.toFixed(6) + '<br>' +
+                        '{% trans "Précision" %} : ' + accuracy.toFixed(1) + ' m' +
+                        '</p>';
+
+                    locationConfirm.style.display = 'block';
+
+                    locationBtn.disabled = false;
+                    locationBtn.innerHTML =
+                        '<svg class="w-5 h-5 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">' +
+                        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>' +
+                        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>' +
+                        '</svg> {% trans "Rafraîchir la position" %}';
+                },
+                function(error) {
+                    var msg = '';
+                    switch(error.code) {
+                        case error.PERMISSION_DENIED:
+                            msg = '{% trans "Accès à la localisation refusé. Veuillez autoriser la géolocalisation dans les paramètres de votre navigateur." %}';
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            msg = '{% trans "Position non disponible. Vérifiez que le GPS est activé." %}';
+                            break;
+                        case error.TIMEOUT:
+                            msg = "{% trans "Délai d'attente dépassé. Réessayez." %}";
+                            break;
+                        default:
+                            msg = '{% trans "Erreur de géolocalisation." %}';
+                            break;
+                    }
+                    locationStatus.textContent = msg;
+                    locationStatus.className = 'text-sm text-red-600 mb-2';
+                    locationBtn.disabled = false;
+                    locationBtn.innerHTML =
+                        '<svg class="w-5 h-5 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">' +
+                        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>' +
+                        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>' +
+                        '</svg> {% trans "Obtenir ma position" %}';
+                },
+                { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+            );
         });
     }
 })();

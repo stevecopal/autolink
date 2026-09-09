@@ -9,6 +9,9 @@ from .account_views import (
     profile_view,
     profile_edit_view,
     client_dashboard_view,
+    notification_list_view,
+    notification_mark_read_view,
+    notification_mark_all_read_view,
 )
 
 __all__ = [
@@ -18,4 +21,7 @@ __all__ = [
     "profile_view",
     "profile_edit_view",
     "client_dashboard_view",
+    "notification_list_view",
+    "notification_mark_read_view",
+    "notification_mark_all_read_view",
 ]

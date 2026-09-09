@@ -13,12 +13,14 @@ DEBUG = config("DEBUG", default=True, cast=bool)
 ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="*").split(",")
 CSRF_TRUSTED_ORIGINS = config("CSRF_TRUSTED_ORIGINS", default="").split(",")
 
-# Payment provider credentials are supplied through the environment only.
+# Payment provider credentials — all stored in .env, never committed.
 PAYMENT_WEBHOOK_SECRET = config("PAYMENT_WEBHOOK_SECRET", default="")
 PAYUNIT_API_KEY = config("PAYUNIT_API_KEY", default="")
-PAYUNIT_API_URL = config("PAYUNIT_API_URL", default="")
-CAMPAY_API_KEY = config("CAMPAY_API_KEY", default="")
-CAMPAY_API_URL = config("CAMPAY_API_URL", default="")
+PAYUNIT_API_USER = config("PAYUNIT_API_USER", default="")
+PAYUNIT_API_PASSWORD = config("PAYUNIT_API_PASSWORD", default="")
+PAYUNIT_API_URL = config("PAYUNIT_API_URL", default="https://gateway.payunit.net")
+PAYUNIT_MODE = config("PAYUNIT_MODE", default="test")  # "live" or "test"
+SITE_URL = config("SITE_URL", default="http://localhost:8000")
 
 INSTALLED_APPS = [
     "django.contrib.admin",
