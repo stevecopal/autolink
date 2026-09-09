@@ -24,7 +24,6 @@
             <p><span class="text-auto-600">{% trans "Garage" %}</span><br><strong>{{ payment.garage.name|default:"—" }}</strong></p>
             <p><span class="text-auto-600">{% trans "Propriétaire" %}</span><br><strong>{{ payment.garage.owner.display_name|default:"—" }}</strong></p>
             <p><span class="text-auto-600">{% trans "Client payeur" %}</span><br><strong>{{ payment.user.display_name }}</strong></p>
-            <p><span class="text-auto-600">{% trans "Commande" %}</span><br><strong>{{ payment.order.order_number|default:"—" }}</strong></p>
         </div>
     </div>
     {% if receipt %}<div class="card p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"><div><h2 class="font-bold">{% trans "Reçu" %}</h2><p class="text-sm text-auto-600">{{ receipt.reference }}</p></div><a class="btn-primary" href="{% url 'administration:receipt_detail' receipt.id %}">{% trans "Consulter le reçu" %}</a></div>{% endif %}

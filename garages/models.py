@@ -142,7 +142,6 @@ class Garage(models.Model):
 
     trust_score = models.DecimalField(max_digits=3, decimal_places=1, default=0)
     total_reviews = models.PositiveIntegerField(default=0)
-    total_orders = models.PositiveIntegerField(default=0)
     total_clients = models.PositiveIntegerField(default=0)
 
     created_at = models.DateTimeField(auto_now_add=True)
@@ -360,14 +359,3 @@ class GarageVerification(models.Model):
             if self.document.size > 5 * 1024 * 1024:
                 raise ValidationError(_("La taille maximale est de 5 Mo."))
 
-
-class GarageBrand(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-
-    garage = models.ForeignKey(Garage, on_delete=models.CASCADE, related_name="brands")
-    brand = models.ForeignKey("vehicles.Brand", on_delete=models.CASCADE)
-
-    class Meta:
-        unique_together = ["garage", "brand"]
-        verbose_name = _("Marque prise en charge")
-        verbose_name_plural = _("Marques prises en charge")

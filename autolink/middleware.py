@@ -54,12 +54,9 @@ class RateLimitMiddleware(MiddlewareMixin):
     RATE_LIMITS = {
         '/compte/connexion/': 10,
         '/compte/inscription/': 5,
-        '/panier/ajouter/': 30,
         '/paiement/': 10,
-        '/api/notifications/': 30,
         '/tickets/': 10,
         '/assistance/': 5,
-        '/favoris/': 20,
     }
 
     def process_request(self, request):

@@ -5,13 +5,7 @@
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-    <div class="mb-8 sm:mb-12">
-        <nav class="flex items-center gap-2 text-sm text-auto-600 mb-4" aria-label="{% trans 'Fil d ariane' %}">
-            <a href="{% url 'core:home' %}" class="hover:text-auto-orange transition">{% trans "Accueil" %}</a>
-            <span aria-hidden="true">/</span>
-            <span class="text-auto-dark font-bold">{% trans "À propos" %}</span>
-        </nav>
-    </div>
+    
 
     <div class="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
         <h1 class="text-3xl sm:text-4xl font-bold text-auto-dark mb-4">{% trans "La plateforme automobile de confiance au Cameroun" %}</h1>
@@ -46,8 +40,8 @@
                 {% trans "Notre mission" %}
             </div>
             <h2 class="text-2xl sm:text-3xl font-bold text-auto-dark mb-4">{% trans "Résoudre les problèmes automobiles simplement" %}</h2>
-            <p class="text-auto-600 leading-relaxed mb-4">
-                {% trans "Au Cameroun, trouver un garage fiable, commander la bonne pièce ou connaître le prix juste reste un défi au quotidien. AutoLink a été créé pour changer cela." %}
+                <p class="text-auto-600 leading-relaxed mb-4">
+                {% trans "Au Cameroun, trouver un garage fiable, trouver la bonne pièce ou connaître le prix juste reste un défi au quotidien. AutoLink a été créé pour changer cela." %}
             </p>
             <p class="text-auto-600 leading-relaxed">
                 {% trans "Nous mettons en relation les automobilistes avec un réseau de garages professionnels vérifiés, tout en offrant un catalogue de pièces automobiles avec compatibilité garantie et prix transparents." %}
@@ -119,8 +113,8 @@
                 <div class="w-16 h-16 rounded-2xl bg-auto-orange/10 flex items-center justify-center mx-auto mb-4 mt-2">
                     <svg class="w-8 h-8 text-auto-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                 </div>
-                <h3 class="font-bold text-auto-dark mb-2">{% trans "Commandez" %}</h3>
-                <p class="text-auto-500 text-sm">{% trans "Passez commande en toute sécurité avec paiement mobile money ou à la livraison" %}</p>
+                <h3 class="font-bold text-auto-dark mb-2">{% trans "Contactez" %}</h3>
+                <p class="text-auto-500 text-sm">{% trans "Contactez directement le garage ou le vendeur pour vos besoins automobiles" %}</p>
             </div>
             <div class="card p-6 text-center relative">
                 <div class="w-16 h-16 rounded-2xl bg-auto-orange/10 flex items-center justify-center mx-auto mb-4 mt-2">

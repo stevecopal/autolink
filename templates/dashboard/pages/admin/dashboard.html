@@ -68,19 +68,6 @@
 
         <div class="stat-card">
             <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 bg-auto-coral/10 rounded-lg flex items-center justify-center">
-                    <svg class="w-5 h-5 text-auto-coral" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-                </div>
-                <div>
-                    <div class="stat-value">{{ total_orders }}</div>
-                    <div class="stat-label">{% trans "Commandes" %}</div>
-                </div>
-            </div>
-            <div class="text-xs text-info-600 mt-2 font-bold">{{ orders_this_month }} {% trans "ce mois" %}</div>
-        </div>
-
-        <div class="stat-card">
-            <div class="flex items-center space-x-3">
                 <div class="w-10 h-10 bg-success-100 rounded-lg flex items-center justify-center">
                     <svg class="w-5 h-5 text-success-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 </div>
@@ -114,39 +101,6 @@
                     </div>
                 {% endfor %}
             </div>
-        </div>
-
-        <!-- Commandes récentes -->
-        <div class="card p-6 lg:col-span-2">
-            <h2 class="font-bold text-lg mb-4">{% trans "Commandes récentes" %}</h2>
-            {% if recent_orders %}
-                <div class="table-container">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>{% trans "Utilisateur" %}</th>
-                                <th>{% trans "Statut" %}</th>
-                                <th>{% trans "Total" %}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for order in recent_orders %}
-                                <tr>
-                                    <td class="font-bold text-xs">{{ order.order_number }}</td>
-                                    <td>{{ order.user.username }}</td>
-                                    <td><span class="badge-{{ order.status_color }} text-[10px]">{{ order.status_label }}</span></td>
-                                    <td class="font-bold">{{ order.total|intcomma }} FCFA</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            {% else %}
-                <div class="text-center py-8 text-auto-600">
-                    <p>{% trans "Pas encore de commandes." %}</p>
-                </div>
-            {% endif %}
         </div>
 
         <!-- Répartition géographique -->

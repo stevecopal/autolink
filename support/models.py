@@ -63,11 +63,8 @@ class Ticket(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="tickets"
     )
-    order = models.ForeignKey(
-        "orders.Order", on_delete=models.CASCADE, related_name="tickets"
-    )
     garage = models.ForeignKey(
-        "garages.Garage", on_delete=models.CASCADE, related_name="tickets"
+        "garages.Garage", on_delete=models.CASCADE, related_name="tickets", null=True, blank=True
     )
     part = models.ForeignKey(
         "catalog.Part",

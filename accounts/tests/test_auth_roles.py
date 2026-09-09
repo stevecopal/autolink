@@ -585,7 +585,7 @@ class AccountStatusMiddlewareTest(TestCase):
     def test_suspended_user_json_request(self):
         self.client.force_login(self.suspended_user)
         response = self.client.get(
-            reverse('notifications:notification_count'),
+            reverse('support:ticket_list'),
             HTTP_ACCEPT='application/json',
         )
         self.assertEqual(response.status_code, 403)

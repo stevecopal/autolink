@@ -65,9 +65,6 @@
         <form method="post" class="space-y-4">
             {% csrf_token %}
             <input type="hidden" name="garage_id" value="{{ garage.pk }}">
-            {% if vehicle_id %}
-            <input type="hidden" name="vehicle_id" value="{{ vehicle_id }}">
-            {% endif %}
 
             <!-- Rating -->
             <div>
@@ -115,23 +112,6 @@
                     <span id="char-count">{{ comment|length|default:0 }}/{% trans "500 max" %}</span>
                 </div>
             </div>
-
-            <!-- Vehicle -->
-            {% if vehicles %}
-            <div>
-                <label class="form-label">{% trans "Véhicule" %}</label>
-                <select name="vehicle"
-                        class="form-input w-full"
-                        {% if not form.vehicle.value %}required{% endif %}>
-                    <option value="">— {% trans "Aucun véhicule" %} —</option>
-                    {% for vehicle in vehicles %}
-                    <option value="{{ vehicle.pk }}" {% if form.vehicle.value == vehicle.pk|string %}selected{% endif %}>
-                        {{ vehicle.display_name }}{% if vehicle.license_plate %} ({{ vehicle.license_plate }}){% endif %}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
-            {% endif %}
 
             <!-- Services -->
             {% if garage.services.exists %}

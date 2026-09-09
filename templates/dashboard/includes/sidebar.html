@@ -1,448 +1,306 @@
 {% load i18n %}
-<nav class="flex-1 overflow-y-auto p-3 space-y-1 scrollbar-thin">
-    <!-- ========================================== -->
-    <!-- ADMINISTRATEUR / SUPERUTILISATEUR          -->
-    <!-- ========================================== -->
-    {% if user.role == 'ADMIN' or user.role == 'SUPERUSER' or user.is_superuser %}
-
-        <div class="pt-1 pb-2">
-            <p class="px-3 py-1 text-xs font-bold text-auto-600 uppercase tracking-wider">
-                {% trans "Plateforme" %}
-            </p>
-        </div>
-
-        <a href="{% url 'administration:dashboard' %}"
-           class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
-                  {% if request.resolver_match.url_name == 'dashboard' %}
-                      bg-auto-light text-auto-orange font-bold
-                  {% endif %}">
-            <svg class="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3"/>
-            </svg>
-            {% trans "Tableau de bord" %}
-        </a>
-
-        <a href="{% url 'administration:monitoring' %}"
-           class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
-                  {% if request.resolver_match.url_name == 'monitoring' %}
-                      bg-auto-light text-auto-orange font-bold
-                  {% endif %}">
-            <svg class="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-            </svg>
-            {% trans "Monitoring" %}
-        </a>
-
-        <a href="{% url 'administration:geography' %}"
-           class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
-                  {% if request.resolver_match.url_name == 'geography' %}
-                      bg-auto-light text-auto-orange font-bold
-                  {% endif %}">
-            <svg class="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            {% trans "Géographie" %}
-        </a>
-
-        <div class="pt-4 pb-1">
-            <p class="px-3 py-1 text-xs font-bold text-auto-600 uppercase tracking-wider">
-                {% trans "Gestion" %}
-            </p>
-        </div>
-
-        <a href="{% url 'administration:users' %}"
-           class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
-                  {% if request.resolver_match.url_name == 'users' or request.resolver_match.url_name == 'user_detail' %}
-                      bg-auto-light text-auto-orange font-bold
-                  {% endif %}">
-            <svg class="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M17 20h5v-2a4 4 0 00-5-3.87M9 20H4v-2a4 4 0 015-3.87M12 12a4 4 0 100-8 4 4 0 000 8z"/>
-            </svg>
-            {% trans "Utilisateurs" %}
-        </a>
-
-        <a href="{% url 'administration:garages' %}"
-           class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
-                  {% if request.resolver_match.url_name == 'garages' or request.resolver_match.url_name == 'garage_verify' %}
-                      bg-auto-light text-auto-orange font-bold
-                  {% endif %}">
-            <svg class="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-            </svg>
-            {% trans "Garages" %}
-        </a>
-
-        <a href="{% url 'administration:cities' %}"
-           class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
-                  {% if request.resolver_match.url_name == 'cities' or request.resolver_match.url_name == 'city_detail' %}
-                      bg-auto-light text-auto-orange font-bold
-                  {% endif %}">
-            <svg class="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 11-2 0v3a1 1 0 112 0z"/>
-            </svg>
-            {% trans "Villes" %}
-        </a>
-
-        <a href="{% url 'administration:neighborhoods' %}"
-           class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
-                  {% if request.resolver_match.url_name == 'neighborhoods' or request.resolver_match.url_name == 'neighborhood_detail' %}
-                      bg-auto-light text-auto-orange font-bold
-                  {% endif %}">
-            <svg class="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-            </svg>
-            {% trans "Quartiers" %}
-        </a>
-
-        <a href="{% url 'administration:orders' %}"
-           class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
-                  {% if request.resolver_match.url_name == 'orders' %}
-                      bg-auto-light text-auto-orange font-bold
-                  {% endif %}">
-            <svg class="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-            </svg>
-            {% trans "Commandes" %}
-        </a>
-
-        <a href="{% url 'administration:payments' %}"
-           class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
-                  {% if request.resolver_match.url_name == 'payments' %}
-                      bg-auto-light text-auto-orange font-bold
-                  {% endif %}">
-            <svg class="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
-            </svg>
-            {% trans "Paiements" %}
-        </a>
-
-        <a href="{% url 'administration:support' %}"
-           class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
-                  {% if request.resolver_match.url_name == 'support' or request.resolver_match.url_name == 'ticket_detail' %}
-                      bg-auto-light text-auto-orange font-bold
-                  {% endif %}">
-            <svg class="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/>
-            </svg>
-            {% trans "Support" %}
-        </a>
-
-        <a href="{% url 'administration:announcements' %}"
-           class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
-                  {% if request.resolver_match.url_name == 'announcements' or request.resolver_match.url_name == 'announcement_detail' %}
-                      bg-auto-light text-auto-orange font-bold
-                  {% endif %}">
-            <svg class="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.458a1.76 1.76 0 00-.592-3.417V5.882a1.76 1.76 0 013.417-.592l2.147 6.458a1.76 1.76 0 00.592 3.417z"/>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
-            </svg>
-            {% trans "Annonces" %}
-        </a>
-
-        <a href="{% url 'administration:notifications_admin' %}"
-           class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
-                  {% if request.resolver_match.url_name == 'notifications_admin' %}
-                      bg-auto-light text-auto-orange font-bold
-                  {% endif %}">
-            <svg class="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M15 17h5l-1.5-2A7 7 0 0012 4a7 7 0 00-6.5 11L4 17h5m3 0v3"/>
-            </svg>
-            {% trans "Notifications" %}
-        </a>
-
-        <a href="{% url 'administration:reviews' %}"
-           class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
-                  {% if request.resolver_match.url_name == 'reviews' %}
-                      bg-auto-light text-auto-orange font-bold
-                  {% endif %}">
-            <svg class="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682"/>
-            </svg>
-            {% trans "Avis" %}
-        </a>
-
-    <!-- ========================================== -->
-    <!-- CLIENT (a au moins un garage approuve)    -->
-    <!-- ========================================== -->
-    {% elif user.role == 'CLIENT' %}
-
-        <div class="pt-1 pb-2">
-            <p class="px-3 py-1 text-xs font-bold text-auto-600 uppercase tracking-wider">
-                {% trans "Mon espace" %}
-            </p>
-        </div>
-
-        <a href="{% url 'accounts:client_dashboard' %}"
-           class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
-                  {% if request.resolver_match.url_name == 'client_dashboard' %}
-                      bg-auto-light text-auto-orange font-bold
-                  {% endif %}">
-            <svg class="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3"/>
-            </svg>
-            {% trans "Tableau de bord" %}
-        </a>
-
-        <a href="{% url 'garages:garage_dashboard' %}"
-           class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
-                  {% if request.resolver_match.url_name == 'garage_dashboard' %}
-                      bg-auto-light text-auto-orange font-bold
-                  {% endif %}">
-            <svg class="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-            </svg>
-            {% trans "Gérer mes garages" %}
-        </a>
-
-        <a href="{% url 'garages:garage_create' %}"
-           class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
-                  {% if request.resolver_match.url_name == 'garage_create' and request.resolver_match.url_name != 'garage_dashboard' %}
-                      bg-auto-light text-auto-orange font-bold
-                  {% endif %}">
-            <svg class="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-            </svg>
-            {% trans "Ajouter un garage" %}
-        </a>
-
-        <div class="pt-3 pb-1">
-            <p class="px-3 py-1 text-xs font-bold text-auto-600 uppercase tracking-wider">
-                {% trans "Informations" %}
-            </p>
-        </div>
-
-        <a href="{% url 'garages:garage_list' %}"
-           class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
-                  {% if request.resolver_match.url_name == 'garage_list' %}
-                      bg-auto-light text-auto-orange font-bold
-                  {% endif %}">
-            <svg class="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-            </svg>
-            {% trans "Trouver un mécanicien" %}
-        </a>
-
-        <a href="{% url 'notifications:notification_list' %}"
-           class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
-                  {% if request.resolver_match.url_name == 'notification_list' %}
-                      bg-auto-light text-auto-orange font-bold
-                  {% endif %}">
-            <svg class="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M15 17h5l-1.5-2A7 7 0 0012 4a7 7 0 00-6.5 11L4 17h5m3 0v3"/>
-            </svg>
-            {% trans "Notifications" %}
-        </a>
-
-    <!-- ========================================== -->
-    <!-- UTILISATEUR (role par defaut)             -->
-    <!-- ========================================== -->
-    {% else %}
-
-        <div class="pt-1 pb-2">
-            <p class="px-3 py-1 text-xs font-bold text-auto-600 uppercase tracking-wider">
-                {% trans "Mon espace" %}
-            </p>
-        </div>
-
-        <a href="{% url 'accounts:client_dashboard' %}"
-           class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
-                  {% if request.resolver_match.url_name == 'client_dashboard' %}
-                      bg-auto-light text-auto-orange font-bold
-                  {% endif %}">
-            <svg class="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3"/>
-            </svg>
-            {% trans "Tableau de bord" %}
-        </a>
-
-        <a href="{% url 'vehicles:vehicle_list' %}"
-           class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
-                  {% if request.resolver_match.url_name == 'vehicle_list' %}
-                      bg-auto-light text-auto-orange font-bold
-                  {% endif %}">
-            <svg class="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99z"/>
-            </svg>
-            {% trans "Mes véhicules" %}
-        </a>
-
-        <a href="{% url 'orders:order_list' %}"
-           class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
-                  {% if request.resolver_match.url_name == 'order_list' %}
-                      bg-auto-light text-auto-orange font-bold
-                  {% endif %}">
-            <svg class="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/>
-            </svg>
-            {% trans "Mes commandes" %}
-        </a>
-
-        <a href="{% url 'orders:cart' %}"
-           class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
-                  {% if request.resolver_match.url_name == 'cart' %}
-                      bg-auto-light text-auto-orange font-bold
-                  {% endif %}">
-            <svg class="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17"/>
-            </svg>
-            {% trans "Panier" %}
-            {% with cart_count=request.session.cart_count %}
-                {% if cart_count %}
-                    <span class="ml-auto bg-auto-deep-red text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                        {{ cart_count }}
-                    </span>
-                {% endif %}
-            {% endwith %}
-        </a>
-
-        <a href="{% url 'reviews:favorite_list' %}"
-           class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
-                  {% if request.resolver_match.url_name == 'favorite_list' %}
-                      bg-auto-light text-auto-orange font-bold
-                  {% endif %}">
-            <svg class="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682"/>
-            </svg>
-            {% trans "Mes favoris" %}
-        </a>
-
-        <a href="{% url 'payments:payment_list' %}"
-           class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
-                  {% if request.resolver_match.url_name == 'payment_list' %}
-                      bg-auto-light text-auto-orange font-bold
-                  {% endif %}">
-            <svg class="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
-            </svg>
-            {% trans "Mes paiements" %}
-        </a>
-
-        <div class="pt-3 pb-1">
-            <p class="px-3 py-1 text-xs font-bold text-auto-600 uppercase tracking-wider">
-                {% trans "Services" %}
-            </p>
-        </div>
-
-        <a href="{% url 'garages:garage_create' %}"
-           class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
-                  {% if request.resolver_match.url_name == 'garage_create' %}
-                      bg-auto-light text-auto-orange font-bold
-                  {% endif %}">
-            <svg class="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-            </svg>
-            {% trans "Ajouter un garage" %}
-        </a>
-
-        <a href="{% url 'garages:garage_list' %}"
-           class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
-                  {% if request.resolver_match.url_name == 'garage_list' %}
-                      bg-auto-light text-auto-orange font-bold
-                  {% endif %}">
-            <svg class="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-            </svg>
-            {% trans "Trouver un mécanicien" %}
-        </a>
-
-        <a href="{% url 'support:ticket_create' %}"
-           class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
-                  {% if request.resolver_match.url_name == 'ticket_create' %}
-                      bg-auto-light text-auto-orange font-bold
-                  {% endif %}">
-            <svg class="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/>
-            </svg>
-            {% trans "Signaler un problème" %}
-        </a>
-
-        <a href="{% url 'notifications:notification_list' %}"
-           class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
-                  {% if request.resolver_match.url_name == 'notification_list' %}
-                      bg-auto-light text-auto-orange font-bold
-                  {% endif %}">
-            <svg class="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M15 17h5l-1.5-2A7 7 0 0012 4a7 7 0 00-6.5 11L4 17h5m3 0v3"/>
-            </svg>
-            {% trans "Notifications" %}
-        </a>
-
-    {% endif %}
-
-    <!-- ========================================== -->
-    <!-- COMMUN A TOUS LES UTILISATEURS CONNECTES   -->
-    <!-- ========================================== -->
-
-    <div class="pt-4 pb-1">
-        <p class="px-3 py-1 text-xs font-bold text-auto-600 uppercase tracking-wider">
-            {% trans "Compte" %}
-        </p>
-    </div>
-
-    <a href="{% url 'accounts:profile' %}"
-       class="block px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark
-              {% if request.resolver_match.url_name == 'profile' %}
-                  bg-auto-light text-auto-orange font-bold
+<!-- ===== SECTION ADMIN/SUPERUSER ===== -->
+{% if user.is_superadmin or user.role == 'ADMIN' or user.role == 'SUPERUSER' %}
+    <!-- Dashboard -->
+    <a href="{% url 'administration:dashboard' %}"
+       class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-auto-light/80 text-sm font-medium transition text-auto-dark
+              {% if request.resolver_match.url_name == 'dashboard' %}
+                 bg-auto-light text-auto-orange font-bold shadow-sm
               {% endif %}">
-        <svg class="w-4 h-4 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14"/>
+                  d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3"/>
         </svg>
-        {% trans "Mon profil" %}
+        {% trans "Tableau de bord" %}
     </a>
-    <div class="">
-        <a href="{% url 'core:home' %}"
-            class="flex items-center px-3 py-2.5 rounded-lg hover:bg-auto-light text-sm font-medium transition text-auto-dark">
-            <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+
+    <!-- Monitoring -->
+    <a href="{% url 'administration:monitoring' %}"
+       class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-auto-light/80 text-sm font-medium transition text-auto-dark
+              {% if request.resolver_match.url_name == 'monitoring' %}
+                 bg-auto-light text-auto-orange font-bold shadow-sm
+              {% endif %}">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+        </svg>
+        {% trans "Monitoring" %}
+    </a>
+
+    <!-- Géographie -->
+    <a href="{% url 'administration:geography' %}"
+       class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-auto-light/80 text-sm font-medium transition text-auto-dark
+              {% if request.resolver_match.url_name == 'geography' %}
+                 bg-auto-light text-auto-orange font-bold shadow-sm
+              {% endif %}">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        {% trans "Géographie" %}
+    </a>
+
+    <!-- Utilisateurs -->
+    <a href="{% url 'administration:users' %}"
+       class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-auto-light/80 text-sm font-medium transition text-auto-dark
+              {% if request.resolver_match.url_name == 'users' or request.resolver_match.url_name == 'user_detail' %}
+                 bg-auto-light text-auto-orange font-bold shadow-sm
+              {% endif %}">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M17 20h5v-2a4 4 0 00-5-3.87M9 20H4v-2a4 4 0 015-3.87M12 12a4 4 0 100-8 4 4 0 000 8z"/>
+        </svg>
+        {% trans "Utilisateurs" %}
+    </a>
+
+    <!-- Garages -->
+    <a href="{% url 'administration:garages' %}"
+       class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-auto-light/80 text-sm font-medium transition text-auto-dark
+              {% if request.resolver_match.url_name == 'garages' or request.resolver_match.url_name == 'garage_verify' %}
+                 bg-auto-light text-auto-orange font-bold shadow-sm
+              {% endif %}">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+        </svg>
+        {% trans "Garages" %}
+    </a>
+
+    <!-- Villes -->
+    <a href="{% url 'administration:cities' %}"
+       class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-auto-light/80 text-sm font-medium transition text-auto-dark
+              {% if request.resolver_match.url_name == 'cities' or request.resolver_match.url_name == 'city_detail' %}
+                 bg-auto-light text-auto-orange font-bold shadow-sm
+              {% endif %}">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 11-2 0v3a1 1 0 112 0z"/>
+        </svg>
+        {% trans "Villes" %}
+    </a>
+
+    <!-- Quartiers -->
+    <a href="{% url 'administration:neighborhoods' %}"
+       class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-auto-light/80 text-sm font-medium transition text-auto-dark
+              {% if request.resolver_match.url_name == 'neighborhoods' or request.resolver_match.url_name == 'neighborhood_detail' %}
+                 bg-auto-light text-auto-orange font-bold shadow-sm
+              {% endif %}">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+        </svg>
+        {% trans "Quartiers" %}
+    </a>
+
+    <!-- Paiements -->
+    <a href="{% url 'administration:payments' %}"
+       class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-auto-light/80 text-sm font-medium transition text-auto-dark
+              {% if request.resolver_match.url_name == 'payments' %}
+                 bg-auto-light text-auto-orange font-bold shadow-sm
+              {% endif %}">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+        </svg>
+        {% trans "Paiements" %}
+    </a>
+
+    <!-- Support -->
+    <a href="{% url 'administration:support' %}"
+       class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-auto-light/80 text-sm font-medium transition text-auto-dark
+              {% if request.resolver_match.url_name == 'support' or request.resolver_match.url_name == 'ticket_detail' %}
+                 bg-auto-light text-auto-orange font-bold shadow-sm
+              {% endif %}">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/>
+        </svg>
+        {% trans "Support" %}
+    </a>
+
+    <!-- Avis -->
+    <a href="{% url 'administration:reviews' %}"
+       class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-auto-light/80 text-sm font-medium transition text-auto-dark
+              {% if request.resolver_match.url_name == 'reviews' %}
+                 bg-auto-light text-auto-orange font-bold shadow-sm
+              {% endif %}">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682"/>
+        </svg>
+        {% trans "Avis" %}
+    </a>
+
+
+{% endif %}
+
+<!-- ===== SECTION CLIENT ===== -->
+{% if user.role == 'CLIENT' %}
+    <!-- Tableau de bord Client -->
+    <a href="{% url 'accounts:client_dashboard' %}"
+       class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-auto-light/80 text-sm font-medium transition text-auto-dark
+              {% if request.resolver_match.url_name == 'client_dashboard' %}
+                 bg-auto-light text-auto-orange font-bold shadow-sm
+              {% endif %}">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3"/>
+        </svg>
+        {% trans "Tableau de bord" %}
+    </a>
+
+    <!-- Gérer mes garages -->
+    <a href="{% url 'garages:garage_dashboard' %}"
+       class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-auto-light/80 text-sm font-medium transition text-auto-dark
+              {% if request.resolver_match.url_name == 'garage_dashboard' %}
+                 bg-auto-light text-auto-orange font-bold shadow-sm
+              {% endif %}">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+        </svg>
+        {% trans "Gérer mes garages" %}
+    </a>
+
+    <!-- Ajouter un garage -->
+    <a href="{% url 'garages:garage_create' %}"
+       class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-auto-light/80 text-sm font-medium transition text-auto-dark
+              {% if request.resolver_match.url_name == 'garage_create' %}
+                 bg-auto-light text-auto-orange font-bold shadow-sm
+              {% endif %}">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+        </svg>
+        {% trans "Ajouter un garage" %}
+    
+    </a>
+    <!-- Mes paiements -->
+    <a href="{% url 'payments:payment_list' %}"
+       class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-auto-light/80 text-sm font-medium transition text-auto-dark
+              {% if request.resolver_match.url_name == 'payment_list' %}
+                 bg-auto-light text-auto-orange font-bold shadow-sm
+              {% endif %}">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+        </svg>
+        {% trans "Mes paiements" %}
+    </a>
+
+
+
+
+{% endif %}
+
+<!-- ===== SECTION USER (par défaut) ===== -->
+{% if user.role == 'USER'  %}
+    <!-- Tableau de bord User -->
+    <a href="{% url 'accounts:client_dashboard' %}"
+       class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-auto-light/80 text-sm font-medium transition text-auto-dark
+              {% if request.resolver_match.url_name == 'client_dashboard' %}
+                 bg-auto-light text-auto-orange font-bold shadow-sm
+              {% endif %}">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3"/>
+        </svg>
+        {% trans "Tableau de bord" %}
+    </a>
+
+    <!-- Mes paiements -->
+    <a href="{% url 'payments:payment_list' %}"
+       class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-auto-light/80 text-sm font-medium transition text-auto-dark
+              {% if request.resolver_match.url_name == 'payment_list' %}
+                 bg-auto-light text-auto-orange font-bold shadow-sm
+              {% endif %}">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+        </svg>
+        {% trans "Mes paiements" %}
+    </a>
+
+  
+
+    <!-- Ajouter un garage -->
+    <a href="{% url 'garages:garage_create' %}"
+       class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-auto-light/80 text-sm font-medium transition text-auto-dark
+              {% if request.resolver_match.url_name == 'garage_create' %}
+                 bg-auto-light text-auto-orange font-bold shadow-sm
+              {% endif %}">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+        </svg>
+        {% trans "Ajouter un garage" %}
+    </a>
+
+    <!-- Trouver un mécanicien -->
+    <a href="{% url 'garages:garage_list' %}"
+       class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-auto-light/80 text-sm font-medium transition text-auto-dark
+              {% if request.resolver_match.url_name == 'garage_list' %}
+                 bg-auto-light text-auto-orange font-bold shadow-sm
+              {% endif %}">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+        {% trans "Trouver un mécanicien" %}
+    </a>
+
+    <!-- Signaler un problème -->
+    <a href="{% url 'support:ticket_create' %}"
+       class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-auto-light/80 text-sm font-medium transition text-auto-dark
+              {% if request.resolver_match.url_name == 'ticket_create' %}
+                 bg-auto-light text-auto-orange font-bold shadow-sm
+              {% endif %}">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+        </svg>
+        {% trans "Signaler un problème" %}
+    </a>
+{% endif %}
+
+
+
+<!-- Mon profil -->
+<a href="{% url 'accounts:profile' %}"
+   class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-auto-light/80 text-sm font-medium transition text-auto-dark
+          {% if request.resolver_match.url_name == 'profile' %}
+             bg-auto-light text-auto-orange font-bold shadow-sm
+          {% endif %}">
+    <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14"/>
+    </svg>
+    {% trans "Mon profil" %}
+</a>
+
+<!-- Voir le site -->
+<a href="{% url 'core:home' %}"
+   class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-auto-light/80 text-sm font-medium transition text-auto-dark">
+    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+    </svg>
+    {% trans "Voir le site" %}
+</a>
+
+<!-- Déconnexion -->
+<aclass="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-auto-light/80 text-sm font-medium transition text-auto-dark">
+    <form method="post" action="{% url 'accounts:logout' %}" class="px-3 py-2.5">
+        {% csrf_token %}
+        <button type="submit"
+                class="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-error-600 hover:bg-error-50
+                        text-sm font-bold transition">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
             </svg>
-            {% trans "Voir le site" %}
-        </a>
-
-
-        <form method="post" action="{% url 'accounts:logout' %}">
-            {% csrf_token %}
-            <button type="submit"
-                    class="w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-error-600 hover:bg-error-50
-                            text-sm font-bold transition">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
-                </svg>
-                {% trans "Deconnexion" %}
-            </button>
-        </form>
-    </div>
-
-</nav>
+            {% trans "Déconnexion" %}
+        </button>
+    </form>
+</aclass=>

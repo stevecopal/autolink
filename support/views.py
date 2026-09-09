@@ -87,7 +87,7 @@ def conversation_detail_view(request, conversation_id):
 def ticket_list_view(request):
     tickets = (
         Ticket.objects.filter(user=request.user)
-        .select_related("order", "garage", "part", "assigned_to")
+        .select_related("garage", "part", "assigned_to")
         .prefetch_related("messages")
         .order_by("-created_at")
     )
@@ -113,72 +113,71 @@ def ticket_list_view(request):
         },
     )
 
-
 @login_required
 def ticket_create_view(request):
     if request.method == "POST":
         form = TicketForm(request.POST, request.FILES, user=request.user)
         if form.is_valid():
-            ticket = form.save(commit=False)
-            ticket.user = request.user
+            try:
+                ticket = form.save(commit=False)
+                ticket.user = request.user
 
-            order = form.cleaned_data.get("order")
-            part = form.cleaned_data.get("part")
-            garage = form.cleaned_data.get("garage")
+                garage = form.cleaned_data.get("garage")
+                if not garage:
+                    part = form.cleaned_data.get("part")
+                    if part and part.garage:
+                        ticket.garage = part.garage
 
-            if order and not garage:
-                first_item = order.items.select_related("part__garage").first()
-                if first_item and first_item.part and first_item.part.garage:
-                    ticket.garage = first_item.part.garage
+                if not ticket.garage:
+                    messages.error(request, _("Vous devez sélectionner un garage."))
+                    return render(
+                        request,
+                        "dashboard/pages/client/support/ticket_form.html",
+                        {"form": form},
+                    )
 
-            if order and not part:
-                first_item = order.items.select_related("part").first()
-                if first_item and first_item.part:
-                    ticket.part = first_item.part
+                ticket.save()
 
-            if part and not garage and part.garage:
-                ticket.garage = part.garage
-
-            ticket.save()
-            conversation = get_or_create_ticket_conversation(ticket)
-            send_message(
-                conversation, request.user, ticket.description, ticket.evidence
-            )
-            from notifications.services import notify_ticket_event
-
-            notify_ticket_event(ticket, "created", sender=request.user)
-
-            attachment = request.FILES.get("attachment")
-            if attachment:
-                TicketMessage.objects.create(
-                    ticket=ticket,
-                    sender=request.user,
-                    message=_("Ticket créé"),
-                    attachment=attachment,
+                conversation = get_or_create_ticket_conversation(ticket)
+                send_message(
+                    conversation, request.user, ticket.description, ticket.evidence
                 )
 
-            messages.success(
-                request,
-                _("Ticket %(number)s créé avec succès.")
-                % {"number": ticket.ticket_number},
-            )
-            return redirect("support:ticket_detail", ticket_number=ticket.ticket_number)
+                attachment = request.FILES.get("attachment")
+                if attachment:
+                    TicketMessage.objects.create(
+                        ticket=ticket,
+                        sender=request.user,
+                        message=_("Ticket créé avec pièce jointe"),
+                        attachment=attachment,
+                    )
+
+                messages.success(
+                    request,
+                    _("Ticket créé avec succès.")
+                    % {"number": ticket.ticket_number},
+                )
+                return redirect("support:ticket_list")
+
+            except Exception as e:
+                messages.error(
+                    request,
+                    _("Une erreur est survenue : {error}").format(error=str(e)),
+                )
+                print(f"[ERROR] Erreur lors de la création du ticket : {e}")
+
     else:
         form = TicketForm(user=request.user)
 
     return render(
-        request,
-        "dashboard/pages/client/support/ticket_form.html",
-        {
-            "form": form,
-        },
+        request, "dashboard/pages/client/support/ticket_form.html", {"form": form}
     )
 
 
 @login_required
 def ticket_detail_view(request, ticket_number):
     ticket = get_object_or_404(
-        Ticket.objects.select_related("order", "garage", "part", "assigned_to"),
+        Ticket.objects.select_related("garage", "part", "assigned_to"),
         ticket_number=ticket_number,
         user=request.user,
     )

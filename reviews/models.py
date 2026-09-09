@@ -31,13 +31,6 @@ class Review(models.Model):
         blank=True,
         related_name="reviews",
     )
-    order = models.OneToOneField(
-        "orders.Order",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="review",
-    )
 
     rating = models.PositiveIntegerField(
         _("Note"), validators=[MinValueValidator(1), MaxValueValidator(5)]
@@ -85,43 +78,3 @@ class Review(models.Model):
                 )
             if self.garage:
                 ReviewService.update_garage_stats(self.garage)
-
-
-class Favorite(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-
-    class ObjectType(models.TextChoices):
-        GARAGE = "GARAGE", _("Garage")
-        PART = "PART", _("Pièce")
-
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="favorites"
-    )
-    object_type = models.CharField(max_length=10, choices=ObjectType.choices)
-    garage = models.ForeignKey(
-        "garages.Garage",
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name="favorited_by",
-    )
-    part = models.ForeignKey(
-        "catalog.Part",
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name="favorited_by",
-    )
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        unique_together = [
-            ["user", "object_type", "garage"],
-            ["user", "object_type", "part"],
-        ]
-        verbose_name = _("Favori")
-        verbose_name_plural = _("Favoris")
-
-    def __str__(self):
-        target = self.garage or self.part
-        return f"{self.user.username} - {target}"

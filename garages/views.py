@@ -26,7 +26,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST
 
 from .forms import GarageDocumentForm, GarageForm
-from .models import Garage, GarageBrand, GaragePhoto, GarageService, GarageVerification
+from .models import Garage, GaragePhoto, GarageService, GarageVerification
 
 
 def _haversine_distance(lat1, lon1, lat2, lon2):
@@ -62,12 +62,6 @@ def _get_base_garage_queryset():
             Prefetch(
                 "photos",
                 queryset=GaragePhoto.objects.order_by("-is_primary", "-created_at"),
-            ),
-            Prefetch(
-                "brands",
-                queryset=GarageBrand.objects.select_related("brand").order_by(
-                    "brand__name"
-                ),
             ),
         )
         .annotate(
@@ -287,7 +281,6 @@ def garage_list_api(request):
     for garage in garages_page:
         primary_photo = garage.photos.first()
         services_list = list(garage.services.all()[:5])
-        brands_list = list(garage.brands.all()[:5])
 
         results.append(
             {
@@ -322,7 +315,6 @@ def garage_list_api(request):
                 "open_weekends": garage.open_weekends,
                 "trust_score": float(garage.trust_score),
                 "total_reviews": garage.total_reviews,
-                "total_orders": garage.total_orders,
                 "total_clients": garage.total_clients,
                 "is_open_now": garage.is_open_now,
                 "active_services_count": garage.active_services_count,
@@ -338,14 +330,6 @@ def garage_list_api(request):
                         "duration_minutes": s.duration_minutes,
                     }
                     for s in services_list
-                ],
-                "brands": [
-                    {
-                        "id": b.brand.id,
-                        "name": b.brand.name,
-                        "logo_url": b.brand.logo.url if b.brand.logo else None,
-                    }
-                    for b in brands_list
                 ],
                 "url": f"/garages/{garage.slug}/",
             }
@@ -395,12 +379,6 @@ def garage_detail_view(request, slug):
                 queryset=GaragePhoto.objects.order_by("-is_primary", "-created_at"),
             ),
             Prefetch(
-                "brands",
-                queryset=GarageBrand.objects.select_related("brand").order_by(
-                    "brand__name"
-                ),
-            ),
-            Prefetch(
                 "reviews",
                 queryset=__import__("reviews.models", fromlist=["Review"])
                 .Review.objects.filter(is_hidden=False)
@@ -414,7 +392,6 @@ def garage_detail_view(request, slug):
 
     services = garage.services.all()
     photos = garage.photos.all()
-    brands = garage.brands.all()
     reviews = garage.reviews.all()[:10]
 
     services_by_category = {}
@@ -429,18 +406,9 @@ def garage_detail_view(request, slug):
         "services": services,
         "services_by_category": services_by_category,
         "photos": photos,
-        "brands": brands,
         "reviews": reviews,
         "total_reviews": garage.reviews.filter(is_hidden=False).count(),
     }
-
-    if request.user.is_authenticated:
-        from reviews.models import Favorite
-
-        context["user_has_favorite"] = Favorite.objects.filter(
-            user=request.user, garage=garage
-        ).exists()
-        context["user_vehicles"] = request.user.vehicles.all()
 
     if request.headers.get("HX-Request"):
         return render(
@@ -465,12 +433,6 @@ def garage_detail_api(request, slug):
                 "photos",
                 queryset=GaragePhoto.objects.order_by("-is_primary", "-created_at"),
             ),
-            Prefetch(
-                "brands",
-                queryset=GarageBrand.objects.select_related("brand").order_by(
-                    "brand__name"
-                ),
-            ),
         ),
         slug=slug,
         is_active=True,
@@ -478,7 +440,6 @@ def garage_detail_api(request, slug):
 
     services = garage.services.all()
     photos = garage.photos.all()
-    brands = garage.brands.all()
 
     services_by_category = {}
     for service in services:
@@ -529,7 +490,6 @@ def garage_detail_api(request, slug):
             "open_weekends": garage.open_weekends,
             "trust_score": float(garage.trust_score),
             "total_reviews": garage.total_reviews,
-            "total_orders": garage.total_orders,
             "total_clients": garage.total_clients,
             "is_open_now": garage.is_open_now,
             "created_at": garage.created_at.isoformat(),
@@ -543,14 +503,6 @@ def garage_detail_api(request, slug):
                     "is_primary": p.is_primary,
                 }
                 for p in photos
-            ],
-            "brands": [
-                {
-                    "id": b.brand.id,
-                    "name": b.brand.name,
-                    "logo_url": b.brand.logo.url if b.brand.logo else None,
-                }
-                for b in brands
             ],
         }
     )
@@ -612,10 +564,6 @@ def garage_create_view(request):
             garage.location_captured_at = timezone.now()
 
             garage.save()
-
-            from notifications.services import notify_garage_event
-
-            notify_garage_event(garage, "submitted")
 
             from accounts.models import User
 
@@ -697,40 +645,23 @@ def garage_dashboard_view(request):
     garage = garages.first()
 
     from catalog.models import Part
-    from orders.models import Order
     from reviews.models import Review
 
-    all_orders = garage.orders.select_related("user", "vehicle").order_by("-created_at")
-    pending_orders = all_orders.filter(status="PENDING")
-    orders = all_orders[:20]
     products = Part.objects.filter(garage=garage, is_active=True).select_related(
-        "category", "brand"
+        "category"
     )
     recent_reviews = Review.objects.filter(
         garage=garage, is_hidden=False
     ).select_related("user")[:5]
 
-    total_sales = (
-        Order.objects.filter(
-            garage=garage,
-            status__in=["PAID", "PROCESSING", "READY", "PICKED_UP", "DELIVERED"],
-        ).aggregate(total=Sum("total"))["total"]
-        or 0
-    )
-
-    total_orders = Order.objects.filter(garage=garage).count()
     total_products = products.count()
     avg_rating = garage.trust_score or 0
 
     context = {
         "garage": garage,
         "garages": garages,
-        "orders": orders,
-        "pending_orders": pending_orders,
         "products": products[:10],
         "recent_reviews": recent_reviews,
-        "total_sales": total_sales,
-        "total_orders": total_orders,
         "total_products": total_products,
         "avg_rating": avg_rating,
         "garage_activation_amount": GARAGE_ACTIVATION_AMOUNT,

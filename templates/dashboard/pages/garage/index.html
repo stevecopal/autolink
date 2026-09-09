@@ -52,15 +52,7 @@
         </div>
         <span class="text-xs text-auto-600">{% trans "Modifié il y a" %} {{ garage.updated_at|timesince }}</span>
     </div>    <!-- Stats Grid -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div class="stat-card text-center">
-            <div class="stat-value">{{ total_orders }}</div>
-            <div class="stat-label">{% trans "Commandes" %}</div>
-        </div>
-        <div class="stat-card text-center">
-            <div class="stat-value text-auto-coral">{{ pending_orders.count }}</div>
-            <div class="stat-label">{% trans "En attente" %}</div>
-        </div>
+    <div class="grid grid-cols-2 md:grid-cols-2 gap-4 mb-6">
         <div class="stat-card text-center">
             <div class="stat-value text-auto-gold">{{ total_sales|intcomma }}</div>
             <div class="stat-label">{% trans "Ventes (FCFA)" %}</div>
@@ -72,43 +64,6 @@
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Recent Orders -->
-        <div class="card p-6">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="font-bold text-lg">{% trans "Commandes récentes" %}</h2>
-                <span class="badge-orange text-[10px]">{{ pending_orders.count }} {% trans "en attente" %}</span>
-            </div>
-            {% if orders %}
-                <div class="table-container">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th>{% trans "Numéro" %}</th>
-                                <th>{% trans "Client" %}</th>
-                                <th>{% trans "Statut" %}</th>
-                                <th>{% trans "Total" %}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for order in orders %}
-                                <tr>
-                                    <td class="font-bold text-xs">{{ order.order_number }}</td>
-                                    <td>{{ order.user.display_name }}</td>
-                                    <td><span class="badge-{{ order.status_color }} text-[10px]">{{ order.status_label }}</span></td>
-                                    <td class="font-bold">{{ order.total|intcomma }} FCFA</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            {% else %}
-                <div class="text-center py-8 text-auto-600">
-                    <div class="text-3xl mb-2">📦</div>
-                    <p>{% trans "Pas encore de commandes." %}</p>
-                </div>
-            {% endif %}
-        </div>
-
         <!-- Products -->
         <div class="card p-6">
             <div class="flex items-center justify-between mb-4">
@@ -174,9 +129,8 @@
                 <a href="{% url 'catalog:garage_products' %}" class="btn-outline text-center text-sm">
                     🔩 {% trans "Produits" %}
                 </a>
-                <a href="{% url 'orders:order_list' %}" class="btn-outline text-center text-sm">
-                    📦 {% trans "Commandes" %}
-                </a>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

@@ -8,7 +8,7 @@ class TicketAdmin(admin.ModelAdmin):
     list_filter = ['status', 'created_at']
     search_fields = ['ticket_number', 'user__username', 'subject', 'description']
     readonly_fields = ['ticket_number', 'created_at', 'updated_at', 'resolved_at']
-    raw_id_fields = ['user', 'order', 'part', 'garage', 'assigned_to']
+    raw_id_fields = ['user', 'part', 'garage', 'assigned_to']
 
 
 @admin.register(TicketMessage)

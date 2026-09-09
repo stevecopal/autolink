@@ -1,22 +1,10 @@
 from django.contrib.auth import get_user_model
 from django.db import transaction
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 
-from notifications.models import Notification
-from notifications.services import notify_user
-
 from .models import Conversation, Message, Ticket
-
 User = get_user_model()
-
-
-def admin_users():
-    from django.db.models import Q
-
-    return User.objects.filter(
-        Q(is_superuser=True) | Q(role__in=[User.Role.ADMIN, User.Role.SUPERUSER]),
-        is_active=True,
-    )
 
 
 def get_or_create_ticket_conversation(ticket):
@@ -25,7 +13,12 @@ def get_or_create_ticket_conversation(ticket):
         defaults={"subject": ticket.subject},
     )
     if created:
-        conversation.participants.add(ticket.user, *admin_users())
+        conversation.participants.add(ticket.user)
+        admins = admin_users()
+        if admins.exists():
+            conversation.participants.add(*admins)
+        else:
+            print("[WARNING] Aucun ADMIN trouvé pour notifier le ticket.")
     return conversation
 
 
@@ -48,21 +41,6 @@ def send_message(conversation, sender, body, attachment=None):
             attachment=attachment,
         )
         conversation.save(update_fields=["updated_at"])
-    recipients = conversation.participants.exclude(pk=sender.pk)
-    for recipient in recipients:
-        notify_user(
-            recipient,
-            Notification.Category.SUPPORT,
-            _("Nouveau message"),
-            _("Vous avez reçu un nouveau message dans « %(subject)s ».")
-            % {"subject": conversation.subject},
-            link=f"/support/messages/{conversation.pk}/",
-            metadata={
-                "event": "message.created",
-                "conversation_id": str(conversation.pk),
-                "message_id": str(message.pk),
-            },
-        )
     return message
 
 
@@ -70,3 +48,7 @@ def mark_conversation_read(conversation, user):
     if not can_access_conversation(conversation, user):
         raise PermissionError("Conversation access denied")
     return conversation.messages.filter(is_read=False).exclude(sender=user).update(is_read=True)
+
+
+def admin_users():
+    return User.objects.filter(role__in=["ADMIN", "SUPERUSER"], is_active=True)

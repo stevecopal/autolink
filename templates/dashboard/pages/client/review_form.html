@@ -65,20 +65,6 @@
             {% csrf_token %}
             <input type="hidden" name="garage_id" value="{{ garage.pk }}">
 
-            {% if vehicle_id %}
-            <div class="p-4 rounded-lg bg-auto-50 border border-auto-100">
-                <h4 class="font-bold text-sm text-auto-700 mb-2">{% trans "Véhicule" %}</h4>
-                <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 rounded-full bg-auto-orange/10 flex items-center justify-center text-sm">🚗</div>
-                    <span>{{ vehicle.display_name }}</span>
-                    {% if vehicle.license_plate %}
-                    <span class="text-xs text-auto-500">({{ vehicle.license_plate }})</span>
-                    {% endif %}
-                </div>
-                <input type="hidden" name="vehicle_id" value="{{ vehicle_id }}">
-            </div>
-            {% endif %}
-
             <div class="flex items-center gap-2 mb-4">
                 <label class="form-label">{% trans "Note" %}</label>
                 <div class="flex items-center gap-1">

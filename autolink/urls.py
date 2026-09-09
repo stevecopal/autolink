@@ -9,13 +9,10 @@ urlpatterns = [
     path('', include('core.urls')),
     path('compte/', include('accounts.urls')),
     path('accounts/', include('allauth.urls')),
-    path('vehicules/', include('vehicles.urls')),
     path('garages/', include('garages.urls')),
     path('', include('catalog.urls')),
-    path('', include('orders.urls')),
     path('', include('payments.urls')),
     path('', include('reviews.urls')),
-    path('notifications/', include('notifications.urls')),
     path('', include('support.urls')),
     path('', include('search.urls')),
 ]

@@ -31,10 +31,6 @@
                     <div class="stat-label">{% trans "Garages" %}</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value text-lg">{{ total_orders }}</div>
-                    <div class="stat-label">{% trans "Commandes" %}</div>
-                </div>
-                <div class="stat-card">
                     <div class="stat-value text-lg">{{ total_revenue|intcomma }}</div>
                     <div class="stat-label">{% trans "Revenus (FCFA)" %}</div>
                 </div>
@@ -97,37 +93,6 @@
             {% else %}
                 <div class="text-center py-8 text-auto-600">
                     <p>{% trans "Aucun utilisateur récent." %}</p>
-                </div>
-            {% endif %}
-        </div>
-
-        <!-- Activité commandes -->
-        <div class="card p-6">
-            <h2 class="font-bold text-lg mb-4">{% trans "Commandes récentes" %}</h2>
-            {% if recent_orders %}
-                <div class="overflow-x-auto">
-                    <table class="w-full text-sm">
-                        <thead class="bg-auto-50">
-                            <tr class="text-left text-auto-700">
-                                <th class="px-3 py-2">#</th>
-                                <th class="px-3 py-2">{% trans "Statut" %}</th>
-                                <th class="px-3 py-2">{% trans "Total" %}</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y">
-                            {% for order in recent_orders %}
-                                <tr class="hover:bg-auto-50">
-                                    <td class="px-3 py-2 font-mono text-xs font-bold">{{ order.order_number }}</td>
-                                    <td class="px-3 py-2"><span class="badge-{{ order.status_color }} text-[10px]">{{ order.status_label }}</span></td>
-                                    <td class="px-3 py-2 font-bold">{{ order.total|intcomma }} FCFA</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            {% else %}
-                <div class="text-center py-8 text-auto-600">
-                    <p>{% trans "Aucune commande récente." %}</p>
                 </div>
             {% endif %}
         </div>

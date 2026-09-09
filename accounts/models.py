@@ -76,8 +76,6 @@ class UserActivity(models.Model):
         REGISTER = 'REGISTER', _('Inscription')
         PASSWORD_CHANGE = 'PASSWORD_CHANGE', _('Changement mot de passe')
         PROFILE_UPDATE = 'PROFILE_UPDATE', _('Mise à jour profil')
-        VEHICLE_ADD = 'VEHICLE_ADD', _('Ajout véhicule')
-        ORDER_CREATE = 'ORDER_CREATE', _('Création commande')
         PAYMENT = 'PAYMENT', _('Paiement')
         REVIEW = 'REVIEW', _('Avis')
         SEARCH = 'SEARCH', _('Recherche')

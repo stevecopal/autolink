@@ -22,12 +22,6 @@
                     {% elif user.role == 'CLIENT' %}
                         <a href="{% url 'garages:garage_dashboard' %}" class="nav-link text-white">{% trans "Tableau de bord" %}</a>
                     {% else %}
-                        <a href="{% url 'orders:cart' %}" class="nav-link text-white relative" aria-label="{% trans 'Panier' %}">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"/></svg>
-                            {% if cart_item_count > 0 %}
-                            <span class="absolute -top-1.5 -right-1.5 bg-auto-orange text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center leading-none" aria-label="{% blocktrans with count=cart_item_count %}{{ count }} article(s) dans le panier{% endblocktrans %}">{{ cart_item_count }}</span>
-                            {% endif %}
-                        </a>
                         <a href="{% url 'accounts:client_dashboard' %}" class="nav-link text-white">{% trans "Tableau de bord" %}</a>
                     {% endif %}
                 {% else %}
@@ -45,7 +39,6 @@
             <a href="{% url 'search:nearby_page' %}" class="block py-2.5 nav-link text-white">{% trans "Mécaniciens" %}</a>
             <a href="{% url 'garages:garage_list' %}" class="block py-2.5 nav-link text-white">{% trans "Garages" %}</a>
             <a href="{% url 'catalog:part_list' %}" class="block py-2.5 nav-link text-white">{% trans "Pieces" %}</a>
-            <a href="{% url 'support:assistance' %}" class="block py-2.5 nav-link text-white">{% trans "Assistance" %}</a>
             
             {% if user.is_authenticated %}
                 <div class="border-t border-white/10 my-2"></div>
@@ -57,13 +50,7 @@
                 {% else %}
                     <a href="{% url 'accounts:client_dashboard' %}" class="block py-2.5 nav-link text-white">{% trans "Tableau de bord" %}</a>
                 {% endif %}
-                <a href="{% url 'orders:cart' %}" class="flex items-center gap-2 py-2.5 nav-link text-white">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"/></svg>
-                    {% trans "Panier" %}
-                    {% if cart_item_count > 0 %}
-                    <span class="bg-auto-orange text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full">{{ cart_item_count }}</span>
-                    {% endif %}
-                </a>
+               
                 <a href="{% url 'accounts:profile' %}" class="block py-2.5 nav-link text-white">{% trans "Mon profil" %}</a>
                 <div class="border-t border-white/10 my-2"></div>
                 <a href="{% url 'accounts:logout' %}" class="block py-2.5 text-error-400 font-bold">{% trans "Deconnexion" %}</a>

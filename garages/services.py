@@ -40,9 +40,6 @@ def approve_garage(garage, admin_user=None):
             "updated_at",
         ]
     )
-    from notifications.services import notify_garage_event
-
-    notify_garage_event(garage, "approved")
 
     owner = garage.owner
     promoted = False
@@ -99,9 +96,6 @@ def reject_garage(garage, reason="", admin_user=None):
             "updated_at",
         ]
     )
-    from notifications.services import notify_garage_event
-
-    notify_garage_event(garage, "rejected", reason=reason)
 
     owner = garage.owner
     demoted = False

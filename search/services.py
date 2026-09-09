@@ -159,7 +159,7 @@ def search_nearby_garages(
     # Calculer les distances et filtrer par rayon
     results = []
     garages = queryset.select_related('owner').prefetch_related(
-        'services', 'photos', 'brands',
+        'services', 'photos',
     )
 
     for garage in garages:

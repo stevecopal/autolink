@@ -51,7 +51,7 @@ def home_view(request: HttpRequest) -> HttpResponse:
             is_active=True,
             stock_status__in=["IN_STOCK", "LOW_STOCK"],
         )
-        .select_related("category", "brand", "garage")
+        .select_related("category", "garage")
         .only(
             "id",
             "name",
@@ -60,7 +60,6 @@ def home_view(request: HttpRequest) -> HttpResponse:
             "price",
             "stock_status",
             "category_id",
-            "brand_id",
             "garage_id",
         )[:8]
     )

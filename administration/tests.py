@@ -2,7 +2,6 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 
-from administration.models import Announcement
 from core.models import City, Neighborhood
 from garages.models import Garage
 from payments.models import Payment, Receipt
@@ -36,16 +35,6 @@ class AdminCRUDPermissionTest(TestCase):
     def test_admin_can_load_neighborhoods(self):
         self.client.login(username="admin", password="pass")
         resp = self.client.get(reverse("administration:neighborhoods"))
-        self.assertEqual(resp.status_code, 200)
-
-    def test_admin_can_load_announcements(self):
-        self.client.login(username="admin", password="pass")
-        resp = self.client.get(reverse("administration:announcements"))
-        self.assertEqual(resp.status_code, 200)
-
-    def test_admin_can_load_notifications_admin(self):
-        self.client.login(username="admin", password="pass")
-        resp = self.client.get(reverse("administration:notifications_admin"))
         self.assertEqual(resp.status_code, 200)
 
     def test_city_edit_json_returns_form(self):
@@ -131,52 +120,6 @@ class AdminCRUDPermissionTest(TestCase):
         data = resp.json()
         self.assertFalse(data.get("success"))
         self.assertIn("message", data)
-
-    def test_announcement_create_and_edit(self):
-        self.client.login(username="admin", password="pass")
-        # Create
-        resp = self.client.post(
-            reverse("administration:announcement_create"),
-            {"title": "Test", "message": "Hello", "status": "DRAFT"},
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
-        )
-        self.assertEqual(resp.status_code, 200)
-        data = resp.json()
-        self.assertTrue(data.get("success"))
-        ann = Announcement.objects.latest("created_at")
-        self.assertEqual(ann.title, "Test")
-
-        # Edit
-        resp = self.client.get(
-            reverse("administration:announcement_edit", args=[ann.id]),
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
-        )
-        self.assertEqual(resp.status_code, 200)
-        data = resp.json()
-        self.assertTrue(data.get("success"))
-        self.assertIn("form", data)
-
-    def test_announcement_delete(self):
-        self.client.login(username="admin", password="pass")
-        ann = Announcement.objects.create(
-            title="Delete me", message="bye", created_by=self.admin
-        )
-        resp = self.client.post(
-            reverse("administration:announcement_delete", args=[ann.id]),
-            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
-        )
-        data = resp.json()
-        self.assertTrue(data.get("success"))
-        self.assertFalse(Announcement.objects.filter(pk=ann.pk).exists())
-
-    def test_announcements_filters_by_search(self):
-        self.client.login(username="admin", password="pass")
-        Announcement.objects.create(
-            title="Important", message="salut tout le monde", created_by=self.admin
-        )
-        resp = self.client.get(reverse("administration:announcements") + "?q=salut")
-        self.assertEqual(resp.status_code, 200)
-        self.assertContains(resp, "Important")
 
 
 class AdminPaymentAndSuspensionTest(TestCase):

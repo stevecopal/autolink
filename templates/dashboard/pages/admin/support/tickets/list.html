@@ -86,9 +86,6 @@
                             <a href="{% url 'administration:ticket_detail' ticket.pk %}" class="text-auto-orange hover:underline font-medium">
                                 {{ ticket.subject|truncatewords:8 }}
                             </a>
-                            {% if ticket.order %}
-                            <div class="text-xs text-auto-400 mt-0.5">{{ ticket.order.order_number }}</div>
-                            {% endif %}
                         </td>
                         <td class="px-4 py-3">
                             <div class="font-medium">{{ ticket.user.display_name }}</div>

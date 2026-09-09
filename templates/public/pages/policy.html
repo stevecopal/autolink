@@ -6,11 +6,7 @@
 {% block content %}
 <div class="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
     <div class="mb-8">
-        <nav class="flex items-center gap-2 text-sm text-auto-600 mb-4" aria-label="{% trans 'Fil d ariane' %}">
-            <a href="{% url 'core:home' %}" class="hover:text-auto-orange transition">{% trans "Accueil" %}</a>
-            <span aria-hidden="true">/</span>
-            <span class="text-auto-dark font-bold">{% trans "Politique et règles" %}</span>
-        </nav>
+      
         <h1 class="text-2xl sm:text-3xl font-bold text-auto-dark mb-2">{% trans "Politique et règles d'AutoLink" %}</h1>
         <p class="text-auto-600 text-sm">{% trans "Dernière mise à jour : Janvier 2026" %}</p>
     </div>
@@ -43,8 +39,7 @@
                     <ul class="space-y-1.5 ml-4">
                         <li>• {% trans "Rechercher des garages à proximité selon leur localisation" %}</li>
                         <li>• {% trans "Consulter les services proposés par chaque garage" %}</li>
-                        <li>• {% trans "Commander des pièces automobiles compatibles avec leur véhicule" %}</li>
-                        <li>• {% trans "Passer commande et payer de manière sécurisée (Mobile Money, carte, espèces)" %}</li>
+                        <li>• {% trans "Consulter les pièces automobiles compatibles avec leur véhicule" %}</li>
                         <li>• {% trans "Laisser des avis et évaluations sur les garages et pièces" %}</li>
                         <li>• {% trans "Demander une assistance routière en cas de panne" %}</li>
                         <li>• {% trans "Signaler tout problème rencontré via le système de support intégré" %}</li>
@@ -57,7 +52,7 @@
                         <li>• {% trans "Créer un profil professionnel vérifié par l'équipe AutoLink" %}</li>
                         <li>• {% trans "Publier leurs services et tarifs" %}</li>
                         <li>• {% trans "Mettre en vente des pièces automobiles avec photos et descriptions" %}</li>
-                        <li>• {% trans "Gérer les commandes et le stock en temps réel" %}</li>
+                        <li>• {% trans "Gérer le stock en temps réel" %}</li>
                         <li>• {% trans "Recevoir des avis clients pour asseoir leur réputation" %}</li>
                         <li>• {% trans "Gérer leur disponibilité en temps réel" %}</li>
                     </ul>
@@ -150,21 +145,19 @@
                     <li>• {% trans "Répondre aux demandes des clients dans des délais raisonnables" %}</li>
                     <li>• {% trans "Assurer la qualité des pièces vendues et des services rendus" %}</li>
                     <li>• {% trans "Respecter les statuts de disponibilité (Disponible, Occupé, Fermé)" %}</li>
-                    <li>• {% trans "Gérer les commandes de manière professionnelle et dans les délais annoncés" %}</li>
+                    <li>• {% trans "Assurer la qualité des pièces vendues et des services rendus" %}</li>
                     <li>• {% trans "Ne pas publier de faux avis ou de contenus trompeurs" %}</li>
                 </ul>
                 <p>{% trans "Tout garage ne respectant pas ces règles verra son profil suspendu ou supprimé après mise en demeure." %}</p>
             </div>
         </section>
 
-        <section id="commandes" class="card p-6 sm:p-8">
-            <h2 class="text-xl font-bold text-auto-dark mb-4">{% trans "6. Commandes et paiements" %}</h2>
+        <section id="paiements" class="card p-6 sm:p-8">
+            <h2 class="text-xl font-bold text-auto-dark mb-4">{% trans "6. Paiements" %}</h2>
             <div class="space-y-4 text-auto-700 text-sm leading-relaxed">
-                <p>{% trans "AutoLink facilite les transactions entre clients et garages tout en garantissant la sécurité :" %}</p>
+                <p>{% trans "AutoLink facilite les paiements entre clients et garages tout en garantissant la sécurité :" %}</p>
                 <ul class="space-y-1.5 ml-4">
-                    <li>• {% trans "Les paiements sont sécurisés via Mobile Money (MTN MoMo, Orange Money) ou à la livraison" %}</li>
-                    <li>• {% trans "Le code de retrait à 4 chiffres est généré automatiquement pour sécuriser le retrait en magasin" %}</li>
-                    <li>• {% trans "Les annulations sont possibles tant que la commande n'a pas été confirmée par le garage" %}</li>
+                    <li>• {% trans "Les paiements sont sécurisés via Mobile Money (MTN MoMo, Orange Money)" %}</li>
                     <li>• {% trans "En cas de litige, l'administration AutoLink intervient comme médiateur" %}</li>
                     <li>• {% trans "Les demandes de remboursement sont traitées sous 48 à 72 heures ouvrées" %}</li>
                 </ul>
@@ -211,7 +204,6 @@
                         <li>• {% trans "Nom, prénom, adresse email, numéro de téléphone" %}</li>
                         <li>• {% trans "Photo de profil (optionnelle)" %}</li>
                         <li>• {% trans "Informations sur les véhicules enregistrés" %}</li>
-                        <li>• {% trans "Historique des commandes et des transactions" %}</li>
                         <li>• {% trans "Données de localisation (avec consentement explicite)" %}</li>
                         <li>• {% trans "Avis et évaluations publiés" %}</li>
                     </ul>
@@ -222,8 +214,7 @@
                     <ul class="space-y-1.5 ml-4">
                         <li>• {% trans "Fourniture et amélioration des services de la plateforme" %}</li>
                         <li>• {% trans "Personnalisation de votre expérience (garages à proximité, pièces compatibles)" %}</li>
-                        <li>• {% trans "Gestion des commandes, paiements et livraisons" %}</li>
-                        <li>• {% trans "Communication relative à vos transactions (confirmations, mises à jour)" %}</li>
+                        <li>• {% trans "Communication relative à votre compte (confirmations, mises à jour)" %}</li>
                         <li>• {% trans "Prévention de la fraude et sécurisation des comptes" %}</li>
                     </ul>
                 </div>
@@ -277,23 +268,7 @@
             </div>
         </section>
 
-        <section id="contact" class="card p-6 sm:p-8">
-            <h2 class="text-xl font-bold text-auto-dark mb-4">{% trans "12. Contact" %}</h2>
-            <div class="space-y-4 text-auto-700 text-sm leading-relaxed">
-                <p>{% trans "Pour toute question relative à ces politiques ou pour exercer vos droits, contactez-nous :" %}</p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
-                    <div class="p-4 rounded-xl bg-auto-50 border border-auto-100">
-                        <div class="font-bold text-auto-dark mb-1">{% trans "Email" %}</div>
-                        <a href="mailto:contact@autolink.cm" class="text-auto-orange hover:underline">contact@autolink.cm</a>
-                    </div>
-                    <div class="p-4 rounded-xl bg-auto-50 border border-auto-100">
-                        <div class="font-bold text-auto-dark mb-1">{% trans "Page de contact" %}</div>
-                        <a href="{% url 'core:contact' %}" class="text-auto-orange hover:underline">{% trans "Nous contacter" %}</a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
+        
     </div>
 </div>
 {% endblock %}

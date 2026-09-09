@@ -7,8 +7,8 @@ from django.core.paginator import Paginator
 from django.utils.text import slugify
 from django.http import JsonResponse
 
-from .models import Category, Part, Compatibility, PartRequest
-from .forms import PartForm, PartRequestForm
+from .models import Category, Part
+from .forms import PartForm
 from garages.models import Garage
 
 
@@ -16,10 +16,9 @@ def part_list_view(request):
     parts = Part.objects.filter(
         is_active=True,
         stock_status__in=[Part.StockStatus.IN_STOCK, Part.StockStatus.LOW_STOCK]
-    ).select_related('category', 'brand', 'seller', 'garage')
+    ).select_related('category', 'seller', 'garage')
 
     category_slug = request.GET.get('category', '')
-    brand_id = request.GET.get('brand', '')
     condition = request.GET.get('condition', '')
     city = request.GET.get('city', '')
     search = request.GET.get('q', '')
@@ -29,8 +28,6 @@ def part_list_view(request):
 
     if category_slug:
         parts = parts.filter(category__slug=category_slug)
-    if brand_id:
-        parts = parts.filter(brand_id=brand_id)
     if condition:
         parts = parts.filter(condition=condition)
     if city:
@@ -67,15 +64,11 @@ def part_list_view(request):
     parts_page = paginator.get_page(page)
 
     categories = Category.objects.filter(parent=None, is_active=True)
-    from vehicles.models import Brand
-    brands = Brand.objects.filter(is_active=True, parts__isnull=False).distinct()
 
     return render(request, 'public/pages/catalog/part_list.html', {
         'parts': parts_page,
         'categories': categories,
-        'brands': brands,
         'selected_category': category_slug,
-        'selected_brand': brand_id,
         'selected_condition': condition,
         'search_query': search,
         'sort': sort,
@@ -84,30 +77,23 @@ def part_list_view(request):
 
 def part_detail_view(request, slug):
     part = get_object_or_404(
-        Part.objects.select_related('category', 'brand', 'seller', 'garage'),
+        Part.objects.select_related('category', 'seller', 'garage'),
         slug=slug,
         is_active=True
     )
-    compatibilities = part.compatibilities.select_related('brand', 'model_vehicle')
     photos = part.photos.all()
 
     context = {
         'part': part,
-        'compatibilities': compatibilities,
         'photos': photos,
     }
 
-    if request.user.is_authenticated:
-        context['user_has_favorite'] = request.user.favorites.filter(
-            part=part, object_type='PART'
-        ).exists()
-        context['user_vehicles'] = request.user.vehicles.all()
-        if part.garage:
-            context['similar_parts'] = Part.objects.filter(
-                category=part.category,
-                is_active=True,
-                stock_status__in=[Part.StockStatus.IN_STOCK, Part.StockStatus.LOW_STOCK]
-            ).exclude(pk=part.pk)[:6]
+    if part.garage:
+        context['similar_parts'] = Part.objects.filter(
+            category=part.category,
+            is_active=True,
+            stock_status__in=[Part.StockStatus.IN_STOCK, Part.StockStatus.LOW_STOCK]
+        ).exclude(pk=part.pk)[:6]
 
     return render(request, 'public/pages/catalog/part_detail.html', context)
 
@@ -118,7 +104,7 @@ def category_detail_view(request, slug):
         category=category,
         is_active=True,
         stock_status__in=[Part.StockStatus.IN_STOCK, Part.StockStatus.LOW_STOCK]
-    ).select_related('brand', 'seller', 'garage')
+    ).select_related('seller', 'garage')
     children = category.children.filter(is_active=True)
 
     return render(request, 'public/pages/catalog/category_detail.html', {
@@ -128,28 +114,6 @@ def category_detail_view(request, slug):
     })
 
 
-@login_required
-def part_request_view(request):
-    if request.method == 'POST':
-        form = PartRequestForm(request.POST, request.FILES)
-        if form.is_valid():
-            pr = form.save(commit=False)
-            pr.user = request.user
-            pr.save()
-            messages.success(request, _('Your part request has been sent.'))
-            return redirect('catalog:part_list')
-    else:
-        form = PartRequestForm()
-
-    vehicles = request.user.vehicles.all()
-    return render(request, 'public/pages/catalog/part_request.html', {
-        'form': form,
-        'vehicles': vehicles,
-    })
-
-
-# ============ GARAGE MARKETPLACE VIEWS ============
-
 def is_garage_owner(user):
     from accounts.models import User
     return user.is_authenticated and user.role in [
@@ -158,24 +122,21 @@ def is_garage_owner(user):
 
 
 def _get_user_garages(user):
-    """Return garages owned by the user."""
     return Garage.objects.filter(owner=user)
 
 
 def _get_user_first_garage(user):
-    """Return the first garage owned by the user, or None."""
     return _get_user_garages(user).first()
 
 
 @user_passes_test(is_garage_owner)
 def garage_product_list_view(request):
-    """List products for the garage owner."""
     garage = _get_user_first_garage(request.user)
     if not garage:
         messages.warning(request, _('Veuillez d\'abord créer un garage.'))
         return redirect('garages:garage_create')
 
-    products = Part.objects.filter(garage=garage).select_related('category', 'brand')
+    products = Part.objects.filter(garage=garage).select_related('category')
 
     status = request.GET.get('status', '')
     if status == 'active':
@@ -196,7 +157,6 @@ def garage_product_list_view(request):
 
 @user_passes_test(is_garage_owner)
 def garage_product_add_view(request):
-    """Add a new product to the garage."""
     garage = _get_user_first_garage(request.user)
     if not garage:
         messages.warning(request, _('Veuillez d\'abord créer un garage.'))
@@ -224,7 +184,6 @@ def garage_product_add_view(request):
 
 @user_passes_test(is_garage_owner)
 def garage_product_edit_view(request, pk):
-    """Edit a product in the garage."""
     garage = _get_user_first_garage(request.user)
     if not garage:
         return redirect('garages:garage_create')
@@ -253,7 +212,6 @@ def garage_product_edit_view(request, pk):
 
 @user_passes_test(is_garage_owner)
 def garage_product_delete_view(request, pk):
-    """Soft-delete a product."""
     garage = _get_user_first_garage(request.user)
     if not garage:
         return redirect('garages:garage_create')
@@ -274,7 +232,6 @@ def garage_product_delete_view(request, pk):
 
 @user_passes_test(is_garage_owner)
 def garage_stock_update_view(request, pk):
-    """Update product stock."""
     garage = _get_user_first_garage(request.user)
     if not garage:
         return redirect('garages:garage_create')
@@ -299,7 +256,6 @@ def garage_stock_update_view(request, pk):
 
 @user_passes_test(is_garage_owner)
 def garage_product_toggle_view(request, pk):
-    """Toggle product active status."""
     garage = _get_user_first_garage(request.user)
     if not garage:
         return redirect('garages:garage_create')

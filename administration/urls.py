@@ -40,7 +40,6 @@ urlpatterns = [
         views.admin_neighborhood_delete_view,
         name="neighborhood_delete",
     ),
-    path("orders/", views.admin_orders_view, name="orders"),
     path("payments/", views.admin_payments_view, name="payments"),
     path(
         "payments/<uuid:payment_id>/",
@@ -57,32 +56,6 @@ urlpatterns = [
         "support/<uuid:ticket_id>/",
         views.admin_ticket_detail_view,
         name="ticket_detail",
-    ),
-    path("announcements/", views.admin_announcements_view, name="announcements"),
-    path(
-        "announcements/create/",
-        views.admin_announcement_create_view,
-        name="announcement_create",
-    ),
-    path(
-        "announcements/<uuid:announcement_id>/edit/",
-        views.admin_announcement_edit_view,
-        name="announcement_edit",
-    ),
-    path(
-        "announcements/<uuid:announcement_id>/delete/",
-        views.admin_announcement_delete_view,
-        name="announcement_delete",
-    ),
-    path(
-        "announcements/<uuid:announcement_id>/",
-        views.admin_announcement_detail_view,
-        name="announcement_detail",
-    ),
-    path(
-        "notifications-admin/",
-        views.admin_notifications_admin_view,
-        name="notifications_admin",
     ),
     path("reviews/", views.admin_reviews_view, name="reviews"),
 ]

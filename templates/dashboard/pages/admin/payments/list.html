@@ -61,7 +61,6 @@
                         <th class="px-4 py-3">{% trans "Garage" %}</th>
                         <th class="px-4 py-3">{% trans "Propriétaire" %}</th>
                         <th class="px-4 py-3">{% trans "Client" %}</th>
-                        <th class="px-4 py-3">{% trans "Commande" %}</th>
                         <th class="px-4 py-3">{% trans "Montant" %}</th>
                         <th class="px-4 py-3">{% trans "Fournisseur" %}</th>
                         <th class="px-4 py-3">{% trans "Transaction" %}</th>
@@ -77,7 +76,6 @@
                             <td class="px-4 py-3"><a href="{% url 'administration:payment_detail' payment.id %}" class="text-auto-orange hover:underline">{{ payment.garage.name|default:'—' }}</a></td>
                             <td class="px-4 py-3">{{ payment.garage.owner.username|default:'—' }}</td>
                             <td class="px-4 py-3">{{ payment.user.username }}</td>
-                            <td class="px-4 py-3 font-mono text-xs">{{ payment.order.order_number }}</td>
                             <td class="px-4 py-3 font-bold">{{ payment.amount|intcomma }} {{ payment.currency }}</td>
                             <td class="px-4 py-3">{{ payment.get_provider_display }}</td>
                             <td class="px-4 py-3 font-mono text-xs">{{ payment.provider_transaction_id|default:'—' }}</td>

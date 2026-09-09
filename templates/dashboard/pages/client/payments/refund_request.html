@@ -47,11 +47,11 @@
         <h3 class="text-lg font-bold text-auto-dark mb-4">{% trans "Paiement" %}</h3>
         <div class="flex items-center justify-between p-4 bg-auto-50 rounded-xl border border-auto-100">
             <div>
-                <div class="font-bold text-lg text-auto-dark">#{{ order.order_number }}</div>
-                <div class="text-sm text-auto-500">{{ order.created_at|date:"d/m/Y H:i" }}</div>
+                <div class="font-bold text-lg text-auto-dark">{{ payment.id }}</div>
+                <div class="text-sm text-auto-500">{{ payment.created_at|date:"d/m/Y H:i" }}</div>
             </div>
             <div class="text-right">
-                <div class="font-bold text-xl text-auto-deep-red">{{ order.total|intcomma }} FCFA</div>
+                <div class="font-bold text-xl text-auto-deep-red">{{ payment.amount|intcomma }} FCFA</div>
             </div>
         </div>
     </div>
@@ -65,20 +65,20 @@
 
             <div>
                 <label class="form-label">{% trans "Montant" %}</label>
-                <div class="relative">
+                    <div class="relative">
                     <input type="number"
                            name="amount"
                            min="0"
-                           max="{{ order.total }}"
+                           max="{{ payment.amount }}"
                            step="1"
                            class="form-input w-full"
-                           placeholder="{{ order.total|intcomma }} FCFA"
+                           placeholder="{{ payment.amount|intcomma }} FCFA"
                            value="{{ amount }}"
                            required>
                     <div class="absolute right-3 top-3 text-sm text-auto-500">FCFA</div>
                 </div>
                 <div class="mt-1 text-xs text-auto-500 flex justify-between">
-                    <span>{% trans "Maximum" %} : {{ order.total|intcomma }} FCFA</span>
+                    <span>{% trans "Maximum" %} : {{ payment.amount|intcomma }} FCFA</span>
                     <span>{% trans "Minimum" %} : 100 FCFA</span>
                 </div>
             </div>

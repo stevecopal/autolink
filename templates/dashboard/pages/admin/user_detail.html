@@ -79,44 +79,11 @@
             <h2 class="font-bold text-lg mb-4">{% trans "Activité" %}</h2>
             <div class="space-y-3">
                 <div class="flex justify-between">
-                    <span>{% trans "Commandes" %}</span>
-                    <span class="font-bold">{{ user_orders.count }}</span>
-                </div>
-                <div class="flex justify-between">
                     <span>{% trans "Paiements" %}</span>
                     <span class="font-bold">{{ user_payments.count }}</span>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Recent Orders -->
-    {% if user_orders %}
-        <div class="card p-6 mt-6">
-            <h2 class="font-bold text-lg mb-4">{% trans "Commandes récentes" %}</h2>
-            <div class="overflow-x-auto">
-                <table class="w-full text-sm">
-                    <thead>
-                        <tr class="border-b text-left text-auto-600">
-                            <th class="pb-2">#</th>
-                            <th class="pb-2">{% trans "Date" %}</th>
-                            <th class="pb-2">{% trans "Statut" %}</th>
-                            <th class="pb-2">{% trans "Total" %}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for order in user_orders %}
-                            <tr class="border-b">
-                                <td class="py-2 font-mono text-xs">{{ order.order_number }}</td>
-                                <td class="py-2">{{ order.created_at|date:"d/m/Y" }}</td>
-                                <td class="py-2"><span class="badge-{{ order.status_color }}">{{ order.status_label }}</span></td>
-                                <td class="py-2 font-bold">{{ order.total|intcomma }} FCFA</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    {% endif %}
 </div>
 {% endblock %}

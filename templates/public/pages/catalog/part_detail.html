@@ -86,32 +86,14 @@
 
             {# Add to Cart #}
             {% if part.stock_status != 'OUT_OF_STOCK' %}
-                {% if user.is_authenticated %}
-                <div class="flex items-center gap-3">
-                    <form method="post" action="{% url 'orders:direct_order' part_id=part.pk %}" class="flex items-center gap-3 flex-1" id="direct-order-form">
-                        {% csrf_token %}
-                        <input type="hidden" name="part_id" value="{{ part.pk }}">
-                        <div class="flex items-center border border-auto-200 rounded-lg overflow-hidden">
-                            <button type="button" id="qty-minus" class="px-3 py-2.5 text-auto-600 hover:bg-auto-50 transition font-bold" aria-label="{% trans 'Diminuer la quantité' %}">−</button>
-                            <input type="number" name="quantity" id="qty-input" value="1" min="1" max="{{ part.stock }}" class="w-16 text-center border-x border-auto-200 py-2.5 text-sm font-bold outline-none" aria-label="{% trans 'Quantité' %}">
-                            <button type="button" id="qty-plus" class="px-3 py-2.5 text-auto-600 hover:bg-auto-50 transition font-bold" aria-label="{% trans 'Augmenter la quantité' %}">+</button>
-                        </div>
-                        <button type="submit" class="btn-primary flex-1" id="order-btn">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                            {% trans "COMMANDER" %}
-                        </button>
-                    </form>
-                </div>
-                {% else %}
                 <div class="bg-auto-50 rounded-xl p-4 text-center">
-                    <p class="text-auto-600 text-sm mb-3">{% trans "Connectez-vous pour commander cette pièce." %}</p>
-                    <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="btn-primary text-sm">
-                        {% trans "Se connecter" %}
+                    <p class="text-auto-600 text-sm mb-3">{% trans "Contactez le vendeur pour commander cette pièce." %}</p>
+                    {% if part.garage and part.garage.phone %}
+                    <a href="tel:{{ part.garage.phone }}" class="btn-primary text-sm">
+                        {% trans "Contacter le vendeur" %}
                     </a>
+                    {% endif %}
                 </div>
-                {% endif %}
             {% else %}
             <div class="bg-auto-50 rounded-xl p-4 text-center">
                 <p class="text-auto-600 text-sm">{% trans "Cette pièce est actuellement indisponible." %}</p>
@@ -189,44 +171,4 @@
         </div>
     </div>
 </div>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-(function() {
-    'use strict';
-    var minusBtn = document.getElementById('qty-minus');
-    var plusBtn = document.getElementById('qty-plus');
-    var qtyInput = document.getElementById('qty-input');
-    var orderForm = document.getElementById('direct-order-form');
-    var orderBtn = document.getElementById('order-btn');
-    
-    if (!minusBtn || !plusBtn || !qtyInput) return;
-
-    var max = parseInt(qtyInput.getAttribute('max')) || 999;
-
-    minusBtn.addEventListener('click', function() {
-        var val = parseInt(qtyInput.value) || 1;
-        if (val > 1) qtyInput.value = val - 1;
-    });
-
-    plusBtn.addEventListener('click', function() {
-        var val = parseInt(qtyInput.value) || 1;
-        if (val < max) qtyInput.value = val + 1;
-    });
-
-    if (orderForm && orderBtn) {
-        var isSubmitting = false;
-        orderForm.addEventListener('submit', function(e) {
-            if (isSubmitting) {
-                e.preventDefault();
-                return false;
-            }
-            isSubmitting = true;
-            orderBtn.disabled = true;
-            orderBtn.innerHTML = '<svg class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Commande en cours...';
-        });
-    }
-})();
-</script>
 {% endblock %}

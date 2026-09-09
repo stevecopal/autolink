@@ -15,60 +15,43 @@ from accounts.models import User
 from catalog.models import Part
 from core.models import City, Neighborhood
 from garages.models import Garage
-from notifications.models import Notification
-from orders.models import Order, OrderItem
-from payments.models import Payment, Receipt, Refund
+from payments.models import Payment, Receipt
 from reviews.models import Review
 from support.models import Ticket
 
-from .forms import AnnouncementForm, CityForm, NeighborhoodForm
-from .models import Announcement
+from .forms import CityForm, NeighborhoodForm
 
 
 def is_admin(user):
     return user.is_authenticated and user.is_admin_or_above
 
 
-# ======================================================================
-# Dashboard (refondu - sections 45/46)
-# ======================================================================
-
-
 @user_passes_test(is_admin)
 def admin_dashboard_view(request):
-    """Admin dashboard - global overview, non-duplicative with sidebar."""
     from django.db.models.functions import TruncDate
 
     now = timezone.now()
     thirty_days_ago = now - timedelta(days=30)
     seven_days_ago = now - timedelta(days=7)
 
-    # KPIs
     total_users = User.objects.count()
     total_garages = Garage.objects.count()
     verified_garages = Garage.objects.filter(
         approval_status=Garage.ApprovalStatus.APPROVED
     ).count()
     total_parts = Part.objects.filter(is_active=True).count()
-    total_orders = Order.objects.count()
     total_payments = Payment.objects.filter(status="SUCCESS").count()
     total_revenue = (
         Payment.objects.filter(status="SUCCESS").aggregate(total=Sum("amount"))["total"]
         or 0
     )
 
-    # Recent activity
-    recent_orders = Order.objects.select_related("user", "garage").order_by(
-        "-created_at"
-    )[:10]
     recent_users = User.objects.order_by("-date_joined")[:10]
     pending_tickets = Ticket.objects.filter(status__in=["OPEN", "IN_PROGRESS"]).count()
     pending_garages = Garage.objects.filter(
         approval_status=Garage.ApprovalStatus.PENDING
     ).count()
 
-    # Time-based stats
-    orders_this_month = Order.objects.filter(created_at__gte=thirty_days_ago).count()
     users_this_month = User.objects.filter(date_joined__gte=thirty_days_ago).count()
     revenue_this_month = (
         Payment.objects.filter(
@@ -77,7 +60,6 @@ def admin_dashboard_view(request):
         or 0
     )
 
-    # Geographic distribution
     city_distribution = (
         Garage.objects.values("city__name")
         .annotate(count=Count("id"))
@@ -89,16 +71,13 @@ def admin_dashboard_view(request):
         )
     ).order_by("-garage_count")[:8]
 
-    # Platform health indicators
     recent_payments = Payment.objects.filter(
         status="SUCCESS", created_at__gte=seven_days_ago
     ).count()
     recent_reviews = Review.objects.filter(
         created_at__gte=seven_days_ago, is_hidden=False
     ).count()
-    unread_notifications = Notification.objects.filter(is_read=False).count()
 
-    # Alert candidates
     alerts = []
     if pending_garages > 0:
         alerts.append(
@@ -124,47 +103,35 @@ def admin_dashboard_view(request):
         "total_garages": total_garages,
         "verified_garages": verified_garages,
         "total_parts": total_parts,
-        "total_orders": total_orders,
         "total_payments": total_payments,
         "total_revenue": total_revenue,
-        "recent_orders": recent_orders,
         "recent_users": recent_users,
         "pending_tickets": pending_tickets,
         "pending_garages": pending_garages,
-        "orders_this_month": orders_this_month,
         "users_this_month": users_this_month,
         "revenue_this_month": revenue_this_month,
         "city_distribution": city_distribution,
         "garage_cities": garage_cities,
         "recent_payments": recent_payments,
         "recent_reviews": recent_reviews,
-        "unread_notifications": unread_notifications,
         "alerts": alerts,
     }
     return render(request, "dashboard/pages/admin/dashboard.html", context)
 
 
-# ======================================================================
-# Monitoring (section 46 - Monitoring)
-# ======================================================================
-
-
 @user_passes_test(is_admin)
 def admin_monitoring_view(request):
-    """Monitoring hub: statistiques, activite recente, alertes, vue d'ensemble."""
     now = timezone.now()
     thirty_days_ago = now - timedelta(days=30)
     seven_days_ago = now - timedelta(days=7)
 
     total_users = User.objects.count()
     total_garages = Garage.objects.count()
-    total_orders = Order.objects.count()
     total_revenue = (
         Payment.objects.filter(status="SUCCESS").aggregate(total=Sum("amount"))["total"]
         or 0
     )
 
-    orders_30d = Order.objects.filter(created_at__gte=thirty_days_ago).count()
     users_30d = User.objects.filter(date_joined__gte=thirty_days_ago).count()
     revenue_30d = (
         Payment.objects.filter(
@@ -177,10 +144,7 @@ def admin_monitoring_view(request):
     ).count()
 
     recent_users = User.objects.order_by("-date_joined")[:10]
-    recent_orders = Order.objects.select_related("user", "garage").order_by(
-        "-created_at"
-    )[:15]
-    recent_payments = Payment.objects.select_related("order", "user").order_by(
+    recent_payments = Payment.objects.select_related("garage", "garage__owner", "user").order_by(
         "-created_at"
     )[:15]
 
@@ -202,14 +166,11 @@ def admin_monitoring_view(request):
     context = {
         "total_users": total_users,
         "total_garages": total_garages,
-        "total_orders": total_orders,
         "total_revenue": total_revenue,
-        "orders_30d": orders_30d,
         "users_30d": users_30d,
         "revenue_30d": revenue_30d,
         "payments_30d": payments_30d,
         "recent_users": recent_users,
-        "recent_orders": recent_orders,
         "recent_payments": recent_payments,
         "pending_garages": pending_garages,
         "pending_tickets": pending_tickets,
@@ -220,14 +181,8 @@ def admin_monitoring_view(request):
     return render(request, "dashboard/pages/admin/monitoring/monitoring.html", context)
 
 
-# ======================================================================
-# Géographie (section 46)
-# ======================================================================
-
-
 @user_passes_test(is_admin)
 def admin_geography_view(request):
-    """Géographie: répartition villes/quartiers, nombre de garages par ville."""
     cities = City.objects.annotate(
         garage_count=Count(
             "garages", filter=Q(garages__approval_status=Garage.ApprovalStatus.APPROVED)
@@ -241,14 +196,8 @@ def admin_geography_view(request):
     return render(request, "dashboard/pages/admin/geography/geography.html", context)
 
 
-# ======================================================================
-# Utilisateurs
-# ======================================================================
-
-
 @user_passes_test(is_admin)
 def admin_users_view(request):
-    """Admin - manage users."""
     users = User.objects.all().order_by("-date_joined")
 
     role = request.GET.get("role", "")
@@ -287,7 +236,6 @@ def admin_users_view(request):
 
 @user_passes_test(is_admin)
 def admin_user_detail_view(request, user_id):
-    """Admin - view/edit user."""
     user_obj = get_object_or_404(User, pk=user_id)
 
     if request.method == "POST":
@@ -315,20 +263,13 @@ def admin_user_detail_view(request, user_id):
 
     context = {
         "user_obj": user_obj,
-        "user_orders": Order.objects.filter(user=user_obj)[:10],
         "user_payments": Payment.objects.filter(user=user_obj)[:10],
     }
     return render(request, "dashboard/pages/admin/user_detail.html", context)
 
 
-# ======================================================================
-# Garages
-# ======================================================================
-
-
 @user_passes_test(is_admin)
 def admin_garages_view(request):
-    """Admin - manage garages."""
     garages = Garage.objects.all().select_related("owner").order_by("-created_at")
 
     status = request.GET.get("status", "")
@@ -371,7 +312,6 @@ def admin_garages_view(request):
 
 @user_passes_test(is_admin)
 def admin_garage_verify_view(request, garage_id):
-    """Admin - verify/reject/suspend garage with role promotion logic."""
     from garages.services import approve_garage, reject_garage, suspend_garage
 
     garage = get_object_or_404(Garage.objects.select_related("owner"), pk=garage_id)
@@ -406,14 +346,8 @@ def admin_garage_verify_view(request, garage_id):
     )
 
 
-# ======================================================================
-# Villes - CRUD Complet avec Modals
-# ======================================================================
-
-
 @user_passes_test(is_admin)
 def admin_cities_view(request):
-    """Admin - manage cities."""
     cities = City.objects.annotate(
         garage_count=Count(
             "garages", filter=Q(garages__approval_status=Garage.ApprovalStatus.APPROVED)
@@ -441,7 +375,6 @@ def admin_cities_view(request):
 
 @user_passes_test(is_admin)
 def admin_city_create_view(request):
-    """Admin - create a city via modal."""
     if request.method == "POST":
         form = CityForm(request.POST)
         if form.is_valid():
@@ -482,7 +415,6 @@ def admin_city_create_view(request):
 
 @user_passes_test(is_admin)
 def admin_city_edit_view(request, city_id):
-    """Admin - edit a city via modal."""
     city = get_object_or_404(City, pk=city_id)
 
     if request.method == "POST":
@@ -538,7 +470,6 @@ def admin_city_edit_view(request, city_id):
 @user_passes_test(is_admin)
 @require_POST
 def admin_city_delete_view(request, city_id):
-    """Admin - delete a city."""
     city = get_object_or_404(City, pk=city_id)
     city_name = city.name
 
@@ -567,14 +498,8 @@ def admin_city_delete_view(request, city_id):
     return redirect("administration:cities")
 
 
-# ======================================================================
-# Quartiers - CRUD Complet avec Modals
-# ======================================================================
-
-
 @user_passes_test(is_admin)
 def admin_neighborhoods_view(request):
-    """Admin - manage neighborhoods."""
     neighborhoods = Neighborhood.objects.select_related("city").order_by(
         "city__name", "name"
     )
@@ -608,7 +533,6 @@ def admin_neighborhoods_view(request):
 
 @user_passes_test(is_admin)
 def admin_neighborhood_create_view(request):
-    """Admin - create a neighborhood via modal."""
     if request.method == "POST":
         form = NeighborhoodForm(request.POST)
         if form.is_valid():
@@ -651,7 +575,6 @@ def admin_neighborhood_create_view(request):
 
 @user_passes_test(is_admin)
 def admin_neighborhood_edit_view(request, neighborhood_id):
-    """Admin - edit a neighborhood via modal."""
     neighborhood = get_object_or_404(Neighborhood, pk=neighborhood_id)
 
     if request.method == "POST":
@@ -714,7 +637,6 @@ def admin_neighborhood_edit_view(request, neighborhood_id):
 @user_passes_test(is_admin)
 @require_POST
 def admin_neighborhood_delete_view(request, neighborhood_id):
-    """Admin - delete a neighborhood."""
     neighborhood = get_object_or_404(Neighborhood, pk=neighborhood_id)
     name = neighborhood.name
 
@@ -743,79 +665,11 @@ def admin_neighborhood_delete_view(request, neighborhood_id):
     return redirect("administration:neighborhoods")
 
 
-# ======================================================================
-# Commandes
-# ======================================================================
-
-
-@user_passes_test(is_admin)
-def admin_orders_view(request):
-    """Admin - view all orders (with filters: status, garage, client, user, date)."""
-    from garages.models import Garage as GarageModel
-
-    orders = (
-        Order.objects.all().select_related("user", "garage").order_by("-created_at")
-    )
-
-    status = request.GET.get("status", "")
-    search = request.GET.get("q", "")
-    garage_id = request.GET.get("garage", "")
-    client = request.GET.get("client", "")
-    user_id = request.GET.get("user", "")
-    date_from = request.GET.get("date_from", "")
-    date_to = request.GET.get("date_to", "")
-
-    if status:
-        orders = orders.filter(status=status)
-    if garage_id:
-        orders = orders.filter(garage_id=garage_id)
-    if client:
-        orders = orders.filter(user__username__icontains=client)
-    if user_id:
-        orders = orders.filter(user_id=user_id)
-    if date_from:
-        orders = orders.filter(created_at__date__gte=date_from)
-    if date_to:
-        orders = orders.filter(created_at__date__lte=date_to)
-    if search:
-        orders = orders.filter(
-            Q(order_number__icontains=search) | Q(user__username__icontains=search)
-        )
-
-    paginator = Paginator(orders, 20)
-    page = request.GET.get("page")
-    orders_page = paginator.get_page(page)
-
-    return render(
-        request,
-        "dashboard/pages/admin/orders/list.html",
-        {
-            "orders": orders_page,
-            "selected_status": status,
-            "search_query": search,
-            "selected_garage": garage_id,
-            "selected_client": client,
-            "selected_user": user_id,
-            "date_from": date_from,
-            "date_to": date_to,
-            "garages": GarageModel.objects.order_by("name").values_list("id", "name"),
-            "users": Order.objects.values_list("user_id", "user__username").distinct(),
-            "all_status_choices": Order.Status.choices,
-        },
-    )
-
-
-# ======================================================================
-# Paiements
-# ======================================================================
-
-
 @user_passes_test(is_admin)
 def admin_payments_view(request):
-    """Admin - view and filter all payments."""
     payments = (
         Payment.objects.all()
-        .select_related("order", "garage", "garage__owner", "user")
+        .select_related("garage", "garage__owner", "user")
         .order_by("-created_at")
     )
 
@@ -880,7 +734,7 @@ def admin_payments_view(request):
 @user_passes_test(is_admin)
 def admin_payment_detail_view(request, payment_id):
     payment = get_object_or_404(
-        Payment.objects.select_related("order", "garage", "garage__owner", "user"),
+        Payment.objects.select_related("garage", "garage__owner", "user"),
         pk=payment_id,
     )
     receipt = getattr(payment, "receipt", None)
@@ -904,17 +758,11 @@ def admin_receipt_detail_view(request, receipt_id):
     )
 
 
-# ======================================================================
-# Support
-# ======================================================================
-
-
 @user_passes_test(is_admin)
 def admin_support_view(request):
-    """Admin - manage support tickets."""
     tickets = (
         Ticket.objects.all()
-        .select_related("user", "assigned_to", "order", "garage", "part")
+        .select_related("user", "assigned_to", "garage", "part")
         .order_by("-created_at")
     )
 
@@ -953,9 +801,8 @@ def admin_support_view(request):
 
 @user_passes_test(is_admin)
 def admin_ticket_detail_view(request, ticket_id):
-    """Admin - view/assign/reply to ticket."""
     ticket = get_object_or_404(
-        Ticket.objects.select_related("user", "order", "garage", "part", "assigned_to"),
+        Ticket.objects.select_related("user", "garage", "part", "assigned_to"),
         pk=ticket_id,
     )
     from support.services import get_or_create_ticket_conversation
@@ -1016,253 +863,8 @@ def admin_ticket_detail_view(request, ticket_id):
     )
 
 
-# ======================================================================
-# Annonces - CRUD Complet avec Modals (UUID)
-# ======================================================================
-
-
-@user_passes_test(is_admin)
-def admin_announcements_view(request):
-    """Admin - manage platform announcements."""
-    announcements = Announcement.objects.select_related("created_by").order_by(
-        "-created_at"
-    )
-
-    search = request.GET.get("q", "")
-    if search:
-        announcements = announcements.filter(
-            Q(title__icontains=search) | Q(message__icontains=search)
-        )
-
-    paginator = Paginator(announcements, 20)
-    page = request.GET.get("page")
-    announcements_page = paginator.get_page(page)
-
-    return render(
-        request,
-        "dashboard/pages/admin/announcements/list.html",
-        {
-            "announcements": announcements_page,
-            "search_query": search,
-        },
-    )
-
-
-@user_passes_test(is_admin)
-def admin_announcement_detail_view(request, announcement_id):
-    """Admin - view announcement details."""
-    announcement = get_object_or_404(Announcement, pk=announcement_id)
-
-    if request.headers.get("x-requested-with") == "XMLHttpRequest":
-        return JsonResponse(
-            {
-                "success": True,
-                "announcement": {
-                    "title": announcement.title,
-                    "message": announcement.message,
-                    "link": announcement.link,
-                    "status": announcement.status,
-                    "created_by": announcement.created_by.display_name
-                    if announcement.created_by
-                    else "-",
-                    "created_at": announcement.created_at.strftime("%d/%m/%Y %H:%M"),
-                },
-            }
-        )
-
-    return render(
-        request,
-        "dashboard/pages/admin/announcements/detail.html",
-        {
-            "announcement": announcement,
-        },
-    )
-
-
-@user_passes_test(is_admin)
-def admin_announcement_create_view(request):
-    """Admin - create an announcement via modal."""
-    if request.method == "POST":
-        form = AnnouncementForm(request.POST)
-        if form.is_valid():
-            announcement = form.save(commit=False)
-            announcement.created_by = request.user
-            announcement.save()
-            from notifications.services import publish_announcement
-
-            publish_announcement(announcement)
-            if request.headers.get("x-requested-with") == "XMLHttpRequest":
-                return JsonResponse(
-                    {
-                        "success": True,
-                        "message": _("Annonce créée avec succès."),
-                        "redirect": reverse("administration:announcements"),
-                    }
-                )
-            messages.success(request, _("Annonce créée avec succès."))
-            return redirect("administration:announcements")
-        else:
-            if request.headers.get("x-requested-with") == "XMLHttpRequest":
-                return JsonResponse(
-                    {
-                        "success": False,
-                        "errors": {
-                            field: str(errs[0]) for field, errs in form.errors.items()
-                        },
-                    },
-                    status=400,
-                )
-    else:
-        form = AnnouncementForm()
-
-    return render(
-        request,
-        "dashboard/pages/admin/announcements/form.html",
-        {
-            "form": form,
-            "is_new": True,
-        },
-    )
-
-
-@user_passes_test(is_admin)
-def admin_announcement_edit_view(request, announcement_id):
-    """Admin - edit an announcement via modal."""
-    announcement = get_object_or_404(Announcement, pk=announcement_id)
-
-    if request.method == "POST":
-        previous_status = announcement.status
-        form = AnnouncementForm(request.POST, instance=announcement)
-        if form.is_valid():
-            form.save()
-            if (
-                previous_status != announcement.Status.PUBLISHED
-                and announcement.status == announcement.Status.PUBLISHED
-            ):
-                from notifications.services import publish_announcement
-
-                publish_announcement(announcement)
-            if request.headers.get("x-requested-with") == "XMLHttpRequest":
-                return JsonResponse(
-                    {
-                        "success": True,
-                        "message": _("Annonce mise à jour avec succès."),
-                        "redirect": reverse("administration:announcements"),
-                    }
-                )
-            messages.success(request, _("Annonce mise à jour avec succès."))
-            return redirect("administration:announcements")
-        else:
-            if request.headers.get("x-requested-with") == "XMLHttpRequest":
-                return JsonResponse(
-                    {
-                        "success": False,
-                        "errors": {
-                            field: str(errs[0]) for field, errs in form.errors.items()
-                        },
-                    },
-                    status=400,
-                )
-    else:
-        form = AnnouncementForm(instance=announcement)
-
-    if request.headers.get("x-requested-with") == "XMLHttpRequest":
-        return JsonResponse(
-            {
-                "success": True,
-                "form": {
-                    "title": announcement.title,
-                    "message": announcement.message,
-                    "link": announcement.link,
-                    "status": announcement.status,
-                },
-            }
-        )
-
-    return render(
-        request,
-        "dashboard/pages/admin/announcements/form.html",
-        {
-            "form": form,
-            "announcement": announcement,
-            "is_new": False,
-        },
-    )
-
-
-@user_passes_test(is_admin)
-@require_POST
-def admin_announcement_delete_view(request, announcement_id):
-    """Admin - delete an announcement."""
-    announcement = get_object_or_404(Announcement, pk=announcement_id)
-    announcement.delete()
-
-    if request.headers.get("x-requested-with") == "XMLHttpRequest":
-        return JsonResponse(
-            {
-                "success": True,
-                "message": _("Annonce supprimée."),
-                "redirect": reverse("administration:announcements"),
-            }
-        )
-
-    messages.success(request, _("Annonce supprimée."))
-    return redirect("administration:announcements")
-
-
-# ======================================================================
-# Notifications admin
-# ======================================================================
-
-
-@user_passes_test(is_admin)
-def admin_notifications_admin_view(request):
-    """Admin - view/manage user notifications."""
-    notifications_qs = Notification.objects.select_related("user").order_by(
-        "-created_at"
-    )
-
-    category = request.GET.get("category", "")
-    user_search = request.GET.get("q", "")
-    is_read = request.GET.get("read", "")
-
-    if category:
-        notifications_qs = notifications_qs.filter(category=category)
-    if user_search:
-        notifications_qs = notifications_qs.filter(
-            Q(user__username__icontains=user_search)
-            | Q(title__icontains=user_search)
-            | Q(message__icontains=user_search)
-        )
-    if is_read == "unread":
-        notifications_qs = notifications_qs.filter(is_read=False)
-    elif is_read == "read":
-        notifications_qs = notifications_qs.filter(is_read=True)
-
-    paginator = Paginator(notifications_qs, 20)
-    page = request.GET.get("page")
-    notifications_page = paginator.get_page(page)
-
-    return render(
-        request,
-        "dashboard/pages/admin/notifications_admin/list.html",
-        {
-            "notifications": notifications_page,
-            "selected_category": category,
-            "selected_read": is_read,
-            "search_query": user_search,
-        },
-    )
-
-
-# ======================================================================
-# Avis
-# ======================================================================
-
-
 @user_passes_test(is_admin)
 def admin_reviews_view(request):
-    """Admin - view all reviews."""
     reviews = (
         Review.objects.all()
         .select_related("user", "garage", "part")

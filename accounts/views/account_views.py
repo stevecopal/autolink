@@ -97,23 +97,10 @@ def profile_edit_view(request):
 @login_required
 def client_dashboard_view(request):
     """Client dashboard - personal space."""
-    from notifications.models import Notification
-    from orders.models import Order
     from payments.models import Payment
-    from vehicles.models import Vehicle
 
     context = {
-        "recent_orders": Order.objects.filter(user=request.user).select_related(
-            "garage"
-        )[:5],
-        "recent_payments": Payment.objects.filter(user=request.user).select_related(
-            "order"
-        )[:5],
-        "vehicles": request.user.vehicles.select_related("brand", "model")[:5],
-        "unread_notifications": Notification.objects.filter(
-            user=request.user, is_read=False
-        ).count(),
-        "total_orders": Order.objects.filter(user=request.user).count(),
+        "recent_payments": Payment.objects.filter(user=request.user)[:5],
         "total_payments": Payment.objects.filter(user=request.user).count(),
     }
     return render(request, "dashboard/pages/client/dashboard.html", context)

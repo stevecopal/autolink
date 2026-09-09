@@ -49,24 +49,6 @@
                     <p class="text-sm text-auto-700 whitespace-pre-wrap leading-relaxed">{{ ticket.description }}</p>
                 </div>
 
-                {% if ticket.order %}
-                <div class="mt-4 p-4 rounded-xl bg-auto-50 border border-auto-100">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-auto-orange/10 flex items-center justify-center flex-shrink-0">
-                            <svg class="w-5 h-5 text-auto-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/></svg>
-                        </div>
-                        <div class="min-w-0">
-                            <div class="text-xs text-auto-500">{% trans "Commande" %}</div>
-                            <div class="font-bold text-sm text-auto-dark">{{ ticket.order.order_number }}</div>
-                        </div>
-                        <a href="{% url 'orders:order_detail' order_number=ticket.order.order_number %}"
-                           class="btn-outline text-xs px-3 py-1.5 flex-shrink-0 ml-auto">
-                            {% trans "Voir" %}
-                        </a>
-                    </div>
-                </div>
-                {% endif %}
-
                 {% if ticket.part %}
                 <div class="mt-3 p-4 rounded-xl bg-auto-50 border border-auto-100">
                     <div class="flex items-center gap-3">

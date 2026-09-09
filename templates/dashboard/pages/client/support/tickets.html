@@ -91,11 +91,6 @@
                                 <span>·</span>
                                 <span>{{ ticket.created_at|date:"d/m/Y H:i" }}</span>
                             </div>
-                            {% if ticket.order %}
-                            <div class="text-xs text-auto-400 mt-0.5">
-                                {% trans "Commande" %} : {{ ticket.order.order_number }}
-                            </div>
-                            {% endif %}
                             <div class="mt-1.5 text-sm text-auto-600 line-clamp-1">{{ ticket.description|truncatewords:20 }}</div>
                         </div>
                     </div>

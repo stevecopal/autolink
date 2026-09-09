@@ -4,101 +4,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}{% trans "Administration" %} - AutoLink{% endblock %}</title>
-    <meta name="description" content="{% block description %}{% trans "Administration AutoLink" %}{% endblock %}">
+    <title>{% block title %}{% trans "AutoLink" %}{% endblock %}</title>
+    <meta name="description" content="{% block description %}{% trans "Plateforme AutoLink - Réparation automobile" %}{% endblock %}">
     <link rel="stylesheet" href="{% static 'css/output.css' %}">
     <link rel="stylesheet" href="{% static 'administration/css/admin.css' %}">
     {% block extra_css %}{% endblock %}
 </head>
-<body class="bg-auto-cream h-screen flex flex-col">
+<body class="bg-auto-cream h-screen flex flex-col md:flex-row">
 
-    <!-- Mobile Drawer Overlay (mobile only) -->
+    <!-- ===== OVERLAY POUR MOBILE (cache le contenu quand sidebar est ouverte) ===== -->
     <div id="admin-drawer-overlay"
-         class="fixed inset-0 bg-black/50 z-40 hidden md:hidden"
+         class="fixed inset-0 bg-black/60 z-40 hidden md:hidden transition-opacity duration-300"
          onclick="window.CloseAdminDrawer()"></div>
 
-    <!-- Two-column layout: Sidebar + Right column -->
-    <div class="flex flex-1 overflow-hidden">
+    <!-- ===== SIDEBAR (Mobile: Drawer / Desktop: Fixée) ===== -->
+    <aside id="admin-sidebar"
+           class="fixed md:relative z-50 h-screen w-64 bg-white border-r border-auto-100 shadow-sm
+                  flex flex-col
+                  transition-transform duration-300 ease-in-out
+                  md:translate-x-0 -translate-x-full">
 
-        <!-- Sidebar -->
-        <aside id="admin-sidebar"
-               class="fixed md:sticky top-0 left-0 h-screen w-64 bg-white border-r border-auto-100 z-50
-                      flex flex-col overflow-hidden
-                      md:overflow-y-auto md:overflow-x-hidden
-                      shadow-sm
-                      transition-transform duration-300 md:translate-x-0 -translate-x-full">
-            <!-- Sidebar Header -->
-            <div class="flex items-center justify-between p-4 border-b border-auto-100">
-                <!-- Close button (mobile only) -->
-                <button onclick="window.CloseAdminDrawer()"
-                        class="md:hidden p-1.5 rounded-lg hover:bg-auto-light text-auto-600 transition"
-                        aria-label="{% trans 'Close menu' %}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
-                </button>
-            </div>
-
-            <!-- User Badge -->
-            <div class="px-4 py-3 border-b border-auto-100 bg-auto-50">
-                <div class="flex items-center space-x-3">
-                    <div class="w-9 h-9 bg-auto-orange rounded-full flex items-center justify-center text-white font-bold text-sm">
-                        {{ user.display_name|first|upper }}
-                    </div>
-                    <div class="min-w-0">
-                        <p class="font-bold text-sm truncate">{{ user.display_name }}</p>
-                        <p class="text-xs text-auto-600 truncate">{{ user.email }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Navigation -->
-            {% include "dashboard/includes/sidebar.html" %}
-
-        </aside>
-
-        <!-- Right column: Header + Content + Footer -->
-        <div class="flex-1 flex flex-col min-h-0">
-
-            <!-- Header bar (mobile only: with hamburger) -->
-            <header class="sticky top-0 z-30 bg-white border-b border-auto-100 px-4 py-3 flex items-center gap-3 md:hidden shrink-0">
-                <!-- Hamburger button (mobile only) -->
-                <button id="sidebar-toggle-btn"
-                        onclick="window.OpenAdminDrawer()"
-                        class="p-2 rounded-xl bg-auto-500 text-white hover:bg-auto-600 shadow-card transition-colors"
-                        aria-label="Ouvrir le menu">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                    </svg>
-                </button>
-
-                <!-- Page title area -->
-                <div class="flex-1 min-w-0">
-                    {% block dashboard_header %}{% endblock %}
-                </div>
-            </header>
-
-            <!-- Main Content (scrollable) -->
-            <main class="flex-1 overflow-y-auto">
-                <div class="p-4 md:p-6 max-w-7xl mx-auto">
-                    {% block content %}{% endblock %}
-                </div>
-            </main>
-
-            <!-- Footer (always at bottom of right column) -->
-            <footer class="border-t border-auto-100 bg-white py-4 shrink-0">
-                <div class="px-4 md:px-6 max-w-7xl mx-auto text-center">
-                    <p class="text-xs text-auto-600">&copy; 2026 AutoLink. Tous droits réservés.</p>
-                </div>
-            </footer>
-
+        <!-- Header de la Sidebar (Logo + Bouton Fermer) -->
+        <div class="flex items-center justify-between p-4 border-b border-auto-100">
+            <a href="{% url 'core:home' %}" class="flex items-center gap-2">
+                <svg class="w-6 h-6 text-auto-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.42 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.42 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.42 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.42z"/>
+                </svg>
+                <span class="font-bold text-auto-dark text-lg">AutoLink</span>
+            </a>
+            <button onclick="window.CloseAdminDrawer()"
+                    class="md:hidden p-1.5 rounded-lg hover:bg-auto-light text-auto-600 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
         </div>
+
+        <!-- Contenu Scrollable -->
+        <div class="flex-1 overflow-y-auto p-3 space-y-1 scrollbar-thin">
+            {% include "dashboard/includes/sidebar.html" %}
+        </div>
+    </aside>
+
+    <!-- ===== CONTENU PRINCIPAL ===== -->
+    <div class="flex-1 flex flex-col min-h-0">
+        <!-- Header (Mobile: Bouton Hamburger / Desktop: Caché) -->
+        <header class="sticky top-0 z-30 bg-white border-b border-auto-100 px-4 py-3 flex items-center gap-3 md:hidden">
+            <button id="sidebar-toggle-btn"
+                    onclick="window.OpenAdminDrawer()"
+                    class="p-2 rounded-xl bg-auto-500 text-white hover:bg-auto-600 shadow-card transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+            </button>
+            <div class="flex-1 min-w-0">
+                {% block dashboard_header %}{% endblock %}
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-6">
+            <div class="max-w-7xl mx-auto w-full">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="border-t border-auto-100 bg-white py-4 shrink-0">
+            <div class="px-4 md:px-6 max-w-7xl mx-auto text-center">
+                <p class="text-xs text-auto-600">&copy; 2026 AutoLink. Tous droits réservés.</p>
+            </div>
+        </footer>
     </div>
 
-
+    <!-- ===== MODALS ET SCRIPTS ===== -->
     {% include "dashboard/includes/messages.html" %}
 
-    <!-- Reusable Delete Confirmation Modal -->
     <div id="modal-delete-confirm" class="al-modal hidden">
         <div class="al-modal-backdrop"></div>
         <div class="al-modal-panel">
@@ -137,11 +119,11 @@
     <script src="{% static 'administration/js/admin.js' %}" defer></script>
     {% block extra_js %}{% endblock %}
 
+    <!-- ===== SCRIPT POUR LA SIDEBAR ===== -->
     <script>
-        /* --- Sidebar toggle (mobile only) --- */
         window.OpenAdminDrawer = function() {
-            var drawer = document.getElementById('admin-sidebar');
-            var overlay = document.getElementById('admin-drawer-overlay');
+            const drawer = document.getElementById('admin-sidebar');
+            const overlay = document.getElementById('admin-drawer-overlay');
             if (drawer && overlay) {
                 drawer.classList.remove('-translate-x-full');
                 overlay.classList.remove('hidden');
@@ -150,8 +132,8 @@
         };
 
         window.CloseAdminDrawer = function() {
-            var drawer = document.getElementById('admin-sidebar');
-            var overlay = document.getElementById('admin-drawer-overlay');
+            const drawer = document.getElementById('admin-sidebar');
+            const overlay = document.getElementById('admin-drawer-overlay');
             if (drawer && overlay) {
                 drawer.classList.add('-translate-x-full');
                 overlay.classList.add('hidden');
@@ -159,7 +141,15 @@
             }
         };
 
-        /* Close sidebar on Escape key (mobile) */
+        // Fermer la sidebar si on clique sur l'overlay
+        document.addEventListener('DOMContentLoaded', function() {
+            const overlay = document.getElementById('admin-drawer-overlay');
+            if (overlay) {
+                overlay.addEventListener('click', window.CloseAdminDrawer);
+            }
+        });
+
+        // Fermer avec la touche Escape
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 window.CloseAdminDrawer();
@@ -167,5 +157,4 @@
         });
     </script>
 </body>
-
 </html>

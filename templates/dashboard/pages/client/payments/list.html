@@ -31,7 +31,6 @@
                     <thead>
                         <tr>
                             <th>#</th>
-                            <th>{% trans "Commande" %}</th>
                             <th>{% trans "Montant" %}</th>
                             <th>{% trans "Méthode" %}</th>
                             <th>{% trans "Statut" %}</th>
@@ -43,12 +42,6 @@
                         {% for payment in payments %}
                             <tr>
                                 <td class="font-bold text-xs">#{{ payment.id }}</td>
-                                <td>
-                                    <a href="{% url 'orders:order_detail' payment.order.order_number %}"
-                                       class="font-medium text-auto-orange hover:underline">
-                                        {{ payment.order.order_number }}
-                                    </a>
-                                </td>
                                 <td class="font-bold">{{ payment.amount|intcomma }} FCFA</td>
                                 <td>
                                     <span class="badge-neutral text-[10px]">{{ payment.get_payment_method_display }}</span>

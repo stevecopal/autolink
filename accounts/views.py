@@ -91,27 +91,14 @@ def profile_edit_view(request):
 def client_dashboard_view(request):
     """Dashboard utilisateur — espace personnel."""
     from garages.models import Garage
-    from notifications.models import Notification
-    from orders.models import Cart, Order
     from payments.models import Payment
-    from vehicles.models import Vehicle
 
     user_garages = Garage.objects.filter(owner=request.user).select_related(
         "city", "neighborhood"
     )
 
     context = {
-        "recent_orders": Order.objects.filter(user=request.user).select_related(
-            "garage"
-        )[:5],
-        "recent_payments": Payment.objects.filter(user=request.user).select_related(
-            "order"
-        )[:5],
-        "vehicles": request.user.vehicles.select_related("brand", "model")[:5],
-        "unread_notifications": Notification.objects.filter(
-            user=request.user, is_read=False
-        ).count(),
-        "total_orders": Order.objects.filter(user=request.user).count(),
+        "recent_payments": Payment.objects.filter(user=request.user)[:5],
         "total_payments": Payment.objects.filter(user=request.user).count(),
         "user_garages": user_garages,
         "has_approved_garage": user_garages.filter(

@@ -2,14 +2,14 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
 
-from .models import Part, PartRequest
+from .models import Part
 
 
 class PartForm(forms.ModelForm):
     class Meta:
         model = Part
         fields = [
-            'name', 'category', 'brand', 'reference_oem', 'reference_fabricant',
+            'name', 'category', 'reference_oem', 'reference_fabricant',
             'condition', 'description', 'price', 'stock', 'photo',
             'warranty_months', 'city', 'neighborhood',
             'latitude', 'longitude',
@@ -21,7 +21,6 @@ class PartForm(forms.ModelForm):
                 'autofocus': True,
             }),
             'category': forms.Select(attrs={'class': 'form-input'}),
-            'brand': forms.Select(attrs={'class': 'form-input'}),
             'reference_oem': forms.TextInput(attrs={
                 'class': 'form-input',
                 'placeholder': _('Ex: OEM-12345'),
@@ -112,23 +111,3 @@ class PartForm(forms.ModelForm):
         if commit:
             instance.save()
         return instance
-
-
-class PartRequestForm(forms.ModelForm):
-    class Meta:
-        model = PartRequest
-        fields = [
-            'vehicle', 'part_name', 'reference', 'description',
-            'photo', 'quantity', 'city', 'neighborhood', 'urgency',
-        ]
-        widgets = {
-            'vehicle': forms.Select(attrs={'class': 'form-input'}),
-            'part_name': forms.TextInput(attrs={'class': 'form-input', 'placeholder': _('Part name')}),
-            'reference': forms.TextInput(attrs={'class': 'form-input'}),
-            'description': forms.Textarea(attrs={'class': 'form-input', 'rows': 3}),
-            'photo': forms.ClearableFileInput(attrs={'class': 'form-input'}),
-            'quantity': forms.NumberInput(attrs={'class': 'form-input', 'min': 1}),
-            'city': forms.TextInput(attrs={'class': 'form-input'}),
-            'neighborhood': forms.TextInput(attrs={'class': 'form-input'}),
-            'urgency': forms.Select(attrs={'class': 'form-input'}),
-        }

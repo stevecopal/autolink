@@ -11,9 +11,7 @@
     <nav class="flex items-center space-x-2 text-sm text-auto-600">
         <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-auto-orange transition">{% trans "Tableau de bord" %}</a>
         <span class="text-auto-400">/</span>
-        <a href="{% url 'orders:order_list' %}" class="hover:text-auto-orange transition">{% trans "Mes commandes" %}</a>
-        <span class="text-auto-400">/</span>
-        <a href="{% url 'orders:order_detail' order.order_number %}" class="hover:text-auto-orange transition">{{ order.order_number }}</a>
+        <a href="{% url 'payments:payment_list' %}" class="hover:text-auto-orange transition">{% trans "Mes paiements" %}</a>
         <span class="text-auto-400">/</span>
         <span class="font-bold text-auto-dark">{% trans "Paiement" %}</span>
     </nav>
@@ -23,14 +21,14 @@
 <div class="max-w-2xl mx-auto">
     <!-- Order Summary -->
     <div class="card p-6 mb-6">
-        <h3 class="text-lg font-bold text-auto-dark mb-4">{% trans "Commande" %}</h3>
+        <h3 class="text-lg font-bold text-auto-dark mb-4">{% trans "Paiement" %}</h3>
         <div class="flex items-center justify-between mb-4 p-4 bg-auto-50 rounded-xl border border-auto-100">
             <div>
-                <div class="font-bold text-lg text-auto-dark">{{ order.order_number }}</div>
-                <div class="text-sm text-auto-500">{{ order.created_at|date:"d/m/Y H:i" }}</div>
+                <div class="font-bold text-lg text-auto-dark">{{ payment.id }}</div>
+                <div class="text-sm text-auto-500">{{ payment.created_at|date:"d/m/Y H:i" }}</div>
             </div>
             <div class="text-right">
-                <div class="font-bold text-xl text-auto-deep-red">{{ order.total|intcomma }} FCFA</div>
+                <div class="font-bold text-xl text-auto-deep-red">{{ payment.amount|intcomma }} FCFA</div>
                 <span class="badge-warning text-[10px] mt-1 inline-block">{% trans "En attente de paiement" %}</span>
             </div>
         </div>
@@ -38,7 +36,7 @@
         <div class="space-y-2 text-sm">
             <div class="flex justify-between">
                 <span class="text-auto-600">{% trans "Total" %}</span>
-                <span class="font-bold text-auto-dark">{{ order.total|intcomma }} FCFA</span>
+                <span class="font-bold text-auto-dark">{{ payment.amount|intcomma }} FCFA</span>
             </div>
         </div>
     </div>
@@ -90,7 +88,7 @@
             <p class="text-sm text-auto-600 mb-2">{% trans "Après validation, vous seront redirigé vers la page de paiement sécurisée." %}</p>
             <form method="post" class="flex justify-between items-center pt-4 border-t border-auto-100">
                 {% csrf_token %}
-                <a href="{% url 'orders:order_detail' order.order_number %}"
+                <a href="{% url 'payments:payment_list' %}"
                    class="btn-outline text-sm">{% trans "Annuler" %}</a>
                 <button type="submit"
                         class="bg-auto-orange text-white px-6 py-2 rounded-lg font-bold text-sm hover:bg-auto-orange-dark transition">

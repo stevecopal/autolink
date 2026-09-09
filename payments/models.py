@@ -26,13 +26,6 @@ class Payment(models.Model):
         CASH = "CASH", _("Espèces")
 
     idempotency_key = models.CharField(max_length=64, unique=True, editable=False)
-    order = models.ForeignKey(
-        "orders.Order",
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        related_name="payments",
-    )
     garage = models.ForeignKey(
         "garages.Garage",
         on_delete=models.SET_NULL,
@@ -112,46 +105,3 @@ class Receipt(models.Model):
         if not self.reference:
             self.reference = f"REC-{self.payment_id.hex[:12].upper()}"
         super().save(*args, **kwargs)
-
-
-class Refund(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-
-    class Status(models.TextChoices):
-        PENDING = "PENDING", _("En attente")
-        PROCESSING = "PROCESSING", _("En cours")
-        APPROVED = "APPROVED", _("Approuvé")
-        REJECTED = "REJECTED", _("Rejeté")
-        COMPLETED = "COMPLETED", _("Terminé")
-
-    payment = models.ForeignKey(
-        Payment, on_delete=models.CASCADE, related_name="refunds"
-    )
-    order = models.ForeignKey(
-        "orders.Order", on_delete=models.CASCADE, related_name="refunds"
-    )
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="refunds"
-    )
-
-    amount = models.DecimalField(max_digits=10, decimal_places=0)
-    reason = models.TextField(_("Raison"))
-    status = models.CharField(
-        max_length=20, choices=Status.choices, default=Status.PENDING
-    )
-
-    processed_by = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True
-    )
-    notes = models.TextField(blank=True)
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    processed_at = models.DateTimeField(null=True, blank=True)
-
-    class Meta:
-        ordering = ["-created_at"]
-        verbose_name = _("Remboursement")
-        verbose_name_plural = _("Remboursements")
-
-    def __str__(self):
-        return f"Remboursement {self.pk} - {self.amount} XAF"

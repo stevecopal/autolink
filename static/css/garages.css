@@ -171,7 +171,6 @@
 
 @media (max-width: 768px) {
     .sidebar-mobile {
-        min-height: 100vh;
         overflow-y: auto;
     }
 }
