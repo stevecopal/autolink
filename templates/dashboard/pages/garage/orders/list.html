@@ -1,0 +1,100 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n humanize %}
+
+{% block title %}{% trans "Commandes de mes garages" %}{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div>
+            <h1 class="text-2xl font-bold text-auto-dark">{% trans "Commandes" %}</h1>
+            <p class="text-auto-600 text-sm">{% trans "Toutes les commandes de vos garages" %}</p>
+        </div>
+        <a href="{% url 'garages:garage_dashboard' %}" class="btn-outline text-sm">{% trans "Tableau du garage" %}</a>
+    </div>
+
+    <!-- Filtres -->
+    <form method="get" class="card p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+        <div>
+            <label class="block text-sm font-medium text-auto-800 mb-1">{% trans "Statut" %}</label>
+            <select name="status" class="form-input">
+                <option value="">{% trans "Tous" %}</option>
+                {% for value, label in status_choices %}
+                    <option value="{{ value }}" {% if status_filter == value %}selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-auto-800 mb-1">{% trans "Garage" %}</label>
+            <select name="garage" class="form-input">
+                <option value="">{% trans "Tous" %}</option>
+                {% for g in garages %}
+                    <option value="{{ g.id }}" {% if garage_filter == g.id|stringformat:"s" %}selected{% endif %}>{{ g.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-auto-800 mb-1">{% trans "Client" %}</label>
+            <input type="text" name="client" value="{{ client_filter }}" class="form-input" placeholder="{% trans 'Nom du client...' %}">
+        </div>
+        <div>
+            <label class="block text-sm font-medium text-auto-800 mb-1">{% trans "Du" %}</label>
+            <input type="date" name="date_from" value="{{ date_from }}" class="form-input">
+        </div>
+        <div class="flex items-end gap-2">
+            <button type="submit" class="btn-primary">{% trans "Filtrer" %}</button>
+        </div>
+    </form>
+
+    {% if orders %}
+    <div class="card overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm min-w-[600px]">
+                <thead class="bg-auto-50">
+                    <tr class="text-left text-auto-700">
+                        <th class="px-3 py-2">{% trans "Commande" %}</th>
+                        <th class="px-3 py-2">{% trans "Client" %}</th>
+                        <th class="px-3 py-2">{% trans "Garage" %}</th>
+                        <th class="px-3 py-2">{% trans "Statut" %}</th>
+                        <th class="px-3 py-2 text-right">{% trans "Total" %}</th>
+                        <th class="px-3 py-2">{% trans "Date" %}</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y">
+                    {% for order in orders %}
+                    <tr class="hover:bg-auto-50 cursor-pointer" onclick="window.location='{% url 'orders:order_detail' order.order_number %}'">
+                        <td class="px-3 py-2 font-mono text-xs">
+                            <a href="{% url 'orders:order_detail' order.order_number %}" class="text-auto-orange hover:underline">{{ order.order_number }}</a>
+                        </td>
+                        <td class="px-3 py-2">{{ order.user.display_name }}</td>
+                        <td class="px-3 py-2 text-xs">{{ order.garage.name|default:"-" }}</td>
+                        <td class="px-3 py-2"><span class="badge-{{ order.status_color }} text-[10px]">{{ order.status_label }}</span></td>
+                        <td class="px-3 py-2 text-right font-bold">{{ order.total|intcomma }} FCFA</td>
+                        <td class="px-3 py-2 text-xs">{{ order.created_at|date:"d/m/Y" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" class="px-3 py-8 text-center text-auto-600">{% trans "Aucune commande trouvée." %}</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if orders.has_other_pages %}
+        <div class="px-4 py-3 border-t flex justify-between items-center">
+            <span class="text-sm text-auto-600">{% trans "Page" %} {{ orders.number }} / {{ orders.paginator.num_pages }}</span>
+            <div class="flex space-x-2">
+                {% if orders.has_previous %}<a href="?page={{ orders.previous_page_number }}" class="btn-outline text-sm py-1 px-3">{% trans "Précédent" %}</a>{% endif %}
+                {% if orders.has_next %}<a href="?page={{ orders.next_page_number }}" class="btn-outline text-sm py-1 px-3">{% trans "Suivant" %}</a>{% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% else %}
+    <div class="card p-8 text-center">
+        <div class="text-4xl mb-3">📦</div>
+        <h3 class="text-lg font-bold text-auto-dark mb-1">{% trans "Aucune commande" %}</h3>
+        <p class="text-auto-600">{% trans "Aucune commande trouvée pour vos garages." %}</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

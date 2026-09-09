@@ -1,0 +1,17 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Paiement d'activation" %}{% endblock %}
+
+{% block content %}
+<div class="max-w-xl mx-auto px-4 py-8">
+    <div class="card p-6 space-y-4">
+        <h1 class="text-xl font-bold text-auto-dark">{% trans "Activation du garage" %}</h1>
+        <p class="text-auto-700">{{ payment.garage.name }}</p>
+        <div class="flex items-center justify-between border-t border-auto-100 pt-4"><span>{% trans "Montant" %}</span><strong>{{ payment.amount }} {{ payment.currency }}</strong></div>
+        <div class="flex items-center justify-between"><span>{% trans "Statut" %}</span><strong>{{ payment.get_status_display }}</strong></div>
+        {% if payment.status == 'PENDING' %}<p class="text-sm text-auto-600">{% trans "La confirmation sera effectuée par le prestataire de paiement." %}</p>{% elif payment.status == 'SUCCESS' %}<p class="text-sm text-success-600">{% trans "Votre garage est activé." %}</p>{% endif %}
+        <a href="{% url 'garages:garage_dashboard' %}" class="btn-outline text-center">{% trans "Retour au garage" %}</a>
+    </div>
+</div>
+{% endblock %}

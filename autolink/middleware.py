@@ -1,7 +1,48 @@
 import time
 from django.core.cache import cache
 from django.http import JsonResponse
+from django.shortcuts import redirect
+from django.contrib import messages
 from django.utils.deprecation import MiddlewareMixin
+from django.utils.translation import gettext_lazy as _
+
+
+class AccountStatusMiddleware(MiddlewareMixin):
+    """
+    Middleware that blocks suspended users from accessing the site.
+    Superusers are never blocked.
+    """
+
+    EXEMPT_PATHS = [
+        '/accounts/logout/',
+        '/accounts/google/',
+        '/admin/',
+        '/static/',
+        '/media/',
+    ]
+
+    def process_request(self, request):
+        if not request.user.is_authenticated:
+            return None
+
+        if request.user.is_superuser:
+            return None
+
+        if request.user.account_status != 'ACTIVE':
+            for path in self.EXEMPT_PATHS:
+                if request.path.startswith(path):
+                    return None
+
+            if request.headers.get('Accept') == 'application/json':
+                return JsonResponse(
+                    {'error': 'Votre compte a été suspendu.'},
+                    status=403,
+                )
+
+            messages.error(request, _('Votre compte a été suspendu. Contactez l\'administrateur.'))
+            return redirect('core:home')
+
+        return None
 
 
 class RateLimitMiddleware(MiddlewareMixin):

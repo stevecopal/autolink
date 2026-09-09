@@ -76,7 +76,7 @@
                             </td>
                             <td class="px-4 py-3">
                                 <button type="button"
-                                        onclick="editCityModal({{ city.id }})"
+                                        onclick="editCityModal('{{ city.id }}')"
                                         class="text-auto-orange font-medium hover:underline text-sm mr-3">
                                     {% trans "Modifier" %}
                                 </button>
@@ -143,11 +143,6 @@
                             <input type="text" name="name" class="form-input" required>
                             <p class="form-error"></p>
                         </div>
-                        <div class="mb-4">
-                            <label class="form-label">{% trans "Slug" %}</label>
-                            <input type="text" name="slug" class="form-input" required>
-                            <p class="form-error"></p>
-                        </div>
                         <div class="flex items-center gap-3 mb-4">
                             <label class="inline-flex items-center gap-2 cursor-pointer">
                                 <input type="checkbox" name="is_active" class="rounded border-auto-200 text-auto-orange focus:ring-auto-orange" checked>
@@ -201,11 +196,6 @@ function editCityModal(id) {
                 '<div class="mb-4">' +
                 '<label class="form-label">{% trans "Nom" %}</label>' +
                 '<input type="text" name="name" class="form-input" value="' + (f.name || '') + '" required>' +
-                '<p class="form-error"></p>' +
-                '</div>' +
-                '<div class="mb-4">' +
-                '<label class="form-label">{% trans "Slug" %}</label>' +
-                '<input type="text" name="slug" class="form-input" value="' + (f.slug || '') + '" required>' +
                 '<p class="form-error"></p>' +
                 '</div>' +
                 '<div class="flex items-center gap-3 mb-4">' +

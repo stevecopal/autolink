@@ -17,9 +17,9 @@
                 <a href="{% url 'catalog:part_list' %}" class="nav-link text-white">{% trans "Pieces" %}</a>
                 
                 {% if user.is_authenticated %}
-                    {% if user.role == 'ADMIN' %}
+                    {% if user.role == 'ADMIN' or user.role == 'SUPERUSER' or user.is_superuser %}
                         <a href="{% url 'administration:dashboard' %}" class="nav-link text-white">{% trans "Tableau de bord" %}</a>
-                    {% elif user.role == 'GARAGE' %}
+                    {% elif user.role == 'CLIENT' %}
                         <a href="{% url 'garages:garage_dashboard' %}" class="nav-link text-white">{% trans "Tableau de bord" %}</a>
                     {% else %}
                         <a href="{% url 'orders:cart' %}" class="nav-link text-white relative" aria-label="{% trans 'Panier' %}">
@@ -49,9 +49,9 @@
             
             {% if user.is_authenticated %}
                 <div class="border-t border-white/10 my-2"></div>
-                {% if user.role == 'ADMIN' %}
+                {% if user.role == 'ADMIN' or user.role == 'SUPERUSER' or user.is_superuser %}
                     <a href="{% url 'administration:dashboard' %}" class="block py-2.5 nav-link text-white">{% trans "Tableau d'administration" %}</a>
-                {% elif user.role == 'GARAGE' %}
+                {% elif user.role == 'CLIENT' %}
                     <a href="{% url 'garages:garage_dashboard' %}" class="block py-2.5 nav-link text-white">{% trans "Tableau du garage" %}</a>
                     <a href="{% url 'catalog:garage_products' %}" class="block py-2.5 nav-link text-white">{% trans "Mes produits" %}</a>
                 {% else %}

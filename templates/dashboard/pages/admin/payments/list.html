@@ -10,6 +10,13 @@
         <a href="{% url 'administration:dashboard' %}" class="btn-outline">{% trans "Retour au tableau de bord" %}</a>
     </div>
 
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+        <div class="stat-card"><div class="stat-value">{{ approved_unpaid_count }}</div><div class="stat-label">{% trans "Approuvés non payés" %}</div></div>
+        <div class="stat-card"><div class="stat-value">{{ paid_garage_count }}</div><div class="stat-label">{% trans "Garages payés" %}</div></div>
+        <div class="stat-card"><div class="stat-value">{{ active_garage_count }}</div><div class="stat-label">{% trans "Garages actifs" %}</div></div>
+        <div class="stat-card"><div class="stat-value">{{ suspended_garage_count }}</div><div class="stat-label">{% trans "Garages suspendus" %}</div></div>
+    </div>
+
     <!-- Filters -->
     <div class="card p-4 mb-6">
         <form method="get" class="flex flex-wrap gap-4 items-end">
@@ -24,13 +31,20 @@
                 </select>
             </div>
             <div>
+                <label class="block text-sm font-medium text-auto-800 mb-1">{% trans "Garage" %}</label>
+                <select name="garage" class="form-input">
+                    <option value="">{% trans "Tous" %}</option>
+                    {% for garage in garages %}<option value="{{ garage.id }}" {% if selected_garage == garage.id|stringformat:'s' %}selected{% endif %}>{{ garage.name }}</option>{% endfor %}
+                </select>
+            </div>
+            <div><label class="block text-sm font-medium text-auto-800 mb-1">{% trans "Client / propriétaire" %}</label><input type="text" name="client" value="{{ selected_client }}" class="form-input"></div>
+            <div><label class="block text-sm font-medium text-auto-800 mb-1">{% trans "Du" %}</label><input type="date" name="date_from" value="{{ date_from }}" class="form-input"></div>
+            <div><label class="block text-sm font-medium text-auto-800 mb-1">{% trans "Au" %}</label><input type="date" name="date_to" value="{{ date_to }}" class="form-input"></div>
+            <div>
                 <label class="block text-sm font-medium text-auto-800 mb-1">{% trans "Fournisseur" %}</label>
                 <select name="provider" class="form-input">
                     <option value="">{% trans "Tous" %}</option>
-                    <option value="MTN_MOMO" {% if selected_provider == 'MTN_MOMO' %}selected{% endif %}>MTN Mobile Money</option>
-                    <option value="ORANGE_MONEY" {% if selected_provider == 'ORANGE_MONEY' %}selected{% endif %}>Orange Money</option>
-                    <option value="CARD" {% if selected_provider == 'CARD' %}selected{% endif %}>{% trans "Carte" %}</option>
-                    <option value="CASH" {% if selected_provider == 'CASH' %}selected{% endif %}>{% trans "Espèces" %}</option>
+                    {% for value, label in provider_choices %}<option value="{{ value }}" {% if selected_provider == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
                 </select>
             </div>
             <button type="submit" class="btn-primary">{% trans "Filtrer" %}</button>
@@ -44,11 +58,15 @@
                 <thead class="bg-auto-50">
                     <tr class="text-left text-auto-700">
                         <th class="px-4 py-3">#</th>
-                        <th class="px-4 py-3">{% trans "Utilisateur" %}</th>
+                        <th class="px-4 py-3">{% trans "Garage" %}</th>
+                        <th class="px-4 py-3">{% trans "Propriétaire" %}</th>
+                        <th class="px-4 py-3">{% trans "Client" %}</th>
                         <th class="px-4 py-3">{% trans "Commande" %}</th>
                         <th class="px-4 py-3">{% trans "Montant" %}</th>
                         <th class="px-4 py-3">{% trans "Fournisseur" %}</th>
+                        <th class="px-4 py-3">{% trans "Transaction" %}</th>
                         <th class="px-4 py-3">{% trans "Statut" %}</th>
+                        <th class="px-4 py-3">{% trans "Confirmation" %}</th>
                         <th class="px-4 py-3">{% trans "Date" %}</th>
                     </tr>
                 </thead>
@@ -56,10 +74,13 @@
                     {% for payment in payments %}
                         <tr class="hover:bg-auto-50">
                             <td class="px-4 py-3 font-mono text-xs">{{ payment.idempotency_key|truncatechars:12 }}</td>
+                            <td class="px-4 py-3"><a href="{% url 'administration:payment_detail' payment.id %}" class="text-auto-orange hover:underline">{{ payment.garage.name|default:'—' }}</a></td>
+                            <td class="px-4 py-3">{{ payment.garage.owner.username|default:'—' }}</td>
                             <td class="px-4 py-3">{{ payment.user.username }}</td>
                             <td class="px-4 py-3 font-mono text-xs">{{ payment.order.order_number }}</td>
                             <td class="px-4 py-3 font-bold">{{ payment.amount|intcomma }} {{ payment.currency }}</td>
                             <td class="px-4 py-3">{{ payment.get_provider_display }}</td>
+                            <td class="px-4 py-3 font-mono text-xs">{{ payment.provider_transaction_id|default:'—' }}</td>
                             <td class="px-4 py-3">
                                 {% if payment.status == 'SUCCESS' %}
                                     <span class="badge-success">{% trans "Succès" %}</span>
@@ -69,11 +90,12 @@
                                     <span class="badge-warning">{{ payment.get_status_display }}</span>
                                 {% endif %}
                             </td>
+                            <td class="px-4 py-3">{{ payment.paid_at|date:"d/m/Y H:i"|default:'—' }}</td>
                             <td class="px-4 py-3">{{ payment.created_at|date:"d/m/Y H:i" }}</td>
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="7" class="px-4 py-8 text-center text-auto-600">{% trans "Aucun paiement trouvé." %}</td>
+                            <td colspan="11" class="px-4 py-8 text-center text-auto-600">{% trans "Aucun paiement trouvé." %}</td>
                         </tr>
                     {% endfor %}
                 </tbody>

@@ -43,6 +43,14 @@ class CustomUserCreationForm(UserCreationForm):
         for field_name in self.fields:
             self.fields[field_name].help_text = ''
 
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.role = User.Role.USER
+        user.account_status = User.AccountStatus.ACTIVE
+        if commit:
+            user.save()
+        return user
+
 
 class CustomLoginForm(AuthenticationForm):
     def __init__(self, *args, **kwargs):

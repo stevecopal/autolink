@@ -1,0 +1,39 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Messages" %}{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex items-center justify-between gap-3">
+        <div>
+            <h1 class="text-2xl font-bold text-auto-dark">{% trans "Messages" %}</h1>
+            <p class="text-sm text-auto-600">{% trans "Vos conversations avec l'administration." %}</p>
+        </div>
+        <form method="post" action="{% url 'support:conversation_create' %}">
+            {% csrf_token %}
+            <button class="btn-primary" type="submit">{% trans "Nouveau message" %}</button>
+        </form>
+    </div>
+    <div class="space-y-3">
+        {% for conversation in conversations %}
+        <a href="{% url 'support:conversation_detail' conversation.id %}" class="card block p-4 hover:border-auto-orange transition">
+            <div class="flex items-start justify-between gap-3">
+                <div>
+                    <h2 class="font-bold text-auto-dark">{{ conversation.subject }}</h2>
+                    {% with last=conversation.messages.last %}
+                    {% if last %}<p class="text-sm text-auto-600 mt-1 truncate">{{ last.body }}</p>{% endif %}
+                    {% endwith %}
+                </div>
+                {% if conversation.unread_count %}
+                <span class="badge-auto-orange text-[10px]">{% trans "Non lu" %}</span>
+                {% endif %}
+            </div>
+            <p class="text-xs text-auto-400 mt-2">{{ conversation.updated_at|date:"d/m/Y H:i" }}</p>
+        </a>
+        {% empty %}
+        <div class="card p-8 text-center text-auto-600">{% trans "Aucune conversation." %}</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

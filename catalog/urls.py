@@ -15,4 +15,5 @@ urlpatterns = [
     path('garage/produits/<uuid:pk>/modifier/', views.garage_product_edit_view, name='garage_product_edit'),
     path('garage/produits/<uuid:pk>/supprimer/', views.garage_product_delete_view, name='garage_product_delete'),
     path('garage/produits/<uuid:pk>/stock/', views.garage_stock_update_view, name='garage_stock_update'),
+    path('garage/produits/<uuid:pk>/toggle/', views.garage_product_toggle_view, name='garage_product_toggle'),
 ]

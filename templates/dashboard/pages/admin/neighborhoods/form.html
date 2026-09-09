@@ -28,10 +28,6 @@
                 <label class="form-label">Nom</label>
                 <input type="text" name="name" class="form-input" value="{{ neighborhood.name|default:'' }}" required>
             </div>
-            <div class="mb-4">
-                <label class="form-label">Slug</label>
-                <input type="text" name="slug" class="form-input" value="{{ neighborhood.slug|default:'' }}" required>
-            </div>
             <div class="flex items-center gap-3 mb-6">
                 <label class="inline-flex items-center gap-2 cursor-pointer">
                     <input type="checkbox" name="is_active" class="rounded border-auto-200 text-auto-orange focus:ring-auto-orange" {% if neighborhood.is_active %}checked{% endif %}>

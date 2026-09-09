@@ -28,16 +28,16 @@
     {% if notifications %}
         <div class="space-y-3">
             {% for notification in notifications %}
-            <div class="card p-4 {% if notification.unread %}bg-auto-orange/5 border border-auto-orange/20{% else %}bg-auto-50 border border-auto-100{% endif %} hover:bg-auto-100 transition">
+            <div data-notification-id="{{ notification.id }}" class="card p-4 {% if not notification.is_read %}bg-auto-orange/5 border border-auto-orange/20{% else %}bg-auto-50 border border-auto-100{% endif %} hover:bg-auto-100 transition">
                 <div class="flex items-start gap-3">
-                    <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 {% if notification.unread %}bg-auto-orange text-white{% else %}bg-auto-100 text-auto-500{% endif %}">
-                        {% if notification.type == 'order' %}
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 {% if not notification.is_read %}bg-auto-orange text-white{% else %}bg-auto-100 text-auto-500{% endif %}">
+                        {% if notification.category == 'ORDER' %}
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-                        {% elif notification.type == 'payment' %}
+                        {% elif notification.category == 'PAYMENT' %}
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-                        {% elif notification.type == 'review' %}
+                        {% elif notification.category == 'REVIEW' %}
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
-                        {% elif notification.type == 'garage' %}
+                        {% elif notification.category == 'SYSTEM' %}
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                         {% else %}
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
@@ -46,7 +46,7 @@
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center justify-between gap-2">
                             <h3 class="font-bold text-sm text-auto-dark">{{ notification.title }}</h3>
-                            {% if notification.unread %}
+                            {% if not notification.is_read %}
                             <span class="badge-auto-orange text-[10px]">{% trans "Nouveau" %}</span>
                             {% endif %}
                         </div>
@@ -54,8 +54,8 @@
                         <div class="text-xs text-auto-400 mt-1">{{ notification.created_at|timesince }}</div>
                     </div>
                     <div class="flex flex-col items-center gap-1">
-                        {% if notification.unread %}
-                        <button class="opacity-0 group-hover:opacity-100 p-1 text-auto-400 hover:text-auto-orange transition" onclick="markAsRead({{ notification.id }})" aria-label="{% trans 'Marquer comme lu' %}">
+                        {% if not notification.is_read %}
+                        <button class="opacity-0 group-hover:opacity-100 p-1 text-auto-400 hover:text-auto-orange transition" onclick="markAsRead('{{ notification.id }}')" aria-label="{% trans 'Marquer comme lu' %}">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                         </button>
                         {% endif %}
@@ -106,13 +106,12 @@
 
 <script>
 function markAsRead(notificationId) {
-    fetch('/notifications/mark-read/', {
+    fetch('{% url "notifications:notification_mark_read" "00000000-0000-0000-0000-000000000000" %}'.replace('00000000-0000-0000-0000-000000000000', notificationId), {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'X-CSRFToken': getCookie('csrftoken')
         },
-        body: JSON.stringify({ notification_id: notificationId })
     })
     .then(response => response.json())
     .then(data => {

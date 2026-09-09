@@ -31,26 +31,26 @@
                        aria-label="{% trans 'Rechercher un garage' %}">
             </div>
 
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                <select name="city" class="form-input !py-2.5 text-sm flex-1 sm:flex-none sm:w-auto" aria-label="{% trans 'Ville' %}">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:items-center gap-3">
+                <select name="city" class="form-input !py-2.5 text-sm min-w-0" aria-label="{% trans 'Ville' %}">
                     <option value="">{% trans "Toutes les villes" %}</option>
                     {% for city in cities %}
                     <option value="{{ city }}" {% if selected_city == city %}selected{% endif %}>{{ city }}</option>
                     {% endfor %}
                 </select>
-                <select name="neighborhood" class="form-input !py-2.5 text-sm flex-1 sm:flex-none sm:w-auto" aria-label="{% trans 'Quartier' %}">
+                <select name="neighborhood" class="form-input !py-2.5 text-sm min-w-0" aria-label="{% trans 'Quartier' %}">
                     <option value="">{% trans "Tous les quartiers" %}</option>
                     {% for hood in neighborhoods %}
                     <option value="{{ hood }}" {% if selected_neighborhood == hood %}selected{% endif %}>{{ hood }}</option>
                     {% endfor %}
                 </select>
-                <select name="service" class="form-input !py-2.5 text-sm flex-1 sm:flex-none sm:w-auto" aria-label="{% trans 'Service' %}">
+                <select name="service" class="form-input !py-2.5 text-sm min-w-0" aria-label="{% trans 'Service' %}">
                     <option value="">{% trans "Tous les services" %}</option>
                     {% for cat_key, cat_label in service_categories %}
                     <option value="{{ cat_key }}" {% if selected_service == cat_key %}selected{% endif %}>{{ cat_label }}</option>
                     {% endfor %}
                 </select>
-                <select name="sort" class="form-input !py-2.5 text-sm flex-1 sm:flex-none sm:w-auto" aria-label="{% trans 'Trier par' %}">
+                <select name="sort" class="form-input !py-2.5 text-sm min-w-0" aria-label="{% trans 'Trier par' %}">
                     <option value="-trust_score" {% if sort == '-trust_score' %}selected{% endif %}>{% trans "Mieux noté" %}</option>
                     <option value="trust_score" {% if sort == 'trust_score' %}selected{% endif %}>{% trans "Moins bien noté" %}</option>
                     <option value="-total_reviews" {% if sort == '-total_reviews' %}selected{% endif %}>{% trans "Plus d'avis" %}</option>
@@ -114,10 +114,10 @@
                 </a>
                 <p class="text-auto-500 text-xs mt-0.5 truncate flex items-center gap-1">
                     <span>📍</span>
-                    <span>{{ garage.neighborhood.name|default:garage.city.name }}</span>
+                    <span>{% if garage.neighborhood %}{{ garage.neighborhood.name }}{% elif garage.city %}{{ garage.city.name }}{% endif %}</span>
                     {% if garage.city and garage.neighborhood %}
                     <span class="text-auto-400">·</span>
-                    <span>{{ garage.city.name }}</span>
+                    <span>{% if garage.city %}{{ garage.city.name }}{% endif %}</span>
                     {% endif %}
                 </p>
                 <div class="flex items-center gap-1.5 mt-1">

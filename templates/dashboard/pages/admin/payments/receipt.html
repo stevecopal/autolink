@@ -1,0 +1,26 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n humanize %}
+
+{% block title %}{% trans "Reçu de paiement" %}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-8">
+    <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-bold text-auto-dark">{% trans "Reçu de paiement" %}</h1>
+        <button type="button" class="btn-outline" onclick="window.print()">{% trans "Imprimer / PDF" %}</button>
+    </div>
+    <div class="card p-6 space-y-4">
+        <div class="flex items-start justify-between gap-4 border-b border-auto-100 pb-4">
+            <div><p class="text-sm text-auto-500">{% trans "Référence" %}</p><p class="font-bold">{{ receipt.reference }}</p></div>
+            <div class="text-right"><p class="text-sm text-auto-500">{% trans "Date" %}</p><p>{{ receipt.created_at|date:"d/m/Y H:i" }}</p></div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div><p class="text-sm text-auto-500">{% trans "Garage" %}</p><p class="font-bold">{{ receipt.garage.name|default:"—" }}</p></div>
+            <div><p class="text-sm text-auto-500">{% trans "Propriétaire" %}</p><p class="font-bold">{{ receipt.owner.display_name|default:"—" }}</p></div>
+            <div><p class="text-sm text-auto-500">{% trans "Montant" %}</p><p class="font-bold">{{ receipt.amount|intcomma }} {{ receipt.currency }}</p></div>
+            <div><p class="text-sm text-auto-500">{% trans "Provider" %}</p><p class="font-bold">{{ receipt.provider }}</p></div>
+            <div><p class="text-sm text-auto-500">{% trans "Statut" %}</p><p class="font-bold">{{ receipt.status }}</p></div>
+        </div>
+    </div>
+</div>
+{% endblock %}

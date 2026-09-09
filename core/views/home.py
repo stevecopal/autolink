@@ -2,15 +2,15 @@
 """
 Core homepage view — cached for performance, split into its own module.
 """
-from django.shortcuts import render
-from django.db.models import Count
+
 from django.core.cache import cache
+from django.db.models import Count
 from django.http import HttpRequest, HttpResponse
+from django.shortcuts import render
 
-from garages.models import Garage
-from catalog.models import Part, Category
+from catalog.models import Category, Part
 from core.models import City
-
+from garages.models import Garage
 
 CACHE_KEY_HOME = "home_page_data"
 CACHE_TTL = 300  # 5 minutes
@@ -22,47 +22,66 @@ def home_view(request: HttpRequest) -> HttpResponse:
     if cached is not None:
         return render(request, "public/pages/home/index.html", cached)
 
-    garages = Garage.objects.filter(
-        is_active=True,
-        verification_status=Garage.VerificationStatus.APPROVED,
-    ).select_related("owner", "city", "neighborhood").prefetch_related("services").only(
-        "id",
-        "name",
-        "slug",
-        "photo",
-        "city_id",
-        "neighborhood_id",
-        "trust_score",
-        "total_reviews",
-        "verification_status",
-        "owner_id",
-    )[:6]
+    garages = (
+        Garage.objects.filter(
+            approval_status=Garage.ApprovalStatus.APPROVED,
+            payment_status=Garage.PaymentStatus.PAID,
+            activation_status=Garage.ActivationStatus.ACTIVE,
+        )
+        .select_related("owner", "city", "neighborhood")
+        .prefetch_related("services")
+        .only(
+            "id",
+            "name",
+            "slug",
+            "photo",
+            "city_id",
+            "neighborhood_id",
+            "trust_score",
+            "total_reviews",
+            "approval_status",
+            "payment_status",
+            "activation_status",
+            "owner_id",
+        )[:6]
+    )
 
-    parts = Part.objects.filter(
-        is_active=True,
-        stock_status__in=["IN_STOCK", "LOW_STOCK"],
-    ).select_related("category", "brand", "garage").only(
-        "id",
-        "name",
-        "slug",
-        "photo",
-        "price",
-        "stock_status",
-        "category_id",
-        "brand_id",
-        "garage_id",
-    )[:8]
+    parts = (
+        Part.objects.filter(
+            is_active=True,
+            stock_status__in=["IN_STOCK", "LOW_STOCK"],
+        )
+        .select_related("category", "brand", "garage")
+        .only(
+            "id",
+            "name",
+            "slug",
+            "photo",
+            "price",
+            "stock_status",
+            "category_id",
+            "brand_id",
+            "garage_id",
+        )[:8]
+    )
 
-    categories = Category.objects.filter(
-        parent=None, is_active=True
-    ).annotate(part_count=Count("parts")).only(
-        "id", "name", "slug", "icon"
-    )[:12]
+    categories = (
+        Category.objects.filter(parent=None, is_active=True)
+        .annotate(part_count=Count("parts"))
+        .only("id", "name", "slug", "icon")[:12]
+    )
 
-    cities = City.objects.filter(
-        is_active=True, garages__is_active=True,
-        garages__verification_status=Garage.VerificationStatus.APPROVED,
-    ).distinct().order_by("name")[:10]
+    cities = (
+        City.objects.filter(
+            is_active=True,
+            garages__is_active=True,
+            garages__approval_status=Garage.ApprovalStatus.APPROVED,
+            garages__payment_status=Garage.PaymentStatus.PAID,
+            garages__activation_status=Garage.ActivationStatus.ACTIVE,
+        )
+        .distinct()
+        .order_by("name")[:10]
+    )
 
     context = {
         "garages": garages,

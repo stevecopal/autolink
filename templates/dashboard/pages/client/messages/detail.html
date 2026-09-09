@@ -1,0 +1,42 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n %}
+
+{% block title %}{{ conversation.subject }}{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto space-y-4">
+    <div class="flex items-center justify-between gap-3">
+        <div class="min-w-0">
+            <p class="text-xs text-auto-500">{% if conversation.ticket %}{% trans "Problème" %} {{ conversation.ticket.ticket_number }}{% else %}{% trans "Administration" %}{% endif %}</p>
+            <h1 class="text-xl font-bold text-auto-dark truncate">{{ conversation.subject }}</h1>
+        </div>
+        <a href="{% url 'support:conversation_list' %}" class="btn-outline text-sm flex-shrink-0">{% trans "Retour" %}</a>
+    </div>
+
+    <div class="card p-4 sm:p-6">
+        <div class="space-y-3 max-h-[60vh] overflow-y-auto">
+            {% for message in conversation_messages %}
+            <article class="p-3 sm:p-4 rounded-xl {% if message.sender_id == request.user.id %}bg-auto-orange/10 ml-4 sm:ml-16{% else %}bg-auto-50 mr-4 sm:mr-16{% endif %}">
+                <div class="flex items-center justify-between gap-2 mb-1">
+                    <strong class="text-sm text-auto-dark">{{ message.sender.display_name }}</strong>
+                    <time class="text-xs text-auto-500">{{ message.created_at|date:"d/m/Y H:i" }}</time>
+                </div>
+                {% if message.body %}<p class="text-sm text-auto-700 whitespace-pre-wrap break-words">{{ message.body }}</p>{% endif %}
+                {% if message.attachment %}<a class="text-sm text-auto-orange underline break-all" href="{{ message.attachment.url }}" target="_blank" rel="noopener">{% trans "Voir la pièce jointe" %}</a>{% endif %}
+            </article>
+            {% empty %}
+            <p class="text-center text-auto-500 py-8">{% trans "Aucun message pour le moment." %}</p>
+            {% endfor %}
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="mt-5 space-y-3">
+            {% csrf_token %}
+            <textarea name="body" class="form-input w-full" rows="3" placeholder="{% trans 'Écrire un message...' %}"></textarea>
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <input type="file" name="attachment" class="form-input text-sm" accept="image/*,application/pdf,.doc,.docx">
+                <button type="submit" class="btn-primary">{% trans "Envoyer" %}</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

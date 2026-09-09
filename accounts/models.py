@@ -11,8 +11,19 @@ class User(AbstractUser):
         USER = 'USER', _('Utilisateur')
         CLIENT = 'CLIENT', _('Client')
         ADMIN = 'ADMIN', _('Administrateur')
+        SUPERUSER = 'SUPERUSER', _('Super Utilisateur')
+
+    class AccountStatus(models.TextChoices):
+        ACTIVE = 'ACTIVE', _('Actif')
+        SUSPENDED = 'SUSPENDED', _('Suspendu')
 
     role = models.CharField(max_length=20, choices=Role.choices, default=Role.USER)
+    account_status = models.CharField(
+        max_length=20,
+        choices=AccountStatus.choices,
+        default=AccountStatus.ACTIVE,
+        verbose_name=_('Statut du compte'),
+    )
     phone = models.CharField(_('Téléphone'), max_length=20, blank=True)
     phone_verified = models.BooleanField(default=False)
     email_verified = models.BooleanField(default=False)
@@ -38,6 +49,22 @@ class User(AbstractUser):
     def display_name(self):
         full = self.get_full_name()
         return full if full else self.username
+
+    @property
+    def is_account_active(self):
+        return self.account_status == self.AccountStatus.ACTIVE
+
+    @property
+    def is_superadmin(self):
+        return self.is_superuser or self.role == self.Role.SUPERUSER
+
+    @property
+    def is_admin_or_above(self):
+        return self.role in (self.Role.ADMIN, self.Role.SUPERUSER) or self.is_superuser
+
+    @property
+    def is_client_or_above(self):
+        return self.role in (self.Role.CLIENT, self.Role.ADMIN, self.Role.SUPERUSER) or self.is_superuser
 
 
 class UserActivity(models.Model):

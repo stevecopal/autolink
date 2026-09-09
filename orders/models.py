@@ -1,7 +1,11 @@
 import uuid
+
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+
+from . import status as st
 
 
 class Cart(models.Model):
@@ -57,8 +61,10 @@ class Order(models.Model):
         PAID = 'PAID', _('Payée')
         PROCESSING = 'PROCESSING', _('En préparation')
         READY = 'READY', _('Prête')
-        PICKED_UP = 'PICKED_UP', _('Retirée')
         DELIVERED = 'DELIVERED', _('Livrée')
+        RECEIVED = 'RECEIVED', _('Reçue')
+        COMPLETED = 'COMPLETED', _('Terminée')
+        PICKED_UP = 'PICKED_UP', _('Retirée')
         CANCELLED = 'CANCELLED', _('Annulée')
         REFUNDED = 'REFUNDED', _('Remboursée')
 
@@ -90,10 +96,14 @@ class Order(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    expected_date = models.DateField(_('Date prévue'), null=True, blank=True)
     confirmed_at = models.DateTimeField(null=True, blank=True)
     paid_at = models.DateTimeField(null=True, blank=True)
     ready_at = models.DateTimeField(null=True, blank=True)
     picked_up_at = models.DateTimeField(null=True, blank=True)
+    delivered_at = models.DateTimeField(null=True, blank=True)
+    received_at = models.DateTimeField(null=True, blank=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
     cancelled_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
@@ -105,52 +115,75 @@ class Order(models.Model):
         return f"Commande {self.order_number}"
 
     def save(self, *args, **kwargs):
+        # allow the service layer to attach audit info: save(actor=user, note="...")
+        actor = kwargs.pop('actor', None)
+        note = kwargs.pop('note', '')
+
+        created = self._state.adding
+        old_status = None
+        if not created:
+            old_status = Order.objects.filter(pk=self.pk).values_list('status', flat=True).first()
+
         if not self.order_number:
             self.order_number = f"AL-{uuid.uuid4().hex[:8].upper()}"
         if not self.pickup_code:
             self.pickup_code = f"{uuid.uuid4().int % 10000:04d}"
         super().save(*args, **kwargs)
 
+        if created or old_status != self.status:
+            self._record_status_history(actor=actor, note=note)
+
+    def _record_status_history(self, actor=None, note=''):
+        now = timezone.now()
+        field_name = st.STATUS_TIMESTAMP_FIELD.get(self.status)
+        if field_name:
+            setattr(self, field_name, now)
+            Order.objects.filter(pk=self.pk).update(**{field_name: now})
+        OrderStatusHistory.objects.create(
+            order=self,
+            status=self.status,
+            admin=actor,
+            note=note or '',
+        )
+
+    @property
+    def status_history(self):
+        """Historique des statuts, du plus récent au plus ancien."""
+        return self.status_entries.all()
+
+    @property
+    def get_items_count(self):
+        return self.items.count()
+
+    def is_viewable_by(self, user):
+        if not user or not user.is_authenticated:
+            return False
+        if user.is_admin_or_above:
+            return True
+        if self.user_id == user.pk:
+            return True
+        if self.garage is not None and self.garage.owner_id == user.pk:
+            return True
+        return False
+
     def get_timeline(self):
         steps = [
             ('PENDING', 'Commande passée', True),
-            ('PAID', 'Paiement confirmé', self.status in ['PAID', 'PROCESSING', 'READY', 'PICKED_UP', 'DELIVERED']),
-            ('CONFIRMED', 'Vendeur confirmé', self.status in ['CONFIRMED', 'PROCESSING', 'READY', 'PICKED_UP', 'DELIVERED']),
-            ('PROCESSING', 'En préparation', self.status in ['PROCESSING', 'READY', 'PICKED_UP', 'DELIVERED']),
-            ('READY', 'Commande prête', self.status in ['READY', 'PICKED_UP', 'DELIVERED']),
-            ('PICKED_UP', 'Retirée', self.status in ['PICKED_UP', 'DELIVERED']),
+            ('CONFIRMED', 'Command confirmée', self.status in ['CONFIRMED', 'READY', 'DELIVERED', 'RECEIVED', 'COMPLETED']),
+            ('READY', 'Commande prête', self.status in ['READY', 'DELIVERED', 'RECEIVED', 'COMPLETED']),
+            ('DELIVERED', 'Command livrée', self.status in ['DELIVERED', 'RECEIVED', 'COMPLETED']),
+            ('RECEIVED', 'Pièce récupérée', self.status in ['RECEIVED', 'COMPLETED']),
+            ('COMPLETED', 'Commande terminée', self.status == 'COMPLETED'),
         ]
         return steps
 
     @property
     def status_label(self):
-        labels = {
-            'PENDING': 'En attente',
-            'CONFIRMED': 'Confirmée',
-            'PAID': 'Payée',
-            'PROCESSING': 'En préparation',
-            'READY': 'Prête',
-            'PICKED_UP': 'Retirée',
-            'DELIVERED': 'Livrée',
-            'CANCELLED': 'Annulée',
-            'REFUNDED': 'Remboursée',
-        }
-        return labels.get(self.status, self.status)
+        return st.STATUS_LABELS.get(self.status, self.status)
 
     @property
     def status_color(self):
-        colors = {
-            'PENDING': 'gray',
-            'CONFIRMED': 'blue',
-            'PAID': 'green',
-            'PROCESSING': 'orange',
-            'READY': 'green',
-            'PICKED_UP': 'green',
-            'DELIVERED': 'green',
-            'CANCELLED': 'red',
-            'REFUNDED': 'purple',
-        }
-        return colors.get(self.status, 'gray')
+        return st.STATUS_COLORS.get(self.status, 'gray')
 
 
 class OrderItem(models.Model):
@@ -175,3 +208,33 @@ class OrderItem(models.Model):
     def save(self, *args, **kwargs):
         self.subtotal = self.part_price * self.quantity
         super().save(*args, **kwargs)
+
+
+class OrderStatusHistory(models.Model):
+    """Journal horodaté des changements de statut d'une commande."""
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='status_entries')
+    status = models.CharField(max_length=20, choices=Order.Status.choices)
+    admin = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name=_('Opérateur'),
+    )
+    note = models.TextField(blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = _('Historique de statut')
+        verbose_name_plural = _('Historique des statuts')
+
+    def __str__(self):
+        return f"{self.order.order_number} -> {self.status}"
+
+    @property
+    def is_current(self):
+        return self.order.status == self.status

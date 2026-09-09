@@ -1,50 +1,98 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.db.models import Avg, Count
-from django.utils.translation import gettext_lazy as _
 from django.core.paginator import Paginator
+from django.core.exceptions import PermissionDenied, ValidationError
+from django.utils.translation import gettext_lazy as _
 
+from accounts.decorators import admin_required, client_required
+from orders.models import Order
 from .models import Review, Favorite
-from .forms import ReviewForm
+from .forms import ReviewCreateForm
+from .services import ReviewService
 
 
 @login_required
 def review_create_view(request):
+    """Create a review for a completed order."""
+    order_id = request.GET.get('order_id') or request.POST.get('order_id')
+
+    if not order_id:
+        messages.error(request, _('Commande non spécifiée.'))
+        return redirect('reviews:review_list')
+
+    order = get_object_or_404(Order, pk=order_id)
+
+    if not ReviewService.can_user_review_order(request.user, order):
+        raise PermissionDenied(
+            _('Vous ne pouvez pas laisser un avis pour cette commande.')
+        )
+
+    if ReviewService.has_user_reviewed_order(request.user, order):
+        messages.warning(request, _('Vous avez déjà laissé un avis pour cette commande.'))
+        return redirect('reviews:review_list')
+
     if request.method == 'POST':
-        form = ReviewForm(request.POST, request.FILES)
+        form = ReviewCreateForm(request.POST)
         if form.is_valid():
-            review = form.save(commit=False)
-            review.user = request.user
-            review.review_type = request.POST.get('review_type', 'GARAGE')
-
-            garage_id = request.POST.get('garage_id')
-            part_id = request.POST.get('part_id')
-            order_id = request.POST.get('order_id')
-
-            if garage_id:
-                review.garage_id = garage_id
-            if part_id:
-                review.part_id = part_id
-            if order_id:
-                review.order_id = order_id
-                review.is_verified = True
-
-            review.save()
-            messages.success(request, _('Your review has been published.'))
-            return redirect('reviews:review_list')
+            try:
+                review = ReviewService.create_review(
+                    user=request.user,
+                    order=order,
+                    rating=form.cleaned_data['rating'],
+                    comment=form.cleaned_data['comment'],
+                    title=form.cleaned_data.get('title', ''),
+                )
+                messages.success(request, _('Votre avis a été publié.'))
+                return redirect('reviews:review_list')
+            except (PermissionDenied, ValidationError) as e:
+                messages.error(request, str(e))
     else:
-        form = ReviewForm()
+        form = ReviewCreateForm()
 
-    return render(request, 'dashboard/pages/client/review_form.html', {'form': form})
+    garage = order.garage
+    return render(request, 'dashboard/pages/client/review_form.html', {
+        'form': form,
+        'order': order,
+        'garage': garage,
+    })
 
 
 def review_list_view(request):
-    reviews = Review.objects.filter(is_hidden=False).select_related('user', 'garage', 'part').order_by('-created_at')
+    """Public list of non-hidden reviews."""
+    reviews = Review.objects.filter(
+        is_hidden=False
+    ).select_related('user', 'garage', 'part').order_by('-created_at')
     paginator = Paginator(reviews, 20)
     page = request.GET.get('page')
     reviews_page = paginator.get_page(page)
-    return render(request, 'dashboard/pages/client/reviews/list.html', {'reviews': reviews_page})
+    return render(request, 'dashboard/pages/client/reviews/list.html', {
+        'reviews': reviews_page,
+    })
+
+
+@client_required
+def garage_reviews_view(request):
+    """CLIENT view: see reviews on the user's garages."""
+    reviews = ReviewService.get_owner_reviews(request.user)
+    paginator = Paginator(reviews, 20)
+    page = request.GET.get('page')
+    reviews_page = paginator.get_page(page)
+    return render(request, 'dashboard/pages/client/reviews/list.html', {
+        'reviews': reviews_page,
+    })
+
+
+@admin_required
+def admin_reviews_view(request):
+    """ADMIN view: see all reviews on the platform."""
+    reviews = ReviewService.get_all_reviews()
+    paginator = Paginator(reviews, 20)
+    page = request.GET.get('page')
+    reviews_page = paginator.get_page(page)
+    return render(request, 'dashboard/pages/admin/reviews/list.html', {
+        'reviews': reviews_page,
+    })
 
 
 @login_required

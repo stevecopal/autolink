@@ -4,8 +4,8 @@ from .models import Ticket, TicketMessage, AssistanceRequest
 
 @admin.register(Ticket)
 class TicketAdmin(admin.ModelAdmin):
-    list_display = ['ticket_number', 'user', 'category', 'status', 'assigned_to', 'created_at']
-    list_filter = ['status', 'category', 'created_at']
+    list_display = ['ticket_number', 'user', 'garage', 'status', 'assigned_to', 'created_at']
+    list_filter = ['status', 'created_at']
     search_fields = ['ticket_number', 'user__username', 'subject', 'description']
     readonly_fields = ['ticket_number', 'created_at', 'updated_at', 'resolved_at']
     raw_id_fields = ['user', 'order', 'part', 'garage', 'assigned_to']

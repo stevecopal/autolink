@@ -46,10 +46,10 @@
                 </h3>
                 <p class="text-auto-600 text-sm mt-0.5 flex items-center gap-1">
                     <span>📍</span>
-                    <span class="truncate">{{ garage.neighborhood.name|default:garage.city.name }}</span>
+                    <span class="truncate">{% if garage.neighborhood %}{{ garage.neighborhood.name }}{% elif garage.city %}{{ garage.city.name }}{% endif %}</span>
                     {% if garage.city and garage.neighborhood %}
                     <span class="text-auto-400">·</span>
-                    <span class="truncate">{{ garage.city.name }}</span>
+                    <span class="truncate">{% if garage.city %}{{ garage.city.name }}{% endif %}</span>
                     {% endif %}
                 </p>
                 <div class="flex items-center gap-2 mt-1.5">

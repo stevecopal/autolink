@@ -1,15 +1,24 @@
 from django.urls import path
+
 from . import views
 
-app_name = 'garages'
+app_name = "garages"
 
 urlpatterns = [
-    path('', views.garage_list_view, name='garage_list'),
-    path('api/', views.garage_list_api, name='garage_list_api'),
-    path('api/search-suggestions/', views.garage_search_suggestions, name='garage_search_suggestions'),
-    path('creer/', views.garage_create_view, name='garage_create'),
-    path('mon-dashboard/', views.garage_dashboard_view, name='garage_dashboard'),
-    path('disponibilite/', views.garage_availability_toggle, name='garage_availability'),
-    path('<slug:slug>/', views.garage_detail_view, name='garage_detail'),
-    path('<slug:slug>/api/', views.garage_detail_api, name='garage_detail_api'),
+    path("", views.garage_list_view, name="garage_list"),
+    path("api/", views.garage_list_api, name="garage_list_api"),
+    path(
+        "api/search-suggestions/",
+        views.garage_search_suggestions,
+        name="garage_search_suggestions",
+    ),
+    path("creer/", views.garage_create_view, name="garage_create"),
+    path("<uuid:garage_id>/modifier/", views.garage_edit_view, name="garage_edit"),
+    path("<uuid:garage_id>/supprimer/", views.garage_delete_view, name="garage_delete"),
+    path("mon-dashboard/", views.garage_dashboard_view, name="garage_dashboard"),
+    path(
+        "disponibilite/", views.garage_availability_toggle, name="garage_availability"
+    ),
+    path("<slug:slug>/", views.garage_detail_view, name="garage_detail"),
+    path("<slug:slug>/api/", views.garage_detail_api, name="garage_detail_api"),
 ]

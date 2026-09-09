@@ -19,13 +19,13 @@
 <div class="max-w-7xl mx-auto px-4 py-8">
     <div class="flex items-center justify-between mb-6">
         <h1 class="text-2xl md:text-3xl font-bold text-auto-dark">{% trans "Mes produits" %}</h1>
-        <a href="{% url 'catalog:garage_product_add' %}" class="btn-primary">+ {% trans "Ajouter un produit" %}</a>
+        <a href="{% url 'catalog:garage_product_add' %}" class="btn-primary text-sm">+ {% trans "Ajouter" %}</a>
     </div>
 
     <!-- Filters -->
     <div class="card p-4 mb-6">
         <form method="get" class="flex flex-wrap gap-4 items-end">
-            <div>
+            <div class="flex-1 min-w-[150px]">
                 <label class="form-label">{% trans "Statut" %}</label>
                 <select name="status" class="form-input">
                     <option value="">{% trans "Tous" %}</option>
@@ -33,12 +33,67 @@
                     <option value="inactive" {% if selected_status == 'inactive' %}selected{% endif %}>{% trans "Inactif" %}</option>
                 </select>
             </div>
-            <button type="submit" class="btn-primary">{% trans "Filtrer" %}</button>
+            <button type="submit" class="btn-primary text-sm">{% trans "Filtrer" %}</button>
         </form>
     </div>
 
-    <!-- Products Table -->
-    <div class="card overflow-hidden">
+    <!-- Mobile: Cards -->
+    <div class="md:hidden space-y-4 mb-6">
+        {% for product in products %}
+            <div class="card p-4">
+                <div class="flex items-start gap-3">
+                    {% if product.photo %}
+                        <img src="{{ product.photo.url }}" class="w-16 h-16 rounded-xl object-cover flex-shrink-0" alt="{{ product.name }}">
+                    {% else %}
+                        <div class="w-16 h-16 rounded-xl bg-auto-orange/10 flex items-center justify-center text-2xl flex-shrink-0">🔩</div>
+                    {% endif %}
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-start justify-between gap-2">
+                            <div class="min-w-0">
+                                <h3 class="font-bold text-auto-dark truncate">{{ product.name }}</h3>
+                                <p class="text-xs text-auto-500">{{ product.brand|default:"—" }}</p>
+                            </div>
+                            {% if product.is_active %}
+                                <span class="badge-success text-[10px] flex-shrink-0">{% trans "Actif" %}</span>
+                            {% else %}
+                                <span class="badge-error text-[10px] flex-shrink-0">{% trans "Inactif" %}</span>
+                            {% endif %}
+                        </div>
+                        <div class="mt-2 flex items-center gap-3 text-sm">
+                            <span class="font-bold text-auto-orange">{{ product.price|intcomma }} FCFA</span>
+                            <span class="badge-{{ product.stock_color }} text-[10px]">{{ product.stock_label }}</span>
+                        </div>
+                        <div class="mt-3 flex items-center gap-2">
+                            <form method="post" action="{% url 'catalog:garage_stock_update' product.pk %}" class="flex items-center gap-2 flex-1">
+                                {% csrf_token %}
+                                <input type="number" name="stock" value="{{ product.stock }}" class="w-20 form-input text-sm py-1" min="0">
+                                <button type="submit" class="text-auto-orange text-xs font-bold hover:text-auto-orange-dark transition whitespace-nowrap">{% trans "Stock" %}</button>
+                            </form>
+                        </div>
+                        <div class="mt-3 flex items-center gap-3 border-t border-auto-100 pt-3">
+                            <a href="{% url 'catalog:garage_product_edit' product.pk %}" class="text-auto-orange font-bold text-xs hover:text-auto-orange-dark transition">{% trans "Modifier" %}</a>
+                            <form method="post" action="{% url 'catalog:garage_product_toggle' product.pk %}" class="inline">
+                                {% csrf_token %}
+                                <button type="submit" class="text-auto-600 font-bold text-xs hover:text-auto-dark transition">
+                                    {% if product.is_active %}{% trans "Désactiver" %}{% else %}{% trans "Activer" %}{% endif %}
+                                </button>
+                            </form>
+                            <a href="{% url 'catalog:garage_product_delete' product.pk %}" class="text-error-600 font-bold text-xs hover:text-error-700 transition">{% trans "Supprimer" %}</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="card p-8 text-center">
+                <div class="text-4xl mb-4">📦</div>
+                <p class="text-auto-600 mb-4">{% trans "Aucun produit pour le moment." %}</p>
+                <a href="{% url 'catalog:garage_product_add' %}" class="btn-primary">{% trans "Ajoutez votre premier produit" %}</a>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Desktop: Table -->
+    <div class="hidden md:block card overflow-hidden">
         <div class="table-container">
             <table class="table">
                 <thead>
@@ -55,8 +110,15 @@
                     {% for product in products %}
                         <tr>
                             <td>
-                                <div class="font-bold text-sm">{{ product.name }}</div>
-                                <div class="text-xs text-auto-600">{{ product.brand|default:"—" }}</div>
+                                <div class="flex items-center gap-3">
+                                    {% if product.photo %}
+                                        <img src="{{ product.photo.url }}" class="w-10 h-10 rounded-lg object-cover" alt="{{ product.name }}">
+                                    {% endif %}
+                                    <div>
+                                        <div class="font-bold text-sm">{{ product.name }}</div>
+                                        <div class="text-xs text-auto-600">{{ product.brand|default:"—" }}</div>
+                                    </div>
+                                </div>
                             </td>
                             <td>{{ product.category|default:"—" }}</td>
                             <td class="font-bold">{{ product.price|intcomma }} FCFA</td>
@@ -68,22 +130,25 @@
                                 </form>
                             </td>
                             <td>
-                                {% if product.is_active %}
-                                    <span class="badge-success">{% trans "Actif" %}</span>
-                                {% else %}
-                                    <span class="badge-error">{% trans "Inactif" %}</span>
-                                {% endif %}
+                                <span class="badge-{{ product.stock_color }}">{{ product.stock_label }}</span>
                             </td>
                             <td>
                                 <div class="flex space-x-2">
                                     <a href="{% url 'catalog:garage_product_edit' product.pk %}" class="text-auto-orange font-bold hover:text-auto-orange-dark transition text-sm">{% trans "Modifier" %}</a>
-                                    <a href="{% url 'catalog:garage_product_delete' product.pk %}" class="text-error-600 font-bold hover:text-error-700 transition text-sm">{% trans "Désactiver" %}</a>
+                                    <form method="post" action="{% url 'catalog:garage_product_toggle' product.pk %}" class="inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="text-auto-600 font-bold hover:text-auto-dark transition text-sm">
+                                            {% if product.is_active %}{% trans "Désactiver" %}{% else %}{% trans "Activer" %}{% endif %}
+                                        </button>
+                                    </form>
+                                    <a href="{% url 'catalog:garage_product_delete' product.pk %}" class="text-error-600 font-bold hover:text-error-700 transition text-sm">{% trans "Supprimer" %}</a>
                                 </div>
                             </td>
                         </tr>
                     {% empty %}
                         <tr>
                             <td colspan="6" class="px-4 py-8 text-center text-auto-600">
+                                <div class="text-4xl mb-2">📦</div>
                                 {% trans "Aucun produit pour le moment." %}
                                 <a href="{% url 'catalog:garage_product_add' %}" class="text-auto-orange font-bold hover:text-auto-orange-dark transition ml-2">{% trans "Ajoutez votre premier produit" %}</a>
                             </td>

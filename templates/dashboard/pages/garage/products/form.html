@@ -14,100 +14,164 @@
         <a href="{% url 'catalog:garage_products' %}" class="hover:text-auto-orange transition">{% trans "Produits" %}</a>
         <span class="text-auto-400">/</span>
         <span class="font-bold text-auto-dark">
-            {% if action == 'add' %}{% trans "Ajouter" %}{% else %}{{ product.name }}{% endif %}
+            {% if action == 'add' %}{% trans "Ajouter" %}{% else %}{{ part.name|truncatechars:30 }}{% endif %}
         </span>
     </nav>
 {% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto">
+<div class="max-w-4xl mx-auto px-4 py-8">
     <div class="flex items-center justify-between mb-6">
         <h1 class="text-2xl md:text-3xl font-bold text-auto-dark">
             {% if action == 'add' %}{% trans "Ajouter un produit" %}{% else %}{% trans "Modifier le produit" %}{% endif %}
         </h1>
-        <a href="{% url 'catalog:garage_products' %}" class="btn-outline">{% trans "Retour aux produits" %}</a>
+        <a href="{% url 'catalog:garage_products' %}" class="btn-outline text-sm">{% trans "Retour" %}</a>
     </div>
 
-    <div class="card p-6">
-        <form method="post" enctype="multipart/form-data" class="space-y-4">
+    <div class="card p-4 md:p-6">
+        <form method="post" enctype="multipart/form-data" class="space-y-4" id="part-form">
             {% csrf_token %}
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="form-label">{% trans "Nom du produit" %} *</label>
-                    {{ form.name }}
+            {% if form.errors %}
+                <div class="p-4 rounded-xl bg-error-50 border border-error-200 mb-4">
+                    <div class="flex items-center gap-2 mb-2">
+                        <svg class="w-5 h-5 text-error-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        <span class="font-bold text-error-700">{% trans "Veuillez corriger les erreurs ci-dessous." %}</span>
+                    </div>
+                    {% for field, errors in form.errors.items %}
+                        {% for error in errors %}
+                            <p class="text-sm text-error-600 ml-7">{{ field|title }}: {{ error }}</p>
+                        {% endfor %}
+                    {% endfor %}
                 </div>
-                <div>
-                    <label class="form-label">{% trans "Catégorie" %}</label>
-                    {{ form.category }}
+            {% endif %}
+
+            <!-- Informations principales -->
+            <div class="border-b border-auto-100 pb-4">
+                <h2 class="text-lg font-bold text-auto-dark mb-4">{% trans "Informations principales" %}</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="md:col-span-2">
+                        <label class="form-label">{% trans "Nom du produit" %} *</label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                            <p class="form-error">{{ form.name.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <label class="form-label">{% trans "Catégorie" %}</label>
+                        {{ form.category }}
+                    </div>
+                    <div>
+                        <label class="form-label">{% trans "Marque" %}</label>
+                        {{ form.brand }}
+                    </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="form-label">{% trans "Marque" %}</label>
-                    {{ form.brand }}
-                </div>
-                <div>
-                    <label class="form-label">{% trans "État" %}</label>
-                    {{ form.condition }}
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label class="form-label">{% trans "Référence OEM" %}</label>
-                    {{ form.reference_oem }}
-                </div>
-                <div>
-                    <label class="form-label">{% trans "Référence fabricant" %}</label>
-                    {{ form.reference_fabricant }}
+            <!-- Références -->
+            <div class="border-b border-auto-100 pb-4">
+                <h2 class="text-lg font-bold text-auto-dark mb-4">{% trans "Références" %}</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="form-label">{% trans "État" %}</label>
+                        {{ form.condition }}
+                    </div>
+                    <div>
+                        <label class="form-label">{% trans "Référence OEM" %}</label>
+                        {{ form.reference_oem }}
+                    </div>
+                    <div>
+                        <label class="form-label">{% trans "Référence fabricant" %}</label>
+                        {{ form.reference_fabricant }}
+                    </div>
                 </div>
             </div>
 
-            <div>
-                <label class="form-label">{% trans "Description" %}</label>
-                {{ form.description }}
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Description -->
+            <div class="border-b border-auto-100 pb-4">
+                <h2 class="text-lg font-bold text-auto-dark mb-4">{% trans "Description" %}</h2>
                 <div>
-                    <label class="form-label">{% trans "Prix (FCFA)" %} *</label>
-                    {{ form.price }}
-                </div>
-                <div>
-                    <label class="form-label">{% trans "Stock" %}</label>
-                    {{ form.stock }}
-                </div>
-                <div>
-                    <label class="form-label">{% trans "Garantie (mois)" %}</label>
-                    {{ form.warranty_months }}
+                    {{ form.description }}
                 </div>
             </div>
 
-            <div>
-                <label class="form-label">{% trans "Photo" %}</label>
-                {{ form.photo }}
+            <!-- Prix et Stock -->
+            <div class="border-b border-auto-100 pb-4">
+                <h2 class="text-lg font-bold text-auto-dark mb-4">{% trans "Prix et stock" %}</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="form-label">{% trans "Prix (FCFA)" %} *</label>
+                        {{ form.price }}
+                        {% if form.price.errors %}
+                            <p class="form-error">{{ form.price.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <label class="form-label">{% trans "Stock" %}</label>
+                        {{ form.stock }}
+                        {% if form.stock.errors %}
+                            <p class="form-error">{{ form.stock.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <label class="form-label">{% trans "Garantie (mois)" %}</label>
+                        {{ form.warranty_months }}
+                    </div>
+                </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Photo -->
+            <div class="border-b border-auto-100 pb-4">
+                <h2 class="text-lg font-bold text-auto-dark mb-4">{% trans "Photo" %}</h2>
                 <div>
-                    <label class="form-label">{% trans "Ville" %}</label>
-                    {{ form.city }}
-                </div>
-                <div>
-                    <label class="form-label">{% trans "Quartier" %}</label>
-                    {{ form.neighborhood }}
+                    {{ form.photo }}
+                    <p class="text-xs text-auto-500 mt-1">{% trans "Formats acceptés: JPG, PNG, WebP. Taille max: 5MB." %}</p>
                 </div>
             </div>
 
-            <div class="flex justify-between items-center pt-6 border-t border-auto-100">
-                <a href="{% url 'catalog:garage_products' %}" class="btn-outline text-sm">{% trans "Annuler" %}</a>
-                <button type="submit" class="bg-auto-orange text-white px-6 py-2 rounded-lg font-bold text-sm hover:bg-auto-orange-dark transition">
-                    {% if action == 'add' %}{% trans "Ajouter le produit" %}{% else %}{% trans "Enregistrer" %}{% endif %}
+            <!-- Localisation -->
+            <div class="pb-4">
+                <h2 class="text-lg font-bold text-auto-dark mb-4">{% trans "Localisation" %}</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="form-label">{% trans "Ville" %}</label>
+                        {{ form.city }}
+                    </div>
+                    <div>
+                        <label class="form-label">{% trans "Quartier" %}</label>
+                        {{ form.neighborhood }}
+                    </div>
+                </div>
+                {{ form.latitude }}
+                {{ form.longitude }}
+            </div>
+
+            <!-- Actions -->
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t border-auto-100">
+                <a href="{% url 'catalog:garage_products' %}" class="btn-outline text-sm w-full sm:w-auto text-center">{% trans "Annuler" %}</a>
+                <button type="submit" class="bg-auto-orange text-white px-6 py-3 rounded-lg font-bold text-sm hover:bg-auto-orange-dark transition w-full sm:w-auto">
+                    {% if action == 'add' %}{% trans "Ajouter le produit" %}{% else %}{% trans "Enregistrer les modifications" %}{% endif %}
                 </button>
             </div>
         </form>
     </div>
 </div>
+
+<script>
+(function() {
+    const form = document.getElementById('part-form');
+    if (!form) return;
+
+    // Disable submit button on form submit to prevent double clicks
+    form.addEventListener('submit', function(e) {
+        const submitBtn = form.querySelector('button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = '{% trans "Enregistrement..." %}';
+        }
+    });
+})();
+</script>
 {% endblock %}

@@ -35,19 +35,10 @@
                     <label class="text-sm text-auto-600">{% trans "Ville" %}</label>
                     <div class="font-medium">{{ garage.city.name }}</div>
                 </div>
-                <div>
-                    <label class="text-sm text-auto-600">{% trans "Statut actuel" %}</label>
-                    <div>
-                        {% if garage.verification_status == 'APPROVED' %}
-                            <span class="badge-success">{% trans "Vérifié" %}</span>
-                        {% elif garage.verification_status == 'PENDING' %}
-                            <span class="badge-warning">{% trans "En attente" %}</span>
-                        {% elif garage.verification_status == 'REJECTED' %}
-                            <span class="badge-error">{% trans "Rejeté" %}</span>
-                        {% else %}
-                            <span class="badge-gray">{% trans "Suspendu" %}</span>
-                        {% endif %}
-                    </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div><label class="text-sm text-auto-600">{% trans "Approbation" %}</label><div class="font-medium">{{ garage.get_approval_status_display }}</div></div>
+                    <div><label class="text-sm text-auto-600">{% trans "Paiement" %}</label><div class="font-medium">{{ garage.get_payment_status_display }}</div></div>
+                    <div><label class="text-sm text-auto-600">{% trans "Activation" %}</label><div class="font-medium">{{ garage.get_activation_status_display }}</div></div>
                 </div>
             </div>
         </div>
@@ -59,8 +50,8 @@
                 <form method="post">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="verify">
-                    <button type="submit" class="btn-primary w-full" onclick="return confirm('{% trans "Vérifier ce garage ?" %}')">
-                        ✅ {% trans "Vérifier le garage" %}
+                    <button type="submit" class="btn-primary w-full" onclick="return confirm('{% trans "Approuver ce garage ?" %}')">
+                        ✅ {% trans "Approuver le garage" %}
                     </button>
                 </form>
 

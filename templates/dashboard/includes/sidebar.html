@@ -1,9 +1,9 @@
 {% load i18n %}
 <nav class="flex-1 overflow-y-auto p-3 space-y-1 scrollbar-thin">
     <!-- ========================================== -->
-    <!-- ADMINISTRATEUR                             -->
+    <!-- ADMINISTRATEUR / SUPERUTILISATEUR          -->
     <!-- ========================================== -->
-    {% if user.role == 'ADMIN' %}
+    {% if user.role == 'ADMIN' or user.role == 'SUPERUSER' or user.is_superuser %}
 
         <div class="pt-1 pb-2">
             <p class="px-3 py-1 text-xs font-bold text-auto-600 uppercase tracking-wider">
@@ -430,7 +430,6 @@
             {% trans "Voir le site" %}
         </a>
 
-        <div class="border-t border-auto-100 my-2"></div>
 
         <form method="post" action="{% url 'accounts:logout' %}">
             {% csrf_token %}

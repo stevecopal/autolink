@@ -5,6 +5,7 @@ from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from django.core.paginator import Paginator
 from django.utils.text import slugify
+from django.http import JsonResponse
 
 from .models import Category, Part, Compatibility, PartRequest
 from .forms import PartForm, PartRequestForm
@@ -151,29 +152,41 @@ def part_request_view(request):
 
 def is_garage_owner(user):
     from accounts.models import User
-    return user.is_authenticated and user.role in [User.Role.CLIENT, User.Role.ADMIN]
+    return user.is_authenticated and user.role in [
+        User.Role.CLIENT, User.Role.ADMIN, User.Role.SUPERUSER
+    ] or (user.is_authenticated and user.is_superuser)
+
+
+def _get_user_garages(user):
+    """Return garages owned by the user."""
+    return Garage.objects.filter(owner=user)
+
+
+def _get_user_first_garage(user):
+    """Return the first garage owned by the user, or None."""
+    return _get_user_garages(user).first()
 
 
 @user_passes_test(is_garage_owner)
 def garage_product_list_view(request):
     """List products for the garage owner."""
-    garage = Garage.objects.filter(owner=request.user).first()
+    garage = _get_user_first_garage(request.user)
     if not garage:
-        messages.warning(request, _('Please create a garage first.'))
+        messages.warning(request, _('Veuillez d\'abord créer un garage.'))
         return redirect('garages:garage_create')
-    
+
     products = Part.objects.filter(garage=garage).select_related('category', 'brand')
-    
+
     status = request.GET.get('status', '')
     if status == 'active':
         products = products.filter(is_active=True)
     elif status == 'inactive':
         products = products.filter(is_active=False)
-    
+
     paginator = Paginator(products, 20)
     page = request.GET.get('page')
     products_page = paginator.get_page(page)
-    
+
     return render(request, 'dashboard/pages/garage/products/list.html', {
         'products': products_page,
         'garage': garage,
@@ -184,31 +197,24 @@ def garage_product_list_view(request):
 @user_passes_test(is_garage_owner)
 def garage_product_add_view(request):
     """Add a new product to the garage."""
-    garage = Garage.objects.filter(owner=request.user).first()
+    garage = _get_user_first_garage(request.user)
     if not garage:
-        messages.warning(request, _('Please create a garage first.'))
+        messages.warning(request, _('Veuillez d\'abord créer un garage.'))
         return redirect('garages:garage_create')
-    
+
     if request.method == 'POST':
-        form = PartForm(request.POST, request.FILES)
+        form = PartForm(request.POST, request.FILES, user=request.user)
         if form.is_valid():
             part = form.save(commit=False)
             part.seller = request.user
             part.garage = garage
-            part.slug = slugify(part.name)
-            # Ensure unique slug
-            base_slug = part.slug
-            counter = 1
-            while Part.objects.filter(slug=part.slug).exists():
-                part.slug = f"{base_slug}-{counter}"
-                counter += 1
             part.update_stock_status()
             part.save()
-            messages.success(request, _('Product added successfully.'))
+            messages.success(request, _('Produit ajouté avec succès.'))
             return redirect('catalog:garage_products')
     else:
-        form = PartForm()
-    
+        form = PartForm(user=request.user)
+
     return render(request, 'dashboard/pages/garage/products/form.html', {
         'form': form,
         'garage': garage,
@@ -219,22 +225,24 @@ def garage_product_add_view(request):
 @user_passes_test(is_garage_owner)
 def garage_product_edit_view(request, pk):
     """Edit a product in the garage."""
-    garage = Garage.objects.filter(owner=request.user).first()
+    garage = _get_user_first_garage(request.user)
     if not garage:
         return redirect('garages:garage_create')
-    
+
     part = get_object_or_404(Part, pk=pk, garage=garage)
-    
+
     if request.method == 'POST':
-        form = PartForm(request.POST, request.FILES, instance=part)
+        form = PartForm(request.POST, request.FILES, instance=part, user=request.user)
         if form.is_valid():
-            part = form.save()
+            part = form.save(commit=False)
+            part.garage = garage
             part.update_stock_status()
-            messages.success(request, _('Product updated.'))
+            part.save()
+            messages.success(request, _('Produit mis à jour.'))
             return redirect('catalog:garage_products')
     else:
-        form = PartForm(instance=part)
-    
+        form = PartForm(instance=part, user=request.user)
+
     return render(request, 'dashboard/pages/garage/products/form.html', {
         'form': form,
         'garage': garage,
@@ -246,18 +254,18 @@ def garage_product_edit_view(request, pk):
 @user_passes_test(is_garage_owner)
 def garage_product_delete_view(request, pk):
     """Soft-delete a product."""
-    garage = Garage.objects.filter(owner=request.user).first()
+    garage = _get_user_first_garage(request.user)
     if not garage:
         return redirect('garages:garage_create')
-    
+
     part = get_object_or_404(Part, pk=pk, garage=garage)
-    
+
     if request.method == 'POST':
         part.is_active = False
         part.save(update_fields=['is_active'])
-        messages.success(request, _('Product deactivated.'))
+        messages.success(request, _('Produit désactivé.'))
         return redirect('catalog:garage_products')
-    
+
     return render(request, 'dashboard/pages/garage/products/delete.html', {
         'part': part,
         'garage': garage,
@@ -267,19 +275,41 @@ def garage_product_delete_view(request, pk):
 @user_passes_test(is_garage_owner)
 def garage_stock_update_view(request, pk):
     """Update product stock."""
-    garage = Garage.objects.filter(owner=request.user).first()
+    garage = _get_user_first_garage(request.user)
     if not garage:
         return redirect('garages:garage_create')
-    
+
     part = get_object_or_404(Part, pk=pk, garage=garage)
-    
+
     if request.method == 'POST':
         try:
             new_stock = int(request.POST.get('stock', part.stock))
-            part.stock = max(0, new_stock)
-            part.update_stock_status()
-            messages.success(request, _('Stock updated.'))
+            if new_stock < 0:
+                messages.error(request, _('Le stock ne peut pas être négatif.'))
+            else:
+                part.stock = new_stock
+                part.save(update_fields=['stock'])
+                part.update_stock_status()
+                messages.success(request, _('Stock mis à jour.'))
         except (ValueError, TypeError):
-            messages.error(request, _('Invalid stock value.'))
-    
+            messages.error(request, _('Valeur de stock invalide.'))
+
+    return redirect('catalog:garage_products')
+
+
+@user_passes_test(is_garage_owner)
+def garage_product_toggle_view(request, pk):
+    """Toggle product active status."""
+    garage = _get_user_first_garage(request.user)
+    if not garage:
+        return redirect('garages:garage_create')
+
+    part = get_object_or_404(Part, pk=pk, garage=garage)
+
+    if request.method == 'POST':
+        part.is_active = not part.is_active
+        part.save(update_fields=['is_active'])
+        status = _('activé') if part.is_active else _('désactivé')
+        messages.success(request, _('Produit %(status)s.') % {'status': status})
+
     return redirect('catalog:garage_products')

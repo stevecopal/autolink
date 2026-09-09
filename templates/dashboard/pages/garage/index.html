@@ -25,6 +25,19 @@
         </div>
     </div>
 
+    {% if garage.approval_status == 'APPROVED' and garage.payment_status != 'PAID' %}
+    <div class="bg-auto-gold/10 border border-auto-gold/30 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+            <p class="font-bold text-auto-dark">{% trans "Votre garage est approuvé" %}</p>
+            <p class="text-sm text-auto-700">{% blocktrans with amount=garage_activation_amount currency=garage_activation_currency %}Payer {{ amount }} {{ currency }} pour activer votre garage{% endblocktrans %}</p>
+        </div>
+        <form method="post" action="{% url 'payments:garage_activation_payment' garage.id %}">
+            {% csrf_token %}
+            <button type="submit" class="btn-primary whitespace-nowrap">{% blocktrans with amount=garage_activation_amount currency=garage_activation_currency %}Payer {{ amount }} {{ currency }}{% endblocktrans %}</button>
+        </form>
+    </div>
+    {% endif %}
+
     <!-- Garage Status Banner -->
     <div class="bg-white rounded-xl border border-auto-100 p-4 mb-8 flex items-center justify-between shadow-card">
         <div class="flex items-center space-x-3">

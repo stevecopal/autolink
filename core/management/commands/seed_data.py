@@ -46,7 +46,7 @@ class Command(BaseCommand):
                 'email': 'admin@autolink.cm',
                 'first_name': 'Admin',
                 'last_name': 'AutoLink',
-                'role': 'ADMIN',
+                'role': 'SUPERUSER',
                 'is_staff': True,
                 'is_superuser': True,
             }

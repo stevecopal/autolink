@@ -1,0 +1,4 @@
+from decimal import Decimal
+
+GARAGE_ACTIVATION_AMOUNT = Decimal("1000")
+GARAGE_ACTIVATION_CURRENCY = "XAF"

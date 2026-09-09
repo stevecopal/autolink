@@ -19,6 +19,24 @@ class City(models.Model):
     def __str__(self):
         return self.name
 
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = self._generate_slug()
+        super().save(*args, **kwargs)
+
+    def _generate_slug(self):
+        from django.utils.text import slugify
+        base = slugify(self.name or '').strip('-') or 'ville'
+        slug = base
+        counter = 1
+        while City.objects.filter(slug=slug).exists():
+            suffix = f'-{counter}'
+            if len(base) + len(suffix) > 50:
+                base = base[:50 - len(suffix)]
+            slug = base + suffix
+            counter += 1
+        return slug
+
 
 class Neighborhood(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -40,6 +58,27 @@ class Neighborhood(models.Model):
 
     def __str__(self):
         return f"{self.name} ({self.city.name})"
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = self._generate_slug()
+        super().save(*args, **kwargs)
+
+    def _generate_slug(self):
+        from django.utils.text import slugify
+        base = slugify(self.name or '').strip('-') or 'quartier'
+        slug = base
+        counter = 1
+        qs = Neighborhood.objects.filter(city=self.city, slug__startswith=base)
+        if self.pk:
+            qs = qs.exclude(pk=self.pk)
+        while qs.filter(slug=slug).exists():
+            suffix = f'-{counter}'
+            if len(base) + len(suffix) > 50:
+                base = base[:50 - len(suffix)]
+            slug = base + suffix
+            counter += 1
+        return slug
 
 
 class ContactMessage(models.Model):

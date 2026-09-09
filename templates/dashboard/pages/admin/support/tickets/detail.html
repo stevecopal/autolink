@@ -166,7 +166,7 @@
                             {% endif %}
                             <span class="text-xs text-auto-500">{{ message.created_at|date:"d/m/Y H:i" }}</span>
                         </div>
-                        <div class="text-sm text-auto-700 whitespace-pre-wrap leading-relaxed">{{ message.message }}</div>
+                        <div class="text-sm text-auto-700 whitespace-pre-wrap leading-relaxed">{{ message.body }}</div>
                         {% if message.attachment %}
                         <div class="mt-3">
                             <a href="{{ message.attachment.url }}" target="_blank" rel="noopener noreferrer"
