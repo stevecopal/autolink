@@ -14,7 +14,7 @@ def sample_profile_data(**overrides: Any) -> Dict[str, Any]:
         "first_name": "Sample",
         "last_name": "User",
         "email": "sample@example.test",
-        "phone": "+23712345678",
+        "phone": "+237123456789",
         "city": "Douala",
         "neighborhood": "Akwa",
     }

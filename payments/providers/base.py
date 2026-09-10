@@ -1,22 +1,26 @@
 """
-PayUnit payment provider — single provider for AutoLink.
+CamPay payment provider — single provider for AutoLink.
 
-Environment variables (in .env):
-  PAYUNIT_API_KEY       – Application token (x-api-key header)
-  PAYUNIT_API_USER      – API username (Basic auth)
-  PAYUNIT_API_PASSWORD  – API password (Basic auth)
-  PAYUNIT_API_URL       – Base URL, default https://gateway.payunit.net
-  PAYUNIT_MODE          – "live" or "test"
-  PAYMENT_WEBHOOK_SECRET – Shared secret for webhook signature verification
-  SITE_URL              – Public site URL for callbacks (https://...)
+Environment variables (in .env or .env.example):
+  CAMPAY_ENVIRONMENT     – DEV or PROD (default DEV)
+  CAMPAY_APP_USERNAME    – App username
+  CAMPAY_APP_PASSWORD    – App password
+  CAMPAY_WEBHOOK_SECRET  – Secret used to validate webhooks (HMAC)
+  CAMPAY_BASE_URL        – optional override for the base API URL
+
+Docs flow used here:
+  1. POST {BASE_URL}/token/  -> token
+  2. POST {BASE_URL}/collect/ -> create payment (PENDING)
+  3. Webhook -> status update (SUCCESS/FAILED)
 """
 
-import base64
+from __future__ import annotations
+
 import hashlib
 import hmac
-import json
 import logging
 from dataclasses import dataclass
+from typing import Any, Dict, Optional
 
 import requests
 from django.conf import settings
@@ -24,285 +28,365 @@ from django.conf import settings
 logger = logging.getLogger("payments")
 
 
-class ProviderError(Exception):
-    """Base error raised by a payment provider adapter."""
+class CamPayError(Exception):
+    """Base error raised by the CamPay adapter."""
 
 
-class ProviderUnavailable(ProviderError):
-    """Provider credentials or network service are unavailable."""
+class CamPayUnavailable(CamPayError):
+    """Credentials, network or API are unavailable."""
 
 
 @dataclass(frozen=True)
-class PaymentInitialization:
-    transaction_id: str
-    checkout_url: str = ""
+class CamPayCollectResult:
+    """Result of a CamPay collect (init) call."""
+
+    success: bool
+    # CamPay's external_reference is our local transaction id (mirror).
+    external_reference: str
+    # Optional raw provider id / message if useful for logs/support.
+    provider_id: Optional[str] = None
+    message: Optional[str] = None
 
 
-class PayUnitProvider:
-    """
-    PayUnit REST API integration.
-    Docs: https://developer.payunit.net/rest-api/initialize-payment
-    """
+class CamPayProvider:
+    name = "CAMPAY"
 
-    name = "PAYUNIT"
+    # ── environment ────────────────────────────────────────────────────
 
-    # ── credentials ──────────────────────────────────────────────
+    def _environment(self) -> str:
+        env = getattr(settings, "CAMPAY_ENVIRONMENT", "DEV") or "DEV"
+        env = env.strip().upper()
+        if env not in {"DEV", "PROD"}:
+            raise CamPayUnavailable("CAMPAY_ENVIRONMENT must be DEV or PROD")
+        return env
 
-    def _base_url(self):
-        url = getattr(settings, "PAYUNIT_API_URL", "") or "https://gateway.payunit.net"
-        return url.rstrip("/")
+    def _base_url(self) -> str:
+        override = getattr(settings, "CAMPAY_BASE_URL", "") or ""
+        if override:
+            return override.rstrip("/")
+        return (
+            "https://demo.campay.net/api"
+            if self._environment() == "DEV"
+            else "https://www.campay.net/api"
+        )
 
-    def _api_key(self):
-        key = getattr(settings, "PAYUNIT_API_KEY", "")
-        if not key:
-            raise ProviderUnavailable("PAYUNIT_API_KEY is not configured in .env")
-        return key
+    def _username(self) -> str:
+        u = getattr(settings, "CAMPAY_APP_USERNAME", "") or ""
+        if not u:
+            raise CamPayUnavailable("CAMPAY_APP_USERNAME is not configured in .env")
+        return u
 
-    def _api_user(self):
-        user = getattr(settings, "PAYUNIT_API_USER", "")
-        if not user:
-            raise ProviderUnavailable("PAYUNIT_API_USER is not configured in .env")
-        return user
+    def _password(self) -> str:
+        p = getattr(settings, "CAMPAY_APP_PASSWORD", "") or ""
+        if not p:
+            raise CamPayUnavailable("CAMPAY_APP_PASSWORD is not configured in .env")
+        return p
 
-    def _api_password(self):
-        pw = getattr(settings, "PAYUNIT_API_PASSWORD", "")
-        if not pw:
-            raise ProviderUnavailable("PAYUNIT_API_PASSWORD is not configured in .env")
-        return pw
+    def _webhook_secret(self) -> str:
+        return getattr(settings, "CAMPAY_WEBHOOK_SECRET", "") or ""
 
-    def _mode(self):
-        return getattr(settings, "PAYUNIT_MODE", "test")
+    # ── authentication ──────────────────────────────────────────────────
 
-    def _headers(self):
-        credentials = base64.b64encode(
-            f"{self._api_user()}:{self._api_password()}".encode()
-        ).decode()
-        return {
-            "Content-Type": "application/json",
-            "Authorization": f"Basic {credentials}",
-            "x-api-key": self._api_key(),
-            "mode": self._mode(),
-        }
-
-    def _site_url(self):
-        return getattr(settings, "SITE_URL", "http://localhost:8000")
-
-    # ── initialize ───────────────────────────────────────────────
-
-    def initialize(self, payment):
+    def get_token(self) -> str:
         """
-        Step 1 – Initialize a payment on PayUnit.
-        POST {BASE_URL}/api/gateway/initialize
-
-        Returns a PaymentInitialization with the PayUnit transaction_id
-        and the hosted checkout URL the user should be redirected to.
+        Retourne un token temporaire CamPay.
+        POST {BASE_URL}/token/
+        {"username": "...", "password": "..."}
         """
         try:
-            payload = {
-                "total_amount": int(payment.amount),
-                "currency": payment.currency,
-                "transaction_id": payment.idempotency_key,
-                "return_url": f"{self._site_url()}/paiement/{payment.pk}/",
-                "notify_url": f"{self._site_url()}/webhook/",
-                "payment_country": "CM",
-            }
+            payload = {"username": self._username(), "password": self._password()}
 
             resp = requests.post(
-                f"{self._base_url()}/api/gateway/initialize",
+                f"{self._base_url()}/token/",
                 json=payload,
-                headers=self._headers(),
+                headers={"Content-Type": "application/json"},
                 timeout=30,
             )
-            resp.raise_for_status()
-            body = resp.json()
 
-            if body.get("status") != "SUCCESS":
-                msg = body.get("message", "PayUnit initialize failed")
-                logger.error("PayUnit initialize error: %s", msg)
-                raise ProviderUnavailable(msg)
+            try:
+                body = resp.json()
+            except ValueError:
+                logger.error(
+                    "CAMPAY TOKEN | invalid_json status=%s response=%s",
+                    resp.status_code,
+                    resp.text,
+                )
+                raise CamPayUnavailable("Réponse CamPay invalide (token)")
 
-            data = body.get("data", {})
-            transaction_id = data.get("transaction_id", "")
-            checkout_url = data.get("transaction_url", "")
+            if resp.status_code != 200:
+                logger.error(
+                    "CAMPAY TOKEN | non_200 status=%s response=%s",
+                    resp.status_code,
+                    resp.text,
+                )
+                if resp.status_code in (401, 403):
+                    raise CamPayUnavailable("Credentials CamPay invalides")
+                if resp.status_code == 404:
+                    raise CamPayUnavailable("Endpoint CamPay /token/ introuvable")
+                raise CamPayUnavailable(
+                    f"Erreur API CamPay (HTTP {resp.status_code})"
+                )
 
-            if not transaction_id:
-                raise ProviderUnavailable("PayUnit returned no transaction_id")
+            if not isinstance(body, dict):
+                logger.error("CAMPAY TOKEN | invalid_response_shape=%s", body)
+                raise CamPayUnavailable("Réponse CamPay invattendue pour le token")
 
-            return PaymentInitialization(
-                transaction_id=transaction_id,
-                checkout_url=checkout_url,
+            token = (
+                body.get("token")
+                or body.get("access_token")
+                or body.get("token_key")
+                or ""
             )
+            if not token:
+                logger.error("CAMPAY TOKEN | missing_token response=%s", body)
+                raise CamPayUnavailable("CamPay n'a pas retourné de token")
+            return str(token)
 
-        except requests.exceptions.ConnectionError:
-            raise ProviderUnavailable("Cannot connect to PayUnit API")
-        except requests.exceptions.Timeout:
-            raise ProviderUnavailable("PayUnit API timed out")
-        except requests.exceptions.HTTPError as exc:
-            logger.error("PayUnit HTTP %s", exc)
-            status = exc.response.status_code if exc.response else "?"
-            raise ProviderUnavailable(f"PayUnit API error {status}")
-        except (KeyError, ValueError, TypeError) as exc:
-            logger.error("PayUnit response parse error: %s", exc)
-            raise ProviderUnavailable("Invalid PayUnit response")
+        except CamPayError:
+            # Erreur métier CamPay déjà explicite : on la propage telle quelle.
+            raise
+        except Exception as e:
+            # Toute autre erreur (réseau, config, bug interne) est loguée
+            # avec la trace complète puis convertie en erreur gérable.
+            logger.exception("Erreur CamPay : %s", e)
+            raise CamPayError(str(e)) from e
 
-    # ── make payment (collect money) ─────────────────────────────
+    # ── collect (init) ─────────────────────────────────────────────────
 
-    def make_payment(self, payment, phone_number, gateway="CM_ORANGE"):
+    def collect(self, payment, phone_number: str) -> CamPayCollectResult:
         """
-        Step 2 – Confirm / collect the payment.
-        POST {BASE_URL}/api/gateway/makepayment
+        Étape 1 : initialisation du paiement CamPay (collect).
+        POST {BASE_URL}/collect/
 
-        After initialize() the user is redirected to the hosted page,
-        OR you can call this endpoint directly with the phone number
-        to trigger the USSD push on the user's phone.
-
-        Returns the provider_transaction_id on success.
-        """
-        try:
-            payload = {
-                "gateway": gateway,
-                "amount": int(payment.amount),
-                "transaction_id": payment.idempotency_key,
-                "phone_number": phone_number,
-                "currency": payment.currency,
-                "paymentType": "button",
-                "return_url": f"{self._site_url()}/paiement/{payment.pk}/",
-                "notify_url": f"{self._site_url()}/webhook/",
-            }
-
-            resp = requests.post(
-                f"{self._base_url()}/api/gateway/makepayment",
-                json=payload,
-                headers=self._headers(),
-                timeout=30,
-            )
-            resp.raise_for_status()
-            body = resp.json()
-
-            if body.get("status") != "SUCCESS":
-                msg = body.get("message", "PayUnit makepayment failed")
-                logger.error("PayUnit makepayment error: %s", msg)
-                raise ProviderUnavailable(msg)
-
-            data = body.get("data", {})
-            return data.get("provider_transaction_id") or data.get("transaction_id", "")
-
-        except requests.exceptions.ConnectionError:
-            raise ProviderUnavailable("Cannot connect to PayUnit API")
-        except requests.exceptions.Timeout:
-            raise ProviderUnavailable("PayUnit API timed out")
-        except requests.exceptions.HTTPError as exc:
-            logger.error("PayUnit HTTP %s", exc)
-            status = exc.response.status_code if exc.response else "?"
-            raise ProviderUnavailable(f"PayUnit API error {status}")
-
-    # ── get status ───────────────────────────────────────────────
-
-    def get_transaction_status(self, transaction_id):
-        """
-        GET {BASE_URL}/api/gateway/status/{transaction_id}
-
-        Returns dict with transaction_status (SUCCESS/FAILED/CANCELLED/PENDING).
-        """
-        try:
-            resp = requests.get(
-                f"{self._base_url()}/api/gateway/status/{transaction_id}",
-                headers=self._headers(),
-                timeout=15,
-            )
-            resp.raise_for_status()
-            body = resp.json()
-            return body.get("data", {})
-        except Exception as exc:
-            logger.error("PayUnit status check error: %s", exc)
-            return {}
-
-    # ── webhook verification ─────────────────────────────────────
-
-    def verify_webhook(self, request):
-        """
-        Verify PayUnit webhook authenticity.
-
-        PayUnit sends a POST to notify_url with this body:
-        {
-          "status": "SUCCESS",
-          "data": {
-            "transaction_status": "SUCCESS|FAILED|CANCELLED",
-            "transaction_id": "PU ...",
-            "transaction_amount": 10000,
-            "transaction_currency": "XAF",
-            ...
+        Payload strict attendu par CamPay (valeurs = chaînes de caractères) :
+          {
+            "amount": "1000",
+            "currency": "XAF",
+            "from": "237XXXXXXXXX",
+            "description": "Activation garage Autolink",
+            "external_reference": "<str(payment.id)>"
           }
+
+        Headers:
+          Authorization: Token <token>   (token obtenu via POST /token/)
+          Content-Type: application/json
+
+        Si HTTP 200, on considère que la transaction est créée et on passe
+        le Payment en PENDING côté notre base.
+        """
+        token = self.get_token()
+        headers = {
+            "Authorization": f"Token {token}",
+            "Content-Type": "application/json",
         }
 
-        We verify by checking the shared PAYMENT_WEBHOOK_SECRET.
-        If no secret is configured, we accept all webhooks (dev mode).
-        """
-        try:
-            secret = getattr(settings, "PAYMENT_WEBHOOK_SECRET", "")
-            if not secret:
-                return True
+        clean_phone = self._normalize_phone(phone_number)
 
-            # PayUnit may send signature in X-PayUnit-Signature or X-Webhook-Secret
-            signature = (
-                request.headers.get("X-PayUnit-Signature", "")
-                or request.headers.get("X-Webhook-Signature", "")
+        external_reference = str(payment.id)
+        # Payload strict : toutes les valeurs sont des chaînes de caractères.
+        payload = {
+            "amount": "1000",
+            "currency": "XAF",
+            "from": clean_phone,
+            "description": "Activation garage Autolink",
+            "external_reference": external_reference,
+        }
+
+        logger.info(
+            "CAMPAY COLLECT | internal_id=%s | phone=%s",
+            external_reference,
+            clean_phone,
+        )
+        logger.debug("CAMPAY COLLECT | request_payload=%s", payload)
+
+        try:
+            resp = requests.post(
+                f"{self._base_url()}/collect/",
+                json=payload,
+                headers=headers,
+                timeout=30,
             )
 
-            if not signature:
-                # Some PayUnit setups use HMAC on the raw body
-                raw = request.body
-                expected = hmac.new(
-                    secret.encode("utf-8"), raw, hashlib.sha256
-                ).hexdigest()
-                return hmac.compare_digest(signature, expected)
+            try:
+                body = resp.json()
+            except ValueError:
+                logger.error(
+                    "CAMPAY COLLECT | invalid_json status=%s response=%s",
+                    resp.status_code,
+                    resp.text,
+                )
+                raise CamPayUnavailable("Réponse CamPay invalide (collect)")
 
-            # If we have a signature header, compare directly
-            raw = request.body
-            expected = hmac.new(
-                secret.encode("utf-8"), raw, hashlib.sha256
-            ).hexdigest()
-            return hmac.compare_digest(signature, expected)
+            logger.debug(
+                "CAMPAY COLLECT | status=%s response=%s",
+                resp.status_code,
+                resp.text,
+            )
 
-        except Exception as exc:
-            logger.error("Webhook verification error: %s", exc)
+            if resp.status_code != 200:
+                msg = body.get("message") if isinstance(body, dict) else None
+                error_msg = body.get("error") if isinstance(body, dict) else None
+                logger.error(
+                    "CAMPAY COLLECT | non_200 status=%s response=%s message=%s error=%s",
+                    resp.status_code,
+                    resp.text,
+                    msg,
+                    error_msg,
+                )
+                if resp.status_code in (401, 403):
+                    raise CamPayUnavailable("Credentials CamPay invalides")
+                if resp.status_code == 404:
+                    raise CamPayUnavailable("Endpoint CamPay /collect/ introuvable")
+                if resp.status_code == 422:
+                    raise CamPayUnavailable(
+                        f"Payload CamPay invalide : {msg or error_msg or resp.text}"
+                    )
+                if resp.status_code == 429:
+                    raise CamPayUnavailable("CamPay rate limit atteint")
+                raise CamPayUnavailable(
+                    f"Erreur API CamPay (HTTP {resp.status_code})"
+                )
+
+            if not isinstance(body, dict):
+                logger.error("CAMPAY COLLECT | invalid_response_shape=%s", body)
+                raise CamPayUnavailable("Réponse CamPay invattendue")
+
+            provider_id = (
+                body.get("id")
+                or body.get("transaction_id")
+                or body.get("external_reference")
+                or ""
+            )
+
+            return CamPayCollectResult(
+                success=True,
+                external_reference=external_reference,
+                provider_id=provider_id or None,
+                message=body.get("message") or body.get("status") or None,
+            )
+
+        except CamPayError:
+            # Erreur métier CamPay déjà explicite : on la propage telle quelle.
+            raise
+        except Exception as e:
+            # Toute autre erreur (réseau, payload, bug interne) est loguée
+            # avec la trace complète puis convertie en erreur gérable.
+            logger.exception("Erreur CamPay : %s", e)
+            raise CamPayError(str(e)) from e
+
+    # ── webhook ────────────────────────────────────────────────────────
+
+    def verify_webhook_signature(self, request) -> bool:
+        """
+        Vérifie la signature du webhook CamPay via HMAC.
+        Compatible avec les payloads JSON bruts.
+        En mode dev (secret vide), on accepte le webhook.
+        """
+        secret = self._webhook_secret()
+        if not secret:
+            logger.warning(
+                "CAMPAY_WEBHOOK_SECRET non configuré. Validation du webhook ignorée (mode développement)."
+            )
+            return True
+
+        # Plusieurs conventions d'en-tête sont possibles selon la config CamPay.
+        signature = (
+            request.META.get("HTTP_X_CAMPAY_SIGNATURE")
+            or request.META.get("HTTP_X_WEBHOOK_SIGNATURE")
+            or request.META.get("HTTP_X_PAYMENT_WEBHOOK_SECRET")
+            or request.META.get("HTTP_X_WEBHOOK_SECRET")
+            or request.headers.get("X-Campay-Signature")
+            or request.headers.get("X-Webhook-Signature")
+            or request.headers.get("X-Payment-Webhook-Secret")
+            or request.headers.get("X-Webhook-Secret")
+        )
+
+        if not signature:
+            logger.error("CAMPAY WEBHOOK | aucune signature trouvée")
             return False
 
-    # ── parse webhook payload ────────────────────────────────────
+        try:
+            raw_body = request.body
+            expected_signature = hmac.new(
+                secret.encode("utf-8"), raw_body, hashlib.sha256
+            ).hexdigest()
+            return hmac.compare_digest(signature, expected_signature)
+        except Exception as e:
+            logger.error("CAMPAY WEBHOOK | erreur vérification signature=%s", e)
+            return False
 
-    @staticmethod
-    def parse_webhook(payload):
+    def parse_webhook(self, payload: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Normalize the PayUnit webhook payload into a standard dict:
-        {
-          "transaction_id": "...",
-          "status": "SUCCESS|FAILED|CANCELLED",
-          "amount": 1000,
-          "currency": "XAF",
-          "provider_reference": "...",
-          "metadata": {},
-        }
-        """
-        data = payload.get("data", payload)
+        Normalise le payload webhook CamPay en un dictionnaire standardisé.
 
-        status_raw = data.get("transaction_status", payload.get("status", "")).upper()
+        Champs attendus (adaptés à la doc fournie) :
+          - external_reference : notre transaction locale
+          - status : SUCCESSFUL / FAILED (ou équivalent)
+          - amount, currency, phone_number, message, etc.
+        """
+        if not isinstance(payload, dict):
+            return {}
+
+        # Le webhook peut placer les données à la racine ou dans un bloc "data".
+        data = payload.get("data") or payload
+
+        status_raw = (
+            data.get("status")
+            or payload.get("status")
+            or data.get("payment_status")
+            or payload.get("payment_status")
+            or ""
+        )
+
         status_map = {
+            "SUCCESSFUL": "SUCCESS",
             "SUCCESS": "SUCCESS",
             "FAILED": "FAILED",
+            "FAIL": "FAILED",
             "CANCELLED": "CANCELLED",
             "PENDING": "PENDING",
         }
-        status = status_map.get(status_raw, status_raw)
+        status = status_map.get(str(status_raw).upper(), str(status_raw).upper())
+
+        external_reference = (
+            data.get("external_reference") or payload.get("external_reference") or ""
+        )
 
         return {
-            "transaction_id": data.get("transaction_id", ""),
+            "external_reference": external_reference,
+            "transaction_id": external_reference,  # compatibilité avec process_webhook existant
             "status": status,
-            "amount": data.get("transaction_amount", payload.get("amount")),
-            "currency": data.get("transaction_currency", payload.get("currency", "XAF")),
-            "provider_reference": data.get("transaction_gateway", ""),
-            "message": data.get("message", data.get("message", "")),
+            "amount": data.get("amount") or payload.get("amount"),
+            "currency": data.get("currency") or payload.get("currency") or "XAF",
+            "provider_reference": data.get("id")
+            or data.get("transaction_id")
+            or payload.get("transaction_id")
+            or "",
+            "message": data.get("message") or payload.get("message") or "",
+            "phone_number": data.get("from")
+            or data.get("phone_number")
+            or payload.get("phone_number")
+            or "",
+            "raw_payload": payload,
         }
+
+    # ── helpers ────────────────────────────────────────────────────────
+
+    @staticmethod
+    def _normalize_phone(phone: str) -> str:
+        """
+        Accepte +237XXXXXXXXX, 237XXXXXXXXX ou 9 chiffres.
+        Retourne 237XXXXXXXXX (12 caractères) comme semble l'attendre CamPay.
+        """
+        raw = phone.replace(" ", "").replace("-", "").replace(".", "")
+        if raw.startswith("+237"):
+            raw = raw[4:]
+        elif raw.startswith("237") and len(raw) > 9:
+            raw = raw[3:]
+        if not raw.isdigit() or len(raw) != 9:
+            raise CamPayUnavailable("Numéro de téléphone invalide")
+        return "237" + raw
 
 
 # Singleton
-payunit_provider = PayUnitProvider()
+_cam_pay_provider = CamPayProvider()

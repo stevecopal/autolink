@@ -1,13 +1,11 @@
 import json
 import logging
 
-from django.conf import settings
-from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db import transaction
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, render
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
@@ -15,170 +13,297 @@ from django.views.decorators.http import require_POST
 from garages.models import Garage
 
 from .constants import GARAGE_ACTIVATION_AMOUNT, GARAGE_ACTIVATION_CURRENCY
-from .models import Payment, Receipt
-from .providers import ProviderError, ProviderUnavailable, get_provider
+from .models import Payment
+from .providers import CamPayError, get_provider
 from .services import PaymentWebhookError, process_webhook
 
 logger = logging.getLogger("payments")
 
 
+def _response_json(request, success, message, status_code=200, data=None):
+    payload = {"success": success, "message": str(message)}
+    if data:
+        payload.update(data)
+    return JsonResponse(payload, status=status_code)
+
+
+# =============================================================================
+# ÉTAPE 1 — INITIALISER LE PAIEMENT CHEZ CAMPAY (COLLECT)
+# =============================================================================
+
+
 @login_required
 @require_POST
-def garage_activation_payment_view(request, garage_id):
-    """Initiate a PayUnit payment for garage activation (1000 XAF)."""
-    garage = get_object_or_404(Garage, pk=garage_id, owner=request.user)
+def garage_payment_init_view(request, garage_id):
+    """
+    Initialisation CamPay (collect).
 
-    if garage.approval_status != Garage.ApprovalStatus.APPROVED:
-        messages.error(request, _("Le garage doit etre approuve avant le paiement."))
-        return redirect("garages:garage_dashboard")
-
-    if garage.payment_status == Garage.PaymentStatus.PAID:
-        messages.info(request, _("Le garage est deja paye."))
-        return redirect("garages:garage_dashboard")
-
-    with transaction.atomic():
-        garage = Garage.objects.select_for_update().get(pk=garage.pk)
-        # Reuse an existing pending payment or create a new one
-        payment = (
-            Payment.objects.filter(
-                garage=garage,
-                provider=Payment.Provider.PAYUNIT,
-                status__in=[
-                    Payment.Status.INITIATED,
-                    Payment.Status.PENDING,
-                    Payment.Status.PROCESSING,
-                ],
-            )
-            .order_by("-created_at")
-            .first()
-        )
-        if not payment:
-            payment = Payment.objects.create(
-                garage=garage,
-                user=request.user,
-                amount=GARAGE_ACTIVATION_AMOUNT,
-                currency=GARAGE_ACTIVATION_CURRENCY,
-                provider=Payment.Provider.PAYUNIT,
-                status=Payment.Status.PENDING,
-            )
-
+    Crée un Payment en attendant, appelle CamPay /token/ puis /collect/,
+    et met le Payment en PENDING si HTTP 200.
+    """
     try:
-        provider = get_provider("PAYUNIT")
-        init_result = provider.initialize(payment)
+        garage = get_object_or_404(Garage, pk=garage_id, owner=request.user)
 
-        if init_result and init_result.transaction_id:
-            payment.provider_transaction_id = init_result.transaction_id
-            payment.status = Payment.Status.PROCESSING
-            payment.save(update_fields=["provider_transaction_id", "status", "updated_at"])
+        if garage.approval_status != Garage.ApprovalStatus.APPROVED:
+            return _response_json(
+                request,
+                False,
+                _("Le garage doit être approuvé avant le paiement."),
+                400,
+            )
 
-            # Redirect user to PayUnit hosted checkout page
-            if init_result.checkout_url:
-                return redirect(init_result.checkout_url)
+        if garage.payment_status == Garage.PaymentStatus.PAID:
+            return _response_json(
+                request,
+                True,
+                _("Ce garage est déjà payé et actif."),
+            )
 
-    except ProviderUnavailable as exc:
-        payment.status_message = str(exc)
-        payment.save(update_fields=["status_message", "updated_at"])
-        messages.error(
-            request,
-            _("PayUnit indisponible: %(error)s") % {"error": str(exc)},
+        if garage.payment_status in (Garage.PaymentStatus.PENDING,):
+            return _response_json(
+                request,
+                False,
+                _("Un paiement est déjà en cours pour ce garage."),
+                409,
+            )
+
+        phone_number = request.POST.get("phone_number", "").strip()
+        if not phone_number:
+            return _response_json(
+                request,
+                False,
+                _("Veuillez saisir votre numéro de téléphone."),
+                400,
+            )
+
+        with transaction.atomic():
+            garage = Garage.objects.select_for_update().get(pk=garage.pk)
+
+            payment = (
+                Payment.objects.filter(
+                    garage=garage,
+                    provider=Payment.Provider.CAMPAY,
+                    status__in=[Payment.Status.INITIATED, Payment.Status.PENDING],
+                )
+                .order_by("-created_at")
+                .first()
+            )
+
+            if not payment:
+                payment = Payment.objects.create(
+                    garage=garage,
+                    user=request.user,
+                    amount=GARAGE_ACTIVATION_AMOUNT,
+                    currency=GARAGE_ACTIVATION_CURRENCY,
+                    provider=Payment.Provider.CAMPAY,
+                    status=Payment.Status.PENDING,
+                )
+            else:
+                if payment.status not in (Payment.Status.INITIATED, Payment.Status.PENDING):
+                    return _response_json(
+                        request,
+                        False,
+                        _("Impossible de relancer le paiement dans l'état actuel."),
+                        409,
+                    )
+
+            provider = get_provider("CAMPAY")
+            try:
+                collect_result = provider.collect(payment, phone_number)
+            except CamPayError as exc:
+                payment.status = Payment.Status.FAILED
+                payment.status_message = str(exc)
+                payment.save(update_fields=["status", "status_message", "updated_at"])
+                return _response_json(
+                    request,
+                    False,
+                    _("Le paiement n'a pas pu être initialisé. Veuillez réessayer."),
+                    503,
+                )
+
+            # CamPay collect réussi → PENDING local.
+            payment.provider_reference = payment.idempotency_key
+            payment.status = Payment.Status.PENDING
+            payment.phone_number = phone_number
+            payment.save(update_fields=["provider_reference", "status", "phone_number", "updated_at"])
+
+            garage.payment_status = Garage.PaymentStatus.PENDING
+            garage.save(update_fields=["payment_status", "updated_at"])
+
+            return _response_json(
+                request,
+                True,
+                _("Paiement initialisé. Confirmez sur votre téléphone."),
+                data={
+                    "payment_id": str(payment.pk),
+                    "provider_reference": payment.provider_reference,
+                    "status": "pending",
+                },
+            )
+
+    except CamPayError as exc:
+        logger.warning(
+            "CAMPAY INIT FAILED | user=%s garage=%s error=%s",
+            getattr(request, "user", None),
+            garage_id,
+            exc,
         )
-        return redirect("garages:garage_dashboard")
-    except ProviderError as exc:
-        payment.status = Payment.Status.FAILED
-        payment.status_message = str(exc)
-        payment.save(update_fields=["status", "status_message", "updated_at"])
-        messages.error(request, _("Erreur de paiement: %(error)s") % {"error": str(exc)})
-        return redirect("garages:garage_dashboard")
+        return _response_json(
+            request,
+            False,
+            _("Le paiement n'a pas pu être initialisé. Veuillez réessayer."),
+            503,
+        )
 
-    garage.payment_status = Garage.PaymentStatus.PENDING
-    garage.save(update_fields=["payment_status", "updated_at"])
+    except Exception as e:
+        logger.exception(
+            "CAMPAY INIT UNEXPECTED | user=%s garage=%s",
+            getattr(request, "user", None),
+            garage_id,
+        )
+        return _response_json(
+            request,
+            False,
+            _("Une erreur inattendue est survenue. Veuillez réessayer."),
+            500,
+        )
 
-    messages.success(
-        request,
-        _("Paiement de %(amount)s %(currency)s initie via PayUnit.")
-        % {"amount": GARAGE_ACTIVATION_AMOUNT, "currency": GARAGE_ACTIVATION_CURRENCY},
-    )
-    return redirect("payments:payment_detail", payment_id=payment.pk)
+
+# =============================================================================
+# RETRY — NOUVELLE TENTATIVE
+# =============================================================================
 
 
-# ── PayUnit Webhook ──────────────────────────────────────────────
+@login_required
+@require_POST
+def garage_payment_retry_view(request, garage_id):
+    """
+    Nouvelle tentative de paiement CamPay.
+
+    Chaque retry recrée un Payment indépendant et relance un collect.
+    """
+    try:
+        garage = get_object_or_404(Garage, pk=garage_id, owner=request.user)
+
+        if garage.approval_status != Garage.ApprovalStatus.APPROVED:
+            return _response_json(
+                request,
+                False,
+                _("Le garage doit être approuvé avant le paiement."),
+                400,
+            )
+
+        # Autoriser le retry depuis un état terminal d'échec ou non payé.
+        if garage.payment_status not in (Garage.PaymentStatus.FAILED, Garage.PaymentStatus.UNPAID):
+            return _response_json(
+                request,
+                False,
+                _("Impossible de relancer le paiement dans l'état actuel."),
+                409,
+            )
+
+        return garage_payment_init_view(request, garage_id)
+
+    except Exception as e:
+        logger.exception(
+            "CAMPAY RETRY UNEXPECTED | user=%s garage=%s",
+            getattr(request, "user", None),
+            garage_id,
+        )
+        return _response_json(
+            request,
+            False,
+            _("Une erreur inattendue est survenue. Veuillez réessayer."),
+            500,
+        )
+
+
+# =============================================================================
+# WEBHOOK CAMPAY
+# =============================================================================
 
 
 @csrf_exempt
 @require_POST
 def payment_webhook_view(request):
     """
-    Receive PayUnit webhook callbacks.
+    Webhook CamPay.
 
-    PayUnit POSTs to this endpoint when a payment status changes.
-    Body example:
-    {
-      "status": "SUCCESS",
-      "data": {
-        "transaction_status": "SUCCESS",
-        "transaction_id": "PU 1672929285456",
-        "transaction_amount": 1000,
-        "transaction_currency": "XAF",
-        "transaction_gateway": "orange_money",
-        "message": "payment has been collected"
-      }
-    }
+    - Vérifie la signature.
+    - Extrait external_reference.
+    - Met à jour Payment (SUCCESS/FAILED).
+    - Idempotent : si SUCCESS déjà enregistré, retourne 200.
     """
-    try:
-        payload = json.loads(request.body or "{}")
-    except (json.JSONDecodeError, ValueError):
-        return JsonResponse({"success": False, "error": "invalid_json"}, status=400)
+    provider = get_provider("CAMPAY")
 
-    # Verify webhook authenticity
-    provider = get_provider("PAYUNIT")
-    if not provider.verify_webhook(request):
-        logger.warning("Webhook signature verification failed")
-        return JsonResponse({"success": False, "error": "unauthorized"}, status=401)
-
-    # Parse the normalized payload
-    parsed = provider.parse_webhook(payload)
-    transaction_id = parsed.get("transaction_id", "")
-    status = parsed.get("status", "")
-    amount = parsed.get("amount")
-    currency = parsed.get("currency")
-
-    if not transaction_id:
-        return JsonResponse(
-            {"success": False, "error": "missing_transaction_id"}, status=400
-        )
-
-    if status not in ("SUCCESS", "FAILED", "CANCELLED"):
-        return JsonResponse(
-            {"success": False, "error": f"invalid_status: {status}"}, status=400
-        )
+    if not provider.verify_webhook_signature(request):
+        logger.warning("Tentative de webhook non autorisée ou signature invalide.")
+        return JsonResponse({"success": False, "message": "Invalid Signature"}, status=403)
 
     try:
+        try:
+            payload = json.loads(request.body.decode("utf-8"))
+        except json.JSONDecodeError as e:
+            logger.error("Webhook JSON decode error: %s", e)
+            return JsonResponse({"success": False, "message": "Invalid JSON payload"}, status=400)
+
+        parsed = provider.parse_webhook(payload)
+        external_reference = parsed.get("external_reference")
+        status = parsed.get("status")
+        amount = parsed.get("amount")
+        currency = parsed.get("currency")
+        provider_reference = parsed.get("provider_reference", "")
+        phone_number = parsed.get("phone_number", "")
+
+        if not external_reference:
+            logger.error("Webhook CamPay: external_reference manquant.")
+            return JsonResponse({"success": False, "message": "Missing external_reference"}, status=400)
+
         payment = process_webhook(
-            provider="PAYUNIT",
-            transaction_id=transaction_id,
+            provider=Payment.Provider.CAMPAY,
+            transaction_id=external_reference,
+            payment_id=None,
             status=status,
             amount=amount,
             currency=currency,
-            provider_reference=parsed.get("provider_reference", ""),
-            metadata={"raw_webhook": payload},
+            provider_reference=provider_reference,
+            metadata={"phone_number": phone_number, "provider": "CAMPAY"},
         )
-    except PaymentWebhookError as exc:
-        return JsonResponse({"success": False, "error": str(exc)}, status=400)
-    except (ValueError, TypeError) as exc:
-        return JsonResponse({"success": False, "error": str(exc)}, status=400)
 
-    return JsonResponse(
-        {"success": True, "payment_id": str(payment.pk), "status": payment.status}
-    )
+        return JsonResponse({"success": True, "message": "Webhook traité avec succès"}, status=200)
+
+    except PaymentWebhookError as e:
+        logger.error("Webhook processing error: %s", e)
+        return JsonResponse({"success": False, "message": str(e)}, status=400)
+
+    except Exception as e:
+        logger.exception("Webhook critical error: %s", e)
+        return JsonResponse({"success": False, "message": "Internal Server Error"}, status=500)
 
 
-# ── Client payment views ────────────────────────────────────────
+@login_required
+@require_POST
+def payment_webhook_view(request):
+    """
+    Alias maintenu pour compatibilité des anciennes références.
+    """
+    return payment_webhook_view(request)
+
+
+# =============================================================================
+# VUES POUR LES CLIENTS (DÉTAILS DES PAIEMENTS)
+# =============================================================================
 
 
 @login_required
 def payment_detail_view(request, payment_id):
+    """
+    Affiche les détails d'un paiement pour un client.
+    """
     payment = get_object_or_404(
-        Payment.objects.select_related("garage"), pk=payment_id, user=request.user
+        Payment.objects.select_related("garage", "user"),
+        pk=payment_id,
+        user=request.user,
     )
     receipt = getattr(payment, "receipt", None)
     template = (
@@ -191,9 +316,12 @@ def payment_detail_view(request, payment_id):
 
 @login_required
 def payment_list_view(request):
+    """
+    Liste des paiements d'un client.
+    """
     payments = (
         Payment.objects.filter(user=request.user)
-        .select_related("garage")
+        .select_related("garage", "user")
         .order_by("-created_at")
     )
     paginator = Paginator(payments, 15)
@@ -208,7 +336,9 @@ def payment_list_view(request):
 
 @login_required
 def receipt_download_view(request, receipt_id):
-    """Download a payment receipt as a printable view."""
+    """
+    Télécharger un reçu de paiement sous forme de vue imprimable.
+    """
     receipt = get_object_or_404(
         Receipt.objects.select_related("payment", "garage", "owner"),
         pk=receipt_id,

@@ -15,11 +15,12 @@ CSRF_TRUSTED_ORIGINS = config("CSRF_TRUSTED_ORIGINS", default="").split(",")
 
 # Payment provider credentials — all stored in .env, never committed.
 PAYMENT_WEBHOOK_SECRET = config("PAYMENT_WEBHOOK_SECRET", default="")
-PAYUNIT_API_KEY = config("PAYUNIT_API_KEY", default="")
-PAYUNIT_API_USER = config("PAYUNIT_API_USER", default="")
-PAYUNIT_API_PASSWORD = config("PAYUNIT_API_PASSWORD", default="")
-PAYUNIT_API_URL = config("PAYUNIT_API_URL", default="https://gateway.payunit.net")
-PAYUNIT_MODE = config("PAYUNIT_MODE", default="test")  # "live" or "test"
+
+# CamPay configuration
+CAMPAY_ENVIRONMENT = config("CAMPAY_ENVIRONMENT", default="DEV")  # DEV or PROD
+CAMPAY_APP_USERNAME = config("CAMPAY_APP_USERNAME", default="")
+CAMPAY_APP_PASSWORD = config("CAMPAY_APP_PASSWORD", default="")
+CAMPAY_WEBHOOK_SECRET = config("CAMPAY_WEBHOOK_SECRET", default="")
 SITE_URL = config("SITE_URL", default="http://localhost:8000")
 
 INSTALLED_APPS = [
@@ -178,7 +179,7 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 # Si vous utilisez django-allauth, force le HTTPS pour les redirections
-# ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
+ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
 
 # Cache configuration
 CACHES = {
