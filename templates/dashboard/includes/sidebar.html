@@ -120,19 +120,6 @@
         {% trans "Support" %}
     </a>
 
-    <!-- Avis -->
-    <a href="{% url 'administration:reviews' %}"
-       class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-auto-light/80 text-sm font-medium transition text-auto-dark
-              {% if request.resolver_match.url_name == 'reviews' %}
-                 bg-auto-light text-auto-orange font-bold shadow-sm
-              {% endif %}">
-        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682"/>
-        </svg>
-        {% trans "Avis" %}
-    </a>
-
 
 {% endif %}
 

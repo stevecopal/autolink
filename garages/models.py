@@ -140,15 +140,14 @@ class Garage(models.Model):
     closing_time = models.TimeField(_("Heure de fermeture"), null=True, blank=True)
     open_weekends = models.BooleanField(_("Ouvert le week-end"), default=False)
 
-    trust_score = models.DecimalField(max_digits=3, decimal_places=1, default=0)
-    total_reviews = models.PositiveIntegerField(default=0)
     total_clients = models.PositiveIntegerField(default=0)
+    total_orders = models.PositiveIntegerField(default=0)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ["-trust_score", "-created_at"]
+        ordering = ["-created_at"]
         verbose_name = _("Garage")
         verbose_name_plural = _("Garages")
         indexes = [
@@ -185,12 +184,6 @@ class Garage(models.Model):
             else:
                 return now >= self.opening_time or now <= self.closing_time
         return False
-
-    @property
-    def average_rating(self):
-        if self.total_reviews > 0:
-            return round(self.trust_score, 1)
-        return 0
 
     @property
     def is_available_for_search(self):
@@ -264,6 +257,7 @@ class GarageService(models.Model):
         Garage, on_delete=models.CASCADE, related_name="services"
     )
     name = models.CharField(_("Service"), max_length=200)
+    slug = models.SlugField(max_length=250, blank=True)
     category = models.CharField(
         max_length=30, choices=Category.choices, default=Category.OTHER
     )
@@ -291,9 +285,28 @@ class GarageService(models.Model):
         ordering = ["category", "name"]
         verbose_name = _("Service")
         verbose_name_plural = _("Services")
+        unique_together = ["garage", "slug"]
 
     def __str__(self):
         return f"{self.garage.name} - {self.name}"
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            from django.utils.text import slugify
+
+            base = slugify(self.name or "").strip("-") or "service"
+            slug = base
+            counter = 1
+            while GarageService.objects.filter(
+                garage=self.garage, slug=slug
+            ).exclude(pk=self.pk).exists():
+                suffix = f"-{counter}"
+                if len(base) + len(suffix) > 240:
+                    base = base[: 240 - len(suffix)]
+                slug = base + suffix
+                counter += 1
+            self.slug = slug
+        super().save(*args, **kwargs)
 
 
 class GaragePhoto(models.Model):

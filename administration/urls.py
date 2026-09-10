@@ -57,7 +57,6 @@ urlpatterns = [
         views.admin_ticket_detail_view,
         name="ticket_detail",
     ),
-    path("reviews/", views.admin_reviews_view, name="reviews"),
     path(
         "users/<uuid:user_id>/send-urgent-message/",
         views.admin_send_urgent_message_view,

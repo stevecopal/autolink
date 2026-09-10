@@ -62,7 +62,6 @@
                         <th class="px-4 py-3">{% trans "Approbation" %}</th>
                         <th class="px-4 py-3">{% trans "Paiement" %}</th>
                         <th class="px-4 py-3">{% trans "Activation" %}</th>
-                        <th class="px-4 py-3">{% trans "Note" %}</th>
                         <th class="px-4 py-3">{% trans "Actions" %}</th>
                     </tr>
                 </thead>
@@ -86,14 +85,13 @@
                             </td>
                             <td class="px-4 py-3">{{ garage.get_payment_status_display }}</td>
                             <td class="px-4 py-3">{{ garage.get_activation_status_display }}</td>
-                            <td class="px-4 py-3">{{ garage.trust_score }}/5</td>
                             <td class="px-4 py-3">
                                 <a href="{% url 'administration:garage_verify' garage.pk %}" class="text-auto-orange hover:underline">{% trans "Examiner" %}</a>
                             </td>
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="8" class="px-4 py-8 text-center text-auto-600">{% trans "Aucun garage trouvé." %}</td>
+                            <td colspan="7" class="px-4 py-8 text-center text-auto-600">{% trans "Aucun garage trouvé." %}</td>
                         </tr>
                     {% endfor %}
                 </tbody>

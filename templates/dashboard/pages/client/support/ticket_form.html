@@ -1,7 +1,7 @@
 {% extends 'dashboard/base.html' %}
 {% load i18n %}
 
-{% block title %}{% trans "Signaler un problème" %} - AutoLink{% endblock %}
+{% block title %}{% trans "Signaler une panne" %} - AutoLink{% endblock %}
 
 {% block dashboard_header %}
     <h1 class="text-sm font-bold text-auto-dark">{% trans "Support" %}</h1>
@@ -13,125 +13,124 @@
         <span class="text-auto-400">/</span>
         <a href="{% url 'support:ticket_list' %}" class="hover:text-auto-orange transition">{% trans "Mes tickets" %}</a>
         <span class="text-auto-400">/</span>
-        <span class="font-bold text-auto-dark">{% trans "Signaler un problème" %}</span>
+        <span class="font-bold text-auto-dark">{% trans "Signaler une panne" %}</span>
     </nav>
 {% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto space-y-6">
-    <div class="card p-6">
-        <h3 class="text-lg font-bold text-auto-dark mb-1">{% trans "Signaler un problème" %}</h3>
-        <p class="text-sm text-auto-500 mb-6">{% trans "Décrivez votre problème et nous vous accompagnerons jusqu'à la résolution." %}</p>
-
-        <form method="post" enctype="multipart/form-data" id="ticket-form">
-            {% csrf_token %}
-
-            <div class="space-y-5">
-                <div>
-                    <label class="form-label">{% trans "Type de problème" %} <span class="text-error-500">*</span></label>
-                    {{ form.category }}
-                    {% if form.category.errors %}
-                    <p class="form-error">{{ form.category.errors.0 }}</p>
-                    {% endif %}
-                </div>
-
-                <div>
-                    <label class="form-label">{% trans "Objet" %} <span class="text-error-500">*</span></label>
-                    {{ form.subject }}
-                    {% if form.subject.errors %}
-                    <p class="form-error">{{ form.subject.errors.0 }}</p>
-                    {% endif %}
-                    <p class="text-xs text-auto-400 mt-1">{% trans "Un résumé clair du problème rencontré" %}</p>
-                </div>
-
-                <div>
-                    <label class="form-label">{% trans "Description" %} <span class="text-error-500">*</span></label>
-                    {{ form.description }}
-                    {% if form.description.errors %}
-                    <p class="form-error">{{ form.description.errors.0 }}</p>
-                    {% endif %}
-                </div>
-            </div>
-        </form>
-    </div>
-
-    <div class="card p-6">
-        <h3 class="text-lg font-bold text-auto-dark mb-1">{% trans "Contexte" %}</h3>
-        <p class="text-sm text-auto-500 mb-4">{% trans "Rattachez votre problème à une commande, une pièce ou un garage si applicable." %}</p>
-
-        <div class="space-y-5">
-            <div>
-                <label class="form-label">{% trans "Commande concernée" %}</label>
-                {{ form.order }}
-                {% if form.order.errors %}
-                <p class="form-error">{{ form.order.errors.0 }}</p>
-                {% endif %}
-                <p class="text-xs text-auto-400 mt-1">{% trans "Sélectionnez la commande concernée si applicable" %}</p>
-            </div>
-
-            <div>
-                <label class="form-label">{% trans "Pièce concernée" %}</label>
-                {{ form.part }}
-                {% if form.part.errors %}
-                <p class="form-error">{{ form.part.errors.0 }}</p>
-                {% endif %}
-            </div>
-
-            <div>
-                <label class="form-label">{% trans "Garage concerné" %}</label>
-                {{ form.garage }}
-                {% if form.garage.errors %}
-                <p class="form-error">{{ form.garage.errors.0 }}</p>
-                {% endif %}
-            </div>
+<div class="max-w-2xl mx-auto px-4 sm:px-0 py-6 space-y-6">
+    <!-- Header -->
+    <div class="flex items-center gap-3">
+        <a href="{% url 'support:ticket_list' %}" class="p-2 rounded-lg hover:bg-auto-100 transition">
+            <svg class="w-5 h-5 text-auto-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        </a>
+        <div>
+            <h2 class="text-lg font-bold text-auto-dark">{% trans "Signaler une panne" %}</h2>
+            <p class="text-sm text-auto-500">{% trans "Décrivez votre problème et joignez une preuve." %}</p>
         </div>
     </div>
 
-    <div class="card p-6">
-        <h3 class="text-lg font-bold text-auto-dark mb-1">{% trans "Preuves" %}</h3>
-        <p class="text-sm text-auto-500 mb-4">{% trans "Joignez des photos, vidéos ou documents pour appuyer votre signalement." %}</p>
+    <form method="post" enctype="multipart/form-data" id="ticket-form" class="space-y-5">
+        {% csrf_token %}
 
-        <label class="flex items-center gap-3 p-4 rounded-xl border-2 border-dashed border-auto-200 hover:border-auto-orange transition cursor-pointer bg-auto-50/50">
-            <svg class="w-6 h-6 text-auto-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-            <div class="min-w-0">
-                <span class="text-sm text-auto-600 block" id="file-label">{% trans "Cliquez pour ajouter un fichier" %}</span>
-                <span class="text-xs text-auto-400">{% trans "Images, PDF, Word — 10 Mo max" %}</span>
+        <!-- Garage Selection -->
+        <div class="card p-5">
+            <label class="form-label text-sm font-bold text-auto-700 mb-2 block">
+                {% trans "Garage concerné" %} <span class="text-red-500">*</span>
+            </label>
+            {{ form.garage }}
+            {% if form.garage.errors %}
+            <p class="text-red-500 text-xs mt-1">{{ form.garage.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <!-- Message -->
+        <div class="card p-5">
+            <label class="form-label text-sm font-bold text-auto-700 mb-2 block">
+                {% trans "Décrivez votre problème" %} <span class="text-red-500">*</span>
+            </label>
+            {{ form.description }}
+            {% if form.description.errors %}
+            <p class="text-red-500 text-xs mt-1">{{ form.description.errors.0 }}</p>
+            {% endif %}
+        </div>
+
+        <!-- Evidence File -->
+        <div class="card p-5">
+            <label class="form-label text-sm font-bold text-auto-700 mb-3 block">
+                {% trans "Pièce justificative" %} <span class="text-auto-400 font-normal">{% trans "(optionnel)" %}</span>
+            </label>
+            <label class="flex items-center gap-3 p-4 rounded-xl border-2 border-dashed border-auto-200 hover:border-auto-orange transition cursor-pointer bg-auto-50/50 active:bg-auto-100">
+                <svg class="w-8 h-8 text-auto-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                <div class="min-w-0 flex-1">
+                    <span class="text-sm text-auto-600 block" id="file-label">{% trans "Appuyez pour ajouter un fichier" %}</span>
+                    <span class="text-xs text-auto-400">{% trans "Images, PDF, Word — 5 Mo max" %}</span>
+                </div>
+                <input type="file"
+                       name="evidence"
+                       class="hidden"
+                       accept="image/*,application/pdf,.doc,.docx"
+                       id="file-input">
+            </label>
+            <div id="file-name" class="hidden mt-2 flex items-center gap-2 text-sm text-auto-700">
+                <svg class="w-4 h-4 text-auto-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                <span id="file-name-text"></span>
+                <button type="button" id="file-remove" class="ml-auto text-red-500 hover:text-red-700">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
             </div>
-            <input type="file"
-                   name="attachment"
-                   class="hidden"
-                   accept="image/*,application/pdf,.doc,.docx"
-                   id="file-input">
-        </label>
-        {% if form.attachment.errors %}
-        <p class="form-error mt-2">{{ form.attachment.errors.0 }}</p>
-        {% endif %}
-    </div>
+            {% if form.evidence.errors %}
+            <p class="text-red-500 text-xs mt-2">{{ form.evidence.errors.0 }}</p>
+            {% endif %}
+        </div>
 
-    <div class="flex justify-between items-center pt-4">
-        <a href="{% url 'support:ticket_list' %}"
-           class="btn-outline text-sm">{% trans "Annuler" %}</a>
-        <button type="submit"
-                form="ticket-form"
-                class="bg-auto-orange text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-auto-orange-dark transition inline-flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
-            {% trans "Envoyer le ticket" %}
-        </button>
-    </div>
+        <!-- Actions -->
+        <div class="flex flex-col sm:flex-row gap-3 pt-2">
+            <a href="{% url 'support:ticket_list' %}"
+               class="flex-1 sm:flex-none px-5 py-2.5 rounded-xl border border-auto-200 text-auto-600 font-bold text-sm text-center hover:bg-auto-50 transition">
+                {% trans "Annuler" %}
+            </a>
+            <button type="submit"
+                    class="flex-1 sm:flex-none bg-auto-orange text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-auto-orange-dark transition inline-flex items-center justify-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                {% trans "Envoyer" %}
+            </button>
+        </div>
+    </form>
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     var fileInput = document.getElementById('file-input');
     var fileLabel = document.getElementById('file-label');
-    if (fileInput && fileLabel) {
+    var fileName = document.getElementById('file-name');
+    var fileNameText = document.getElementById('file-name-text');
+    var fileRemove = document.getElementById('file-remove');
+
+    if (fileInput) {
         fileInput.addEventListener('change', function() {
             if (this.files && this.files.length > 0) {
-                fileLabel.textContent = '📎 ' + this.files[0].name;
+                fileLabel.classList.add('hidden');
+                fileName.classList.remove('hidden');
+                fileNameText.textContent = '📎 ' + this.files[0].name;
             } else {
-                fileLabel.textContent = '{% trans "Cliquez pour ajouter un fichier" %}';
+                resetFile();
             }
         });
+    }
+
+    if (fileRemove) {
+        fileRemove.addEventListener('click', function(e) {
+            e.preventDefault();
+            fileInput.value = '';
+            resetFile();
+        });
+    }
+
+    function resetFile() {
+        fileLabel.classList.remove('hidden');
+        fileName.classList.add('hidden');
+        fileNameText.textContent = '';
     }
 });
 </script>

@@ -1,0 +1,78 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Services" %}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-8">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
+        <div>
+            <h1 class="text-2xl md:text-3xl font-bold text-auto-dark">{% trans "Services" %}</h1>
+        </div>
+        <a href="{% url 'garages:service_create' %}" class="btn-primary whitespace-nowrap">
+            + {% trans "Ajouter un service" %}
+        </a>
+    </div>
+
+    {% if garages|length > 1 %}
+    <div class="card p-4 mb-6">
+        <form method="get" class="flex flex-wrap gap-4 items-end">
+            <div class="flex-1 min-w-[150px]">
+                <label class="form-label">{% trans "Garage" %}</label>
+                <select name="garage" class="form-input" onchange="this.form.submit()">
+                    <option value="">{% trans "Tous mes garages" %}</option>
+                    {% for g in garages %}
+                        <option value="{{ g.pk }}" {% if selected_garage and selected_garage.pk == g.pk %}selected{% endif %}>{{ g.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </form>
+    </div>
+    {% endif %}
+
+    <div class="card p-6">
+        {% if services %}
+            <div class="space-y-3">
+                {% for service in services %}
+                    <div class="flex items-center justify-between p-4 rounded-xl border border-auto-100 hover:bg-auto-50 transition">
+                        <div class="min-w-0 flex-1">
+                            <div class="font-bold text-sm text-auto-dark">{{ service.name }}</div>
+                            <div class="text-xs text-auto-500 mt-0.5">{{ service.get_category_display }}</div>
+                            {% if garages|length > 1 and not selected_garage %}
+                            <div class="text-xs text-auto-400 mt-0.5">{{ service.garage.name }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="flex items-center gap-2 ml-3">
+                            <a href="{% url 'garages:service_edit' service.id %}" class="text-auto-orange hover:text-auto-orange-dark text-sm font-bold transition">
+                                {% trans "Modifier" %}
+                            </a>
+                            <form method="post" action="{% url 'garages:service_delete' service.id %}" class="inline"
+                                  onsubmit="return confirm('{% trans "Supprimer ce service ?" %}')">
+                                {% csrf_token %}
+                                <button type="submit" class="text-red-500 hover:text-red-700 text-sm font-bold transition">
+                                    {% trans "Supprimer" %}
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-12 text-auto-600">
+                <div class="text-4xl mb-3">🔧</div>
+                <p class="font-bold">{% trans "Aucun service ajouté." %}</p>
+                <p class="text-sm mt-1">{% trans "Ajoutez les services proposés par votre garage." %}</p>
+                <a href="{% url 'garages:service_create' %}" class="btn-primary mt-4 inline-block">
+                    + {% trans "Ajouter un service" %}
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="mt-6">
+        <a href="{% url 'garages:garage_dashboard' %}" class="text-auto-orange hover:text-auto-orange-dark font-bold text-sm transition">
+            ← {% trans "Retour au tableau de bord" %}
+        </a>
+    </div>
+</div>
+{% endblock %}

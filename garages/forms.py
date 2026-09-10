@@ -3,10 +3,30 @@ from django.utils.translation import gettext_lazy as _
 
 from core.models import City, Neighborhood
 
-from .models import Garage, GarageVerification
+from .models import Garage, GarageService, GarageVerification
 
 
 class GarageForm(forms.ModelForm):
+    description = forms.CharField(
+        label=_("Description"),
+        widget=forms.Textarea(attrs={"class": "form-input", "rows": 3, "placeholder": _("Décrivez votre garage...")}),
+        required=True,
+    )
+    whatsapp = forms.CharField(
+        label=_("WhatsApp"),
+        widget=forms.TextInput(attrs={"class": "form-input", "placeholder": "+237 6XX XXX XXX"}),
+        required=True,
+    )
+    email = forms.EmailField(
+        label=_("Email"),
+        widget=forms.EmailInput(attrs={"class": "form-input", "placeholder": "garage@example.com"}),
+        required=True,
+    )
+    photo = forms.ImageField(
+        label=_("Photo du garage"),
+        widget=forms.ClearableFileInput(attrs={"class": "form-input", "accept": "image/*"}),
+        required=True,
+    )
     city = forms.ModelChoiceField(
         queryset=City.objects.filter(is_active=True),
         label=_("Ville"),
@@ -20,13 +40,13 @@ class GarageForm(forms.ModelForm):
         required=True,
     )
     latitude = forms.DecimalField(
-        max_digits=9, decimal_places=6, widget=forms.HiddenInput(), required=False
+        max_digits=9, decimal_places=6, widget=forms.HiddenInput(), required=True,
     )
     longitude = forms.DecimalField(
-        max_digits=9, decimal_places=6, widget=forms.HiddenInput(), required=False
+        max_digits=9, decimal_places=6, widget=forms.HiddenInput(), required=True,
     )
     gps_accuracy = forms.DecimalField(
-        max_digits=8, decimal_places=2, widget=forms.HiddenInput(), required=False
+        max_digits=8, decimal_places=2, widget=forms.HiddenInput(), required=True,
     )
 
     class Meta:
@@ -52,29 +72,10 @@ class GarageForm(forms.ModelForm):
                     "placeholder": _("Nom du garage"),
                 }
             ),
-            "description": forms.Textarea(
-                attrs={
-                    "class": "form-input",
-                    "rows": 3,
-                    "placeholder": _("Décrivez votre garage..."),
-                }
-            ),
             "phone": forms.TextInput(
                 attrs={
                     "class": "form-input",
                     "placeholder": "+237 6XX XXX XXX",
-                }
-            ),
-            "whatsapp": forms.TextInput(
-                attrs={
-                    "class": "form-input",
-                    "placeholder": "+237 6XX XXX XXX",
-                }
-            ),
-            "email": forms.EmailInput(
-                attrs={
-                    "class": "form-input",
-                    "placeholder": "garage@example.com",
                 }
             ),
             "address": forms.Textarea(
@@ -82,12 +83,6 @@ class GarageForm(forms.ModelForm):
                     "class": "form-input",
                     "rows": 2,
                     "placeholder": _("Adresse complète"),
-                }
-            ),
-            "photo": forms.ClearableFileInput(
-                attrs={
-                    "class": "form-input",
-                    "accept": "image/*",
                 }
             ),
         }
@@ -135,11 +130,13 @@ class GarageDocumentForm(forms.Form):
                 "accept": ".pdf,.doc,.docx",
             }
         ),
+        required=True,
     )
     document_type = forms.ChoiceField(
         choices=GarageVerification.DocumentType.choices,
         label=_("Type de document"),
         widget=forms.Select(attrs={"class": "form-input"}),
+        required=True,
     )
 
     def clean_document(self):
@@ -153,3 +150,34 @@ class GarageDocumentForm(forms.Form):
                     _("Seuls les fichiers PDF et Word sont acceptés.")
                 )
         return document
+
+
+class GarageServiceForm(forms.ModelForm):
+    garage = forms.ModelChoiceField(
+        queryset=Garage.objects.none(),
+        label=_("Garage"),
+        empty_label=_("Sélectionnez un garage"),
+        required=True,
+    )
+
+    class Meta:
+        model = GarageService
+        fields = ["garage", "name", "category"]
+        widgets = {
+            "name": forms.TextInput(
+                attrs={
+                    "class": "form-input",
+                    "placeholder": _("Nom du service"),
+                }
+            ),
+            "category": forms.Select(attrs={"class": "form-input"}),
+        }
+
+    def __init__(self, *args, user=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if user:
+            self.fields["garage"].queryset = Garage.objects.filter(owner=user)
+        if self.instance and self.instance.pk and hasattr(self.instance, 'garage') and self.instance.garage:
+            self.fields["garage"].queryset = Garage.objects.filter(
+                pk=self.instance.garage.pk
+            )

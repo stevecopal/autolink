@@ -19,6 +19,18 @@ urlpatterns = [
     path(
         "disponibilite/", views.garage_availability_toggle, name="garage_availability"
     ),
+    path("services/", views.service_list_view, name="service_list"),
+    path("services/ajouter/", views.service_create_view, name="service_create"),
+    path(
+        "services/<uuid:service_id>/modifier/",
+        views.service_edit_view,
+        name="service_edit",
+    ),
+    path(
+        "services/<uuid:service_id>/supprimer/",
+        views.service_delete_view,
+        name="service_delete",
+    ),
     path("<slug:slug>/", views.garage_detail_view, name="garage_detail"),
     path("<slug:slug>/api/", views.garage_detail_api, name="garage_detail_api"),
 ]

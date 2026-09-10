@@ -1,0 +1,59 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n %}
+
+{% block title %}{% if is_edit %}{% trans "Modifier le service" %}{% else %}{% trans "Ajouter un service" %}{% endif %}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-8">
+    <h1 class="text-2xl md:text-3xl font-bold text-auto-dark mb-6">
+        {% if is_edit %}{% trans "Modifier le service" %}{% else %}{% trans "Ajouter un service" %}{% endif %}
+    </h1>
+
+    <div class="card p-6">
+        <form method="post" class="space-y-4">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                {% for error in form.non_field_errors %}
+                <p class="text-sm text-red-600">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div>
+                <label class="form-label">{% trans "Garage" %} *</label>
+                {{ form.garage }}
+                {% if form.garage.errors %}
+                <p class="form-error">{{ form.garage.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label class="form-label">{% trans "Nom du service" %} *</label>
+                {{ form.name }}
+                {% if form.name.errors %}
+                <p class="form-error">{{ form.name.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div>
+                <label class="form-label">{% trans "Catégorie" %} *</label>
+                {{ form.category }}
+                {% if form.category.errors %}
+                <p class="form-error">{{ form.category.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                <button type="submit" class="btn-primary flex-1">
+                    {% if is_edit %}{% trans "Enregistrer" %}{% else %}{% trans "Ajouter" %}{% endif %}
+                </button>
+                <a href="{% url 'garages:service_list' %}" class="btn-outline flex-1 text-center">
+                    {% trans "Annuler" %}
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

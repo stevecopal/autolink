@@ -12,6 +12,10 @@
     window.AutoLink = window.AutoLink || {};
 
     window.AutoLink.getCSRFToken = function() {
+        var meta = document.querySelector('meta[name="csrf-token"]');
+        if (meta && meta.getAttribute('content')) return meta.getAttribute('content');
+        var formInput = document.querySelector('input[name="csrfmiddlewaretoken"]');
+        if (formInput && formInput.value) return formInput.value;
         var cookie = document.cookie.split(';').find(function(c) {
             return c.trim().startsWith('csrftoken=');
         });
@@ -118,6 +122,15 @@
             if (toast.parentNode) toast.parentNode.removeChild(toast);
         }, 350);
     }
+
+    // Show a toast, then navigate to the next page once it's visible
+    window.AutoLink.toastAndRedirect = function(message, url, type) {
+        if (message) window.AutoLink.showToast(message, type || 'success');
+        if (!url) return;
+        setTimeout(function() {
+            window.location.href = url;
+        }, 1400);
+    };
 
     // Process Django messages on page load → convert to toasts
     var messagesContainer = document.getElementById('messages-container');
@@ -232,6 +245,7 @@
         fetch(form.action, {
             method: form.method,
             headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
                 'X-CSRFToken': csrfToken,
                 'X-Requested-With': 'XMLHttpRequest',
             },
@@ -269,20 +283,20 @@
             }
 
             // Success path
+            var msgType = data.type || 'success';
+            if (data.redirect) {
+                window.AutoLink.toastAndRedirect(data.message, data.redirect, msgType);
+                return;
+            }
             if (data.message) {
-                var msgType = data.type || 'success';
                 window.AutoLink.showToast(data.message, msgType);
             }
-            if (data.redirect) {
-                window.location.href = data.redirect;
-            } else {
-                // Close modal on success
-                var modalId = modal.id;
-                window.AutoLink.closeModal(modalId);
-                if (submitBtn) {
-                    submitBtn.disabled = false;
-                    submitBtn.innerHTML = originalText;
-                }
+            // Close modal on success
+            var modalId = modal.id;
+            window.AutoLink.closeModal(modalId);
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalText;
             }
         })
         .catch(function(error) {

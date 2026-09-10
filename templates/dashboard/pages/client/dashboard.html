@@ -120,12 +120,6 @@
                     </div>
                 </div>
                 {% if garage.activation_status != 'ACTIVE' and garage.approval_status == 'APPROVED' and garage.payment_status == 'UNPAID' %}
-                <div class="mt-2 pt-2 border-t border-auto-100">
-                    <a href="{% url 'payments:garage_activation' garage.pk %}" class="inline-flex items-center gap-1.5 text-xs font-bold text-auto-orange hover:underline">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-                        {% trans "Effectuer le paiement (1000 FCFA)" %}
-                    </a>
-                </div>
                 {% endif %}
             </a>
             {% endfor %}
@@ -175,71 +169,7 @@
     </div>
     {% endif %}
 
-    <!-- Quick Actions -->
-    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-        <a href="{% url 'garages:garage_create' %}" class="stat-card hover:border-auto-orange transition-all duration-200 group text-center py-6">
-            <svg class="w-8 h-8 text-auto-orange mx-auto mb-2 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
-            <div class="font-bold text-sm">{% trans "Ajouter un garage" %}</div>
-        </a>
-        <a href="{% url 'garages:garage_list' %}" class="stat-card hover:border-auto-orange transition-all duration-200 group text-center py-6">
-            <svg class="w-8 h-8 text-auto-gold mx-auto mb-2 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-            <div class="font-bold text-sm">{% trans "Trouver un mecanicien" %}</div>
-        </a>
-        <a href="{% url 'support:ticket_create' %}" class="stat-card hover:border-auto-orange transition-all duration-200 group text-center py-6">
-            <svg class="w-8 h-8 text-auto-coral mx-auto mb-2 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
-            <div class="font-bold text-sm">{% trans "Signaler un probleme" %}</div>
-        </a>
-    </div>
-
-    <!-- Support & Messages -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div class="card p-6">
-            <h2 class="text-lg font-bold text-auto-deep-red mb-4">{% trans "Support" %}</h2>
-            <div class="space-y-3">
-                <a href="{% url 'support:ticket_list' %}" class="block p-3 rounded-lg hover:bg-auto-50 border border-auto-100 transition">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-8 h-8 bg-auto-deep-red/10 rounded-lg flex items-center justify-center">🎫</div>
-                        <span class="font-bold text-sm">{% trans "Mes tickets" %}</span>
-                    </div>
-                </a>
-                <a href="{% url 'support:conversation_list' %}" class="block p-3 rounded-lg hover:bg-auto-50 border border-auto-100 transition">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-8 h-8 bg-auto-orange/10 rounded-lg flex items-center justify-center">💬</div>
-                        <span class="font-bold text-sm">{% trans "Messages" %}</span>
-                    </div>
-                </a>
-                <a href="{% url 'support:assistance' %}" class="block p-3 rounded-lg hover:bg-auto-50 border border-auto-100 transition">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-8 h-8 bg-auto-coral/10 rounded-lg flex items-center justify-center">🚨</div>
-                        <span class="font-bold text-sm">{% trans "Assistance routiere" %}</span>
-                    </div>
-                </a>
-            </div>
-        </div>
-
-        <div class="card p-6">
-            <h2 class="text-lg font-bold text-auto-deep-red mb-4">{% trans "Explorer" %}</h2>
-            <div class="space-y-3">
-                <a href="{% url 'catalog:part_list' %}" class="block p-3 rounded-lg hover:bg-auto-50 border border-auto-100 transition">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-8 h-8 bg-info-100 rounded-lg flex items-center justify-center">🔍</div>
-                        <span class="font-bold text-sm">{% trans "Trouver des pieces" %}</span>
-                    </div>
-                </a>
-                <a href="{% url 'garages:garage_list' %}" class="block p-3 rounded-lg hover:bg-auto-50 border border-auto-100 transition">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-8 h-8 bg-auto-gold/10 rounded-lg flex items-center justify-center">🏪</div>
-                        <span class="font-bold text-sm">{% trans "Trouver des garages" %}</span>
-                    </div>
-                </a>
-                <a href="{% url 'accounts:notifications' %}" class="block p-3 rounded-lg hover:bg-auto-50 border border-auto-100 transition">
-                    <div class="flex items-center space-x-3">
-                        <div class="w-8 h-8 bg-warning-100 rounded-lg flex items-center justify-center">🔔</div>
-                        <span class="font-bold text-sm">{% trans "Notifications" %}{% if unread_notifications > 0 %} <span class="badge-danger text-[10px] ml-1">{{ unread_notifications }}</span>{% endif %}</span>
-                    </div>
-                </a>
-            </div>
-        </div>
-    </div>
+    
+   
 </div>
 {% endblock %}

@@ -19,7 +19,7 @@ MAX_FILE_SIZE = 5 * 1024 * 1024
 
 class TicketForm(forms.ModelForm):
     evidence = forms.FileField(
-        label=_("Preuve (optionnel)"),
+        label=_("Pièce justificative (optionnel)"),
         required=False,
         widget=forms.ClearableFileInput(
             attrs={
@@ -32,24 +32,16 @@ class TicketForm(forms.ModelForm):
     class Meta:
         model = Ticket
         fields = [
-            "subject",
-            "description",
             "garage",
+            "description",
             "evidence",
-        ]  # order et part retirés
+        ]
         widgets = {
-            "subject": forms.TextInput(
-                attrs={
-                    "class": "form-input w-full",
-                    "placeholder": _("Ex: Garage frauduleux"),
-                    "maxlength": 300,
-                }
-            ),
             "description": forms.Textarea(
                 attrs={
                     "class": "form-input w-full",
-                    "rows": 4,
-                    "placeholder": _("Décrivez votre problème en détail..."),
+                    "rows": 5,
+                    "placeholder": _("Décrivez votre problème..."),
                 }
             ),
             "garage": forms.Select(
@@ -63,16 +55,16 @@ class TicketForm(forms.ModelForm):
     def __init__(self, *args, user=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.user = user
+        self.fields["garage"].label = _("Garage concerné")
+        self.fields["description"].label = _("Message")
         if user:
             from garages.models import Garage
 
-            # Filtrer les garages approuvés, actifs et visibles
             self.fields["garage"].queryset = Garage.objects.filter(
                 approval_status=Garage.ApprovalStatus.APPROVED,
                 activation_status=Garage.ActivationStatus.ACTIVE,
                 is_active=True,
             ).order_by("name")
-            # Rendre garage obligatoire
             self.fields["garage"].required = True
         else:
             self.fields["garage"].queryset = Garage.objects.none()

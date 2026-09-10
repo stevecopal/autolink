@@ -31,7 +31,7 @@
             <p class="font-bold text-auto-dark">{% trans "Votre garage est approuvé" %}</p>
             <p class="text-sm text-auto-700">{% blocktrans with amount=garage_activation_amount currency=garage_activation_currency %}Payer {{ amount }} {{ currency }} pour activer votre garage{% endblocktrans %}</p>
         </div>
-        <form method="post" action="{% url 'payments:garage_activation_payment' garage.id %}">
+        <form method="post" action="{% url 'payments:garage_activation' garage.id %}">
             {% csrf_token %}
             <button type="submit" class="btn-primary whitespace-nowrap">{% blocktrans with amount=garage_activation_amount currency=garage_activation_currency %}Payer {{ amount }} {{ currency }}{% endblocktrans %}</button>
         </form>
@@ -51,19 +51,42 @@
             </span>
         </div>
         <span class="text-xs text-auto-600">{% trans "Modifié il y a" %} {{ garage.updated_at|timesince }}</span>
-    </div>    <!-- Stats Grid -->
-    <div class="grid grid-cols-2 md:grid-cols-2 gap-4 mb-6">
+    </div>    <div class="grid grid-cols-1 gap-4 mb-6">
         <div class="stat-card text-center">
             <div class="stat-value text-auto-gold">{{ total_sales|intcomma }}</div>
             <div class="stat-label">{% trans "Ventes (FCFA)" %}</div>
         </div>
-        <div class="stat-card text-center">
-            <div class="stat-value">{{ avg_rating|floatformat:1 }}</div>
-            <div class="stat-label">{% trans "Note moyenne" %}</div>
-        </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Services -->
+        <div class="card p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="font-bold text-lg">{% trans "Services" %}</h2>
+                <a href="{% url 'garages:service_list' %}" class="text-auto-orange font-bold text-sm hover:text-auto-orange-dark transition">{% trans "Gérer" %} →</a>
+            </div>
+            {% if services %}
+                <div class="space-y-2">
+                    {% for service in services %}
+                        <div class="flex items-center justify-between p-3 rounded-lg border border-auto-100 hover:bg-auto-light transition">
+                            <div>
+                                <div class="font-bold text-sm">{{ service.name }}</div>
+                                <div class="text-xs text-auto-600">{{ service.get_category_display }}</div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="text-center py-8 text-auto-600">
+                    <div class="text-3xl mb-2">🔧</div>
+                    <p>{% trans "Aucun service ajouté." %}</p>
+                    <a href="{% url 'garages:service_create' %}" class="text-auto-orange font-bold text-sm hover:text-auto-orange-dark transition mt-2 inline-block">
+                        + {% trans "Ajouter un service" %}
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+
         <!-- Products -->
         <div class="card p-6">
             <div class="flex items-center justify-between mb-4">
@@ -89,29 +112,6 @@
                 <div class="text-center py-8 text-auto-600">
                     <div class="text-3xl mb-2">🔩</div>
                     <p>{% trans "Aucun produit listé." %}</p>
-                </div>
-            {% endif %}
-        </div>
-
-        <!-- Recent Reviews -->
-        <div class="card p-6">
-            <h2 class="font-bold text-lg mb-4">{% trans "Avis récents" %}</h2>
-            {% if recent_reviews %}
-                <div class="space-y-3">
-                    {% for review in recent_reviews %}
-                        <div class="p-3 rounded-lg border border-auto-100">
-                            <div class="flex items-center justify-between mb-1">
-                                <span class="font-bold text-sm">{{ review.user.display_name }}</span>
-                                <span class="text-auto-gold font-bold">⭐ {{ review.rating }}/5</span>
-                            </div>
-                            <p class="text-sm text-auto-700">{{ review.comment|truncatewords:20 }}</p>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <div class="text-center py-8 text-auto-600">
-                    <div class="text-3xl mb-2">⭐</div>
-                    <p>{% trans "Pas encore d'avis." %}</p>
                 </div>
             {% endif %}
         </div>

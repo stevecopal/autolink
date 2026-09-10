@@ -121,12 +121,8 @@ def ticket_create_view(request):
             try:
                 ticket = form.save(commit=False)
                 ticket.user = request.user
-
-                garage = form.cleaned_data.get("garage")
-                if not garage:
-                    part = form.cleaned_data.get("part")
-                    if part and part.garage:
-                        ticket.garage = part.garage
+                ticket.subject = ticket.description[:100]
+                ticket.category = Ticket.Category.GARAGE
 
                 if not ticket.garage:
                     messages.error(request, _("Vous devez sélectionner un garage."))
@@ -154,8 +150,7 @@ def ticket_create_view(request):
 
                 messages.success(
                     request,
-                    _("Ticket créé avec succès.")
-                    % {"number": ticket.ticket_number},
+                    _("Ticket créé avec succès."),
                 )
                 return redirect("support:ticket_list")
 

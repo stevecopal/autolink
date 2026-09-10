@@ -51,11 +51,8 @@
                     {% endfor %}
                 </select>
                 <select name="sort" class="form-input !py-2.5 text-sm min-w-0" aria-label="{% trans 'Trier par' %}">
-                    <option value="-trust_score" {% if sort == '-trust_score' %}selected{% endif %}>{% trans "Mieux noté" %}</option>
-                    <option value="trust_score" {% if sort == 'trust_score' %}selected{% endif %}>{% trans "Moins bien noté" %}</option>
-                    <option value="-total_reviews" {% if sort == '-total_reviews' %}selected{% endif %}>{% trans "Plus d'avis" %}</option>
-                    <option value="name" {% if sort == 'name' %}selected{% endif %}>{% trans "Nom" %}</option>
                     <option value="-created_at" {% if sort == '-created_at' %}selected{% endif %}>{% trans "Plus récent" %}</option>
+                    <option value="name" {% if sort == 'name' %}selected{% endif %}>{% trans "Nom" %}</option>
                 </select>
                 <button type="submit" class="btn-primary !py-2.5 text-sm whitespace-nowrap">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -120,11 +117,6 @@
                     <span>{% if garage.city %}{{ garage.city.name }}{% endif %}</span>
                     {% endif %}
                 </p>
-                <div class="flex items-center gap-1.5 mt-1">
-                    <span class="text-auto-gold text-xs">⭐</span>
-                    <span class="font-bold text-xs">{{ garage.trust_score }}</span>
-                    <span class="text-auto-400 text-xs">({{ garage.total_reviews }} {% trans "avis" %})</span>
-                </div>
                 {% if garage.services %}
                 <div class="flex flex-wrap gap-1 mt-2">
                     {% for service in garage.services.all|slice:":3" %}

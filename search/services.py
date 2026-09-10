@@ -192,8 +192,6 @@ def search_nearby_garages(
                 'availability_display': garage.get_availability_status_display(),
                 'verification_status': garage.verification_status,
                 'is_featured': garage.is_featured,
-                'trust_score': float(garage.trust_score),
-                'total_reviews': garage.total_reviews,
                 'phone': garage.phone,
                 'whatsapp': garage.whatsapp,
                 'photo_url': garage.photo.url if garage.photo else None,

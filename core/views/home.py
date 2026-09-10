@@ -37,8 +37,6 @@ def home_view(request: HttpRequest) -> HttpResponse:
             "photo",
             "city_id",
             "neighborhood_id",
-            "trust_score",
-            "total_reviews",
             "approval_status",
             "payment_status",
             "activation_status",

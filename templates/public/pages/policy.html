@@ -40,7 +40,6 @@
                         <li>• {% trans "Rechercher des garages à proximité selon leur localisation" %}</li>
                         <li>• {% trans "Consulter les services proposés par chaque garage" %}</li>
                         <li>• {% trans "Consulter les pièces automobiles compatibles avec leur véhicule" %}</li>
-                        <li>• {% trans "Laisser des avis et évaluations sur les garages et pièces" %}</li>
                         <li>• {% trans "Demander une assistance routière en cas de panne" %}</li>
                         <li>• {% trans "Signaler tout problème rencontré via le système de support intégré" %}</li>
                     </ul>
@@ -53,7 +52,6 @@
                         <li>• {% trans "Publier leurs services et tarifs" %}</li>
                         <li>• {% trans "Mettre en vente des pièces automobiles avec photos et descriptions" %}</li>
                         <li>• {% trans "Gérer le stock en temps réel" %}</li>
-                        <li>• {% trans "Recevoir des avis clients pour asseoir leur réputation" %}</li>
                         <li>• {% trans "Gérer leur disponibilité en temps réel" %}</li>
                     </ul>
                 </div>
@@ -64,7 +62,7 @@
                         <li>• {% trans "Vérifier l'identité et les qualifications des garages" %}</li>
                         <li>• {% trans "Assurer le support client et la résolution des litiges" %}</li>
                         <li>• {% trans "Garantir la sécurité des transactions" %}</li>
-                        <li>• {% trans "Modérer les avis et les contenus publiés" %}</li>
+                        <li>• {% trans "Modérer les contenus publiés" %}</li>
                     </ul>
                 </div>
             </div>
@@ -127,7 +125,7 @@
                 <ul class="space-y-1.5 ml-4">
                     <li>• {% trans "Fournir des informations exactes et à jour" %}</li>
                     <li>• {% trans "Maintenir la confidentialité de vos identifiants de connexion" %}</li>
-                    <li>• {% trans "Ne pas créer de comptes multiples pour manipuler les avis ou les transactions" %}</li>
+                    <li>• {% trans "Ne pas créer de comptes multiples pour manipuler les transactions" %}</li>
                     <li>• {% trans "Signaler immédiatement tout accès non autorisé à votre compte" %}</li>
                     <li>• {% trans "Respecter les conditions d'utilisation de la plateforme" %}</li>
                 </ul>
@@ -146,7 +144,7 @@
                     <li>• {% trans "Assurer la qualité des pièces vendues et des services rendus" %}</li>
                     <li>• {% trans "Respecter les statuts de disponibilité (Disponible, Occupé, Fermé)" %}</li>
                     <li>• {% trans "Assurer la qualité des pièces vendues et des services rendus" %}</li>
-                    <li>• {% trans "Ne pas publier de faux avis ou de contenus trompeurs" %}</li>
+                    <li>• {% trans "Ne pas publier de contenus trompeurs" %}</li>
                 </ul>
                 <p>{% trans "Tout garage ne respectant pas ces règles verra son profil suspendu ou supprimé après mise en demeure." %}</p>
             </div>
@@ -179,22 +177,8 @@
             </div>
         </section>
 
-        <section id="avis" class="card p-6 sm:p-8">
-            <h2 class="text-xl font-bold text-auto-dark mb-4">{% trans "8. Avis et évaluations" %}</h2>
-            <div class="space-y-4 text-auto-700 text-sm leading-relaxed">
-                <p>{% trans "Les avis jouent un rôle essentiel dans la confiance entre les utilisateurs. Les règles suivantes s'appliquent :" %}</p>
-                <ul class="space-y-1.5 ml-4">
-                    <li>• {% trans "Seuls les utilisateurs ayant interactué avec un garage ou une pièce peuvent laisser un avis" %}</li>
-                    <li>• {% trans "Les avis doivent être honnêtes, pertinents et respectueux" %}</li>
-                    <li>• {% trans "Les avis frauduleux, copiés ou fictifs seront supprimés" %}</li>
-                    <li>• {% trans "Les garages peuvent répondre publiquement aux avis laissés sur leur établissement" %}</li>
-                    <li>• {% trans "Un score de confiance (trust score) est calculé automatiquement en fonction de la qualité du service" %}</li>
-                </ul>
-            </div>
-        </section>
-
         <section id="donnees" class="card p-6 sm:p-8">
-            <h2 class="text-xl font-bold text-auto-dark mb-4">{% trans "9. Données personnelles et confidentialité" %}</h2>
+            <h2 class="text-xl font-bold text-auto-dark mb-4">{% trans "8. Données personnelles et confidentialité" %}</h2>
             <div class="space-y-4 text-auto-700 text-sm leading-relaxed">
                 <p>{% trans "AutoLink s'engage à protéger vos données personnelles conformément à la réglementation en vigueur :" %}</p>
 
@@ -205,7 +189,6 @@
                         <li>• {% trans "Photo de profil (optionnelle)" %}</li>
                         <li>• {% trans "Informations sur les véhicules enregistrés" %}</li>
                         <li>• {% trans "Données de localisation (avec consentement explicite)" %}</li>
-                        <li>• {% trans "Avis et évaluations publiés" %}</li>
                     </ul>
                 </div>
 
@@ -233,13 +216,12 @@
         </section>
 
         <section id="interdits" class="card p-6 sm:p-8">
-            <h2 class="text-xl font-bold text-auto-dark mb-4">{% trans "10. Comportements interdits" %}</h2>
+            <h2 class="text-xl font-bold text-auto-dark mb-4">{% trans "9. Comportements interdits" %}</h2>
             <div class="space-y-4 text-auto-700 text-sm leading-relaxed">
                 <p>{% trans "Les comportements suivants sont strictement interdits sur AutoLink :" %}</p>
                 <ul class="space-y-1.5 ml-4">
                     <li>• {% trans "Publier des contenus offensants, discriminatoires ou illégaux" %}</li>
                     <li>• {% trans "Créer de faux comptes ou usurper l'identité d'un tiers" %}</li>
-                    <li>• {% trans "Manipuler les avis ou les évaluations (faux avis, achat d'avis)" %}</li>
                     <li>• {% trans "Tenter de pirater, compromettre ou surcharger la plateforme" %}</li>
                     <li>• {% trans "Utiliser des robots, scripts ou automatisations non autorisés" %}</li>
                     <li>• {% trans "Revendre ou transférer un compte à un tiers" %}</li>
@@ -250,7 +232,7 @@
         </section>
 
         <section id="responsabilite" class="card p-6 sm:p-8">
-            <h2 class="text-xl font-bold text-auto-dark mb-4">{% trans "11. Limitation de responsabilité" %}</h2>
+            <h2 class="text-xl font-bold text-auto-dark mb-4">{% trans "10. Limitation de responsabilité" %}</h2>
             <div class="space-y-4 text-auto-700 text-sm leading-relaxed">
                 <p>{% trans "AutoLink agit en tant qu'intermédiaire technique entre les automobilistes et les garages. Notre responsabilité se limite à :" %}</p>
                 <ul class="space-y-1.5 ml-4">

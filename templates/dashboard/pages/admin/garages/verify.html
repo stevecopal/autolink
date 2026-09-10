@@ -47,6 +47,7 @@
         <div class="card p-6">
             <h2 class="font-bold text-lg mb-4">{% trans "Actions de vérification" %}</h2>
             <div class="space-y-4">
+                {% if garage.approval_status != 'APPROVED' %}
                 <form method="post">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="verify">
@@ -54,6 +55,11 @@
                         ✅ {% trans "Approuver le garage" %}
                     </button>
                 </form>
+                {% else %}
+                <div class="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
+                    <span class="text-green-700 font-medium">✅ {% trans "Garage déjà approuvé" %}</span>
+                </div>
+                {% endif %}
 
                 <form method="post">
                     {% csrf_token %}

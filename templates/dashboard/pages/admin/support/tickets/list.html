@@ -1,7 +1,7 @@
 {% extends 'dashboard/base.html' %}
 {% load i18n %}
 
-{% block title %}{% trans "Tickets de support" %} - AutoLink{% endblock %}
+{% block title %}{% trans "Support" %} - AutoLink{% endblock %}
 
 {% block dashboard_header %}
     <h1 class="text-sm font-bold text-auto-dark">{% trans "Support" %}</h1>
@@ -11,17 +11,18 @@
     <nav class="flex items-center space-x-2 text-sm text-auto-600">
         <a href="{% url 'administration:dashboard' %}" class="hover:text-auto-orange transition">{% trans "Tableau de bord" %}</a>
         <span class="text-auto-400">/</span>
-        <span class="font-bold text-auto-dark">{% trans "Tickets de support" %}</span>
+        <span class="font-bold text-auto-dark">{% trans "Support" %}</span>
     </nav>
 {% endblock %}
 
 {% block content %}
 <div class="space-y-6">
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <h2 class="text-lg font-bold text-auto-dark">{% trans "Tickets de support" %}</h2>
+        <h2 class="text-lg font-bold text-auto-dark">{% trans "Support" %}</h2>
         <a href="{% url 'administration:dashboard' %}" class="btn-outline text-sm">{% trans "Retour au tableau de bord" %}</a>
     </div>
 
+    <!-- Search -->
     <div class="card p-4">
         <form method="get" class="space-y-3">
             <div class="relative">
@@ -29,7 +30,7 @@
                     <svg class="w-5 h-5 text-auto-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                 </div>
                 <input type="text" name="q" value="{{ search_query }}"
-                       placeholder="{% trans 'Rechercher par numéro, sujet, utilisateur...' %}"
+                       placeholder="{% trans 'Rechercher...' %}"
                        class="w-full pl-10 pr-4 py-2.5 border border-auto-200 rounded-xl text-sm focus:ring-2 focus:ring-auto-orange focus:border-auto-orange outline-none">
             </div>
             <div class="flex flex-wrap gap-3 items-end">
@@ -56,14 +57,29 @@
                         <option value="OTHER" {% if selected_category == 'OTHER' %}selected{% endif %}>{% trans "Autre" %}</option>
                     </select>
                 </div>
+                <input type="hidden" name="tab" value="{{ active_tab }}">
                 <button type="submit" class="btn-primary text-sm py-2">{% trans "Filtrer" %}</button>
                 {% if search_query or selected_status or selected_category %}
-                <a href="{% url 'administration:support' %}" class="btn-outline text-sm py-2">{% trans "Réinitialiser" %}</a>
+                <a href="{% url 'administration:support' %}?tab={{ active_tab }}" class="btn-outline text-sm py-2">{% trans "Réinitialiser" %}</a>
                 {% endif %}
             </div>
         </form>
     </div>
 
+    <!-- Tabs -->
+    <div class="flex border-b border-auto-200">
+        <a href="?tab=tickets{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}"
+           class="px-4 py-3 text-sm font-bold border-b-2 transition {% if active_tab == 'tickets' %}border-auto-orange text-auto-orange{% else %}border-transparent text-auto-500 hover:text-auto-700{% endif %}">
+            {% trans "Tickets" %} ({{ tickets.paginator.count }})
+        </a>
+        <a href="?tab=conversations{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}"
+           class="px-4 py-3 text-sm font-bold border-b-2 transition {% if active_tab == 'conversations' %}border-auto-orange text-auto-orange{% else %}border-transparent text-auto-500 hover:text-auto-700{% endif %}">
+            {% trans "Conversations" %} ({{ conversations.paginator.count }})
+        </a>
+    </div>
+
+    {% if active_tab == 'tickets' %}
+    <!-- Tickets Table -->
     <div class="card overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
@@ -129,16 +145,93 @@
             </span>
             <div class="flex gap-2">
                 {% if tickets.has_previous %}
-                <a href="?page={{ tickets.previous_page_number }}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}"
+                <a href="?page={{ tickets.previous_page_number }}&tab=tickets{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}"
                    class="btn-outline text-sm py-1 px-3">{% trans "Précédent" %}</a>
                 {% endif %}
                 {% if tickets.has_next %}
-                <a href="?page={{ tickets.next_page_number }}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}"
+                <a href="?page={{ tickets.next_page_number }}&tab=tickets{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}"
                    class="btn-outline text-sm py-1 px-3">{% trans "Suivant" %}</a>
                 {% endif %}
             </div>
         </div>
         {% endif %}
     </div>
+
+    {% else %}
+    <!-- Conversations Table -->
+    <div class="card overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-auto-50">
+                    <tr class="text-left text-auto-700">
+                        <th class="px-4 py-3 font-bold">{% trans "Sujet" %}</th>
+                        <th class="px-4 py-3 font-bold">{% trans "Participants" %}</th>
+                        <th class="px-4 py-3 font-bold">{% trans "Dernier message" %}</th>
+                        <th class="px-4 py-3 font-bold">{% trans "Non lus" %}</th>
+                        <th class="px-4 py-3 font-bold">{% trans "Date" %}</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y">
+                    {% for conv in conversations %}
+                    <tr class="hover:bg-auto-50">
+                        <td class="px-4 py-3">
+                            <a href="{% url 'support:conversation_detail' conv.pk %}" class="text-auto-orange hover:underline font-medium">
+                                {{ conv.subject|truncatewords:8 }}
+                            </a>
+                        </td>
+                        <td class="px-4 py-3">
+                            {% for participant in conv.participants.all %}
+                                <div class="font-medium">{{ participant.display_name }}</div>
+                                <div class="text-xs text-auto-400">{{ participant.email }}</div>
+                            {% endfor %}
+                        </td>
+                        <td class="px-4 py-3">
+                            {% if conv.last_message %}
+                                <div class="text-auto-700 truncate max-w-xs">{{ conv.last_message.body|truncatewords:10 }}</div>
+                                <div class="text-xs text-auto-400">{{ conv.last_message.sender.display_name }} - {{ conv.last_message.created_at|date:"d/m/Y H:i" }}</div>
+                            {% else %}
+                                <span class="text-auto-400">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3">
+                            {% if conv.unread_count > 0 %}
+                                <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-auto-orange rounded-full">{{ conv.unread_count }}</span>
+                            {% else %}
+                                <span class="text-auto-400">0</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3 text-auto-500">{{ conv.created_at|date:"d/m/Y" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="px-4 py-12 text-center text-auto-500">
+                            <div class="text-3xl mb-2">💬</div>
+                            {% trans "Aucune conversation trouvée." %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if conversations.has_other_pages %}
+        <div class="px-4 py-3 border-t flex justify-between items-center">
+            <span class="text-sm text-auto-600">
+                {% trans "Page" %} {{ conversations.number }} {% trans "sur" %} {{ conversations.paginator.num_pages }}
+            </span>
+            <div class="flex gap-2">
+                {% if conversations.has_previous %}
+                <a href="?conv_page={{ conversations.previous_page_number }}&tab=conversations{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}"
+                   class="btn-outline text-sm py-1 px-3">{% trans "Précédent" %}</a>
+                {% endif %}
+                {% if conversations.has_next %}
+                <a href="?conv_page={{ conversations.next_page_number }}&tab=conversations{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}"
+                   class="btn-outline text-sm py-1 px-3">{% trans "Suivant" %}</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
 </div>
 {% endblock %}

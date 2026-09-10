@@ -12,7 +12,6 @@ urlpatterns = [
     path('garages/', include('garages.urls')),
     path('', include('catalog.urls')),
     path('', include('payments.urls')),
-    path('', include('reviews.urls')),
     path('', include('support.urls')),
     path('', include('search.urls')),
 ]

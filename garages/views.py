@@ -19,13 +19,13 @@ from django.db.models import (
 )
 from django.db.models.functions import ATan2, Cos, Radians, Sin, Sqrt
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, redirect, render
+from django.shortcuts import get_object_or_404, redirect, render, reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST
 
-from .forms import GarageDocumentForm, GarageForm
+from .forms import GarageDocumentForm, GarageForm, GarageServiceForm
 from .models import Garage, GaragePhoto, GarageService, GarageVerification
 
 
@@ -82,7 +82,7 @@ def garage_list_view(request):
     latitude = request.GET.get("lat", "")
     longitude = request.GET.get("lng", "")
     radius = request.GET.get("radius", "")
-    sort = request.GET.get("sort", "-trust_score")
+    sort = request.GET.get("sort", "-created_at")
     page_size = int(request.GET.get("page_size", 12))
 
     if city:
@@ -128,14 +128,11 @@ def garage_list_view(request):
             pass
 
     valid_sorts = {
-        "-trust_score": "-trust_score",
-        "trust_score": "trust_score",
-        "-total_reviews": "-total_reviews",
         "name": "name",
         "-created_at": "-created_at",
         "distance": "distance",
     }
-    sort_field = valid_sorts.get(sort, "-trust_score")
+    sort_field = valid_sorts.get(sort, "-created_at")
     if sort_field != "distance":
         garages = garages.order_by(sort_field)
 
@@ -214,7 +211,7 @@ def garage_list_api(request):
     latitude = request.GET.get("lat", "")
     longitude = request.GET.get("lng", "")
     radius = request.GET.get("radius", "")
-    sort = request.GET.get("sort", "-trust_score")
+    sort = request.GET.get("sort", "-created_at")
     page_size = min(int(request.GET.get("page_size", 12)), 50)
     page = int(request.GET.get("page", 1))
 
@@ -261,13 +258,10 @@ def garage_list_api(request):
             pass
 
     valid_sorts = {
-        "-trust_score": "-trust_score",
-        "trust_score": "trust_score",
-        "-total_reviews": "-total_reviews",
         "name": "name",
         "-created_at": "-created_at",
     }
-    sort_field = valid_sorts.get(sort, "-trust_score")
+    sort_field = valid_sorts.get(sort, "-created_at")
     garages = garages.order_by(sort_field)
 
     paginator = Paginator(garages, page_size)
@@ -313,8 +307,6 @@ def garage_list_api(request):
                 if garage.closing_time
                 else None,
                 "open_weekends": garage.open_weekends,
-                "trust_score": float(garage.trust_score),
-                "total_reviews": garage.total_reviews,
                 "total_clients": garage.total_clients,
                 "is_open_now": garage.is_open_now,
                 "active_services_count": garage.active_services_count,
@@ -378,21 +370,14 @@ def garage_detail_view(request, slug):
                 "photos",
                 queryset=GaragePhoto.objects.order_by("-is_primary", "-created_at"),
             ),
-            Prefetch(
-                "reviews",
-                queryset=__import__("reviews.models", fromlist=["Review"])
-                .Review.objects.filter(is_hidden=False)
-                .select_related("user")
-                .order_by("-created_at"),
-            ),
         ),
-        Garage.public_filter(),
+        approval_status=Garage.ApprovalStatus.APPROVED,
+        is_active=True,
         slug=slug,
     )
 
     services = garage.services.all()
     photos = garage.photos.all()
-    reviews = garage.reviews.all()[:10]
 
     services_by_category = {}
     for service in services:
@@ -406,8 +391,6 @@ def garage_detail_view(request, slug):
         "services": services,
         "services_by_category": services_by_category,
         "photos": photos,
-        "reviews": reviews,
-        "total_reviews": garage.reviews.filter(is_hidden=False).count(),
     }
 
     if request.headers.get("HX-Request"):
@@ -488,8 +471,6 @@ def garage_detail_api(request, slug):
             if garage.closing_time
             else None,
             "open_weekends": garage.open_weekends,
-            "trust_score": float(garage.trust_score),
-            "total_reviews": garage.total_reviews,
             "total_clients": garage.total_clients,
             "is_open_now": garage.is_open_now,
             "created_at": garage.created_at.isoformat(),
@@ -528,24 +509,6 @@ def garage_create_view(request):
                     _(
                         "La position GPS est obligatoire. Veuillez autoriser la géolocalisation."
                     ),
-                )
-                return render(
-                    request,
-                    "dashboard/pages/garage/form.html",
-                    {
-                        "form": form,
-                        "doc_form": doc_form,
-                    },
-                )
-
-            if accuracy and accuracy > GPS_ACCURACY_THRESHOLD:
-                messages.error(
-                    request,
-                    _(
-                        "Votre position n'est pas suffisamment précise (%(accuracy).1f m). "
-                        "Veuillez vous rapprocher du garage et réessayer."
-                    )
-                    % {"accuracy": accuracy},
                 )
                 return render(
                     request,
@@ -645,25 +608,24 @@ def garage_dashboard_view(request):
     garage = garages.first()
 
     from catalog.models import Part
-    from reviews.models import Review
 
     products = Part.objects.filter(garage=garage, is_active=True).select_related(
         "category"
     )
-    recent_reviews = Review.objects.filter(
-        garage=garage, is_hidden=False
-    ).select_related("user")[:5]
+    services = GarageService.objects.filter(garage=garage, is_active=True).order_by(
+        "category", "name"
+    )[:10]
 
     total_products = products.count()
-    avg_rating = garage.trust_score or 0
+    total_sales = 0
 
     context = {
         "garage": garage,
         "garages": garages,
         "products": products[:10],
-        "recent_reviews": recent_reviews,
+        "services": services,
         "total_products": total_products,
-        "avg_rating": avg_rating,
+        "total_sales": total_sales,
         "garage_activation_amount": GARAGE_ACTIVATION_AMOUNT,
         "garage_activation_currency": GARAGE_ACTIVATION_CURRENCY,
     }
@@ -746,3 +708,107 @@ def garage_search_suggestions(request):
         )
 
     return JsonResponse({"suggestions": suggestions})
+
+
+@login_required
+def service_list_view(request):
+    from accounts.models import User
+
+    if request.user.role not in [User.Role.CLIENT, User.Role.ADMIN]:
+        return redirect("garages:garage_create")
+
+    garages = Garage.objects.filter(owner=request.user)
+    if not garages.exists():
+        return redirect("garages:garage_create")
+
+    garage_id = request.GET.get("garage", "")
+    if garage_id:
+        services = GarageService.objects.filter(garage_id=garage_id, garage__owner=request.user).order_by(
+            "category", "name"
+        )
+        selected_garage = garages.filter(pk=garage_id).first()
+    else:
+        services = GarageService.objects.filter(garage__owner=request.user).order_by(
+            "category", "name"
+        )
+        selected_garage = None
+
+    context = {
+        "garages": garages,
+        "selected_garage": selected_garage,
+        "services": services,
+    }
+    return render(request, "dashboard/pages/garage/services/list.html", context)
+
+
+@login_required
+def service_create_view(request):
+    from accounts.models import User
+
+    if request.user.role not in [User.Role.CLIENT, User.Role.ADMIN]:
+        return redirect("garages:garage_create")
+
+    garages = Garage.objects.filter(owner=request.user)
+    if not garages.exists():
+        return redirect("garages:garage_create")
+
+    if request.method == "POST":
+        form = GarageServiceForm(request.POST, user=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, _("Service ajouté."))
+            garage_id = form.cleaned_data["garage"].pk
+            return redirect(f"{reverse('garages:service_list')}?garage={garage_id}")
+    else:
+        form = GarageServiceForm(user=request.user)
+
+    return render(
+        request,
+        "dashboard/pages/garage/services/form.html",
+        {"form": form, "garages": garages, "is_edit": False},
+    )
+
+
+@login_required
+def service_edit_view(request, service_id):
+    from accounts.models import User
+
+    if request.user.role not in [User.Role.CLIENT, User.Role.ADMIN]:
+        return redirect("garages:garage_create")
+
+    garages = Garage.objects.filter(owner=request.user)
+    if not garages.exists():
+        return redirect("garages:garage_create")
+
+    service = get_object_or_404(GarageService, pk=service_id, garage__owner=request.user)
+
+    if request.method == "POST":
+        form = GarageServiceForm(request.POST, instance=service, user=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, _("Service mis à jour."))
+            garage_id = form.cleaned_data["garage"].pk
+            return redirect(f"{reverse('garages:service_list')}?garage={garage_id}")
+    else:
+        form = GarageServiceForm(instance=service, user=request.user)
+
+    return render(
+        request,
+        "dashboard/pages/garage/services/form.html",
+        {"form": form, "garages": garages, "service": service, "is_edit": True},
+    )
+
+
+@login_required
+@require_POST
+def service_delete_view(request, service_id):
+    from accounts.models import User
+
+    if request.user.role not in [User.Role.CLIENT, User.Role.ADMIN]:
+        return redirect("garages:garage_create")
+
+    service = get_object_or_404(GarageService, pk=service_id, garage__owner=request.user)
+    garage_id = service.garage.pk
+    service.delete()
+    messages.success(request, _("Service supprimé."))
+    return redirect(f"{reverse('garages:service_list')}?garage={garage_id}")

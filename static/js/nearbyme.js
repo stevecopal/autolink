@@ -230,7 +230,6 @@
                         '<div class="flex items-center gap-2 mt-2">' +
                             availabilityBadge +
                             openBadge +
-                            '<span class="text-auto-gold text-xs">⭐ ' + garage.trust_score + '</span>' +
                         '</div>' +
                         '<div class="flex items-center gap-2 mt-3 pt-2 border-t border-auto-100">' +
                             (garage.phone

@@ -121,10 +121,6 @@
                     <div class="flex-1 min-w-0">
                         <h4 class="font-bold text-auto-dark truncate">{{ part.garage.name }}</h4>
                         <p class="text-auto-500 text-xs mt-0.5">📍 {{ part.garage.neighborhood.name|default:part.garage.city.name }}</p>
-                        <div class="flex items-center gap-2 mt-1">
-                            <span class="text-auto-gold text-xs">⭐ {{ part.garage.trust_score }}</span>
-                            <span class="text-auto-400 text-xs">({{ part.garage.total_reviews }} {% trans "avis" %})</span>
-                        </div>
                     </div>
                     <a href="{% url 'garages:garage_detail' slug=part.garage.slug %}" class="btn-outline text-xs px-4 py-2 flex-shrink-0">
                         {% trans "Voir le garage" %}

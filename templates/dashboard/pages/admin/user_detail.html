@@ -32,6 +32,10 @@
                     <div class="font-medium">{{ user_obj.city|default:"-" }}</div>
                 </div>
                 <div>
+                    <label class="text-sm text-auto-600">{% trans "Quartier" %}</label>
+                    <div class="font-medium">{{ user_obj.neighborhood|default:"-" }}</div>
+                </div>
+                <div>
                     <label class="text-sm text-auto-600">{% trans "Rôle" %}</label>
                     <div><span class="badge-{{ user_obj.role|lower }}">{{ user_obj.role }}</span></div>
                 </div>

@@ -179,7 +179,8 @@
 {% endblock %}
 
 {% block extra_js %}
-<script defer>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
 function openNeighborhoodModal() {
     var form = document.getElementById('neighborhood-form');
     form.reset();
@@ -250,6 +251,9 @@ function clearNeighborhoodErrors() {
     formBody.querySelectorAll('.border-error-500').forEach(function(el) { el.classList.remove('border-error-500'); });
 }
 
+window.openNeighborhoodModal = openNeighborhoodModal;
+window.editNeighborhoodModal = editNeighborhoodModal;
+
 document.querySelectorAll('.delete-neighborhood-form').forEach(function(form) {
     form.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -265,8 +269,7 @@ document.querySelectorAll('.delete-neighborhood-form').forEach(function(form) {
             .then(function(r) { return r.json(); })
             .then(function(data) {
                 if (data.success) {
-                    window.AutoLink.showToast(data.message, 'success');
-                    if (data.redirect) window.location.href = data.redirect;
+                    window.AutoLink.toastAndRedirect(data.message, data.redirect, 'success');
                 } else {
                     window.AutoLink.showToast(data.message, 'error');
                 }
@@ -276,6 +279,7 @@ document.querySelectorAll('.delete-neighborhood-form').forEach(function(form) {
             });
         });
     });
+});
 });
 </script>
 {% endblock %}

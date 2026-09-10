@@ -3,13 +3,21 @@ from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
 
 from .models import Part
+from garages.models import Garage
 
 
 class PartForm(forms.ModelForm):
+    garage = forms.ModelChoiceField(
+        queryset=Garage.objects.none(),
+        label=_("Garage"),
+        empty_label=_("Sélectionnez un garage"),
+        required=True,
+    )
+
     class Meta:
         model = Part
         fields = [
-            'name', 'category', 'reference_oem', 'reference_fabricant',
+            'garage', 'name', 'category', 'reference_oem', 'reference_fabricant',
             'condition', 'description', 'price', 'stock', 'photo',
             'warranty_months', 'city', 'neighborhood',
             'latitude', 'longitude',
@@ -73,6 +81,12 @@ class PartForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['name'].required = True
         self.fields['price'].required = True
+        if self.user:
+            self.fields['garage'].queryset = Garage.objects.filter(owner=self.user)
+        if self.instance and self.instance.pk and hasattr(self.instance, 'garage') and self.instance.garage:
+            self.fields['garage'].queryset = Garage.objects.filter(
+                pk=self.instance.garage.pk
+            )
 
     def clean_price(self):
         price = self.cleaned_data.get('price')

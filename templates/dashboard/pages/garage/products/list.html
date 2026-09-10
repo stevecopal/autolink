@@ -25,6 +25,17 @@
     <!-- Filters -->
     <div class="card p-4 mb-6">
         <form method="get" class="flex flex-wrap gap-4 items-end">
+            {% if garages|length > 1 %}
+            <div class="flex-1 min-w-[150px]">
+                <label class="form-label">{% trans "Garage" %}</label>
+                <select name="garage" class="form-input" onchange="this.form.submit()">
+                    <option value="">{% trans "Tous mes garages" %}</option>
+                    {% for g in garages %}
+                        <option value="{{ g.pk }}" {% if selected_garage and selected_garage.pk == g.pk %}selected{% endif %}>{{ g.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% endif %}
             <div class="flex-1 min-w-[150px]">
                 <label class="form-label">{% trans "Statut" %}</label>
                 <select name="status" class="form-input">
@@ -166,10 +177,10 @@
                 </span>
                 <div class="flex space-x-2">
                     {% if products.has_previous %}
-                        <a href="?page={{ products.previous_page_number }}{% if selected_status %}&status={{ selected_status }}{% endif %}" class="btn-outline text-sm py-1 px-3">{% trans "Précédent" %}</a>
+                        <a href="?page={{ products.previous_page_number }}{% if selected_garage %}&garage={{ selected_garage.pk }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}" class="btn-outline text-sm py-1 px-3">{% trans "Précédent" %}</a>
                     {% endif %}
                     {% if products.has_next %}
-                        <a href="?page={{ products.next_page_number }}{% if selected_status %}&status={{ selected_status }}{% endif %}" class="btn-outline text-sm py-1 px-3">{% trans "Suivant" %}</a>
+                        <a href="?page={{ products.next_page_number }}{% if selected_garage %}&garage={{ selected_garage.pk }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}" class="btn-outline text-sm py-1 px-3">{% trans "Suivant" %}</a>
                     {% endif %}
                 </div>
             </div>

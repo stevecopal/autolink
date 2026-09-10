@@ -16,14 +16,19 @@ from catalog.models import Part
 from core.models import City, Neighborhood
 from garages.models import Garage
 from payments.models import Payment, Receipt
-from reviews.models import Review
 from support.models import Ticket
 
 from .forms import CityForm, NeighborhoodForm
 
-
 def is_admin(user):
-    return user.is_authenticated and user.is_admin_or_above
+    """
+    Vérifie si l'utilisateur est ADMIN ou SUPERUSER.
+    """
+    return user.is_authenticated and (
+        user.is_superuser
+        or user.is_staff
+        or getattr(user, "role", None) in [user.Role.ADMIN, user.Role.SUPERUSER]
+    )
 
 
 @user_passes_test(is_admin)
@@ -74,9 +79,6 @@ def admin_dashboard_view(request):
     recent_payments = Payment.objects.filter(
         status="SUCCESS", created_at__gte=seven_days_ago
     ).count()
-    recent_reviews = Review.objects.filter(
-        created_at__gte=seven_days_ago, is_hidden=False
-    ).count()
 
     alerts = []
     if pending_garages > 0:
@@ -119,7 +121,6 @@ def admin_dashboard_view(request):
         "city_distribution": city_distribution,
         "garage_cities": garage_cities,
         "recent_payments": recent_payments,
-        "recent_reviews": recent_reviews,
         "latest_payments": latest_payments,
         "alerts": alerts,
     }
@@ -162,7 +163,6 @@ def admin_monitoring_view(request):
     failed_payments_7d = Payment.objects.filter(
         status__in=["FAILED", "PENDING"], created_at__gte=seven_days_ago
     ).count()
-    hidden_reviews = Review.objects.filter(is_hidden=True).count()
 
     garage_cities = City.objects.annotate(
         garage_count=Count(
@@ -182,7 +182,6 @@ def admin_monitoring_view(request):
         "pending_garages": pending_garages,
         "pending_tickets": pending_tickets,
         "failed_payments_7d": failed_payments_7d,
-        "hidden_reviews": hidden_reviews,
         "garage_cities": garage_cities,
     }
     return render(request, "dashboard/pages/admin/monitoring/monitoring.html", context)
@@ -767,15 +766,22 @@ def admin_receipt_detail_view(request, receipt_id):
 
 @user_passes_test(is_admin)
 def admin_support_view(request):
+    from support.models import Conversation, Message
+
     tickets = (
         Ticket.objects.all()
         .select_related("user", "assigned_to", "garage", "part")
         .order_by("-created_at")
     )
 
+    conversations = Conversation.objects.prefetch_related(
+        "participants", "messages__sender"
+    ).order_by("-updated_at")
+
     status = request.GET.get("status", "")
     category = request.GET.get("category", "")
     search = request.GET.get("q", "").strip()
+    tab = request.GET.get("tab", "tickets")
 
     if status:
         tickets = tickets.filter(status=status)
@@ -789,19 +795,36 @@ def admin_support_view(request):
             | Q(user__email__icontains=search)
             | Q(description__icontains=search)
         )
+        conversations = conversations.filter(
+            Q(subject__icontains=search)
+            | Q(participants__username__icontains=search)
+            | Q(participants__email__icontains=search)
+            | Q(messages__body__icontains=search)
+        ).distinct()
+
+    for conv in conversations:
+        conv.last_message = conv.messages.select_related("sender").order_by(
+            "-created_at"
+        ).first()
+        conv.unread_count = conv.unread_count_for(request.user)
 
     paginator = Paginator(tickets, 20)
     page = request.GET.get("page")
     tickets_page = paginator.get_page(page)
+
+    conv_paginator = Paginator(conversations, 20)
+    conv_page = conv_paginator.get_page(request.GET.get("conv_page"))
 
     return render(
         request,
         "dashboard/pages/admin/support/tickets/list.html",
         {
             "tickets": tickets_page,
+            "conversations": conv_page,
             "selected_status": status,
             "selected_category": category,
             "search_query": search,
+            "active_tab": tab,
         },
     )
 
@@ -867,23 +890,6 @@ def admin_ticket_detail_view(request, ticket_id):
             "ticket_messages": ticket_messages,
             "conversation": conversation,
         },
-    )
-
-
-@user_passes_test(is_admin)
-def admin_reviews_view(request):
-    reviews = (
-        Review.objects.all()
-        .select_related("user", "garage", "part")
-        .order_by("-created_at")
-    )
-
-    paginator = Paginator(reviews, 20)
-    page = request.GET.get("page")
-    reviews_page = paginator.get_page(page)
-
-    return render(
-        request, "dashboard/pages/admin/reviews/list.html", {"reviews": reviews_page}
     )
 
 

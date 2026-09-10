@@ -39,7 +39,7 @@
                     </div>
 
                     <div>
-                        <label class="form-label">{% trans "Description" %}</label>
+                        <label class="form-label">{% trans "Description" %} *</label>
                         {{ form.description }}
                         {% if form.description.errors %}
                         <p class="form-error">{{ form.description.errors.0 }}</p>
@@ -70,7 +70,7 @@
                     </div>
 
                     <div>
-                        <label class="form-label">{% trans "WhatsApp" %}</label>
+                        <label class="form-label">{% trans "WhatsApp" %} *</label>
                         {{ form.whatsapp }}
                         {% if form.whatsapp.errors %}
                         <p class="form-error">{{ form.whatsapp.errors.0 }}</p>
@@ -79,7 +79,7 @@
                 </div>
 
                 <div class="mt-4">
-                    <label class="form-label">{% trans "Email" %}</label>
+                    <label class="form-label">{% trans "Email" %} *</label>
                     {{ form.email }}
                     {% if form.email.errors %}
                     <p class="form-error">{{ form.email.errors.0 }}</p>
@@ -121,7 +121,7 @@
                 <h2 class="text-lg font-bold text-auto-dark mb-3">{% trans "Justificatif" %}</h2>
 
                 <div>
-                    <label class="form-label">{% trans "Type de document" %}</label>
+                    <label class="form-label">{% trans "Type de document" %} *</label>
                     {{ doc_form.document_type }}
                     {% if doc_form.document_type.errors %}
                     <p class="form-error">{{ doc_form.document_type.errors.0 }}</p>
@@ -129,7 +129,7 @@
                 </div>
 
                 <div class="mt-4">
-                    <label class="form-label">{% trans "Document justificatif" %}</label>
+                    <label class="form-label">{% trans "Document justificatif" %} *</label>
                     <p class="text-xs text-auto-500 mb-2">{% trans "PDF ou Word, max 5 Mo." %}</p>
                     {{ doc_form.document }}
                     {% if doc_form.document.errors %}

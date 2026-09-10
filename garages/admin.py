@@ -4,11 +4,11 @@ from .models import Garage, GarageService, GaragePhoto, GarageVerification
 
 @admin.register(Garage)
 class GarageAdmin(admin.ModelAdmin):
-    list_display = ['name', 'owner', 'city', 'neighborhood', 'verification_status', 'trust_score', 'is_active']
+    list_display = ['name', 'owner', 'city', 'neighborhood', 'verification_status', 'is_active']
     list_filter = ['verification_status', 'is_active', 'city', 'is_featured']
     search_fields = ['name', 'owner__username', 'phone', 'city']
     prepopulated_fields = {'slug': ('name',)}
-    readonly_fields = ['trust_score', 'total_reviews', 'total_clients']
+    readonly_fields = ['total_clients']
 
 
 @admin.register(GarageService)

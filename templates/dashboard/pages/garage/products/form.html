@@ -52,20 +52,23 @@
             <div class="border-b border-auto-100 pb-4">
                 <h2 class="text-lg font-bold text-auto-dark mb-4">{% trans "Informations principales" %}</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="md:col-span-2">
-                        <label class="form-label">{% trans "Nom du produit" %} *</label>
-                        {{ form.name }}
-                        {% if form.name.errors %}
-                            <p class="form-error">{{ form.name.errors.0 }}</p>
+                    <div>
+                        <label class="form-label">{% trans "Garage" %} *</label>
+                        {{ form.garage }}
+                        {% if form.garage.errors %}
+                            <p class="form-error">{{ form.garage.errors.0 }}</p>
                         {% endif %}
                     </div>
                     <div>
                         <label class="form-label">{% trans "Catégorie" %}</label>
                         {{ form.category }}
                     </div>
-                    <div>
-                        <label class="form-label">{% trans "Marque" %}</label>
-                        {{ form.brand }}
+                    <div class="md:col-span-2">
+                        <label class="form-label">{% trans "Nom du produit" %} *</label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                            <p class="form-error">{{ form.name.errors.0 }}</p>
+                        {% endif %}
                     </div>
                 </div>
             </div>

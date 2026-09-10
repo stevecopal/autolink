@@ -78,15 +78,16 @@ class UserProfileForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email', 'phone', 'city', 'neighborhood', 'address', 'whatsapp', 'avatar']
+        fields = ['phone', 'city', 'neighborhood']
         widgets = {
-            'first_name': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Prénom'}),
-            'last_name': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Nom'}),
-            'email': forms.EmailInput(attrs={'class': 'form-input', 'placeholder': 'Email'}),
-            'phone': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Téléphone'}),
-            'neighborhood': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Quartier'}),
-            'address': forms.Textarea(attrs={'class': 'form-input', 'rows': 3, 'placeholder': 'Adresse'}),
-            'whatsapp': forms.TextInput(attrs={'class': 'form-input', 'placeholder': 'Numéro WhatsApp'}),
+            'phone': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': '+237 6XX XXX XXX',
+            }),
+            'neighborhood': forms.TextInput(attrs={
+                'class': 'form-input',
+                'placeholder': 'Votre quartier',
+            }),
         }
 
     def __init__(self, *args, **kwargs):

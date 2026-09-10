@@ -28,7 +28,6 @@ def configure_test_settings():
                 "catalog",
                 "garages",
                 "payments",
-                "reviews",
                 "support",
                 "search",
                 "core",

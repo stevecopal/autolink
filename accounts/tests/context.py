@@ -1,6 +1,6 @@
 # accounts/tests/context.py
 """
-Shared test fixtures and context builders for project-level reviews.
+Shared test fixtures and context builders for project-level helpers.
 Avoids a single enormous test file by centralizing common helpers.
 """
 from django.test import TestCase

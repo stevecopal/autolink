@@ -56,8 +56,17 @@ class Ticket(models.Model):
     class Status(models.TextChoices):
         OPEN = "OPEN", _("Ouvert")
         IN_PROGRESS = "IN_PROGRESS", _("En cours")
+        WAITING_CLIENT = "WAITING_CLIENT", _("En attente du client")
         RESOLVED = "RESOLVED", _("Résolu")
         CLOSED = "CLOSED", _("Fermé")
+
+    class Category(models.TextChoices):
+        PART = "PART", _("Pièce")
+        GARAGE = "GARAGE", _("Garage")
+        ORDER = "ORDER", _("Commande")
+        SERVICE = "SERVICE", _("Prestation")
+        PLATFORM = "PLATFORM", _("Plateforme")
+        OTHER = "OTHER", _("Autre")
 
     ticket_number = models.CharField(max_length=20, unique=True, editable=False)
     user = models.ForeignKey(
@@ -76,6 +85,12 @@ class Ticket(models.Model):
 
     status = models.CharField(
         max_length=30, choices=Status.choices, default=Status.OPEN
+    )
+    category = models.CharField(
+        _("Catégorie"),
+        max_length=20,
+        choices=Category.choices,
+        default=Category.OTHER,
     )
     subject = models.CharField(_("Sujet"), max_length=300)
     description = models.TextField(_("Description"))
