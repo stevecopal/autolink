@@ -891,7 +891,7 @@ def admin_ticket_create_view(request):
                 notif_type=Notification.Type.TICKET_REPLY,
                 title=_("Message du support : %(subject)s") % {"subject": ticket.subject},
                 message=data["description"],
-                link=f"/support/tickets/{ticket.ticket_number}/",
+                link=f"/tickets/{ticket.ticket_number}/",
             )
 
             messages.success(
