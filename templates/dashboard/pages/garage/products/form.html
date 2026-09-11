@@ -4,16 +4,16 @@
 {% block title %}{% if action == 'add' %}{% trans "Ajouter un produit" %}{% else %}{% trans "Modifier le produit" %}{% endif %} - AutoLink{% endblock %}
 
 {% block dashboard_header %}
-    <h1 class="text-sm font-bold text-auto-dark">{% trans "Produits" %}</h1>
+    <h1 class="text-sm font-bold text-navy-900">{% trans "Produits" %}</h1>
 {% endblock %}
 
 {% block dashboard_breadcrumb %}
-    <nav class="flex items-center space-x-2 text-sm text-auto-600">
-        <a href="{% url 'garages:garage_dashboard' %}" class="hover:text-auto-orange transition">{% trans "Tableau de bord" %}</a>
-        <span class="text-auto-400">/</span>
-        <a href="{% url 'catalog:garage_products' %}" class="hover:text-auto-orange transition">{% trans "Produits" %}</a>
-        <span class="text-auto-400">/</span>
-        <span class="font-bold text-auto-dark">
+    <nav class="flex items-center space-x-2 text-sm text-graphite-600">
+        <a href="{% url 'garages:garage_dashboard' %}" class="hover:text-orange-500 transition">{% trans "Tableau de bord" %}</a>
+        <span class="text-graphite-500">/</span>
+        <a href="{% url 'catalog:garage_products' %}" class="hover:text-orange-500 transition">{% trans "Produits" %}</a>
+        <span class="text-graphite-500">/</span>
+        <span class="font-bold text-navy-900">
             {% if action == 'add' %}{% trans "Ajouter" %}{% else %}{{ part.name|truncatechars:30 }}{% endif %}
         </span>
     </nav>
@@ -22,10 +22,10 @@
 {% block content %}
 <div class="max-w-4xl mx-auto px-4 py-8">
     <div class="flex items-center justify-between mb-6">
-        <h1 class="text-2xl md:text-3xl font-bold text-auto-dark">
+        <h1 class="text-2xl md:text-3xl font-bold text-navy-900">
             {% if action == 'add' %}{% trans "Ajouter un produit" %}{% else %}{% trans "Modifier le produit" %}{% endif %}
         </h1>
-        <a href="{% url 'catalog:garage_products' %}" class="btn-outline text-sm">{% trans "Retour" %}</a>
+        <a href="{% url 'catalog:garage_products' %}" class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 text-sm">{% trans "Retour" %}</a>
     </div>
 
     <div class="card p-4 md:p-6">
@@ -33,24 +33,24 @@
             {% csrf_token %}
 
             {% if form.errors %}
-                <div class="p-4 rounded-xl bg-error-50 border border-error-200 mb-4">
+                <div class="p-4 rounded-xl bg-orange-500/10 border border-orange-500/20 mb-4">
                     <div class="flex items-center gap-2 mb-2">
-                        <svg class="w-5 h-5 text-error-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
-                        <span class="font-bold text-error-700">{% trans "Veuillez corriger les erreurs ci-dessous." %}</span>
+                        <span class="font-bold text-orange-600">{% trans "Veuillez corriger les erreurs ci-dessous." %}</span>
                     </div>
                     {% for field, errors in form.errors.items %}
                         {% for error in errors %}
-                            <p class="text-sm text-error-600 ml-7">{{ field|title }}: {{ error }}</p>
+                            <p class="text-sm text-orange-600 ml-7">{{ field|title }}: {{ error }}</p>
                         {% endfor %}
                     {% endfor %}
                 </div>
             {% endif %}
 
             <!-- Informations principales -->
-            <div class="border-b border-auto-100 pb-4">
-                <h2 class="text-lg font-bold text-auto-dark mb-4">{% trans "Informations principales" %}</h2>
+            <div class="border-b border-line-200 pb-4">
+                <h2 class="text-lg font-bold text-navy-900 mb-4">{% trans "Informations principales" %}</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="form-label">{% trans "Garage" %} *</label>
@@ -74,8 +74,8 @@
             </div>
 
             <!-- Références -->
-            <div class="border-b border-auto-100 pb-4">
-                <h2 class="text-lg font-bold text-auto-dark mb-4">{% trans "Références" %}</h2>
+            <div class="border-b border-line-200 pb-4">
+                <h2 class="text-lg font-bold text-navy-900 mb-4">{% trans "Références" %}</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                         <label class="form-label">{% trans "État" %}</label>
@@ -93,16 +93,16 @@
             </div>
 
             <!-- Description -->
-            <div class="border-b border-auto-100 pb-4">
-                <h2 class="text-lg font-bold text-auto-dark mb-4">{% trans "Description" %}</h2>
+            <div class="border-b border-line-200 pb-4">
+                <h2 class="text-lg font-bold text-navy-900 mb-4">{% trans "Description" %}</h2>
                 <div>
                     {{ form.description }}
                 </div>
             </div>
 
             <!-- Prix et Stock -->
-            <div class="border-b border-auto-100 pb-4">
-                <h2 class="text-lg font-bold text-auto-dark mb-4">{% trans "Prix et stock" %}</h2>
+            <div class="border-b border-line-200 pb-4">
+                <h2 class="text-lg font-bold text-navy-900 mb-4">{% trans "Prix et stock" %}</h2>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                         <label class="form-label">{% trans "Prix (FCFA)" %} *</label>
@@ -126,17 +126,17 @@
             </div>
 
             <!-- Photo -->
-            <div class="border-b border-auto-100 pb-4">
-                <h2 class="text-lg font-bold text-auto-dark mb-4">{% trans "Photo" %}</h2>
+            <div class="border-b border-line-200 pb-4">
+                <h2 class="text-lg font-bold text-navy-900 mb-4">{% trans "Photo" %}</h2>
                 <div>
                     {{ form.photo }}
-                    <p class="text-xs text-auto-500 mt-1">{% trans "Formats acceptés: JPG, PNG, WebP. Taille max: 5MB." %}</p>
+                    <p class="text-xs text-graphite-500 mt-1">{% trans "Formats acceptés: JPG, PNG, WebP. Taille max: 5MB." %}</p>
                 </div>
             </div>
 
             <!-- Localisation -->
             <div class="pb-4">
-                <h2 class="text-lg font-bold text-auto-dark mb-4">{% trans "Localisation" %}</h2>
+                <h2 class="text-lg font-bold text-navy-900 mb-4">{% trans "Localisation" %}</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="form-label">{% trans "Ville" %}</label>
@@ -152,9 +152,9 @@
             </div>
 
             <!-- Actions -->
-            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t border-auto-100">
-                <a href="{% url 'catalog:garage_products' %}" class="btn-outline text-sm w-full sm:w-auto text-center">{% trans "Annuler" %}</a>
-                <button type="submit" class="bg-auto-orange text-white px-6 py-3 rounded-lg font-bold text-sm hover:bg-auto-orange-dark transition w-full sm:w-auto">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 pt-6 border-t border-line-200">
+                <a href="{% url 'catalog:garage_products' %}" class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 text-sm w-full sm:w-auto text-center">{% trans "Annuler" %}</a>
+                <button type="submit" class="bg-orange-500 text-white px-6 py-3 rounded-lg font-bold text-sm hover:bg-orange-500-dark transition w-full sm:w-auto">
                     {% if action == 'add' %}{% trans "Ajouter le produit" %}{% else %}{% trans "Enregistrer les modifications" %}{% endif %}
                 </button>
             </div>

@@ -5,7 +5,7 @@
 
 {% block content %}
 <div class="max-w-2xl mx-auto px-4 py-8">
-    <h1 class="text-2xl md:text-3xl font-bold text-auto-dark mb-6">{% if is_edit %}{% trans "Modifier le garage" %}{% else %}{% trans "Ajouter un garage" %}{% endif %}</h1>
+    <h1 class="text-2xl md:text-3xl font-bold text-navy-900 mb-6">{% if is_edit %}{% trans "Modifier le garage" %}{% else %}{% trans "Ajouter un garage" %}{% endif %}</h1>
 
     <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
         <p class="text-sm text-blue-800">
@@ -26,8 +26,8 @@
             </div>
             {% endif %}
 
-            <div class="border-b border-auto-100 pb-4 mb-4">
-                <h2 class="text-lg font-bold text-auto-dark mb-3">{% trans "Identité du garage" %}</h2>
+            <div class="border-b border-line-200 pb-4 mb-4">
+                <h2 class="text-lg font-bold text-navy-900 mb-3">{% trans "Identité du garage" %}</h2>
 
                 <div class="space-y-4">
                     <div>
@@ -48,7 +48,7 @@
 
                     <div>
                         <label class="form-label">{% trans "Photo du garage" %} *</label>
-                        <p class="text-xs text-auto-500 mb-2">{% trans "Photo réelle du garage. Formats : JPG, PNG, WebP. Max 5 Mo." %}</p>
+                        <p class="text-xs text-graphite-500 mb-2">{% trans "Photo réelle du garage. Formats : JPG, PNG, WebP. Max 5 Mo." %}</p>
                         {{ form.photo }}
                         {% if form.photo.errors %}
                         <p class="form-error">{{ form.photo.errors.0 }}</p>
@@ -57,8 +57,8 @@
                 </div>
             </div>
 
-            <div class="border-b border-auto-100 pb-4 mb-4">
-                <h2 class="text-lg font-bold text-auto-dark mb-3">{% trans "Contact" %}</h2>
+            <div class="border-b border-line-200 pb-4 mb-4">
+                <h2 class="text-lg font-bold text-navy-900 mb-3">{% trans "Contact" %}</h2>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -87,8 +87,8 @@
                 </div>
             </div>
 
-            <div class="border-b border-auto-100 pb-4 mb-4">
-                <h2 class="text-lg font-bold text-auto-dark mb-3">{% trans "Localisation administrative" %}</h2>
+            <div class="border-b border-line-200 pb-4 mb-4">
+                <h2 class="text-lg font-bold text-navy-900 mb-3">{% trans "Localisation administrative" %}</h2>
 
                 <div>
                     <label class="form-label">{% trans "Adresse" %} *</label>
@@ -117,8 +117,8 @@
                 </div>
             </div>
 
-            <div class="border-b border-auto-100 pb-4 mb-4">
-                <h2 class="text-lg font-bold text-auto-dark mb-3">{% trans "Justificatif" %}</h2>
+            <div class="border-b border-line-200 pb-4 mb-4">
+                <h2 class="text-lg font-bold text-navy-900 mb-3">{% trans "Justificatif" %}</h2>
 
                 <div>
                     <label class="form-label">{% trans "Type de document" %} *</label>
@@ -130,7 +130,7 @@
 
                 <div class="mt-4">
                     <label class="form-label">{% trans "Document justificatif" %} *</label>
-                    <p class="text-xs text-auto-500 mb-2">{% trans "PDF ou Word, max 5 Mo." %}</p>
+                    <p class="text-xs text-graphite-500 mb-2">{% trans "PDF ou Word, max 5 Mo." %}</p>
                     {{ doc_form.document }}
                     {% if doc_form.document.errors %}
                     <p class="form-error">{{ doc_form.document.errors.0 }}</p>
@@ -139,13 +139,13 @@
             </div>
 
             <div class="pb-4 mb-4">
-                <h2 class="text-lg font-bold text-auto-dark mb-3">{% trans "Position GPS" %}</h2>
+                <h2 class="text-lg font-bold text-navy-900 mb-3">{% trans "Position GPS" %}</h2>
 
-                <div id="location-status" class="text-sm text-auto-500 mb-2">
+                <div id="location-status" class="text-sm text-graphite-500 mb-2">
                     {% trans "Position non encore capturée." %}
                 </div>
 
-                <button type="button" id="get-location-btn" class="btn-primary w-full">
+                <button type="button" id="get-location-btn" class="btn bg-blue-500 hover:bg-blue-500/90 text-white w-full">
                     <svg class="w-5 h-5 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
@@ -173,7 +173,7 @@
                 {{ form.gps_accuracy }}
             </div>
 
-            <button type="submit" class="btn-primary w-full">
+            <button type="submit" class="btn bg-blue-500 hover:bg-blue-500/90 text-white w-full">
                 {% if is_edit %}{% trans "Enregistrer les modifications" %}{% else %}{% trans "Soumettre pour vérification" %}{% endif %}
             </button>
         </form>
@@ -284,7 +284,7 @@
         locationStatus.className = 'text-sm text-green-600 font-medium mb-2';
 
         locationInfo.innerHTML =
-            '<p class="text-sm text-auto-600 mt-2">' +
+            '<p class="text-sm text-graphite-600 mt-2">' +
             '{% trans "Latitude" %} : ' + latText + '<br>' +
             '{% trans "Longitude" %} : ' + lngText + '<br>' +
             '{% trans "Précision" %} : ' + bestFix.accuracy.toFixed(1) + ' m' +
@@ -365,7 +365,7 @@
         if (!bestFix || fix.accuracy < bestFix.accuracy) {
             bestFix = fix;
         }
-        locationStatus.className = 'text-sm text-auto-500 mb-2';
+        locationStatus.className = 'text-sm text-graphite-500 mb-2';
         locationStatus.textContent =
             '{% trans "Précision actuelle" %} : ' + Math.round(fix.accuracy) + ' m' +
             ' — {% trans "meilleure" %} : ' + Math.round(bestFix.accuracy) + ' m';
@@ -419,7 +419,7 @@
             setLoading(true,
                 '<svg class="w-5 h-5 mr-2 inline animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> {% trans "Recherche GPS de précision…" %}');
             locationStatus.textContent = '{% trans "Recherche de votre position GPS… Restez immobile." %}';
-            locationStatus.className = 'text-sm text-auto-500 mb-2';
+            locationStatus.className = 'text-sm text-graphite-500 mb-2';
 
             stopWatching();
             watchId = navigator.geolocation.watchPosition(

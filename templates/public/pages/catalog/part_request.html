@@ -3,69 +3,74 @@
 
 {% block title %}{% trans "Demande de pièce" %} - AutoLink{% endblock %}
 
-
-
 {% block content %}
-<div class="max-w-2xl mx-auto">
-    <div class="card p-6 mt-6">
-        <h2 class="text-xl font-bold text-auto-dark mb-2">{% trans "Demande de pièce" %}</h2>
-        <p class="text-sm text-auto-600">
-            {% trans "Vous pouvez demander une pièce spécifique à votre garage." %}
-        </p>
+<div class="max-w-2xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
+    <div class="text-center mb-8">
+        <span class="inline-flex items-center gap-2 text-xs font-mono font-medium tracking-widest uppercase text-orange-500 mb-3">
+            <span class="w-8 h-px bg-orange-500" aria-hidden="true"></span>
+            {% trans "Demande" %}
+        </span>
+        <h1 class="font-display text-3xl sm:text-4xl font-bold text-navy-900 tracking-tight mb-3">{% trans "Demande de pièce" %}</h1>
+        <p class="text-graphite-600 text-sm sm:text-base">{% trans "Vous pouvez demander une pièce spécifique à votre garage." %}</p>
     </div>
 
-    <div class="card p-6">
-        <form method="post" class="space-y-4">
+    <div class="tech-panel bg-white rounded-2xl p-6 sm:p-8 shadow-card" data-accent="blue">
+        <form method="post" class="space-y-5">
             {% csrf_token %}
+            {% if form.non_field_errors %}
+            <div class="bg-orange-500/10 text-orange-600 p-3 rounded-lg text-sm border border-orange-500/20">
+                {{ form.non_field_errors.0 }}
+            </div>
+            {% endif %}
 
             <div>
-                <label class="form-label">{% trans "Pièce recherchée" %} *</label>
+                <label class="form-label" for="{{ form.part_request.id_for_label }}">{% trans "Pièce recherchée" %} <span class="text-orange-500">*</span></label>
                 {{ form.part_request }}
                 {% if form.part_request.errors %}
                 <p class="form-error">{{ form.part_request.errors.0 }}</p>
                 {% endif %}
             </div>
 
-            <div>
-                <label class="form-label">{% trans "Marque" %} *</label>
-                {{ form.brand }}
-                {% if form.brand.errors %}
-                <p class="form-error">{{ form.brand.errors.0 }}</p>
-                {% endif %}
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                <div>
+                    <label class="form-label" for="{{ form.brand.id_for_label }}">{% trans "Marque" %} <span class="text-orange-500">*</span></label>
+                    {{ form.brand }}
+                    {% if form.brand.errors %}
+                    <p class="form-error">{{ form.brand.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <label class="form-label" for="{{ form.model.id_for_label }}">{% trans "Modèle" %} <span class="text-orange-500">*</span></label>
+                    {{ form.model }}
+                    {% if form.model.errors %}
+                    <p class="form-error">{{ form.model.errors.0 }}</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <label class="form-label" for="{{ form.year.id_for_label }}">{% trans "Année" %} <span class="text-orange-500">*</span></label>
+                    {{ form.year }}
+                    {% if form.year.errors %}
+                    <p class="form-error">{{ form.year.errors.0 }}</p>
+                    {% endif %}
+                </div>
             </div>
 
             <div>
-                <label class="form-label">{% trans "Modèle" %} *</label>
-                {{ form.model }}
-                {% if form.model.errors %}
-                <p class="form-error">{{ form.model.errors.0 }}</p>
-                {% endif %}
-            </div>
-
-            <div>
-                <label class="form-label">{% trans "Année" %} *</label>
-                {{ form.year }}
-                {% if form.year.errors %}
-                <p class="form-error">{{ form.year.errors.0 }}</p>
-                {% endif %}
-            </div>
-
-            <div>
-                <label class="form-label">{% trans "Référence OEM" %}</label>
+                <label class="form-label" for="{{ form.reference_oem.id_for_label }}">{% trans "Référence OEM" %}</label>
                 {{ form.reference_oem }}
             </div>
 
             <div>
-                <label class="form-label">{% trans "Description" %} *</label>
+                <label class="form-label" for="{{ form.description.id_for_label }}">{% trans "Description" %} <span class="text-orange-500">*</span></label>
                 {{ form.description }}
                 {% if form.description.errors %}
                 <p class="form-error">{{ form.description.errors.0 }}</p>
                 {% endif %}
             </div>
 
-            <div class="flex justify-between items-center pt-6 border-t border-auto-100">
-                <a href="{% url 'catalog:garage_products' %}" class="btn-outline text-sm">{% trans "Annuler" %}</a>
-                <button type="submit" class="bg-auto-orange text-white px-6 py-2 rounded-lg font-bold text-sm hover:bg-auto-orange-dark transition">
+            <div class="flex flex-col-reverse sm:flex-row justify-between items-center gap-3 pt-6 border-t border-line-200">
+                <a href="{% url 'catalog:garage_products' %}" class="btn w-full sm:w-auto bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 text-sm">{% trans "Annuler" %}</a>
+                <button type="submit" class="btn w-full sm:w-auto bg-orange-500 hover:bg-orange-600 text-white">
                     {% trans "Envoyer la demande" %}
                 </button>
             </div>

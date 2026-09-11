@@ -4,16 +4,16 @@
 {% block title %}{{ ticket.ticket_number }} - {{ ticket.subject }} - AutoLink{% endblock %}
 
 {% block dashboard_header %}
-    <h1 class="text-sm font-bold text-auto-dark">{% trans "Ticket" %}</h1>
+    <h1 class="text-sm font-bold text-navy-900">{% trans "Ticket" %}</h1>
 {% endblock %}
 
 {% block dashboard_breadcrumb %}
-    <nav class="flex items-center space-x-2 text-sm text-auto-600">
-        <a href="{% url 'administration:dashboard' %}" class="hover:text-auto-orange transition">{% trans "Tableau de bord" %}</a>
-        <span class="text-auto-400">/</span>
-        <a href="{% url 'administration:support' %}" class="hover:text-auto-orange transition">{% trans "Tickets" %}</a>
-        <span class="text-auto-400">/</span>
-        <span class="font-bold text-auto-dark">{{ ticket.ticket_number }}</span>
+    <nav class="flex items-center space-x-2 text-sm text-graphite-600">
+        <a href="{% url 'administration:dashboard' %}" class="hover:text-orange-500 transition">{% trans "Tableau de bord" %}</a>
+        <span class="text-graphite-500">/</span>
+        <a href="{% url 'administration:support' %}" class="hover:text-orange-500 transition">{% trans "Tickets" %}</a>
+        <span class="text-graphite-500">/</span>
+        <span class="font-bold text-navy-900">{{ ticket.ticket_number }}</span>
     </nav>
 {% endblock %}
 
@@ -22,22 +22,22 @@
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
             <div class="flex items-center gap-2 mb-1 flex-wrap">
-                <span class="font-mono text-sm text-auto-500">{{ ticket.ticket_number }}</span>
+                <span class="font-mono text-sm text-graphite-500">{{ ticket.ticket_number }}</span>
                 {% if ticket.status == 'OPEN' %}
-                    <span class="badge-warning text-[10px]">{% trans "Ouvert" %}</span>
+                    <span class="bg-orange-100 text-orange-600 text-[10px]">{% trans "Ouvert" %}</span>
                 {% elif ticket.status == 'IN_PROGRESS' %}
-                    <span class="badge-info text-[10px]">{% trans "En cours" %}</span>
+                    <span class="bg-blue-100 text-blue-500 text-[10px]">{% trans "En cours" %}</span>
                 {% elif ticket.status == 'WAITING_CLIENT' %}
-                    <span class="badge-warning text-[10px]">{% trans "En attente du client" %}</span>
+                    <span class="bg-orange-100 text-orange-600 text-[10px]">{% trans "En attente du client" %}</span>
                 {% elif ticket.status == 'RESOLVED' %}
-                    <span class="badge-success text-[10px]">{% trans "Résolu" %}</span>
+                    <span class="bg-blue-100 text-blue-500 text-[10px]">{% trans "Résolu" %}</span>
                 {% else %}
-                    <span class="badge-neutral text-[10px]">{% trans "Fermé" %}</span>
+                    <span class="bg-steel-50 text-graphite-600 text-[10px]">{% trans "Fermé" %}</span>
                 {% endif %}
-                <span class="badge-neutral text-[10px]">{{ ticket.get_category_display }}</span>
+                <span class="bg-steel-50 text-graphite-600 text-[10px]">{{ ticket.get_category_display }}</span>
             </div>
-            <h2 class="text-xl font-bold text-auto-dark">{{ ticket.subject }}</h2>
-            <div class="text-sm text-auto-500 mt-1">
+            <h2 class="text-xl font-bold text-navy-900">{{ ticket.subject }}</h2>
+            <div class="text-sm text-graphite-500 mt-1">
                 {% trans "Créé le" %} {{ ticket.created_at|date:"d/m/Y à H:i" }}
                 {% if ticket.resolved_at %}
                 · {% trans "Résolu le" %} {{ ticket.resolved_at|date:"d/m/Y à H:i" }}
@@ -46,12 +46,12 @@
         </div>
         <div class="flex gap-2 flex-wrap">
             <a href="{% url 'administration:support' %}"
-               class="btn-outline text-sm">{% trans "Retour à la liste" %}</a>
+               class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 text-sm">{% trans "Retour à la liste" %}</a>
             {% if ticket.status == 'OPEN' %}
             <form method="post" action="{% url 'administration:ticket_detail' ticket.pk %}" class="inline-flex">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="assign">
-                <button type="submit" class="bg-auto-orange text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-auto-orange-dark transition">
+                <button type="submit" class="bg-orange-500 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-orange-500-dark transition">
                     {% trans "Prendre en charge" %}
                 </button>
             </form>
@@ -60,7 +60,7 @@
             <form method="post" action="{% url 'administration:ticket_detail' ticket.pk %}" class="inline-flex gap-2">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="waiting">
-                <button type="submit" class="bg-warning-500 text-white px-3 py-2 rounded-lg font-bold text-sm hover:bg-warning-600 transition">
+                <button type="submit" class="bg-orange-500/100 text-white px-3 py-2 rounded-lg font-bold text-sm hover:bg-warning-600 transition">
                     {% trans "En attente" %}
                 </button>
                 <input type="hidden" name="action" value="resolve">
@@ -73,7 +73,7 @@
             <form method="post" action="{% url 'administration:ticket_detail' ticket.pk %}" class="inline-flex">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="close">
-                <button type="submit" class="bg-error-500 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-error-600 transition">
+                <button type="submit" class="bg-orange-500/100 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-error-600 transition">
                     {% trans "Fermer" %}
                 </button>
             </form>
@@ -84,15 +84,15 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div class="lg:col-span-2 space-y-6">
             <div class="card p-6">
-                <h3 class="font-bold text-sm text-auto-700 mb-4">{% trans "Description" %}</h3>
-                <div class="p-4 rounded-xl bg-auto-50 border border-auto-100">
-                    <p class="text-sm text-auto-700 whitespace-pre-wrap leading-relaxed">{{ ticket.description }}</p>
+                <h3 class="font-bold text-sm text-graphite-600 mb-4">{% trans "Description" %}</h3>
+                <div class="p-4 rounded-xl bg-steel-50 border border-line-200">
+                    <p class="text-sm text-graphite-600 whitespace-pre-wrap leading-relaxed">{{ ticket.description }}</p>
                 </div>
 
                 {% if ticket.part %}
-                <div class="mt-3 p-4 rounded-xl bg-auto-50 border border-auto-100">
+                <div class="mt-3 p-4 rounded-xl bg-steel-50 border border-line-200">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-auto-orange/10 flex items-center justify-center flex-shrink-0">
+                        <div class="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center flex-shrink-0">
                             {% if ticket.part.photo %}
                             <img src="{{ ticket.part.photo.url }}" class="w-full h-full object-cover rounded-xl">
                             {% else %}
@@ -100,18 +100,18 @@
                             {% endif %}
                         </div>
                         <div class="min-w-0">
-                            <div class="text-xs text-auto-500">{% trans "Pièce" %}</div>
-                            <div class="font-bold text-sm text-auto-dark truncate">{{ ticket.part.name }}</div>
-                            <div class="text-xs text-auto-400">{{ ticket.part.price|intcomma }} FCFA</div>
+                            <div class="text-xs text-graphite-500">{% trans "Pièce" %}</div>
+                            <div class="font-bold text-sm text-navy-900 truncate">{{ ticket.part.name }}</div>
+                            <div class="text-xs text-graphite-500">{{ ticket.part.price|intcomma }} FCFA</div>
                         </div>
                     </div>
                 </div>
                 {% endif %}
 
                 {% if ticket.garage %}
-                <div class="mt-3 p-4 rounded-xl bg-auto-50 border border-auto-100">
+                <div class="mt-3 p-4 rounded-xl bg-steel-50 border border-line-200">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-auto-orange/10 flex items-center justify-center flex-shrink-0">
+                        <div class="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center flex-shrink-0">
                             {% if ticket.garage.photo %}
                             <img src="{{ ticket.garage.photo.url }}" class="w-full h-full object-cover rounded-xl">
                             {% else %}
@@ -119,8 +119,8 @@
                             {% endif %}
                         </div>
                         <div class="min-w-0">
-                            <div class="text-xs text-auto-500">{% trans "Garage" %}</div>
-                            <div class="font-bold text-sm text-auto-dark truncate">{{ ticket.garage.name }}</div>
+                            <div class="text-xs text-graphite-500">{% trans "Garage" %}</div>
+                            <div class="font-bold text-sm text-navy-900 truncate">{{ ticket.garage.name }}</div>
                         </div>
                     </div>
                 </div>
@@ -128,35 +128,35 @@
             </div>
 
             <div class="card p-6">
-                <h3 class="font-bold text-sm text-auto-700 mb-4">{% trans "Conversation" %}</h3>
+                <h3 class="font-bold text-sm text-graphite-600 mb-4">{% trans "Conversation" %}</h3>
 
                 {% if ticket_messages %}
                 <div class="space-y-4">
                     {% for message in ticket_messages %}
-                    <div class="p-4 rounded-xl {% if message.sender == ticket.user %}bg-auto-50 border-l-4 border-l-auto-orange{% else %}bg-auto-orange/5 border-l-4 border-l-auto-deep-red{% endif %}">
+                    <div class="p-4 rounded-xl {% if message.sender == ticket.user %}bg-steel-50 border-l-4 border-l-orange-500{% else %}bg-orange-500/10 border-l-4 border-l-orange-600{% endif %}">
                         <div class="flex items-center gap-2 mb-2">
                             {% if message.sender.avatar %}
                             <img src="{{ message.sender.avatar.url }}" class="w-6 h-6 rounded-full object-cover">
                             {% else %}
-                            <div class="w-6 h-6 rounded-full bg-auto-orange/10 flex items-center justify-center text-xs font-bold text-auto-dark">
+                            <div class="w-6 h-6 rounded-full bg-orange-500/10 flex items-center justify-center text-xs font-bold text-navy-900">
                                 {{ message.sender.display_name|first|upper }}
                             </div>
                             {% endif %}
-                            <span class="font-bold text-sm text-auto-dark">{{ message.sender.display_name }}</span>
+                            <span class="font-bold text-sm text-navy-900">{{ message.sender.display_name }}</span>
                             {% if message.sender == ticket.user %}
-                            <span class="badge-neutral text-[10px]">{% trans "Client" %}</span>
+                            <span class="bg-steel-50 text-graphite-600 text-[10px]">{% trans "Client" %}</span>
                             {% else %}
-                            <span class="badge-info text-[10px]">{% trans "Support" %}</span>
+                            <span class="bg-blue-100 text-blue-500 text-[10px]">{% trans "Support" %}</span>
                             {% endif %}
-                            <span class="text-xs text-auto-500">{{ message.created_at|date:"d/m/Y H:i" }}</span>
+                            <span class="text-xs text-graphite-500">{{ message.created_at|date:"d/m/Y H:i" }}</span>
                         </div>
-                        <div class="text-sm text-auto-700 whitespace-pre-wrap leading-relaxed">{{ message.body }}</div>
+                        <div class="text-sm text-graphite-600 whitespace-pre-wrap leading-relaxed">{{ message.body }}</div>
                         {% if message.attachment %}
                         <div class="mt-3">
                             <a href="{{ message.attachment.url }}" target="_blank" rel="noopener noreferrer"
-                               class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-auto-100 hover:bg-auto-50 transition text-sm">
-                                <svg class="w-4 h-4 text-auto-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586-6.586a2 2 0 112.828-2.828l6.414 6.414a4 4 0 00-5.656-5.656l-6.415-6.414a6 6 0 118.486 8.486L20.5 13"/></svg>
-                                <span class="text-auto-dark font-medium truncate max-w-[200px]">{{ message.attachment.name|cut:"tickets/attachments/" }}</span>
+                               class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-line-200 hover:bg-steel-50 transition text-sm">
+                                <svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586-6.586a2 2 0 112.828-2.828l6.414 6.414a4 4 0 00-5.656-5.656l-6.415-6.414a6 6 0 118.486 8.486L20.5 13"/></svg>
+                                <span class="text-navy-900 font-medium truncate max-w-[200px]">{{ message.attachment.name|cut:"tickets/attachments/" }}</span>
                             </a>
                         </div>
                         {% endif %}
@@ -164,14 +164,14 @@
                     {% endfor %}
                 </div>
                 {% else %}
-                <div class="p-8 text-center text-auto-500">
+                <div class="p-8 text-center text-graphite-500">
                     <p>{% trans "Aucun message pour le moment." %}</p>
                 </div>
                 {% endif %}
 
                 {% if ticket.status != 'CLOSED' %}
                 <form method="post" action="{% url 'administration:ticket_detail' ticket.pk %}"
-                      class="mt-6 p-4 rounded-xl bg-auto-50 border border-auto-100">
+                      class="mt-6 p-4 rounded-xl bg-steel-50 border border-line-200">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="reply">
                     <label class="form-label mb-2">{% trans "Votre réponse" %}</label>
@@ -182,7 +182,7 @@
                               required></textarea>
                     <div class="flex justify-end mt-3">
                         <button type="submit"
-                                class="bg-auto-orange text-white px-6 py-2 rounded-lg font-bold text-sm hover:bg-auto-orange-dark transition">
+                                class="bg-orange-500 text-white px-6 py-2 rounded-lg font-bold text-sm hover:bg-orange-500-dark transition">
                             {% trans "Répondre" %}
                         </button>
                     </div>
@@ -193,63 +193,63 @@
 
         <div class="space-y-6">
             <div class="card p-5">
-                <h4 class="font-bold text-sm uppercase tracking-wider text-auto-700 mb-3">{% trans "Client" %}</h4>
+                <h4 class="font-bold text-sm uppercase tracking-wider text-graphite-600 mb-3">{% trans "Client" %}</h4>
                 <div class="flex items-center gap-3">
                     {% if ticket.user.avatar %}
-                    <img src="{{ ticket.user.avatar.url }}" class="w-10 h-10 rounded-full object-cover border-2 border-auto-orange">
+                    <img src="{{ ticket.user.avatar.url }}" class="w-10 h-10 rounded-full object-cover border-2 border-orange-500">
                     {% else %}
-                    <div class="w-10 h-10 rounded-full bg-auto-orange/10 flex items-center justify-center text-lg font-bold text-auto-dark border-2 border-auto-100">
+                    <div class="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center text-lg font-bold text-navy-900 border-2 border-line-200">
                         {{ ticket.user.display_name|first|upper }}
                     </div>
                     {% endif %}
                     <div class="min-w-0">
                         <div class="font-bold text-sm truncate">{{ ticket.user.display_name }}</div>
-                        <div class="text-xs text-auto-500 truncate">{{ ticket.user.email }}</div>
+                        <div class="text-xs text-graphite-500 truncate">{{ ticket.user.email }}</div>
                     </div>
                 </div>
                 <div class="mt-3 space-y-1.5 text-sm">
                     <div class="flex justify-between">
-                        <span class="text-auto-500">{% trans "Téléphone" %}</span>
+                        <span class="text-graphite-500">{% trans "Téléphone" %}</span>
                         <span class="font-medium">{{ ticket.user.phone|default:"—" }}</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-auto-500">{% trans "Ville" %}</span>
+                        <span class="text-graphite-500">{% trans "Ville" %}</span>
                         <span class="font-medium">{{ ticket.user.city|default:"—" }}</span>
                     </div>
                 </div>
             </div>
 
             <div class="card p-5">
-                <h4 class="font-bold text-sm uppercase tracking-wider text-auto-700 mb-3">{% trans "Informations" %}</h4>
+                <h4 class="font-bold text-sm uppercase tracking-wider text-graphite-600 mb-3">{% trans "Informations" %}</h4>
                 <div class="space-y-3 text-sm">
                     <div class="flex justify-between">
-                        <span class="text-auto-500">{% trans "Statut" %}</span>
+                        <span class="text-graphite-500">{% trans "Statut" %}</span>
                         {% if ticket.status == 'OPEN' %}
-                            <span class="badge-warning text-[10px]">{% trans "Ouvert" %}</span>
+                            <span class="bg-orange-100 text-orange-600 text-[10px]">{% trans "Ouvert" %}</span>
                         {% elif ticket.status == 'IN_PROGRESS' %}
-                            <span class="badge-info text-[10px]">{% trans "En cours" %}</span>
+                            <span class="bg-blue-100 text-blue-500 text-[10px]">{% trans "En cours" %}</span>
                         {% elif ticket.status == 'WAITING_CLIENT' %}
-                            <span class="badge-warning text-[10px]">{% trans "En attente" %}</span>
+                            <span class="bg-orange-100 text-orange-600 text-[10px]">{% trans "En attente" %}</span>
                         {% elif ticket.status == 'RESOLVED' %}
-                            <span class="badge-success text-[10px]">{% trans "Résolu" %}</span>
+                            <span class="bg-blue-100 text-blue-500 text-[10px]">{% trans "Résolu" %}</span>
                         {% else %}
-                            <span class="badge-neutral text-[10px]">{% trans "Fermé" %}</span>
+                            <span class="bg-steel-50 text-graphite-600 text-[10px]">{% trans "Fermé" %}</span>
                         {% endif %}
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-auto-500">{% trans "Catégorie" %}</span>
+                        <span class="text-graphite-500">{% trans "Catégorie" %}</span>
                         <span class="font-medium">{{ ticket.get_category_display }}</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-auto-500">{% trans "Assigné à" %}</span>
+                        <span class="text-graphite-500">{% trans "Assigné à" %}</span>
                         <span class="font-medium">{{ ticket.assigned_to.username|default:"—" }}</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-auto-500">{% trans "Créé le" %}</span>
+                        <span class="text-graphite-500">{% trans "Créé le" %}</span>
                         <span class="font-medium">{{ ticket.created_at|date:"d/m/Y" }}</span>
                     </div>
                     <div class="flex justify-between">
-                        <span class="text-auto-500">{% trans "Mis à jour" %}</span>
+                        <span class="text-graphite-500">{% trans "Mis à jour" %}</span>
                         <span class="font-medium">{{ ticket.updated_at|date:"d/m/Y" }}</span>
                     </div>
                 </div>

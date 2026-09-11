@@ -1,65 +1,65 @@
 {% load i18n %}
-<section class="relative bg-auto-deep-red overflow-hidden" aria-label="{% trans 'En-tête principal' %}">
-
-  
-    <div class="absolute inset-0 opacity-[0.03]" aria-hidden="true">
+<section class="relative bg-navy-900 overflow-hidden" aria-label="{% trans 'En-tête principal' %}">
+    <!-- Blueprint grid background -->
+    <div class="absolute inset-0 opacity-[0.05]" aria-hidden="true">
         <div class="absolute inset-0" style="background-image: url(&quot;data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
     </div>
-
-    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 py-14 sm:py-20 md:py-28">
-        <div class="text-center max-w-3xl mx-auto">
-
-            {# Badge #}
-            <div class="inline-flex items-center gap-2 bg-white/[0.08] backdrop-blur-sm border border-white/[0.06] text-auto-gold px-4 py-2 rounded-full text-xs sm:text-sm font-bold mb-6 sm:mb-8 animate-fade-in">
-                <span class="w-2 h-2 rounded-full bg-success-500 animate-pulse" aria-hidden="true"></span>
-                {% trans "Plateforme automobile #1 au Cameroun" %}
-            </div>
-
-            {# Headline #}
-            <h1 class="text-3xl sm:text-4xl md:text-[3.25rem] font-bold text-white mb-8 sm:mb-6 animate-slide-up leading-[1.15] tracking-tight">
-                {% trans "Trouvez la" %}
-                <span class="relative inline-block mb-4">
-                    <span class="text-auto-gold">{% trans "bonne solution" %}</span>
-                </span>
-                {% trans "automobile" %}
-            </h1>
-
-            {# Subtitle #}
-            <p class="text-white/60 text-base sm:text-lg md:text-xl mb-8 sm:mb-10 animate-slide-up max-w-2xl mx-auto leading-relaxed" style="animation-delay: 0.1s">
-                {% trans "Garages vérifiés, pièces compatibles, prix transparents. Tout près de vous au Cameroun." %}
-            </p>
-
-            {# Search Bar #}
-            <form action="{% url 'core:search' %}" method="get" class="max-w-2xl mx-auto animate-slide-up" style="animation-delay: 0.2s" role="search" aria-label="{% trans 'Recherche' %}">
-                <label for="hero-search" class="sr-only">{% trans 'Rechercher garage, pièce, service...' %}</label>
-                <div class="relative group">
-                    <div class="absolute -inset-1 bg-gradient-to-r from-auto-orange/20 via-auto-gold/10 to-auto-orange/20 rounded-2xl blur-sm opacity-0 group-focus-within:opacity-100 transition-opacity duration-300" aria-hidden="true"></div>
-                    <div class="relative flex bg-white rounded-xl overflow-hidden shadow-[0_8px_30px_rgba(0,0,0,0.25)]">
-                        <div class="flex items-center pl-4 sm:pl-5 text-gray-400" aria-hidden="true">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                        </div>
-                        <input
-                            type="text"
-                            id="hero-search"
-                            name="q"
-                            placeholder="{% trans 'Rechercher garage, pièce, service...' %}"
-                            class="flex-1 min-w-0 px-3 sm:px-4 py-4 sm:py-5 text-auto-dark text-base sm:text-lg outline-none font-mono bg-transparent"
-                            autocomplete="off"
-                        >
-                        <button
-                            type="submit"
-                            class="bg-auto-orange hover:bg-auto-orange-dark text-white px-5 sm:px-8 font-bold transition-all duration-200 flex items-center gap-2 shrink-0"
-                            aria-label="{% trans 'Lancer la recherche' %}"
-                        >
-                            <span class="hidden sm:inline">{% trans "Rechercher" %}</span>
-                            <svg class="w-5 h-5 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
-                        </button>
-                    </div>
-                </div>
-            </form>
-
-            
-        </div>
+    <!-- Radial glow -->
+    <div class="absolute top-0 right-0 w-full lg:w-3/5 h-full opacity-[0.07]" aria-hidden="true">
+        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,var(--tw-colors-blue-500,#1C6DD0),transparent_65%)]"></div>
     </div>
 
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-24 sm:pt-20 sm:pb-28 md:pt-28 md:pb-32 lg:pt-32 lg:pb-36">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
+            <!-- Left: copy + search -->
+            <div class="lg:col-span-7">
+                <div class="hero-fade inline-flex items-center gap-2 bg-white/[0.06] border border-white/[0.08] text-blue-400 px-4 py-2 rounded-full text-xs font-mono font-medium mb-6 sm:mb-8">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" aria-hidden="true"></span>
+                    {% trans "Plateforme automobile #1 au Cameroun" %}
+                </div>
+
+                <h1 class="hero-fade font-display text-4xl sm:text-5xl md:text-6xl font-bold text-white leading-[1.06] tracking-tight mb-6 sm:mb-8">
+                    {% trans "Trouvez la" %}
+                    <span class="text-orange-500">{% trans "bonne solution" %}</span>
+                    <br class="hidden sm:block">
+                    {% trans "automobile" %}
+                </h1>
+
+                <p class="hero-fade-delayed text-white/60 text-base sm:text-lg md:text-xl mb-8 sm:mb-10 max-w-xl leading-relaxed">
+                    {% trans "Garages vérifiés, pièces compatibles, prix transparents. Tout près de vous au Cameroun." %}
+                </p>
+
+                <form action="{% url 'core:search' %}" method="get" class="hero-fade-delayed max-w-2xl" role="search" aria-label="{% trans 'Recherche' %}">
+                    <label for="hero-search" class="sr-only">{% trans 'Rechercher garage, pièce, service...' %}</label>
+                    <div class="relative">
+                        <div class="relative flex bg-white rounded-2xl overflow-hidden shadow-[0_18px_50px_rgba(0,0,0,0.4)]">
+                            <div class="flex items-center pl-4 sm:pl-5 text-graphite-500" aria-hidden="true">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                            </div>
+                            <input
+                                type="text"
+                                id="hero-search"
+                                name="q"
+                                placeholder="{% trans 'Rechercher garage, pièce, service...' %}"
+                                class="flex-1 min-w-0 px-3 sm:px-4 py-4 sm:py-5 text-graphite-900 text-base sm:text-lg outline-none font-body bg-transparent"
+                                autocomplete="off"
+                            >
+                            <button
+                                type="submit"
+                                class="bg-blue-500 hover:bg-blue-500/90 text-white px-5 sm:px-8 font-bold text-sm transition-colors duration-200 flex items-center gap-2 shrink-0"
+                                aria-label="{% trans 'Lancer la recherche' %}"
+                            >
+                                <span class="hidden sm:inline">{% trans "Rechercher" %}</span>
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            
+    </div>
+
+    <!-- Bottom fade into page -->
+    <div class="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-b from-transparent to-white/0" aria-hidden="true"></div>
 </section>

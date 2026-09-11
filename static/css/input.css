@@ -2,261 +2,268 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url("https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap");
 
-:root {
-  --color-autolink-light: #ebebeb;
-  --color-autolink-gold: #e2a95c;
-  --color-autolink-orange: #cd8135;
-  --color-autolink-coral: #d45437;
-  --color-autolink-deep-red: #762011;
-  --font-family-primary: "Space Mono", monospace;
+/* ============================================================
+   Base Styles
+   ============================================================ */
+html {
+  scroll-behavior: smooth;
 }
 
-@layer base {
-  * {
-    @apply font-mono;
-  }
-  body {
-    @apply bg-auto-cream text-auto-dark antialiased;
-    font-family: "Space Mono", monospace;
-    line-height: 1.6;
-  }
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    font-family: "Space Mono", monospace;
-    font-weight: 700;
-    letter-spacing: -0.01em;
-  }
-  h1 {
-    @apply text-3xl md:text-4xl;
-  }
-  h2 {
-    @apply text-2xl md:text-3xl;
-  }
-  h3 {
-    @apply text-xl md:text-2xl;
-  }
-  h4 {
-    @apply text-lg md:text-xl;
-  }
-  :focus-visible {
-    @apply outline-2 outline-offset-2 outline-auto-orange;
-  }
+section[id] {
+  scroll-margin-top: 5rem;
 }
 
-@layer components {
-  /* --- Buttons --- */
-  .btn {
-    @apply font-bold px-6 py-3 rounded-lg transition-all duration-200 active:scale-[0.98] inline-flex items-center justify-center gap-2;
-  }
-  .btn-primary {
-    @apply bg-auto-orange hover:bg-auto-600 text-white font-bold px-6 py-3 rounded-lg transition-all duration-200 shadow-sm active:scale-[0.98] inline-flex items-center justify-center gap-2;
-  }
-  .btn-secondary {
-    @apply bg-auto-deep-red hover:bg-auto-900 text-white font-bold px-6 py-3 rounded-lg transition-all duration-200 active:scale-[0.98] inline-flex items-center justify-center gap-2;
-  }
-  .btn-outline {
-    @apply border-2 border-auto-orange text-auto-orange hover:bg-auto-orange hover:text-white font-bold px-6 py-3 rounded-lg transition-all duration-200 active:scale-[0.98] inline-flex items-center justify-center gap-2;
-  }
-  .btn-danger {
-    @apply bg-error-600 hover:bg-error-700 text-white font-bold px-6 py-3 rounded-lg transition-all duration-200 active:scale-[0.98] inline-flex items-center justify-center gap-2;
-  }
-  .btn-ghost {
-    @apply text-auto-dark hover:bg-auto-100 font-bold px-6 py-3 rounded-lg transition-all duration-200 inline-flex items-center justify-center gap-2;
-  }
-  .btn-sm {
-    @apply !px-4 !py-2 text-sm;
-  }
-  .btn-xs {
-    @apply !px-3 !py-1.5 text-xs;
-  }
+body {
+  font-feature-settings: "ss01";
+  @apply bg-white text-graphite-900 font-body antialiased;
+}
 
-  /* Keep primary controls comfortable for touch interaction. */
-  .btn,
-  .btn-primary,
-  .btn-secondary,
-  .btn-outline,
-  .btn-danger,
-  .btn-ghost {
-    min-height: 2.75rem;
-  }
+:focus-visible {
+  outline: 2px solid #1C6DD0;
+  outline-offset: 3px;
+}
 
-  /* --- Form Inputs --- */
-  .form-input {
-    @apply w-full px-4 py-3 border border-auto-200 rounded-lg focus:ring-2 focus:ring-auto-orange focus:border-auto-orange outline-none transition-all duration-200 font-mono bg-white;
-  }
+/* ============================================================
+   Components
+   ============================================================ */
 
-  input[type="file"] {
-    min-height: 2.75rem;
-  }
-  .form-label {
-    @apply block text-sm font-bold text-auto-dark mb-2;
-  }
-  .form-error {
-    @apply text-error-600 text-sm mt-1;
-  }
+/* Technical corner-bracket panel, used for cards throughout the page */
+.tech-panel {
+  position: relative;
+  border: 1px solid #D7DCE1;
+  --accent-color: #1C6DD0;
+}
 
-  /* --- Cards --- */
-  .card {
-    @apply bg-white rounded-xl shadow-card border border-auto-100/50 overflow-hidden hover:shadow-card-hover transition-all duration-200;
-  }
+.tech-panel::before,
+.tech-panel::after {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+}
 
-  /* --- Badges --- */
-  .badge {
-    @apply text-xs font-bold px-2.5 py-0.5 rounded-full inline-flex items-center;
-  }
-  .badge-success {
-    @apply bg-success-100 text-success-700;
-  }
-  .badge-warning {
-    @apply bg-warning-100 text-warning-700;
-  }
-  .badge-error {
-    @apply bg-error-100 text-error-700;
-  }
-  .badge-info {
-    @apply bg-info-100 text-info-700;
-  }
-  .badge-neutral {
-    @apply bg-auto-100 text-auto-700;
-  }
-  .badge-orange {
-    @apply bg-auto-orange/10 text-auto-orange;
-  }
-  .badge-gold {
-    @apply bg-auto-gold/10 text-auto-700;
-  }
-  .badge-green {
-    @apply bg-success-100 text-success-700;
-  }
-  .badge-red {
-    @apply bg-error-100 text-error-700;
-  }
-  .badge-blue {
-    @apply bg-info-100 text-info-700;
-  }
-  .badge-gray {
-    @apply bg-auto-100 text-auto-700;
-  }
-  .badge-dark {
-    @apply bg-auto-deep-red text-white;
-  }
+.tech-panel::before {
+  top: -1px;
+  left: -1px;
+  border-top: 2px solid var(--accent-color);
+  border-left: 2px solid var(--accent-color);
+}
 
-  /* --- Role Badges --- */
-  .badge-user {
-    @apply bg-auto-100 text-auto-700;
-  }
-  .badge-client {
-    @apply bg-success-100 text-success-700;
-  }
-  .badge-admin {
-    @apply bg-info-100 text-info-700;
-  }
-  .badge-superuser {
-    @apply bg-auto-deep-red text-white;
-  }
+.tech-panel::after {
+  bottom: -1px;
+  right: -1px;
+  border-bottom: 2px solid var(--accent-color);
+  border-right: 2px solid var(--accent-color);
+}
 
-  /* --- Navigation --- */
-  .nav-link {
-    @apply hover:text-auto-gold transition-all duration-200 font-bold;
-  }
-  .nav-link-active {
-    @apply text-auto-gold font-bold;
-  }
+.tech-panel[data-accent="orange"] {
+  --accent-color: #FF6A2B;
+}
 
-  /* --- Tables --- */
-  .table-container {
-    @apply overflow-x-auto rounded-xl border border-auto-100/50;
-  }
-  .table {
-    @apply w-full text-sm;
-  }
-  .table th {
-    @apply px-4 py-3 text-left font-bold text-white bg-auto-deep-red border-b border-auto-800;
-  }
-  .table td {
-    @apply px-4 py-3 border-b border-auto-100;
-  }
-  .table tr:hover td {
-    @apply bg-auto-50;
-  }
+.tech-panel[data-accent="blue"] {
+  --accent-color: #1C6DD0;
+}
 
-  /* --- Stats Cards --- */
-  .stat-card {
-    @apply bg-white rounded-xl p-5 border border-auto-100/50 shadow-card;
-  }
-  .stat-value {
-    @apply text-2xl md:text-3xl font-bold text-auto-deep-red;
-  }
-  .stat-label {
-    @apply text-sm text-auto-600 mt-1;
-  }
+.blueprint-grid {
+  background-image:
+    linear-gradient(#ffffff 1px, transparent 1px),
+    linear-gradient(90deg, #ffffff 1px, transparent 1px);
+  background-size: 44px 44px;
+}
 
-  /* --- Section Headers --- */
-  .section-header {
-    @apply bg-auto-deep-red text-white py-6 md:py-8;
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
   }
-
-  /* --- Status Indicators --- */
-  .status-dot {
-    @apply w-2.5 h-2.5 rounded-full inline-block;
-  }
-  .status-available {
-    @apply bg-success-500;
-  }
-  .status-busy {
-    @apply bg-warning-500;
-  }
-  .status-closed {
-    @apply bg-error-500;
-  }
-  .status-temporary {
-    @apply bg-gray-400;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-@layer utilities {
-  .line-clamp-1 {
-    display: -webkit-box;
-    -webkit-line-clamp: 1;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+.hero-fade {
+  animation: fadeUp 0.7s ease-out both;
+}
+
+.hero-fade-delayed {
+  animation: fadeUp 0.7s ease-out 0.15s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-fade,
+  .hero-fade-delayed {
+    animation: none;
   }
-  .line-clamp-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-  .line-clamp-3 {
-    display: -webkit-box;
-    -webkit-line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    *,
-    *::before,
-    *::after {
-      animation-duration: 0.01ms !important;
-      animation-iteration-count: 1 !important;
-      transition-duration: 0.01ms !important;
-    }
+  .animate-ping {
+    animation: none;
   }
 }
 
+/* ============================================================
+   Buttons
+   ============================================================ */
+.btn {
+  @apply font-bold px-6 py-3 rounded-lg transition-all duration-200 active:scale-[0.98] inline-flex items-center justify-center gap-2;
+  min-height: 2.75rem;
+}
+
+/* ============================================================
+   Form Inputs
+   ============================================================ */
+.form-input {
+  @apply w-full px-4 py-3 border border-line-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-200 font-mono bg-white;
+}
+
+input[type="file"] {
+  min-height: 2.75rem;
+}
+
+.form-label {
+  @apply block text-sm font-bold text-graphite-900 mb-2;
+}
+
+.form-error {
+  @apply text-orange-600 text-sm mt-1;
+}
+
+/* ============================================================
+   Cards
+   ============================================================ */
+.card {
+  @apply bg-white rounded-xl shadow-card border border-line-200/50 overflow-hidden hover:shadow-card-hover transition-all duration-200;
+}
+
+/* ============================================================
+   Badges
+   ============================================================ */
+.badge {
+  @apply text-xs font-bold px-2.5 py-0.5 rounded-full inline-flex items-center;
+}
+
+.badge-success {
+  @apply bg-blue-100 text-blue-500;
+}
+
+.badge-warning {
+  @apply bg-orange-100 text-orange-500;
+}
+
+.badge-error {
+  @apply bg-orange-100 text-orange-600;
+}
+
+.badge-info {
+  @apply bg-blue-100 text-blue-500;
+}
+
+/* ============================================================
+   Navigation
+   ============================================================ */
+.nav-link {
+  @apply hover:text-navy-800 transition-all duration-200;
+}
+
+.nav-link-active {
+  @apply text-navy-800;
+}
+
+/* ============================================================
+   Tables
+   ============================================================ */
+.table-container {
+  @apply overflow-x-auto rounded-xl border border-line-200/50;
+}
+
+.table {
+  @apply w-full text-sm;
+}
+
+.table th {
+  @apply px-4 py-3 text-left font-bold text-white bg-navy-800 border-b border-line-200;
+}
+
+.table td {
+  @apply px-4 py-3 border-b border-line-200;
+}
+
+.table tr:hover td {
+  @apply bg-steel-50;
+}
+
+/* ============================================================
+   Stats Cards
+   ============================================================ */
+.stat-card {
+  @apply bg-white rounded-xl p-5 border border-line-200/50 shadow-card;
+}
+
+.stat-value {
+  @apply text-2xl md:text-3xl font-bold text-navy-800;
+}
+
+.stat-label {
+  @apply text-sm text-graphite-600 mt-1;
+}
+
+/* ============================================================
+   Section Headers
+   ============================================================ */
+.section-header {
+  @apply bg-navy-800 text-white py-6 md:py-8;
+}
+
+/* ============================================================
+   Status Indicators
+   ============================================================ */
+.status-dot {
+  @apply w-2.5 h-2.5 rounded-full inline-block;
+}
+
+.status-available {
+  @apply bg-blue-500;
+}
+
+.status-busy {
+  @apply bg-orange-500;
+}
+
+.status-closed {
+  @apply bg-orange-600;
+}
+
+/* ============================================================
+   Utilities
+   ============================================================ */
+.line-clamp-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 
 /* ============================================================
    Administration - Modal + UI additions
-   (complements Tailwind output + existing app.js modal system)
    ============================================================ */
 
-/* Modal Backdrop (shared with app.js expectations) */
+/* Modal Backdrop */
 .al-modal {
   position: fixed;
   inset: 0;
@@ -291,7 +298,7 @@
   max-width: 24rem;
   background: #ffffff;
   border-radius: 0.75rem;
-  border: 1px solid rgb(250 224 216 / 0.5);
+  border: 1px solid #D7DCE1;
   box-shadow: 0 20px 60px -12px rgba(0, 0, 0, 0.25);
   display: flex;
   flex-direction: column;
@@ -305,14 +312,14 @@
   align-items: center;
   justify-content: space-between;
   padding: 1rem 1.25rem;
-  border-bottom: 1px solid rgb(250 224 216 / 0.5);
+  border-bottom: 1px solid #D7DCE1;
   flex-shrink: 0;
 }
 
 .al-modal-title {
   font-size: 1.125rem;
   font-weight: 700;
-  color: rgb(118 32 17 / 1);
+  color: #0B2540;
   margin: 0;
 }
 
@@ -322,12 +329,12 @@
   cursor: pointer;
   padding: 0.25rem;
   border-radius: 0.375rem;
-  color: rgb(181 112 45 / 1);
+  color: #FF6A2B;
   transition: background-color 150ms ease;
 }
 
 .al-modal-close:hover {
-  background-color: rgb(250 224 216 / 1);
+  background-color: #F3F5F7;
 }
 
 .al-modal-body {
@@ -336,30 +343,29 @@
   flex: 1 1 auto;
 }
 
+.al-modal-body .form-input {
+  border-color: #D7DCE1;
+}
+
+.al-modal-body .form-input:focus {
+  border-color: #1C6DD0;
+  box-shadow: 0 0 0 2px rgba(28, 109, 208, 0.25);
+}
+
+.al-modal-body .form-error {
+  color: #E8591C;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
 .al-modal-footer {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 0.75rem;
   padding: 1rem 1.25rem;
-  border-top: 1px solid rgb(250 224 216 / 0.5);
+  border-top: 1px solid #D7DCE1;
   flex-shrink: 0;
-}
-
-/* Form inside modals */
-.al-modal-body .form-input {
-  border-color: rgb(244 187 164 / 1);
-}
-
-.al-modal-body .form-input:focus {
-  border-color: rgb(205 129 53 / 1);
-  box-shadow: 0 0 0 2px rgb(205 129 53 / 0.25);
-}
-
-.al-modal-body .form-error {
-  color: rgb(220 38 38 / 1);
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
 }
 
 /* Spinner for modal submit buttons */
@@ -367,7 +373,7 @@
   display: inline-block;
   width: 1rem;
   height: 1rem;
-  border: 2px solid rgb(255 255 255 / 0.4);
+  border: 2px solid rgba(255, 255, 255, 0.4);
   border-top-color: #ffffff;
   border-radius: 50%;
   animation: al-spin 0.6s linear infinite;
@@ -388,9 +394,9 @@
 
 /* Confirmation prompt styling consistency */
 .admin-confirm-banner {
-  background-color: rgb(254 243 199 / 1);
-  border: 1px solid rgb(245 158 11 / 1);
-  color: rgb(180 83 9 / 1);
+  background-color: #F3F5F7;
+  border: 1px solid #FF6A2B;
+  color: #E8591C;
   padding: 0.625rem 1rem;
   border-radius: 0.5rem;
   font-size: 0.875rem;

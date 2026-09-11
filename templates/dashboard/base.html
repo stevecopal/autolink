@@ -4,76 +4,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0B2540">
     <title>{% block title %}{% trans "AutoLink" %}{% endblock %}</title>
     <meta name="description" content="{% block description %}{% trans "Plateforme AutoLink - Réparation automobile" %}{% endblock %}">
     <link rel="stylesheet" href="{% static 'css/output.css' %}">
     <meta name="csrf-token" content="{{ csrf_token }}">
+    <style>
+        select.form-input, select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><path fill='%234B545D' d='M8 3l1.5 1.5-1.5 1.5-1.5 1.5 1.5 1.5-1.5 3' transform='translate(8,6)'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 0.8rem center;
+            background-size: 1em;
+            padding-right: 2.25rem;
+        }
+        input[type="checkbox"], input[type="radio"] { accent-color: #1C6DD0; }
+        input[type="date"] { min-height: 2.75rem; }
+    </style>
     {% block extra_css %}{% endblock %}
 </head>
-<body class="bg-auto-cream h-screen flex flex-col md:flex-row">
+<body class="bg-steel-50 text-graphite-900 font-body antialiased min-h-screen overflow-x-hidden">
 
-    <!-- ===== OVERLAY POUR MOBILE (cache le contenu quand sidebar est ouverte) ===== -->
+    <!-- ===== OVERLAY MOBILE ===== -->
     <div id="admin-drawer-overlay"
-         class="fixed inset-0 bg-black/60 z-40 hidden md:hidden transition-opacity duration-300"
+         class="fixed inset-0 bg-navy-900/50 backdrop-blur-sm z-40 hidden lg:hidden transition-opacity duration-300"
          onclick="window.CloseAdminDrawer()"></div>
 
-    <!-- ===== SIDEBAR (Mobile: Drawer / Desktop: Fixée) ===== -->
+    <!-- ===== SIDEBAR ===== -->
     <aside id="admin-sidebar"
-           class="fixed md:relative z-50 h-screen w-64 bg-white border-r border-auto-100 shadow-sm
+           class="fixed inset-y-0 left-0 z-50 w-64 bg-navy-900
                   flex flex-col
                   transition-transform duration-300 ease-in-out
-                  md:translate-x-0 -translate-x-full">
+                  -translate-x-full lg:translate-x-0
+                  shadow-elevated">
 
-        <!-- Header de la Sidebar (Logo + Bouton Fermer) -->
-        <div class="flex items-center justify-between p-4 border-b border-auto-100">
-            <a href="{% url 'core:home' %}" class="flex items-center gap-2">
-                <svg class="w-6 h-6 text-auto-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.42 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.42 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.42 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.42z"/>
-                </svg>
-                <span class="font-bold text-auto-dark text-lg">AutoLink</span>
+        <!-- Header logo -->
+        <div class="flex items-center justify-between h-16 px-4 border-b border-white/10 flex-shrink-0">
+            <a href="{% url 'core:home' %}" class="flex items-center gap-2" aria-label="AutoLink">
+                <span class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center shadow-[0_4px_14px_rgba(28,109,208,0.4)]">
+                    <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/></svg>
+                </span>
+                <span class="font-display font-bold text-white text-lg tracking-tight">Auto<span class="text-orange-500">Link</span></span>
             </a>
-            <button onclick="window.CloseAdminDrawer()"
-                    class="md:hidden p-1.5 rounded-lg hover:bg-auto-light text-auto-600 transition">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
+            <button onclick="window.CloseAdminDrawer()" class="lg:hidden p-1.5 rounded-lg hover:bg-white/10 text-white/70 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
 
-        <!-- Contenu Scrollable -->
-        <div class="flex-1 overflow-y-auto p-3 space-y-1 scrollbar-thin">
+        <!-- Navigation -->
+        <div class="flex-1 overflow-y-auto px-3 py-4 space-y-1">
             {% include "dashboard/includes/sidebar.html" %}
+        </div>
+
+        <!-- Footer sidebar -->
+        <div class="flex-shrink-0 p-3 border-t border-white/10">
+            {% if user.is_authenticated %}
+            <div class="flex items-center gap-3 rounded-xl bg-white/5 p-3">
+                <span class="w-9 h-9 shrink-0 rounded-full bg-blue-500/20 flex items-center justify-center text-sm font-bold text-blue-400">{{ user.display_name|first|upper }}</span>
+                <div class="min-w-0 flex-1">
+                    <div class="text-sm font-bold text-white truncate">{{ user.display_name }}</div>
+                    <div class="text-[11px] text-white/50 font-mono uppercase tracking-wide truncate">{{ user.role|default:"compte" }}</div>
+                </div>
+            </div>
+            {% endif %}
         </div>
     </aside>
 
     <!-- ===== CONTENU PRINCIPAL ===== -->
-    <div class="flex-1 flex flex-col min-h-0">
-        <!-- Header (Mobile: Bouton Hamburger / Desktop: Caché) -->
-        <header class="sticky top-0 z-30 bg-white border-b border-auto-100 px-4 py-3 flex items-center gap-3 md:hidden">
-            <button id="sidebar-toggle-btn"
-                    onclick="window.OpenAdminDrawer()"
-                    class="p-2 rounded-xl bg-auto-500 text-white hover:bg-auto-600 shadow-card transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                </svg>
-            </button>
-            <div class="flex-1 min-w-0">
-                {% block dashboard_header %}{% endblock %}
+    <div class="lg:pl-64 min-w-0 flex flex-col min-h-screen">
+
+        <!-- ===== TOPBAR ===== -->
+        <header class="sticky top-0 z-30 bg-white/85 backdrop-blur border-b border-line-200 flex-shrink-0">
+            <div class="flex items-center gap-1.5 md:gap-3 px-3 sm:px-4 md:px-6 lg:px-8 h-16">
+                <button id="sidebar-toggle-btn" onclick="window.OpenAdminDrawer()"
+                        class="lg:hidden p-2 -ml-1 rounded-lg text-navy-900 hover:bg-steel-50 transition" aria-label="{% trans 'Ouvrir le menu' %}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+
+                <button onclick="window.history.length > 1 ? window.history.back() : location.href='{% url 'core:home' %}'"
+                        class="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-bold text-graphite-600 hover:bg-steel-50 hover:text-navy-900 transition"
+                        aria-label="{% trans 'Retour' %}">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                    <span class="hidden md:inline">{% trans "Retour" %}</span>
+                </button>
+
+                <div class="min-w-0 flex-1">
+                    <h1 class="font-display font-bold text-navy-900 text-sm sm:text-base lg:text-lg truncate">{% block dashboard_header %}{% trans "Tableau de bord" %}{% endblock %}</h1>
+                    <div class="hidden md:block text-xs text-graphite-500 truncate">{% block dashboard_breadcrumb %}{% endblock %}</div>
+                </div>
+
+                <a href="{% url 'accounts:notifications' %}" class="relative p-2 rounded-lg text-graphite-600 hover:bg-steel-50 transition" aria-label="{% trans 'Notifications' %}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
+                    <span id="notif-badge" class="hidden absolute -top-0.5 -right-0.5 min-w-4 h-4 px-1 rounded-full bg-orange-500 text-white text-[10px] font-bold flex items-center justify-center"></span>
+                </a>
+
+                {% if user.is_authenticated %}
+                <details class="relative" id="profile-menu">
+                    <summary class="list-none flex items-center gap-2 pl-2 pr-1 py-1.5 rounded-lg hover:bg-steel-50 transition cursor-pointer" aria-label="{% trans 'Menu du compte' %}">
+                        <span class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-sm font-bold text-white">{{ user.display_name|first|upper }}</span>
+                        <svg class="hidden sm:block w-4 h-4 text-graphite-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </summary>
+                    <div class="absolute right-0 mt-2 w-56 bg-white rounded-xl border border-line-200 shadow-elevated py-1.5 z-50">
+                        <div class="px-4 py-2 border-b border-line-200 mb-1">
+                            <div class="text-sm font-bold text-navy-900 truncate">{{ user.display_name }}</div>
+                            <div class="text-xs text-graphite-500 truncate">{{ user.email|default:'' }}</div>
+                        </div>
+                        <a href="{% url 'accounts:profile' %}" class="flex items-center gap-2 px-4 py-2 text-sm text-graphite-600 hover:bg-steel-50 hover:text-navy-900">{% trans "Mon profil" %}</a>
+                        <a href="{% url 'core:home' %}" class="flex items-center gap-2 px-4 py-2 text-sm text-graphite-600 hover:bg-steel-50 hover:text-navy-900">{% trans "Voir le site" %}</a>
+                        <form method="post" action="{% url 'accounts:logout' %}" class="border-t border-line-200 mt-1">
+                            {% csrf_token %}
+                            <button type="submit" class="w-full text-left flex items-center gap-2 px-4 py-2 text-sm font-bold text-orange-600 hover:bg-orange-500/10">{% trans "Déconnexion" %}</button>
+                        </form>
+                    </div>
+                </details>
+                {% endif %}
             </div>
         </header>
 
-        <!-- Main Content -->
-        <main class="flex-1 overflow-y-auto p-4 md:p-6">
+        <!-- ===== MAIN CONTENT ===== -->
+        <main class="flex-1 p-4 sm:p-5 md:p-6 lg:p-8">
             <div class="max-w-7xl mx-auto w-full">
                 {% block content %}{% endblock %}
             </div>
         </main>
-
-        
     </div>
 
-    <!-- ===== MODALS ET SCRIPTS ===== -->
     {% include "dashboard/includes/messages.html" %}
 
     <div id="modal-delete-confirm" class="al-modal hidden">
@@ -83,28 +138,22 @@
                 <div class="al-modal-header">
                     <h2 class="al-modal-title" id="delete-confirm-title">{% trans "Confirmer la suppression" %}</h2>
                     <button type="button" class="al-modal-close" data-modal-close>
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                        </svg>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
                     </button>
                 </div>
                 <div class="al-modal-body">
                     <div class="flex items-start gap-3">
-                        <div class="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 flex items-center justify-center" id="delete-confirm-icon">
-                            <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                            </svg>
+                        <div class="flex-shrink-0 w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center" id="delete-confirm-icon">
+                            <svg class="w-5 h-5 text-orange-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
                         </div>
                         <div>
-                            <p class="text-sm text-auto-dark" id="delete-confirm-message"></p>
+                            <p class="text-sm text-navy-900" id="delete-confirm-message"></p>
                         </div>
                     </div>
                 </div>
                 <div class="al-modal-footer">
-                    <button type="button" class="btn-outline text-sm" data-modal-close>{% trans "Annuler" %}</button>
-                    <button type="button" id="delete-confirm-btn" class="bg-red-600 hover:bg-red-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors">
-                        {% trans "Supprimer" %}
-                    </button>
+                    <button type="button" class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 text-sm" data-modal-close>{% trans "Annuler" %}</button>
+                    <button type="button" id="delete-confirm-btn" class="btn bg-orange-600 hover:bg-orange-700 text-white text-sm">{% trans "Supprimer" %}</button>
                 </div>
             </div>
         </div>
@@ -114,7 +163,6 @@
     <script src="{% static 'js/admin.js' %}" defer></script>
     {% block extra_js %}{% endblock %}
 
-    <!-- ===== SCRIPT POUR LA SIDEBAR ===== -->
     <script>
         window.OpenAdminDrawer = function() {
             const drawer = document.getElementById('admin-sidebar');
@@ -125,7 +173,6 @@
                 document.body.style.overflow = 'hidden';
             }
         };
-
         window.CloseAdminDrawer = function() {
             const drawer = document.getElementById('admin-sidebar');
             const overlay = document.getElementById('admin-drawer-overlay');
@@ -135,20 +182,16 @@
                 document.body.style.overflow = '';
             }
         };
-
-        // Fermer la sidebar si on clique sur l'overlay
         document.addEventListener('DOMContentLoaded', function() {
             const overlay = document.getElementById('admin-drawer-overlay');
-            if (overlay) {
-                overlay.addEventListener('click', window.CloseAdminDrawer);
-            }
+            if (overlay) overlay.addEventListener('click', window.CloseAdminDrawer);
+            const menu = document.getElementById('profile-menu');
+            document.addEventListener('click', function(e) {
+                if (menu && !menu.contains(e.target)) menu.removeAttribute('open');
+            });
         });
-
-        // Fermer avec la touche Escape
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                window.CloseAdminDrawer();
-            }
+            if (e.key === 'Escape') window.CloseAdminDrawer();
         });
     </script>
 </body>

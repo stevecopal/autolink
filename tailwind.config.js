@@ -4,66 +4,35 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        mono: ['"Space Mono"', "monospace"],
-        "space-mono": ['"Space Mono"', "monospace"],
+        display: ['"Space Grotesk"', "sans-serif"],
+        body: ['"IBM Plex Sans"', "sans-serif"],
+        mono: ['"IBM Plex Mono"', "monospace"],
       },
       colors: {
-        autolink: {
-          light: "#EBEBEB",
-          gold: "#E2A95C",
-          orange: "#CD8135",
-          coral: "#D45437",
-          "deep-red": "#762011",
+        // Couleurs utilisées dans ton HTML
+        navy: {
+          900: "#0B2540",
+          800: "#0F3460",
+          700: "#15417A",
         },
-        auto: {
-          50: "#FDF2EE",
-          100: "#FAE0D8",
-          200: "#F4BBA4",
-          300: "#ED956F",
-          400: "#D96A3E",
-          500: "#CD8135",
-          600: "#B5702D",
-          700: "#9A5A24",
-          800: "#762011",
-          900: "#4A1008",
-          dark: "#762011",
-          gray: "#3D1810",
-          orange: "#CD8135",
-          "orange-dark": "#B5702D",
-          "orange-light": "#F5D9B5",
-          light: "#EBEBEB",
-          gold: "#E2A95C",
-          coral: "#D45437",
-          "deep-red": "#1C1C1C",
-          cream: "#CCCCCC",
+        blue: {
+          500: "#1C6DD0",
+          100: "#E7F0FB",
         },
-        success: {
-          50: "#ECFDF5",
-          100: "#D1FAE5",
-          500: "#10B981",
-          600: "#059669",
-          700: "#047857",
+        orange: {
+          500: "#FF6A2B",
+          600: "#E8591C",
         },
-        warning: {
-          50: "#FFFBEB",
-          100: "#FEF3C7",
-          500: "#F59E0B",
-          600: "#D97706",
-          700: "#B45309",
+        steel: {
+          50: "#F3F5F7",
         },
-        error: {
-          50: "#FEF2F2",
-          100: "#FEE2E2",
-          500: "#EF4444",
-          600: "#DC2626",
-          700: "#B91C1C",
+        graphite: {
+          900: "#14181C",
+          600: "#4B545D",
+          500: "#6B7480",
         },
-        info: {
-          50: "#EFF6FF",
-          100: "#DBEAFE",
-          500: "#3B82F6",
-          600: "#2563EB",
-          700: "#1D4ED8",
+        line: {
+          200: "#D7DCE1",
         },
       },
       borderRadius: {

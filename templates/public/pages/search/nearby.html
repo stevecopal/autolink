@@ -11,11 +11,11 @@
       crossorigin="" />
 <style>
     #nearby-map { min-height: 400px; height: 100%; }
-    .leaflet-popup-content-wrapper { border-radius: 12px; font-family: 'Space Mono', monospace; }
+    .leaflet-popup-content-wrapper { border-radius: 12px; font-family: 'IBM Plex Mono', monospace; }
     .leaflet-popup-content { margin: 12px 16px; }
     .garage-result-card { transition: all 0.2s ease; }
     .garage-result-card:hover { transform: translateX(4px); }
-    .garage-result-card.active { border-color: #CD8135; background: #FDF2EE; }
+    .garage-result-card.active { border-color: #1C6DD0; background: #E7F0FB; }
     .search-pulse { animation: searchPulse 1.5s ease-in-out infinite; }
     @keyframes searchPulse {
         0%, 100% { transform: scale(1); opacity: 1; }
@@ -26,33 +26,35 @@
 {% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-    {# Header #}
-    <div class="mb-6 sm:mb-8">
-        <nav class="flex items-center gap-2 text-sm text-auto-600 mb-4" aria-label="{% trans 'Fil d\'ariane' %}">
-            <a href="{% url 'core:home' %}" class="hover:text-auto-orange transition">{% trans "Accueil" %}</a>
-            <span aria-hidden="true">/</span>
-            <span class="text-auto-dark font-bold">{% trans "Mécaniciens à proximité" %}</span>
-        </nav>
-        <h1 class="text-2xl sm:text-3xl font-bold text-auto-dark mb-2">
-            {% trans "Trouver un garage à proximité" %}
-        </h1>
-        <p class="text-auto-600 text-sm sm:text-base">
-            {% trans "Localisez les garages vérifiés et disponibles autour de vous" %}
-        </p>
-        <p class="text-auto-400 text-xs mt-1">
-            {% trans "Le GPS de votre appareil sera utilisé pour vous localiser précisément" %}
-        </p>
+{# ============ PAGE HEADER ============ #}
+<div class="relative bg-navy-900 overflow-hidden">
+    <div class="absolute top-0 right-0 w-1/2 h-full opacity-[0.08]" aria-hidden="true">
+        <div class="absolute inset-0 bg-gradient-to-l from-blue-500/30 to-transparent"></div>
     </div>
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+        <nav class="flex flex-wrap items-center gap-2 text-sm text-white/50 mb-6" aria-label="{% trans 'Fil d\'ariane' %}">
+            <a href="{% url 'core:home' %}" class="hover:text-white transition">{% trans "Accueil" %}</a>
+            <span aria-hidden="true" class="text-white/30">/</span>
+            <span class="text-white font-bold">{% trans "Mécaniciens à proximité" %}</span>
+        </nav>
+        <span class="inline-flex items-center gap-2 text-xs font-mono font-medium tracking-widest uppercase text-orange-500 mb-3">
+            <span class="w-8 h-px bg-orange-500" aria-hidden="true"></span>
+            {% trans "Géolocalisation" %}
+        </span>
+        <h1 class="font-display text-4xl sm:text-5xl font-bold text-white tracking-tight mb-3">{% trans "Trouver un garage à proximité" %}</h1>
+        <p class="text-white/60 text-sm sm:text-base max-w-2xl">{% trans "Localisez les garages vérifiés et disponibles autour de vous" %}</p>
+        <p class="text-white/40 text-xs mt-2 font-mono">{% trans "Le GPS de votre appareil sera utilisé pour vous localiser précisément" %}</p>
+    </div>
+</div>
 
+<div class="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-12">
     {# Search Controls #}
-    <div class="bg-white rounded-2xl shadow-card border border-auto-100/50 p-4 sm:p-6 mb-6" id="search-controls">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            {# GPS Button #}
+    <div class="bg-white rounded-2xl border border-line-200 shadow-card p-4 sm:p-6 mb-6" id="search-controls">
+        <div class="flex flex-col lg:flex-row items-start lg:items-center gap-4">
             <button
                 type="button"
                 id="find-nearby-btn"
-                class="btn-primary w-full sm:w-auto"
+                class="btn bg-blue-500 hover:bg-blue-500/90 text-white w-full lg:w-auto"
                 aria-label="{% trans 'Rechercher les mécaniciens près de ma position' %}"
             >
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -62,21 +64,19 @@
                 <span id="find-nearby-btn-text">{% trans "Trouver un mécanicien" %}</span>
             </button>
 
-            {# Radius selector #}
-            <div class="flex items-center gap-3 flex-1">
-                <label for="radius-select" class="text-sm font-bold text-auto-dark whitespace-nowrap">
-                    {% trans "Rayon" %} :
-                </label>
-                <select id="radius-select" class="form-input !w-auto !py-2 text-sm" aria-label="{% trans 'Rayon de recherche' %}">
-                    <option value="1">{% trans "1 km" %}</option>
-                    <option value="2">{% trans "2 km" %}</option>
-                    <option value="5" selected>{% trans "5 km" %}</option>
-                    <option value="10">{% trans "10 km" %}</option>
-                    <option value="20">{% trans "20 km" %}</option>
-                </select>
-
-                <label for="available-filter" class="flex items-center gap-2 text-sm text-auto-dark cursor-pointer whitespace-nowrap">
-                    <input type="checkbox" id="available-filter" class="w-4 h-4 rounded border-auto-300 text-auto-orange focus:ring-auto-orange">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-3 lg:flex-1">
+                <div class="flex items-center gap-3 flex-1">
+                    <label for="radius-select" class="text-sm font-bold text-navy-900 whitespace-nowrap">{% trans "Rayon" %} :</label>
+                    <select id="radius-select" class="form-input !w-auto !py-2 text-sm" aria-label="{% trans 'Rayon de recherche' %}">
+                        <option value="1">{% trans "1 km" %}</option>
+                        <option value="2">{% trans "2 km" %}</option>
+                        <option value="5" selected>{% trans "5 km" %}</option>
+                        <option value="10">{% trans "10 km" %}</option>
+                        <option value="20">{% trans "20 km" %}</option>
+                    </select>
+                </div>
+                <label for="available-filter" class="flex items-center gap-2 text-sm text-navy-900 cursor-pointer whitespace-nowrap">
+                    <input type="checkbox" id="available-filter" class="w-4 h-4 rounded border-line-200 text-blue-500 focus:ring-blue-500 accent-blue-500">
                     <span>{% trans "Disponibles" %}</span>
                 </label>
             </div>
@@ -88,13 +88,11 @@
 
     {# Main Content: Map + List #}
     <div class="grid grid-cols-1 lg:grid-cols-5 gap-6" id="results-container" style="display: none;">
-        {# Results List (2 cols) #}
+        {# Results List #}
         <div class="lg:col-span-2 order-2 lg:order-1">
             <div class="flex items-center justify-between mb-4">
-                <h2 class="text-lg font-bold text-auto-dark" id="results-count">
-                    {% trans "Résultats" %}
-                </h2>
-                <span class="badge-info text-sm" id="results-badge" style="display: none;"></span>
+                <h2 class="font-display text-lg font-bold text-navy-900" id="results-count">{% trans "Résultats" %}</h2>
+                <span class="badge bg-blue-100 text-blue-500 text-sm" id="results-badge" style="display: none;"></span>
             </div>
 
             <div id="results-list" class="space-y-3 max-h-[600px] overflow-y-auto pr-2" role="list" aria-label="{% trans 'Liste des garages à proximité' %}">
@@ -103,33 +101,29 @@
 
             {# Empty state #}
             <div id="empty-state" class="hidden text-center py-12">
-                <div class="text-5xl mb-4">🔍</div>
-                <h3 class="text-xl font-bold text-auto-dark mb-2">
-                    {% trans "Aucun mécanicien trouvé" %}
-                </h3>
-                <p class="text-auto-600 mb-4 text-sm">
-                    {% trans "Aucun garage vérifié n'a été trouvé dans cette zone." %}
-                </p>
-                <p class="text-auto-400 text-xs">
-                    {% trans "Essayez d'élargir le rayon de recherche." %}
-                </p>
+                <div class="w-16 h-16 mx-auto mb-5 rounded-2xl bg-steel-50 flex items-center justify-center">
+                    <svg class="w-8 h-8 text-graphite-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </div>
+                <h3 class="font-display text-xl font-bold text-navy-900 mb-2">{% trans "Aucun mécanicien trouvé" %}</h3>
+                <p class="text-graphite-600 mb-2 text-sm">{% trans "Aucun garage vérifié n'a été trouvé dans cette zone." %}</p>
+                <p class="text-graphite-500 text-xs">{% trans "Essayez d'élargir le rayon de recherche." %}</p>
             </div>
         </div>
 
-        {# Map (3 cols) #}
+        {# Map #}
         <div class="lg:col-span-3 order-1 lg:order-2">
-            <div id="nearby-map" class="rounded-2xl shadow-card border border-auto-100/50 overflow-hidden" role="application" aria-label="{% trans 'Carte des garages à proximité' %}"></div>
+            <div id="nearby-map" class="rounded-2xl border border-line-200 overflow-hidden shadow-card" role="application" aria-label="{% trans 'Carte des garages à proximité' %}"></div>
         </div>
     </div>
 
     {# Error States #}
-    <div id="error-state" class="hidden bg-white rounded-2xl shadow-card border border-auto-100/50 p-8 text-center">
-        <div class="text-5xl mb-4" id="error-icon">⚠️</div>
-        <h3 class="text-xl font-bold text-auto-dark mb-2" id="error-title">
-            {% trans "Erreur de localisation" %}
-        </h3>
-        <p class="text-auto-600 mb-6 text-sm" id="error-message"></p>
-        <button type="button" id="retry-btn" class="btn-primary" style="display: none;">
+    <div id="error-state" class="hidden bg-white rounded-2xl border border-line-200 shadow-card p-8 text-center">
+        <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-orange-500/10 flex items-center justify-center">
+            <svg class="w-8 h-8 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+        </div>
+        <h3 class="font-display text-xl font-bold text-navy-900 mb-2" id="error-title">{% trans "Erreur de localisation" %}</h3>
+        <p class="text-graphite-600 mb-6 text-sm" id="error-message"></p>
+        <button type="button" id="retry-btn" class="btn bg-blue-500 hover:bg-blue-500/90 text-white" style="display: none;">
             {% trans "Réessayer" %}
         </button>
     </div>

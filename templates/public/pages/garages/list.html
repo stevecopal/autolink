@@ -4,30 +4,37 @@
 {% block title %}{% trans "Garages" %} - AutoLink{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-    <div class="mb-6 sm:mb-8">
-        <nav class="flex items-center gap-2 text-sm text-auto-600 mb-4" aria-label="{% trans 'Fil d ariane' %}">
-            <a href="{% url 'core:home' %}" class="hover:text-auto-orange transition">{% trans "Accueil" %}</a>
-            <span aria-hidden="true">/</span>
-            <span class="text-auto-dark font-bold">{% trans "Garages" %}</span>
-        </nav>
-        <h1 class="text-2xl sm:text-3xl font-bold text-auto-dark mb-2">{% trans "Trouver un garage" %}</h1>
-        <p class="text-auto-600 text-sm sm:text-base">
-            {% trans "Parcourez les garages automobiles disponibles sur AutoLink" %}
-        </p>
+{# ============ PAGE HEADER ============ #}
+<div class="relative bg-navy-900 overflow-hidden">
+    <div class="absolute top-0 right-0 w-1/2 h-full opacity-[0.08]" aria-hidden="true">
+        <div class="absolute inset-0 bg-gradient-to-l from-blue-500/30 to-transparent"></div>
     </div>
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+        <nav class="flex flex-wrap items-center gap-2 text-sm text-white/50 mb-6" aria-label="{% trans 'Fil d\'ariane' %}">
+            <a href="{% url 'core:home' %}" class="hover:text-white transition">{% trans "Accueil" %}</a>
+            <span aria-hidden="true" class="text-white/30">/</span>
+            <span class="text-white font-bold">{% trans "Garages" %}</span>
+        </nav>
+        <span class="inline-flex items-center gap-2 text-xs font-mono font-medium tracking-widest uppercase text-orange-500 mb-3">
+            <span class="w-8 h-px bg-orange-500" aria-hidden="true"></span>
+            {% trans "Nos partenaires" %}
+        </span>
+        <h1 class="font-display text-4xl sm:text-5xl font-bold text-white tracking-tight mb-3">{% trans "Trouver un garage" %}</h1>
+        <p class="text-white/60 text-sm sm:text-base max-w-2xl">{% trans "Parcourez les garages automobiles disponibles sur AutoLink" %}</p>
+    </div>
+</div>
 
-    <div class="bg-white rounded-2xl shadow-card border border-auto-100/50 p-4 sm:p-6 mb-6">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-12">
+    <!-- Filter card -->
+    <div class="bg-white rounded-2xl border border-line-200 shadow-card p-4 sm:p-6 mb-8">
         <form method="get" class="space-y-4" role="search" aria-label="{% trans 'Recherche de garages' %}">
             <div class="relative">
                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none" aria-hidden="true">
-                    <svg class="w-5 h-5 text-auto-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                    </svg>
+                    <svg class="w-5 h-5 text-graphite-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                 </div>
                 <input type="text" name="q" value="{{ search_query }}"
                        placeholder="{% trans 'Rechercher un garage, service, quartier...' %}"
-                       class="w-full pl-11 pr-4 py-3 border border-auto-200 rounded-xl focus:ring-2 focus:ring-auto-orange focus:border-auto-orange outline-none transition-all duration-200 font-mono bg-auto-50/50 text-sm"
+                       class="w-full pl-11 pr-4 py-3 border border-line-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-200 font-mono bg-steel-50/50 text-sm"
                        aria-label="{% trans 'Rechercher un garage' %}">
             </div>
 
@@ -53,21 +60,18 @@
                 <select name="sort" class="form-input !py-2.5 text-sm min-w-0" aria-label="{% trans 'Trier par' %}">
                     <option value="-created_at" {% if sort == '-created_at' %}selected{% endif %}>{% trans "Plus récent" %}</option>
                     <option value="name" {% if sort == 'name' %}selected{% endif %}>{% trans "Nom" %}</option>
+                    <option value="-rating" {% if sort == '-rating' %}selected{% endif %}>{% trans "Mieux notés" %}</option>
                 </select>
-                <button type="submit" class="btn-primary !py-2.5 text-sm whitespace-nowrap">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                    </svg>
+                <button type="submit" class="btn bg-blue-500 hover:bg-blue-500/90 text-white !py-2.5 text-sm whitespace-nowrap">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                     {% trans "Rechercher" %}
                 </button>
             </div>
         </form>
     </div>
 
-    <div class="flex items-center justify-between mb-4">
-        <h2 class="text-lg font-bold text-auto-dark">
-            {{ garages.paginator.count }} {% trans "garage(s) trouvé(s)" %}
-        </h2>
+    <div class="flex items-center justify-between mb-5">
+        <h2 class="font-display text-lg font-bold text-navy-900">{{ garages.paginator.count }} {% trans "garage(s) trouvé(s)" %}</h2>
     </div>
 
     {% if garages %}
@@ -75,92 +79,89 @@
         {% for garage in garages %}
         <article class="card group" role="listitem">
             <a href="{% url 'garages:garage_detail' slug=garage.slug %}" class="block">
-                <div class="relative aspect-video overflow-hidden rounded-t-xl bg-auto-100">
+                <div class="relative aspect-video overflow-hidden rounded-t-xl bg-steel-50">
                     {% if garage.photo %}
                     <img src="{{ garage.photo.url }}" alt="{{ garage.name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy">
-                    {% elif garage.photo %}
-                    <img src="{{ garage.photo.url }}" alt="{{ garage.name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy">
                     {% else %}
-                    <div class="w-full h-full flex items-center justify-center text-4xl text-auto-300">🔧</div>
+                    <div class="w-full h-full flex items-center justify-center">
+                        <svg class="w-10 h-10 text-graphite-500/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                    </div>
                     {% endif %}
                     <div class="absolute top-2 left-2 flex gap-1">
                         {% if garage.verification_status == 'APPROVED' %}
-                        <span class="badge-success text-[10px] px-2 py-1">{% trans "Vérifié" %}</span>
+                        <span class="badge bg-blue-100 text-blue-500 !px-2 !py-1">{% trans "Vérifié" %}</span>
                         {% endif %}
                         {% if garage.is_featured %}
-                        <span class="badge-warning text-[10px] px-2 py-1">{% trans "Recommandé" %}</span>
+                        <span class="badge bg-orange-500 text-white !px-2 !py-1">{% trans "Recommandé" %}</span>
                         {% endif %}
                     </div>
                     <div class="absolute bottom-2 left-2">
                         {% if garage.availability_status == 'AVAILABLE' %}
-                        <span class="badge-success text-[10px] px-2 py-1">{% trans "Disponible" %}</span>
+                        <span class="badge bg-emerald-600 text-white !px-2 !py-1">{% trans "Disponible" %}</span>
                         {% else %}
-                        <span class="badge-neutral text-[10px] px-2 py-1">{% trans "Fermé" %}</span>
+                        <span class="badge bg-graphite-900/70 text-white !px-2 !py-1">{% trans "Fermé" %}</span>
                         {% endif %}
                     </div>
                     {% if garage.is_open_now %}
                     <div class="absolute bottom-2 right-2">
-                        <span class="badge-success text-[10px] px-2 py-1">{% trans "Ouvert" %}</span>
+                        <span class="badge bg-white text-emerald-700 border border-line-200 !px-2 !py-1">{% trans "Ouvert" %}</span>
                     </div>
                     {% endif %}
                 </div>
             </a>
             <div class="p-3 sm:p-4">
                 <a href="{% url 'garages:garage_detail' slug=garage.slug %}" class="block">
-                    <h3 class="font-bold text-auto-dark text-sm truncate group-hover:text-auto-orange transition-colors">{{ garage.name }}</h3>
+                    <h3 class="font-bold text-graphite-900 text-sm truncate group-hover:text-blue-500 transition-colors">{{ garage.name }}</h3>
                 </a>
-                <p class="text-auto-500 text-xs mt-0.5 truncate flex items-center gap-1">
-                    <span>📍</span>
+                <p class="text-graphite-500 text-xs mt-0.5 truncate flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                     <span>{% if garage.neighborhood %}{{ garage.neighborhood.name }}{% elif garage.city %}{{ garage.city.name }}{% endif %}</span>
                     {% if garage.city and garage.neighborhood %}
-                    <span class="text-auto-400">·</span>
+                    <span class="text-graphite-500/60">·</span>
                     <span>{% if garage.city %}{{ garage.city.name }}{% endif %}</span>
                     {% endif %}
                 </p>
                 {% if garage.services %}
                 <div class="flex flex-wrap gap-1 mt-2">
                     {% for service in garage.services.all|slice:":3" %}
-                    <span class="badge-neutral text-[10px] px-2 py-0.5">{{ service.name }}</span>
+                    <span class="badge bg-steel-50 text-graphite-600 !px-2 !py-0.5 font-medium">{{ service.name }}</span>
                     {% endfor %}
                     {% if garage.active_services_count > 3 %}
-                    <span class="badge-info text-[10px] px-2 py-0.5">+{{ garage.active_services_count|add:"-3" }}</span>
+                    <span class="badge bg-blue-100 text-blue-500 !px-2 !py-0.5">+{{ garage.active_services_count|add:"-3" }}</span>
                     {% endif %}
                 </div>
                 {% endif %}
-                
             </div>
         </article>
         {% endfor %}
     </div>
 
     {% if garages.has_other_pages %}
-    <nav class="mt-8 flex justify-center" aria-label="{% trans 'Pagination' %}">
+    <nav class="mt-10 flex justify-center" aria-label="{% trans 'Pagination' %}">
         <div class="flex items-center gap-2">
             {% if garages.has_previous %}
             <a href="?page={{ garages.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_city %}&city={{ selected_city }}{% endif %}{% if selected_neighborhood %}&neighborhood={{ selected_neighborhood }}{% endif %}{% if selected_service %}&service={{ selected_service }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}"
-               class="btn-outline text-sm px-4 py-2" aria-label="{% trans 'Page précédente' %}">
+               class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 text-sm px-4 py-2" aria-label="{% trans 'Page précédente' %}">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                 <span class="hidden sm:inline">{% trans "Précédent" %}</span>
             </a>
             {% else %}
-            <span class="btn-outline text-sm px-4 py-2 opacity-50 cursor-not-allowed" aria-disabled="true">
+            <span class="btn bg-white border border-line-200 text-graphite-900 text-sm px-4 py-2 opacity-50 cursor-not-allowed" aria-disabled="true">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
                 <span class="hidden sm:inline">{% trans "Précédent" %}</span>
             </span>
             {% endif %}
 
-            <span class="px-4 py-2 text-sm font-medium text-auto-700">
-                {% trans "Page" %} {{ garages.number }} / {{ garages.paginator.num_pages }}
-            </span>
+            <span class="px-4 py-2 text-sm font-medium text-graphite-600 font-mono">{% trans "Page" %} {{ garages.number }} / {{ garages.paginator.num_pages }}</span>
 
             {% if garages.has_next %}
             <a href="?page={{ garages.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_city %}&city={{ selected_city }}{% endif %}{% if selected_neighborhood %}&neighborhood={{ selected_neighborhood }}{% endif %}{% if selected_service %}&service={{ selected_service }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}"
-               class="btn-outline text-sm px-4 py-2" aria-label="{% trans 'Page suivante' %}">
+               class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 text-sm px-4 py-2" aria-label="{% trans 'Page suivante' %}">
                 <span class="hidden sm:inline">{% trans "Suivant" %}</span>
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
             </a>
             {% else %}
-            <span class="btn-outline text-sm px-4 py-2 opacity-50 cursor-not-allowed" aria-disabled="true">
+            <span class="btn bg-white border border-line-200 text-graphite-900 text-sm px-4 py-2 opacity-50 cursor-not-allowed" aria-disabled="true">
                 <span class="hidden sm:inline">{% trans "Suivant" %}</span>
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
             </span>
@@ -171,10 +172,12 @@
 
     {% else %}
     <div class="text-center py-16">
-        <div class="text-5xl mb-4">🔍</div>
-        <h2 class="text-2xl font-bold text-auto-dark mb-2">{% trans "Aucun garage trouvé" %}</h2>
-        <p class="text-auto-600 mb-6 text-sm">{% trans "Essayez de modifier vos filtres ou votre recherche" %}</p>
-        <a href="{% url 'garages:garage_list' %}" class="btn-outline text-sm">{% trans "Réinitialiser les filtres" %}</a>
+        <div class="w-16 h-16 mx-auto mb-5 rounded-2xl bg-steel-50 flex items-center justify-center">
+            <svg class="w-8 h-8 text-graphite-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+        </div>
+        <h2 class="font-display text-2xl font-bold text-navy-900 mb-2">{% trans "Aucun garage trouvé" %}</h2>
+        <p class="text-graphite-600 mb-6 text-sm">{% trans "Essayez de modifier vos filtres ou votre recherche" %}</p>
+        <a href="{% url 'garages:garage_list' %}" class="btn bg-blue-500 hover:bg-blue-500/90 text-white text-sm">{% trans "Réinitialiser les filtres" %}</a>
     </div>
     {% endif %}
 </div>

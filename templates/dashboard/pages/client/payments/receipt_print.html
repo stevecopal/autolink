@@ -22,7 +22,7 @@
         .total .currency { font-size: 16px; color: #666; }
         .footer { text-align: center; padding: 20px; color: #999; font-size: 12px; border-top: 1px solid #f0f0f0; }
         .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
-        .badge-success { background: #d4edda; color: #155724; }
+        .bg-blue-100 text-blue-500 { background: #d4edda; color: #155724; }
         @media print { body { background: white; padding: 0; } .receipt { box-shadow: none; } .no-print { display: none; } }
         @media (max-width: 640px) { .body { padding: 20px; } .total { margin: 20px -20px -20px; padding: 20px; } }
     </style>
@@ -62,7 +62,7 @@
             {% endif %}
             <div class="row">
                 <span class="label">Statut</span>
-                <span class="value"><span class="badge badge-success">Paye</span></span>
+                <span class="value"><span class="badge bg-blue-100 text-blue-500">Paye</span></span>
             </div>
             <div class="total">
                 <div class="amount">{{ receipt.amount|intcomma }}</div>

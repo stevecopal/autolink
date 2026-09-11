@@ -4,16 +4,16 @@
 {% block title %}{% trans "Modifier le profil" %} - AutoLink{% endblock %}
 
 {% block dashboard_header %}
-    <h1 class="text-sm font-bold text-auto-dark">{% trans "Mon profil" %}</h1>
+    <h1 class="text-sm font-bold text-navy-900">{% trans "Mon profil" %}</h1>
 {% endblock %}
 
 {% block dashboard_breadcrumb %}
-    <nav class="flex items-center space-x-2 text-sm text-auto-600">
-        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-auto-orange transition">{% trans "Tableau de bord" %}</a>
-        <span class="text-auto-400">/</span>
-        <a href="{% url 'accounts:profile' %}" class="hover:text-auto-orange transition">{% trans "Mon profil" %}</a>
-        <span class="text-auto-400">/</span>
-        <span class="font-bold text-auto-dark">{% trans "Modifier" %}</span>
+    <nav class="flex items-center space-x-2 text-sm text-graphite-600">
+        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-orange-500 transition">{% trans "Tableau de bord" %}</a>
+        <span class="text-graphite-500">/</span>
+        <a href="{% url 'accounts:profile' %}" class="hover:text-orange-500 transition">{% trans "Mon profil" %}</a>
+        <span class="text-graphite-500">/</span>
+        <span class="font-bold text-navy-900">{% trans "Modifier" %}</span>
     </nav>
 {% endblock %}
 
@@ -21,12 +21,12 @@
 <div class="max-w-2xl mx-auto px-4 sm:px-0 py-6 space-y-6">
     <!-- Header -->
     <div class="flex items-center gap-3">
-        <a href="{% url 'accounts:profile' %}" class="p-2 rounded-lg hover:bg-auto-100 transition">
-            <svg class="w-5 h-5 text-auto-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        <a href="{% url 'accounts:profile' %}" class="p-2 rounded-lg hover:bg-line-200/30 transition">
+            <svg class="w-5 h-5 text-graphite-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
         </a>
         <div>
-            <h2 class="text-lg font-bold text-auto-dark">{% trans "Modifier mon profil" %}</h2>
-            <p class="text-sm text-auto-500">{% trans "Mettez à jour vos informations." %}</p>
+            <h2 class="text-lg font-bold text-navy-900">{% trans "Modifier mon profil" %}</h2>
+            <p class="text-sm text-graphite-500">{% trans "Mettez à jour vos informations." %}</p>
         </div>
     </div>
 
@@ -35,7 +35,7 @@
 
         <!-- Phone -->
         <div class="card p-5">
-            <label class="form-label text-sm font-bold text-auto-700 mb-2 block">
+            <label class="form-label text-sm font-bold text-graphite-600 mb-2 block">
                 {% trans "Numéro de téléphone" %}
             </label>
             {{ form.phone }}
@@ -46,7 +46,7 @@
 
         <!-- City -->
         <div class="card p-5">
-            <label class="form-label text-sm font-bold text-auto-700 mb-2 block">
+            <label class="form-label text-sm font-bold text-graphite-600 mb-2 block">
                 {% trans "Ville" %}
             </label>
             {{ form.city }}
@@ -57,7 +57,7 @@
 
         <!-- Neighborhood -->
         <div class="card p-5">
-            <label class="form-label text-sm font-bold text-auto-700 mb-2 block">
+            <label class="form-label text-sm font-bold text-graphite-600 mb-2 block">
                 {% trans "Quartier" %}
             </label>
             {{ form.neighborhood }}
@@ -69,11 +69,11 @@
         <!-- Actions -->
         <div class="flex flex-col sm:flex-row gap-3 pt-2">
             <a href="{% url 'accounts:profile' %}"
-               class="flex-1 sm:flex-none px-5 py-2.5 rounded-xl border border-auto-200 text-auto-600 font-bold text-sm text-center hover:bg-auto-50 transition">
+               class="flex-1 sm:flex-none px-5 py-2.5 rounded-xl border border-line-200 text-graphite-600 font-bold text-sm text-center hover:bg-steel-50 transition">
                 {% trans "Annuler" %}
             </a>
             <button type="submit"
-                    class="flex-1 sm:flex-none bg-auto-orange text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-auto-orange-dark transition inline-flex items-center justify-center gap-2">
+                    class="flex-1 sm:flex-none bg-orange-500 text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-orange-500-dark transition inline-flex items-center justify-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
                 {% trans "Enregistrer" %}
             </button>

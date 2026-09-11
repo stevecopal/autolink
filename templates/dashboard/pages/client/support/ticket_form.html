@@ -4,16 +4,16 @@
 {% block title %}{% trans "Signaler une panne" %} - AutoLink{% endblock %}
 
 {% block dashboard_header %}
-    <h1 class="text-sm font-bold text-auto-dark">{% trans "Support" %}</h1>
+    <h1 class="text-sm font-bold text-navy-900">{% trans "Support" %}</h1>
 {% endblock %}
 
 {% block dashboard_breadcrumb %}
-    <nav class="flex items-center space-x-2 text-sm text-auto-600">
-        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-auto-orange transition">{% trans "Tableau de bord" %}</a>
-        <span class="text-auto-400">/</span>
-        <a href="{% url 'support:ticket_list' %}" class="hover:text-auto-orange transition">{% trans "Mes tickets" %}</a>
-        <span class="text-auto-400">/</span>
-        <span class="font-bold text-auto-dark">{% trans "Signaler une panne" %}</span>
+    <nav class="flex items-center space-x-2 text-sm text-graphite-600">
+        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-orange-500 transition">{% trans "Tableau de bord" %}</a>
+        <span class="text-graphite-500">/</span>
+        <a href="{% url 'support:ticket_list' %}" class="hover:text-orange-500 transition">{% trans "Mes tickets" %}</a>
+        <span class="text-graphite-500">/</span>
+        <span class="font-bold text-navy-900">{% trans "Signaler une panne" %}</span>
     </nav>
 {% endblock %}
 
@@ -21,12 +21,12 @@
 <div class="max-w-2xl mx-auto px-4 sm:px-0 py-6 space-y-6">
     <!-- Header -->
     <div class="flex items-center gap-3">
-        <a href="{% url 'support:ticket_list' %}" class="p-2 rounded-lg hover:bg-auto-100 transition">
-            <svg class="w-5 h-5 text-auto-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        <a href="{% url 'support:ticket_list' %}" class="p-2 rounded-lg hover:bg-line-200/30 transition">
+            <svg class="w-5 h-5 text-graphite-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
         </a>
         <div>
-            <h2 class="text-lg font-bold text-auto-dark">{% trans "Signaler une panne" %}</h2>
-            <p class="text-sm text-auto-500">{% trans "Décrivez votre problème et joignez une preuve." %}</p>
+            <h2 class="text-lg font-bold text-navy-900">{% trans "Signaler une panne" %}</h2>
+            <p class="text-sm text-graphite-500">{% trans "Décrivez votre problème et joignez une preuve." %}</p>
         </div>
     </div>
 
@@ -35,7 +35,7 @@
 
         <!-- Garage Selection -->
         <div class="card p-5">
-            <label class="form-label text-sm font-bold text-auto-700 mb-2 block">
+            <label class="form-label text-sm font-bold text-graphite-600 mb-2 block">
                 {% trans "Garage concerné" %} <span class="text-red-500">*</span>
             </label>
             {{ form.garage }}
@@ -46,7 +46,7 @@
 
         <!-- Message -->
         <div class="card p-5">
-            <label class="form-label text-sm font-bold text-auto-700 mb-2 block">
+            <label class="form-label text-sm font-bold text-graphite-600 mb-2 block">
                 {% trans "Décrivez votre problème" %} <span class="text-red-500">*</span>
             </label>
             {{ form.description }}
@@ -57,14 +57,14 @@
 
         <!-- Evidence File -->
         <div class="card p-5">
-            <label class="form-label text-sm font-bold text-auto-700 mb-3 block">
-                {% trans "Pièce justificative" %} <span class="text-auto-400 font-normal">{% trans "(optionnel)" %}</span>
+            <label class="form-label text-sm font-bold text-graphite-600 mb-3 block">
+                {% trans "Pièce justificative" %} <span class="text-graphite-500 font-normal">{% trans "(optionnel)" %}</span>
             </label>
-            <label class="flex items-center gap-3 p-4 rounded-xl border-2 border-dashed border-auto-200 hover:border-auto-orange transition cursor-pointer bg-auto-50/50 active:bg-auto-100">
-                <svg class="w-8 h-8 text-auto-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+            <label class="flex items-center gap-3 p-4 rounded-xl border-2 border-dashed border-line-200 hover:border-orange-500 transition cursor-pointer bg-steel-50/50 active:bg-line-200/30">
+                <svg class="w-8 h-8 text-graphite-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
                 <div class="min-w-0 flex-1">
-                    <span class="text-sm text-auto-600 block" id="file-label">{% trans "Appuyez pour ajouter un fichier" %}</span>
-                    <span class="text-xs text-auto-400">{% trans "Images, PDF, Word — 5 Mo max" %}</span>
+                    <span class="text-sm text-graphite-600 block" id="file-label">{% trans "Appuyez pour ajouter un fichier" %}</span>
+                    <span class="text-xs text-graphite-500">{% trans "Images, PDF, Word — 5 Mo max" %}</span>
                 </div>
                 <input type="file"
                        name="evidence"
@@ -72,8 +72,8 @@
                        accept="image/*,application/pdf,.doc,.docx"
                        id="file-input">
             </label>
-            <div id="file-name" class="hidden mt-2 flex items-center gap-2 text-sm text-auto-700">
-                <svg class="w-4 h-4 text-auto-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <div id="file-name" class="hidden mt-2 flex items-center gap-2 text-sm text-graphite-600">
+                <svg class="w-4 h-4 text-graphite-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                 <span id="file-name-text"></span>
                 <button type="button" id="file-remove" class="ml-auto text-red-500 hover:text-red-700">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -87,11 +87,11 @@
         <!-- Actions -->
         <div class="flex flex-col sm:flex-row gap-3 pt-2">
             <a href="{% url 'support:ticket_list' %}"
-               class="flex-1 sm:flex-none px-5 py-2.5 rounded-xl border border-auto-200 text-auto-600 font-bold text-sm text-center hover:bg-auto-50 transition">
+               class="flex-1 sm:flex-none px-5 py-2.5 rounded-xl border border-line-200 text-graphite-600 font-bold text-sm text-center hover:bg-steel-50 transition">
                 {% trans "Annuler" %}
             </a>
             <button type="submit"
-                    class="flex-1 sm:flex-none bg-auto-orange text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-auto-orange-dark transition inline-flex items-center justify-center gap-2">
+                    class="flex-1 sm:flex-none bg-orange-500 text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-orange-500-dark transition inline-flex items-center justify-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
                 {% trans "Envoyer" %}
             </button>

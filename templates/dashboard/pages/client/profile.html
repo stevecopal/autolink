@@ -5,19 +5,19 @@
 
 {% block dashboard_header %}
     <div class="flex items-center justify-between">
-        <h1 class="text-sm font-bold text-auto-dark">{% trans "Mon profil" %}</h1>
+        <h1 class="text-sm font-bold text-navy-900">{% trans "Mon profil" %}</h1>
         <a href="{% url 'accounts:profile_edit' %}"
-           class="bg-auto-orange text-white px-3 py-1.5 rounded-lg font-bold text-xs hover:bg-auto-orange-dark transition">
+           class="bg-orange-500 text-white px-3 py-1.5 rounded-lg font-bold text-xs hover:bg-orange-500-dark transition">
             {% trans "Modifier" %}
         </a>
     </div>
 {% endblock %}
 
 {% block dashboard_breadcrumb %}
-    <nav class="flex items-center space-x-2 text-sm text-auto-600">
-        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-auto-orange transition">{% trans "Tableau de bord" %}</a>
-        <span class="text-auto-400">/</span>
-        <span class="font-bold text-auto-dark">{% trans "Mon profil" %}</span>
+    <nav class="flex items-center space-x-2 text-sm text-graphite-600">
+        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-orange-500 transition">{% trans "Tableau de bord" %}</a>
+        <span class="text-graphite-500">/</span>
+        <span class="font-bold text-navy-900">{% trans "Mon profil" %}</span>
     </nav>
 {% endblock %}
 
@@ -29,20 +29,20 @@
             <div class="flex-shrink-0">
                 {% if user.avatar %}
                 <img src="{{ user.avatar.url }}"
-                     class="w-20 h-20 rounded-2xl object-cover border-4 border-auto-orange shadow-lg">
+                     class="w-20 h-20 rounded-2xl object-cover border-4 border-orange-500 shadow-lg">
                 {% else %}
-                <div class="w-20 h-20 rounded-2xl bg-auto-orange/10 flex items-center justify-center text-4xl shadow-lg border-4 border-auto-100">
+                <div class="w-20 h-20 rounded-2xl bg-orange-500/10 flex items-center justify-center text-4xl shadow-lg border-4 border-line-200">
                     👤
                 </div>
                 {% endif %}
             </div>
             <div class="flex-1">
-                <h2 class="text-xl font-bold text-auto-dark">{{ user.display_name }}</h2>
-                <p class="text-sm text-auto-600">{{ user.email|default:"" }}</p>
+                <h2 class="text-xl font-bold text-navy-900">{{ user.display_name }}</h2>
+                <p class="text-sm text-graphite-600">{{ user.email|default:"" }}</p>
                 <div class="flex items-center gap-2 mt-2">
                     <span class="badge-{{ user.role|lower }} text-[10px]">{{ user.role|title }}</span>
                     {% if user.is_active %}
-                    <span class="badge-success text-[10px]">{% trans "Compte actif" %}</span>
+                    <span class="bg-blue-100 text-blue-500 text-[10px]">{% trans "Compte actif" %}</span>
                     {% endif %}
                 </div>
             </div>
@@ -52,44 +52,44 @@
     <!-- Editable fields -->
     <div class="card p-6">
         <div class="flex items-center justify-between mb-4">
-            <h3 class="font-bold text-lg text-auto-dark">{% trans "Mes informations" %}</h3>
-            <a href="{% url 'accounts:profile_edit' %}" class="text-auto-orange text-sm font-bold hover:underline">{% trans "Modifier" %}</a>
+            <h3 class="font-bold text-lg text-navy-900">{% trans "Mes informations" %}</h3>
+            <a href="{% url 'accounts:profile_edit' %}" class="text-orange-500 text-sm font-bold hover:underline">{% trans "Modifier" %}</a>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-            <div class="p-3 rounded-lg bg-auto-50 border border-auto-100">
-                <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Téléphone" %}</p>
-                <p class="font-bold text-auto-dark">{{ user.phone|default:"—" }}</p>
+            <div class="p-3 rounded-lg bg-steel-50 border border-line-200">
+                <p class="text-xs text-graphite-500 uppercase tracking-wider mb-1">{% trans "Téléphone" %}</p>
+                <p class="font-bold text-navy-900">{{ user.phone|default:"—" }}</p>
             </div>
-            <div class="p-3 rounded-lg bg-auto-50 border border-auto-100">
-                <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Ville" %}</p>
-                <p class="font-bold text-auto-dark">{{ user.city|default:"—" }}</p>
+            <div class="p-3 rounded-lg bg-steel-50 border border-line-200">
+                <p class="text-xs text-graphite-500 uppercase tracking-wider mb-1">{% trans "Ville" %}</p>
+                <p class="font-bold text-navy-900">{{ user.city|default:"—" }}</p>
             </div>
-            <div class="p-3 rounded-lg bg-auto-50 border border-auto-100 sm:col-span-2">
-                <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Quartier" %}</p>
-                <p class="font-bold text-auto-dark">{{ user.neighborhood|default:"—" }}</p>
+            <div class="p-3 rounded-lg bg-steel-50 border border-line-200 sm:col-span-2">
+                <p class="text-xs text-graphite-500 uppercase tracking-wider mb-1">{% trans "Quartier" %}</p>
+                <p class="font-bold text-navy-900">{{ user.neighborhood|default:"—" }}</p>
             </div>
         </div>
     </div>
 
     <!-- Account info (read-only) -->
     <div class="card p-6">
-        <h3 class="font-bold text-lg text-auto-dark mb-4">{% trans "Compte" %}</h3>
+        <h3 class="font-bold text-lg text-navy-900 mb-4">{% trans "Compte" %}</h3>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-            <div class="p-3 rounded-lg bg-auto-50 border border-auto-100">
-                <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Nom d'utilisateur" %}</p>
-                <p class="font-bold text-auto-dark">{{ user.username }}</p>
+            <div class="p-3 rounded-lg bg-steel-50 border border-line-200">
+                <p class="text-xs text-graphite-500 uppercase tracking-wider mb-1">{% trans "Nom d'utilisateur" %}</p>
+                <p class="font-bold text-navy-900">{{ user.username }}</p>
             </div>
-            <div class="p-3 rounded-lg bg-auto-50 border border-auto-100">
-                <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Email" %}</p>
-                <p class="font-bold text-auto-orange">{{ user.email|default:"—" }}</p>
+            <div class="p-3 rounded-lg bg-steel-50 border border-line-200">
+                <p class="text-xs text-graphite-500 uppercase tracking-wider mb-1">{% trans "Email" %}</p>
+                <p class="font-bold text-orange-500">{{ user.email|default:"—" }}</p>
             </div>
-            <div class="p-3 rounded-lg bg-auto-50 border border-auto-100">
-                <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Rôle" %}</p>
-                <p class="font-bold text-auto-dark">{{ user.role|title }}</p>
+            <div class="p-3 rounded-lg bg-steel-50 border border-line-200">
+                <p class="text-xs text-graphite-500 uppercase tracking-wider mb-1">{% trans "Rôle" %}</p>
+                <p class="font-bold text-navy-900">{{ user.role|title }}</p>
             </div>
-            <div class="p-3 rounded-lg bg-auto-50 border border-auto-100">
-                <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Inscrit le" %}</p>
-                <p class="font-bold text-auto-dark">{{ user.created_at|date:"d/m/Y" }}</p>
+            <div class="p-3 rounded-lg bg-steel-50 border border-line-200">
+                <p class="text-xs text-graphite-500 uppercase tracking-wider mb-1">{% trans "Inscrit le" %}</p>
+                <p class="font-bold text-navy-900">{{ user.created_at|date:"d/m/Y" }}</p>
             </div>
         </div>
     </div>

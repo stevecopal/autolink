@@ -4,28 +4,34 @@
 {% block title %}{% trans "Recherche" %}{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 py-8">
-    <form action="" method="get" class="max-w-2xl mx-auto mb-8">
-        <div class="flex bg-white rounded-xl overflow-hidden shadow-lg border">
-            <input type="text" name="q" value="{{ query }}" placeholder="{% trans "Rechercher..." %}"
-                   class="flex-1 px-6 py-4 text-auto-dark outline-none" autofocus>
-            <button type="submit" class="bg-auto-orange text-white px-6 font-bold">🔍</button>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
+    <form action="" method="get" class="max-w-2xl mx-auto mb-8" role="search" aria-label="{% trans 'Recherche globale' %}">
+        <label for="search-q" class="sr-only">{% trans "Rechercher..." %}</label>
+        <div class="flex bg-white rounded-2xl overflow-hidden shadow-card border border-line-200">
+            <input id="search-q" type="text" name="q" value="{{ query }}" placeholder="{% trans "Rechercher..." %}"
+                   class="flex-1 px-6 py-4 text-navy-900 outline-none bg-transparent" autofocus>
+            <button type="submit" class="bg-blue-500 hover:bg-blue-500/90 text-white px-6 font-bold flex items-center">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                <span class="sr-only">{% trans "Rechercher" %}</span>
+            </button>
         </div>
     </form>
 
     {% if query %}
-    <p class="text-auto-600 mb-6">{% blocktrans %}Resultats pour « {{ query }} »{% endblocktrans %}</p>
+    <p class="text-graphite-600 mb-8 text-sm">{% blocktrans %}Résultats pour « {{ query }} »{% endblocktrans %}</p>
 
     {% if results.garages %}
-    <div class="mb-8">
-        <h2 class="text-xl font-bold text-auto-dark mb-4">🔧 {% trans "Garages" %}</h2>
+    <div class="mb-10">
+        <h2 class="font-display text-xl font-bold text-navy-900 mb-4">{% trans "Garages" %}</h2>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             {% for garage in results.garages %}
-            <a href="{% url 'garages:garage_detail' slug=garage.slug %}" class="card p-4 flex items-center space-x-4">
-                <div class="w-12 h-12 rounded-lg bg-auto-orange/10 flex items-center justify-center text-xl">🔧</div>
-                <div>
-                    <h3 class="font-bold">{{ garage.name }}</h3>
-                    <p class="text-auto-600 text-sm">📍 {{ garage.neighborhood.name|default:garage.city.name }}</p>
+            <a href="{% url 'garages:garage_detail' slug=garage.slug %}" class="card p-4 flex items-center gap-4 group">
+                <div class="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center text-xl flex-shrink-0">
+                    <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                </div>
+                <div class="min-w-0">
+                    <h3 class="font-bold text-navy-900 group-hover:text-blue-500 transition-colors truncate">{{ garage.name }}</h3>
+                    <p class="text-graphite-600 text-sm truncate">{{ garage.neighborhood.name|default:garage.city.name }}</p>
                 </div>
             </a>
             {% endfor %}
@@ -34,13 +40,13 @@
     {% endif %}
 
     {% if results.parts %}
-    <div class="mb-8">
-        <h2 class="text-xl font-bold text-auto-dark mb-4">🔩 {% trans "Pieces" %}</h2>
+    <div class="mb-10">
+        <h2 class="font-display text-xl font-bold text-navy-900 mb-4">{% trans "Pieces" %}</h2>
         <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
             {% for part in results.parts %}
-            <a href="{% url 'catalog:part_detail' slug=part.slug %}" class="card p-4">
-                <h3 class="font-bold text-sm">{{ part.name }}</h3>
-                <p class="text-auto-orange font-bold mt-2">{{ part.price }} FCFA</p>
+            <a href="{% url 'catalog:part_detail' slug=part.slug %}" class="card p-4 group">
+                <h3 class="font-bold text-sm text-navy-900 group-hover:text-blue-500 transition-colors">{{ part.name }}</h3>
+                <p class="text-orange-600 font-bold mt-2 text-sm">{{ part.price }} FCFA</p>
             </a>
             {% endfor %}
         </div>
@@ -48,13 +54,15 @@
     {% endif %}
 
     {% if not results.garages and not results.parts %}
-    <div class="text-center py-12">
-        <div class="text-5xl mb-4">🔍</div>
-        <h3 class="text-xl font-bold text-auto-dark mb-2">{% trans "Aucun resultat trouve" %}</h3>
-        <p class="text-auto-600">{% trans "Essayez avec d'autres mots-cles ou explorez nos categories." %}</p>
-        <div class="mt-6 space-x-3">
-            <a href="{% url 'garages:garage_list' %}" class="btn-primary">{% trans "Trouver un garage" %}</a>
-            <a href="{% url 'catalog:part_list' %}" class="btn-outline">{% trans "Trouver une piece" %}</a>
+    <div class="text-center py-14">
+        <div class="w-16 h-16 mx-auto mb-5 rounded-2xl bg-steel-50 flex items-center justify-center">
+            <svg class="w-8 h-8 text-graphite-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        </div>
+        <h3 class="font-display text-2xl font-bold text-navy-900 mb-2">{% trans "Aucun resultat trouve" %}</h3>
+        <p class="text-graphite-600">{% trans "Essayez avec d'autres mots-cles ou explorez nos categories." %}</p>
+        <div class="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <a href="{% url 'garages:garage_list' %}" class="btn bg-blue-500 hover:bg-blue-500/90 text-white">{% trans "Trouver un garage" %}</a>
+            <a href="{% url 'catalog:part_list' %}" class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50">{% trans "Trouver une piece" %}</a>
         </div>
     </div>
     {% endif %}

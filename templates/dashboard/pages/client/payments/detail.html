@@ -4,16 +4,16 @@
 {% block title %}{% trans "Paiement" %} #{{ payment.id }} - AutoLink{% endblock %}
 
 {% block dashboard_header %}
-    <h1 class="text-sm font-bold text-auto-dark">{% trans "Paiement" %}</h1>
+    <h1 class="text-sm font-bold text-navy-900">{% trans "Paiement" %}</h1>
 {% endblock %}
 
 {% block dashboard_breadcrumb %}
-    <nav class="flex items-center space-x-2 text-sm text-auto-600">
-        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-auto-orange transition">{% trans "Tableau de bord" %}</a>
-        <span class="text-auto-400">/</span>
-        <a href="{% url 'payments:payment_list' %}" class="hover:text-auto-orange transition">{% trans "Mes paiements" %}</a>
-        <span class="text-auto-400">/</span>
-        <span class="font-bold text-auto-dark">#{{ payment.id }}</span>
+    <nav class="flex items-center space-x-2 text-sm text-graphite-600">
+        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-orange-500 transition">{% trans "Tableau de bord" %}</a>
+        <span class="text-graphite-500">/</span>
+        <a href="{% url 'payments:payment_list' %}" class="hover:text-orange-500 transition">{% trans "Mes paiements" %}</a>
+        <span class="text-graphite-500">/</span>
+        <span class="font-bold text-navy-900">#{{ payment.id }}</span>
     </nav>
 {% endblock %}
 
@@ -21,33 +21,33 @@
 <div class="space-y-6">
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-            <h2 class="text-xl font-bold text-auto-dark mb-1">{% trans "Paiement" %} #{{ payment.id }}</h2>
-            <p class="text-sm text-auto-500">{{ payment.created_at|date:"d/m/Y H:i" }}</p>
+            <h2 class="text-xl font-bold text-navy-900 mb-1">{% trans "Paiement" %} #{{ payment.id }}</h2>
+            <p class="text-sm text-graphite-500">{{ payment.created_at|date:"d/m/Y H:i" }}</p>
         </div>
         <div class="flex gap-2">
             <a href="{% url 'payments:payment_list' %}"
-               class="btn-outline text-sm">{% trans "Retour à la liste" %}</a>
+               class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 text-sm">{% trans "Retour à la liste" %}</a>
         </div>
     </div>
 
     <!-- Status Badge -->
-    <div class="card p-4 bg-auto-50 border border-auto-100 flex items-center justify-between">
+    <div class="card p-4 bg-steel-50 border border-line-200 flex items-center justify-between">
         <div>
             <span class="font-bold text-sm">{% trans "Statut" %}</span>
             <div class="flex items-center gap-2 mt-1">
                 <span class="badge-{{ payment.status_color }} text-[10px]">{{ payment.status_label }}</span>
                 {% if payment.status == 'PENDING' %}
-                    <span class="text-xs text-warning-600">{% trans "En attente de confirmation." %}</span>
+                    <span class="text-xs text-orange-600">{% trans "En attente de confirmation." %}</span>
                 {% elif payment.status == 'SUCCESS' %}
-                    <span class="text-xs text-success-600">{% trans "Paiement réussi." %}</span>
+                    <span class="text-xs text-emerald-600">{% trans "Paiement réussi." %}</span>
                 {% elif payment.status == 'FAILED' %}
-                    <span class="text-xs text-error-600">{% trans "Paiement échoué." %}</span>
+                    <span class="text-xs text-orange-600">{% trans "Paiement échoué." %}</span>
                 {% elif payment.status == 'REFUNDED' %}
-                    <span class="text-xs text-auto-gold">{% trans "Remboursé." %}</span>
+                    <span class="text-xs text-orange-500">{% trans "Remboursé." %}</span>
                 {% endif %}
             </div>
         </div>
-        <div class="text-right text-sm text-auto-500">
+        <div class="text-right text-sm text-graphite-500">
             <div>{% trans "CR" %} {{ payment.cr_number }}</div>
             <div>{% trans "Référence" %} : {{ payment.reference }}</div>
         </div>
@@ -56,35 +56,35 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- Informations du paiement -->
         <div class="card p-6 md:col-span-2">
-            <h3 class="text-lg font-bold text-auto-dark mb-4">{% trans "Informations" %}</h3>
+            <h3 class="text-lg font-bold text-navy-900 mb-4">{% trans "Informations" %}</h3>
             <div class="space-y-4">
-                <div class="flex justify-between items-center py-2 border-b border-auto-100">
-                    <span class="text-auto-600">{% trans "Montant" %}</span>
-                    <span class="font-bold text-lg text-auto-deep-red">{{ payment.amount|intcomma }} FCFA</span>
+                <div class="flex justify-between items-center py-2 border-b border-line-200">
+                    <span class="text-graphite-600">{% trans "Montant" %}</span>
+                    <span class="font-bold text-lg text-orange-600">{{ payment.amount|intcomma }} FCFA</span>
                 </div>
-                <div class="flex justify-between items-center py-2 border-b border-auto-100">
-                    <span class="text-auto-600">{% trans "Méthode" %}</span>
+                <div class="flex justify-between items-center py-2 border-b border-line-200">
+                    <span class="text-graphite-600">{% trans "Méthode" %}</span>
                     <span class="font-bold">{{ payment.get_payment_method_display }}</span>
                 </div>
-                <div class="flex justify-between items-center py-2 border-b border-auto-100">
-                    <span class="text-auto-600">{% trans "Transaction" %}</span>
-                    <span class="font-bold text-auto-orange text-sm">{{ payment.transaction_id }}</span>
+                <div class="flex justify-between items-center py-2 border-b border-line-200">
+                    <span class="text-graphite-600">{% trans "Transaction" %}</span>
+                    <span class="font-bold text-orange-500 text-sm">{{ payment.transaction_id }}</span>
                 </div>
-                <div class="flex justify-between items-center py-2 border-b border-auto-100">
-                    <span class="text-auto-600">{% trans "Paiement" %}</span>
+                <div class="flex justify-between items-center py-2 border-b border-line-200">
+                    <span class="text-graphite-600">{% trans "Paiement" %}</span>
                     <span class="font-bold">{{ payment.created_at|date:"d/m/Y H:i" }}</span>
                 </div>
                 {% if payment.refunds.first %}
-                <div class="flex justify-between items-center py-2 border-b border-auto-100">
-                    <span class="text-auto-600">{% trans "Remboursement" %}</span>
+                <div class="flex justify-between items-center py-2 border-b border-line-200">
+                    <span class="text-graphite-600">{% trans "Remboursement" %}</span>
                     <a href="{% url 'payments:refund_detail' payment.refunds.first.id %}"
-                       class="font-bold text-auto-coral hover:underline text-sm">
+                       class="font-bold text-orange-600 hover:underline text-sm">
                         {{ payment.refunds.first.amount|intcomma }} FCFA
                     </a>
                 </div>
                 {% endif %}
                 <div class="flex justify-between items-center">
-                    <span class="text-auto-600">{% trans "Statut" %}</span>
+                    <span class="text-graphite-600">{% trans "Statut" %}</span>
                     <span class="badge-{{ payment.status_color }} text-[10px]">{{ payment.status_label }}</span>
                 </div>
             </div>
@@ -92,10 +92,10 @@
 
     <!-- Informations de la commande -->
     <div class="card p-6">
-        <h3 class="text-lg font-bold text-auto-dark mb-4">{% trans "Détails" %}</h3>
-        <div class="flex justify-between items-center pt-3 border-t border-auto-100">
-            <span class="text-sm text-auto-600">{% trans "Montant" %}</span>
-            <span class="font-bold text-lg text-auto-deep-red">{{ payment.amount|intcomma }} FCFA</span>
+        <h3 class="text-lg font-bold text-navy-900 mb-4">{% trans "Détails" %}</h3>
+        <div class="flex justify-between items-center pt-3 border-t border-line-200">
+            <span class="text-sm text-graphite-600">{% trans "Montant" %}</span>
+            <span class="font-bold text-lg text-orange-600">{{ payment.amount|intcomma }} FCFA</span>
         </div>
     </div>
 
@@ -103,49 +103,49 @@
         <div class="space-y-6">
             <!-- Client -->
             <div class="card p-6">
-                <h3 class="text-lg font-bold text-auto-dark mb-4">{% trans "Client" %}</h3>
+                <h3 class="text-lg font-bold text-navy-900 mb-4">{% trans "Client" %}</h3>
                 <div class="flex items-center gap-3 mb-4">
                     {% if payment.user.avatar %}
                         <img src="{{ payment.user.avatar.url }}"
-                             class="w-12 h-12 rounded-full object-cover border-2 border-auto-orange">
+                             class="w-12 h-12 rounded-full object-cover border-2 border-orange-500">
                     {% else %}
-                        <div class="w-12 h-12 rounded-full bg-auto-orange/10 flex items-center justify-center text-xl font-bold text-auto-dark border-2 border-auto-100">
+                        <div class="w-12 h-12 rounded-full bg-orange-500/10 flex items-center justify-center text-xl font-bold text-navy-900 border-2 border-line-200">
                             {{ payment.user.display_name|first|upper }}
                         </div>
                     {% endif %}
                     <div>
                         <div class="font-bold">{{ payment.user.display_name }}</div>
                         <a href="mailto:{{ payment.user.email }}"
-                           class="text-sm text-auto-orange hover:underline">{{ payment.user.email }}</a>
+                           class="text-sm text-orange-500 hover:underline">{{ payment.user.email }}</a>
                     </div>
                 </div>
                 <div class="space-y-2 text-sm">
                     <div>
-                        <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Téléphone" %}</p>
+                        <p class="text-xs text-graphite-500 uppercase tracking-wider mb-1">{% trans "Téléphone" %}</p>
                         <a href="tel:{{ payment.user.phone }}"
                            class="font-bold">{{ payment.user.phone|default:"—" }}</a>
                     </div>
                     <div>
-                        <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Ville" %}</p>
+                        <p class="text-xs text-graphite-500 uppercase tracking-wider mb-1">{% trans "Ville" %}</p>
                         <p class="font-bold">{{ payment.user.city|default:"—" }}</p>
                     </div>
                     <div>
-                        <p class="text-xs text-auto-500 uppercase tracking-wider mb-1">{% trans "Quartier" %}</p>
+                        <p class="text-xs text-graphite-500 uppercase tracking-wider mb-1">{% trans "Quartier" %}</p>
                         <p class="font-bold">{{ payment.user.neighborhood|default:"—" }}</p>
                     </div>
                 </div>
             </div>
 
             <!-- Assistance -->
-            <div class="card p-6 border border-auto-200 bg-auto-50">
-                <h3 class="text-lg font-bold text-auto-dark mb-4">{% trans "Besoin d'aide" %}</h3>
+            <div class="card p-6 border border-line-200 bg-steel-50">
+                <h3 class="text-lg font-bold text-navy-900 mb-4">{% trans "Besoin d'aide" %}</h3>
                 <div class="space-y-3">
                     <a href="{% url 'support:ticket_list' %}"
-                       class="block w-full p-3 bg-white rounded-lg border border-auto-100 hover:bg-auto-50 transition text-center text-sm font-bold text-auto-dark">
+                       class="block w-full p-3 bg-white rounded-lg border border-line-200 hover:bg-steel-50 transition text-center text-sm font-bold text-navy-900">
                         {% trans "Contactez le support" %}
                     </a>
                     <a href="{% url 'support:assistance' %}"
-                       class="block w-full p-3 bg-white rounded-lg border border-auto-100 hover:bg-auto-50 transition text-center text-sm font-bold text-auto-dark">
+                       class="block w-full p-3 bg-white rounded-lg border border-line-200 hover:bg-steel-50 transition text-center text-sm font-bold text-navy-900">
                         {% trans "Assistance" %}
                     </a>
                 </div>
@@ -155,22 +155,22 @@
 
     <!-- Remboursement -->
     {% if payment.refunds.first %}
-    <div class="card p-6 border border-warning-500 bg-warning-50">
-        <h3 class="text-lg font-bold text-warning-700 mb-4">{% trans "Remboursement" %}</h3>
+    <div class="card p-6 border border-orange-500/30 bg-orange-500/10">
+        <h3 class="text-lg font-bold text-orange-600 mb-4">{% trans "Remboursement" %}</h3>
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-                <div class="text-sm text-warning-600 mb-1">{% trans "Montant remboursé" %}</div>
-                <div class="text-2xl font-bold text-warning-700">{{ payment.refunds.first.amount|intcomma }} FCFA</div>
-                <div class="text-xs text-warning-600 mt-1">{% trans "le" %} {{ payment.refunds.first.created_at|date:"d/m/Y H:i" }}</div>
+                <div class="text-sm text-orange-600 mb-1">{% trans "Montant remboursé" %}</div>
+                <div class="text-2xl font-bold text-orange-600">{{ payment.refunds.first.amount|intcomma }} FCFA</div>
+                <div class="text-xs text-orange-600 mt-1">{% trans "le" %} {{ payment.refunds.first.created_at|date:"d/m/Y H:i" }}</div>
             </div>
             <a href="{% url 'payments:refund_detail' payment.refunds.first.id %}"
-               class="btn-outline text-sm">{% trans "Voir les détails" %}</a>
+               class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 text-sm">{% trans "Voir les détails" %}</a>
         </div>
     </div>
     {% elif payment.status == 'SUCCESS' and not payment.refunds.first %}
-    <div class="card p-6 border border-warning-500 bg-warning-50">
-        <h3 class="text-lg font-bold text-warning-700 mb-4">{% trans "Demander un remboursement" %}</h3>
-        <p class="text-sm text-warning-600 mb-4">{% trans "Vous pouvez demander un remboursement pour ce paiement." %}</p>
+    <div class="card p-6 border border-orange-500/30 bg-orange-500/10">
+        <h3 class="text-lg font-bold text-orange-600 mb-4">{% trans "Demander un remboursement" %}</h3>
+        <p class="text-sm text-orange-600 mb-4">{% trans "Vous pouvez demander un remboursement pour ce paiement." %}</p>
         {% if request.user.role != 'ADMIN' and request.user.role != 'SUPERUSER' and not request.user.is_superuser %}
         <form method="post" action="{% url 'payments:refund_request' %}" class="max-w-md">
             {% csrf_token %}
@@ -181,10 +181,10 @@
                        class="form-input flex-1"
                        placeholder="{{ payment.amount|intcomma }} FCFA" required>
             </div>
-            <div class="flex justify-between items-center pt-4 border-t border-warning-500">
+            <div class="flex justify-between items-center pt-4 border-t border-orange-500/30">
                 <a href="{% url 'payments:payment_list' %}"
-                   class="btn-outline text-sm">{% trans "Annuler" %}</a>
-                <button type="submit" class="bg-error-500 text-white px-6 py-2 rounded-lg font-bold text-sm hover:bg-error-600 transition">
+                   class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 text-sm">{% trans "Annuler" %}</a>
+                <button type="submit" class="bg-orange-500/100 text-white px-6 py-2 rounded-lg font-bold text-sm hover:bg-error-600 transition">
                     {% trans "Demander le remboursement" %}
                 </button>
             </div>
@@ -195,16 +195,16 @@
 
     <!-- Avertissement paiement échoué -->
     {% if payment.status == 'FAILED' %}
-    <div class="card p-6 border border-error-500 bg-error-50">
-        <h3 class="text-lg font-bold text-error-700 mb-4">{% trans "Paiement échoué" %}</h3>
-        <p class="text-sm text-error-600 mb-4">{% trans "Ce paiement a échoué. Veuillez réessayer ou contacter le support." %}</p>
+    <div class="card p-6 border border-orange-500/30 bg-orange-500/10">
+        <h3 class="text-lg font-bold text-orange-600 mb-4">{% trans "Paiement échoué" %}</h3>
+        <p class="text-sm text-orange-600 mb-4">{% trans "Ce paiement a échoué. Veuillez réessayer ou contacter le support." %}</p>
         <div class="flex gap-2">
             <a href="{% url 'payments:payment_list' %}"
-               class="bg-auto-orange text-white px-6 py-3 rounded-lg font-bold text-sm hover:bg-auto-orange-dark transition">
+               class="bg-orange-500 text-white px-6 py-3 rounded-lg font-bold text-sm hover:bg-orange-500-dark transition">
                 {% trans "Retour aux paiements" %}
             </a>
             <a href="{% url 'support:ticket_list' %}"
-               class="bg-white text-auto-dark px-6 py-3 rounded-lg font-bold text-sm hover:bg-auto-50 transition border border-auto-100">
+               class="bg-white text-navy-900 px-6 py-3 rounded-lg font-bold text-sm hover:bg-steel-50 transition border border-line-200">
                 {% trans "Contacter le support" %}
             </a>
         </div>

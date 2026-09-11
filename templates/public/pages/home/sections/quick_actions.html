@@ -1,48 +1,38 @@
 {% load i18n %}
-<section class="max-w-7xl mx-auto px-4 sm:px-6 -mt-8 sm:-mt-10 relative z-10" aria-label="{% trans 'Actions rapides' %}">
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-8 sm:-mt-10 relative z-10" aria-label="{% trans 'Actions rapides' %}">
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4">
-
-        {# Trouver un mécanicien à proximité #}
-        <a href="{% url 'search:nearby_page' %}" class="group relative bg-white rounded-2xl p-4 sm:p-5 text-center border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.1)] hover:border-auto-orange/30 transition-all duration-300 hover:-translate-y-0.5">
-            <div class="w-12 h-12 sm:w-13 sm:h-13 bg-gradient-to-br from-auto-orange/10 to-auto-orange/5 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:from-auto-orange/20 group-hover:to-auto-orange/10 transition-all duration-300">
-                <svg class="w-6 h-6 text-auto-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        <a href="{% url 'search:nearby_page' %}" class="group bg-white rounded-xl p-4 sm:p-5 text-center border border-line-200 hover:border-blue-500/30 hover:shadow-card-hover transition-all duration-300">
+            <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:bg-blue-500/10 transition-colors duration-300">
+                <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
             </div>
-            <h3 class="font-bold text-auto-dark group-hover:text-auto-orange transition text-xs sm:text-sm mb-0.5">{% trans "Trouver un garage" %}</h3>
-            <p class="text-gray-400 text-[10px] sm:text-xs">{% trans "À proximité" %}</p>
+            <h3 class="font-bold text-graphite-900 text-xs sm:text-sm mb-0.5">{% trans "Trouver un garage" %}</h3>
+            <p class="text-graphite-500 text-[10px] sm:text-xs">{% trans "À proximité" %}</p>
         </a>
 
-        {# Find Part #}
-        <a href="{% url 'catalog:part_list' %}" class="group relative bg-white rounded-2xl p-4 sm:p-5 text-center border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.1)] hover:border-auto-orange/30 transition-all duration-300 hover:-translate-y-0.5">
-            <div class="w-12 h-12 sm:w-13 sm:h-13 bg-gradient-to-br from-auto-orange/10 to-auto-orange/5 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:from-auto-orange/20 group-hover:to-auto-orange/10 transition-all duration-300">
-                <svg class="w-6 h-6 text-auto-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <a href="{% url 'catalog:part_list' %}" class="group bg-white rounded-xl p-4 sm:p-5 text-center border border-line-200 hover:border-blue-500/30 hover:shadow-card-hover transition-all duration-300">
+            <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:bg-blue-500/10 transition-colors duration-300">
+                <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
             </div>
-            <h3 class="font-bold text-auto-dark group-hover:text-auto-orange transition text-xs sm:text-sm mb-0.5">{% trans "Trouver une pièce" %}</h3>
-            <p class="text-gray-400 text-[10px] sm:text-xs">{% trans "Compatible" %}</p>
+            <h3 class="font-bold text-graphite-900 text-xs sm:text-sm mb-0.5">{% trans "Trouver une pièce" %}</h3>
+            <p class="text-graphite-500 text-[10px] sm:text-xs">{% trans "Compatible" %}</p>
         </a>
 
-        
-
-        
-
-        {# My Vehicle or Sign Up #}
         {% if user.is_authenticated %}
-        {# Roadside Assistance #}
-        <a href="{% url 'support:ticket_create' %}" class="group relative bg-white rounded-2xl p-4 sm:p-5 text-center border border-gray-100 shadow-[0_2px_12px_rgba(0,0,0,0.06)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.1)] hover:border-auto-coral/30 transition-all duration-300 hover:-translate-y-0.5">
-            <div class="w-12 h-12 sm:w-13 sm:h-13 bg-gradient-to-br from-auto-coral/10 to-auto-coral/5 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:from-auto-coral/20 group-hover:to-auto-coral/10 transition-all duration-300">
-                <svg class="w-6 h-6 text-auto-coral" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+        <a href="{% url 'support:ticket_create' %}" class="group bg-white rounded-xl p-4 sm:p-5 text-center border border-line-200 hover:border-orange-500/30 hover:shadow-card-hover transition-all duration-300">
+            <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:bg-orange-500/10 transition-colors duration-300">
+                <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
             </div>
-            <h3 class="font-bold text-auto-dark group-hover:text-auto-coral transition text-xs sm:text-sm mb-0.5">{% trans "Signaler un problème" %}</h3>
-            <p class="text-gray-400 text-[10px] sm:text-xs">{% trans "Support rapide" %}</p>
+            <h3 class="font-bold text-graphite-900 text-xs sm:text-sm mb-0.5">{% trans "Signaler un problème" %}</h3>
+            <p class="text-graphite-500 text-[10px] sm:text-xs">{% trans "Support rapide" %}</p>
         </a>
         {% else %}
-        <a href="{% url 'accounts:register' %}" class="group relative bg-white rounded-2xl p-4 sm:p-5 text-center border border-auto-gold/20 shadow-[0_2px_12px_rgba(226,169,92,0.1)] hover:shadow-[0_8px_30px_rgba(226,169,92,0.15)] hover:border-auto-gold/40 transition-all duration-300 hover:-translate-y-0.5 col-span-2 sm:col-span-1">
-            <div class="w-12 h-12 sm:w-13 sm:h-13 bg-gradient-to-br from-auto-gold/20 to-auto-gold/10 rounded-2xl flex items-center justify-center mx-auto mb-3 group-hover:from-auto-gold/30 group-hover:to-auto-gold/15 transition-all duration-300">
-                <svg class="w-6 h-6 text-auto-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+        <a href="{% url 'accounts:register' %}" class="group bg-white rounded-xl p-4 sm:p-5 text-center border border-line-200 hover:border-orange-500/30 hover:shadow-card-hover transition-all duration-300 col-span-2 sm:col-span-1">
+            <div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:bg-orange-500/10 transition-colors duration-300">
+                <svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
             </div>
-            <h3 class="font-bold text-auto-dark group-hover:text-auto-gold transition text-xs sm:text-sm mb-0.5">{% trans "S'inscrire" %}</h3>
-            <p class="text-gray-400 text-[10px] sm:text-xs">{% trans "C'est gratuit" %}</p>
+            <h3 class="font-bold text-graphite-900 text-xs sm:text-sm mb-0.5">{% trans "S'inscrire" %}</h3>
+            <p class="text-graphite-500 text-[10px] sm:text-xs">{% trans "C'est gratuit" %}</p>
         </a>
         {% endif %}
-
     </div>
 </section>

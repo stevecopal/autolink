@@ -4,16 +4,16 @@
 {% block title %}{% trans "Nouveau ticket de support" %} - AutoLink{% endblock %}
 
 {% block dashboard_header %}
-    <h1 class="text-sm font-bold text-auto-dark">{% trans "Nouveau ticket" %}</h1>
+    <h1 class="text-sm font-bold text-navy-900">{% trans "Nouveau ticket" %}</h1>
 {% endblock %}
 
 {% block dashboard_breadcrumb %}
-    <nav class="flex items-center space-x-2 text-sm text-auto-600">
-        <a href="{% url 'administration:dashboard' %}" class="hover:text-auto-orange transition">{% trans "Tableau de bord" %}</a>
-        <span class="text-auto-400">/</span>
-        <a href="{% url 'administration:support' %}" class="hover:text-auto-orange transition">{% trans "Support" %}</a>
-        <span class="text-auto-400">/</span>
-        <span class="font-bold text-auto-dark">{% trans "Créer" %}</span>
+    <nav class="flex items-center space-x-2 text-sm text-graphite-600">
+        <a href="{% url 'administration:dashboard' %}" class="hover:text-orange-500 transition">{% trans "Tableau de bord" %}</a>
+        <span class="text-graphite-500">/</span>
+        <a href="{% url 'administration:support' %}" class="hover:text-orange-500 transition">{% trans "Support" %}</a>
+        <span class="text-graphite-500">/</span>
+        <span class="font-bold text-navy-900">{% trans "Créer" %}</span>
     </nav>
 {% endblock %}
 
@@ -21,10 +21,10 @@
 <div class="space-y-6 max-w-3xl">
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
         <div>
-            <h2 class="text-lg font-bold text-auto-dark">{% trans "Créer un ticket de support" %}</h2>
-            <p class="text-sm text-auto-600 mt-1">{% trans "Adressez un message officiel à un utilisateur ou à une boutique. Il pourra vous répondre depuis son espace." %}</p>
+            <h2 class="text-lg font-bold text-navy-900">{% trans "Créer un ticket de support" %}</h2>
+            <p class="text-sm text-graphite-600 mt-1">{% trans "Adressez un message officiel à un utilisateur ou à une boutique. Il pourra vous répondre depuis son espace." %}</p>
         </div>
-        <a href="{% url 'administration:support' %}" class="btn-outline text-sm">{% trans "Retour à la liste" %}</a>
+        <a href="{% url 'administration:support' %}" class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 text-sm">{% trans "Retour à la liste" %}</a>
     </div>
 
     <form method="post" class="card p-6 space-y-6">
@@ -38,22 +38,22 @@
 
         <!-- Destinataire -->
         <div>
-            <label class="block text-sm font-bold text-auto-dark mb-2">{% trans "Envoyer à" %}</label>
+            <label class="block text-sm font-bold text-navy-900 mb-2">{% trans "Envoyer à" %}</label>
             <div class="grid grid-cols-2 gap-3" id="recipient-toggle">
                 <label class="cursor-pointer">
                     <input type="radio" name="recipient_type" value="USER"
                            class="peer sr-only" {% if form.recipient_type.value != 'GARAGE' %}checked{% endif %}>
-                    <div class="border-2 border-auto-200 peer-checked:border-auto-orange peer-checked:bg-auto-orange/5 rounded-xl p-4 text-center transition-all">
+                    <div class="border-2 border-line-200 peer-checked:border-orange-500 peer-checked:bg-orange-500/10 rounded-xl p-4 text-center transition-all">
                         <div class="text-2xl mb-1">👤</div>
-                        <div class="text-sm font-bold text-auto-dark">{% trans "Utilisateur" %}</div>
+                        <div class="text-sm font-bold text-navy-900">{% trans "Utilisateur" %}</div>
                     </div>
                 </label>
                 <label class="cursor-pointer">
                     <input type="radio" name="recipient_type" value="GARAGE"
                            class="peer sr-only" {% if form.recipient_type.value == 'GARAGE' %}checked{% endif %}>
-                    <div class="border-2 border-auto-200 peer-checked:border-auto-orange peer-checked:bg-auto-orange/5 rounded-xl p-4 text-center transition-all">
+                    <div class="border-2 border-line-200 peer-checked:border-orange-500 peer-checked:bg-orange-500/10 rounded-xl p-4 text-center transition-all">
                         <div class="text-2xl mb-1">🏪</div>
-                        <div class="text-sm font-bold text-auto-dark">{% trans "Boutique (garage)" %}</div>
+                        <div class="text-sm font-bold text-navy-900">{% trans "Boutique (garage)" %}</div>
                     </div>
                 </label>
             </div>
@@ -61,41 +61,41 @@
 
         <!-- Sélection destinataire -->
         <div id="user-field" class="{% if form.recipient_type.value == 'GARAGE' %}hidden{% endif %}">
-            <label for="{{ form.user.id_for_label }}" class="block text-sm font-bold text-auto-dark mb-1.5">{{ form.user.label }}</label>
+            <label for="{{ form.user.id_for_label }}" class="block text-sm font-bold text-navy-900 mb-1.5">{{ form.user.label }}</label>
             {{ form.user }}
             {% for error in form.user.errors %}<p class="text-xs text-red-600 mt-1">{{ error }}</p>{% endfor %}
         </div>
 
         <div id="garage-field" class="{% if form.recipient_type.value != 'GARAGE' %}hidden{% endif %}">
-            <label for="{{ form.garage.id_for_label }}" class="block text-sm font-bold text-auto-dark mb-1.5">{{ form.garage.label }}</label>
+            <label for="{{ form.garage.id_for_label }}" class="block text-sm font-bold text-navy-900 mb-1.5">{{ form.garage.label }}</label>
             {{ form.garage }}
             {% for error in form.garage.errors %}<p class="text-xs text-red-600 mt-1">{{ error }}</p>{% endfor %}
         </div>
 
         <!-- Catégorie -->
         <div>
-            <label for="{{ form.category.id_for_label }}" class="block text-sm font-bold text-auto-dark mb-1.5">{{ form.category.label }}</label>
+            <label for="{{ form.category.id_for_label }}" class="block text-sm font-bold text-navy-900 mb-1.5">{{ form.category.label }}</label>
             {{ form.category }}
             {% for error in form.category.errors %}<p class="text-xs text-red-600 mt-1">{{ error }}</p>{% endfor %}
         </div>
 
         <!-- Sujet -->
         <div>
-            <label for="{{ form.subject.id_for_label }}" class="block text-sm font-bold text-auto-dark mb-1.5">{{ form.subject.label }}</label>
+            <label for="{{ form.subject.id_for_label }}" class="block text-sm font-bold text-navy-900 mb-1.5">{{ form.subject.label }}</label>
             {{ form.subject }}
             {% for error in form.subject.errors %}<p class="text-xs text-red-600 mt-1">{{ error }}</p>{% endfor %}
         </div>
 
         <!-- Message -->
         <div>
-            <label for="{{ form.description.id_for_label }}" class="block text-sm font-bold text-auto-dark mb-1.5">{{ form.description.label }}</label>
+            <label for="{{ form.description.id_for_label }}" class="block text-sm font-bold text-navy-900 mb-1.5">{{ form.description.label }}</label>
             {{ form.description }}
             {% for error in form.description.errors %}<p class="text-xs text-red-600 mt-1">{{ error }}</p>{% endfor %}
         </div>
 
-        <div class="flex justify-end gap-3 pt-2 border-t border-auto-100">
-            <a href="{% url 'administration:support' %}" class="btn-outline text-sm">{% trans "Annuler" %}</a>
-            <button type="submit" class="btn-primary text-sm">{% trans "Créer et envoyer" %}</button>
+        <div class="flex justify-end gap-3 pt-2 border-t border-line-200">
+            <a href="{% url 'administration:support' %}" class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 text-sm">{% trans "Annuler" %}</a>
+            <button type="submit" class="btn bg-blue-500 hover:bg-blue-500/90 text-white text-sm">{% trans "Créer et envoyer" %}</button>
         </div>
     </form>
 </div>

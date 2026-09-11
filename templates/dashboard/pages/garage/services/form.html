@@ -5,7 +5,7 @@
 
 {% block content %}
 <div class="max-w-2xl mx-auto px-4 py-8">
-    <h1 class="text-2xl md:text-3xl font-bold text-auto-dark mb-6">
+    <h1 class="text-2xl md:text-3xl font-bold text-navy-900 mb-6">
         {% if is_edit %}{% trans "Modifier le service" %}{% else %}{% trans "Ajouter un service" %}{% endif %}
     </h1>
 
@@ -46,10 +46,10 @@
             </div>
 
             <div class="flex flex-col sm:flex-row gap-3 pt-2">
-                <button type="submit" class="btn-primary flex-1">
+                <button type="submit" class="btn bg-blue-500 hover:bg-blue-500/90 text-white flex-1">
                     {% if is_edit %}{% trans "Enregistrer" %}{% else %}{% trans "Ajouter" %}{% endif %}
                 </button>
-                <a href="{% url 'garages:service_list' %}" class="btn-outline flex-1 text-center">
+                <a href="{% url 'garages:service_list' %}" class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 flex-1 text-center">
                     {% trans "Annuler" %}
                 </a>
             </div>

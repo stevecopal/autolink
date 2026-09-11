@@ -1,19 +1,19 @@
 {% extends 'dashboard/base.html' %}
-{% load i18n %}
+{% load i18n humanize %}
 
 {% block title %}{% trans "Paiement" %} - AutoLink{% endblock %}
 
 {% block dashboard_header %}
-    <h1 class="text-sm font-bold text-auto-dark">{% trans "Paiement" %}</h1>
+    <h1 class="text-sm font-bold text-navy-900">{% trans "Paiement" %}</h1>
 {% endblock %}
 
 {% block dashboard_breadcrumb %}
-    <nav class="flex items-center space-x-2 text-sm text-auto-600">
-        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-auto-orange transition">{% trans "Tableau de bord" %}</a>
-        <span class="text-auto-400">/</span>
-        <a href="{% url 'payments:payment_list' %}" class="hover:text-auto-orange transition">{% trans "Mes paiements" %}</a>
-        <span class="text-auto-400">/</span>
-        <span class="font-bold text-auto-dark">{% trans "Paiement" %}</span>
+    <nav class="flex items-center space-x-2 text-sm text-graphite-600">
+        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-orange-500 transition">{% trans "Tableau de bord" %}</a>
+        <span class="text-graphite-500">/</span>
+        <a href="{% url 'payments:payment_list' %}" class="hover:text-orange-500 transition">{% trans "Mes paiements" %}</a>
+        <span class="text-graphite-500">/</span>
+        <span class="font-bold text-navy-900">{% trans "Paiement" %}</span>
     </nav>
 {% endblock %}
 
@@ -21,58 +21,58 @@
 <div class="max-w-2xl mx-auto">
     <!-- Order Summary -->
     <div class="card p-6 mb-6">
-        <h3 class="text-lg font-bold text-auto-dark mb-4">{% trans "Paiement" %}</h3>
-        <div class="flex items-center justify-between mb-4 p-4 bg-auto-50 rounded-xl border border-auto-100">
+        <h3 class="text-lg font-bold text-navy-900 mb-4">{% trans "Paiement" %}</h3>
+        <div class="flex items-center justify-between mb-4 p-4 bg-steel-50 rounded-xl border border-line-200">
             <div>
-                <div class="font-bold text-lg text-auto-dark">{{ payment.id }}</div>
-                <div class="text-sm text-auto-500">{{ payment.created_at|date:"d/m/Y H:i" }}</div>
+                <div class="font-bold text-lg text-navy-900">{{ payment.id }}</div>
+                <div class="text-sm text-graphite-500">{{ payment.created_at|date:"d/m/Y H:i" }}</div>
             </div>
             <div class="text-right">
-                <div class="font-bold text-xl text-auto-deep-red">{{ payment.amount|intcomma }} FCFA</div>
-                <span class="badge-warning text-[10px] mt-1 inline-block">{% trans "En attente de paiement" %}</span>
+                <div class="font-bold text-xl text-orange-600">{{ payment.amount|intcomma }} FCFA</div>
+                <span class="bg-orange-100 text-orange-600 text-[10px] mt-1 inline-block">{% trans "En attente de paiement" %}</span>
             </div>
         </div>
 
         <div class="space-y-2 text-sm">
             <div class="flex justify-between">
-                <span class="text-auto-600">{% trans "Total" %}</span>
-                <span class="font-bold text-auto-dark">{{ payment.amount|intcomma }} FCFA</span>
+                <span class="text-graphite-600">{% trans "Total" %}</span>
+                <span class="font-bold text-navy-900">{{ payment.amount|intcomma }} FCFA</span>
             </div>
         </div>
     </div>
 
     {% if error %}
-    <div class="alert alert-error p-4 mb-6 rounded-xl border border-error-100 bg-error-50">
+    <div class="alert alert-error p-4 mb-6 rounded-xl border border-orange-500/20 bg-orange-500/10">
         <div class="flex items-center gap-2 mb-2">
-            <svg class="w-5 h-5 text-error-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-            <span class="font-bold text-error-700">{% trans "Erreur" %}</span>
+            <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span class="font-bold text-orange-600">{% trans "Erreur" %}</span>
         </div>
-        <p class="text-sm text-error-600">{{ error }}</p>
+        <p class="text-sm text-orange-600">{{ error }}</p>
     </div>
     {% endif %}
 
     <div class="card p-6">
-        <h3 class="text-lg font-bold text-auto-dark mb-4">{% trans "Choisir une méthode" %}</h3>
+        <h3 class="text-lg font-bold text-navy-900 mb-4">{% trans "Choisir une méthode" %}</h3>
 
         <div class="space-y-4 mb-6">
             {% for method in payment_methods %}
-            <label class="flex items-center gap-4 p-4 rounded-xl border {{ method.selected|yesno:'border-auto-orange bg-auto-orange/5':'border-auto-100 hover:bg-auto-50' }} cursor-pointer transition">
+            <label class="flex items-center gap-4 p-4 rounded-xl border {{ method.selected|yesno:'border-orange-500 bg-orange-500/10':'border-line-200 hover:bg-steel-50' }} cursor-pointer transition">
                 <input type="radio"
                        name="payment_method"
                        value="{{ method.id }}"
-                       class="w-4 h-4 text-auto-orange border-auto-300 focus:ring-auto-orange"
+                       class="w-4 h-4 text-orange-500 border-line-200 focus:ring-orange-500"
                        {% if method.selected %}checked{% endif %}>
                 <div class="flex items-center gap-2">
                     {% if method.logo %}
                         <img src="{{ method.logo }}" class="w-8 h-8 rounded-lg" alt="{{ method.name }}">
                     {% else %}
-                        <div class="w-8 h-8 rounded-lg bg-auto-100 flex items-center justify-center text-sm font-bold text-auto-dark">
+                        <div class="w-8 h-8 rounded-lg bg-line-200/30 flex items-center justify-center text-sm font-bold text-navy-900">
                             {{ method.name|first|upper }}
                         </div>
                     {% endif %}
                     <span class="font-bold text-sm">{{ method.name }}</span>
                 </div>
-                <div class="ml-auto text-xs text-auto-500">
+                <div class="ml-auto text-xs text-graphite-500">
                     {% if method.fee > 0 %}
                         {% trans "Frais" %} : {{ method.fee|intcomma }} FCFA
                     {% else %}
@@ -84,14 +84,14 @@
         </div>
 
         <!-- Redirection vers le paiement -->
-        <div class="p-4 rounded-xl bg-auto-50 border border-auto-100">
-            <p class="text-sm text-auto-600 mb-2">{% trans "Après validation, vous seront redirigé vers la page de paiement sécurisée." %}</p>
-            <form method="post" class="flex justify-between items-center pt-4 border-t border-auto-100">
+        <div class="p-4 rounded-xl bg-steel-50 border border-line-200">
+            <p class="text-sm text-graphite-600 mb-2">{% trans "Après validation, vous seront redirigé vers la page de paiement sécurisée." %}</p>
+            <form method="post" class="flex justify-between items-center pt-4 border-t border-line-200">
                 {% csrf_token %}
                 <a href="{% url 'payments:payment_list' %}"
-                   class="btn-outline text-sm">{% trans "Annuler" %}</a>
+                   class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 text-sm">{% trans "Annuler" %}</a>
                 <button type="submit"
-                        class="bg-auto-orange text-white px-6 py-2 rounded-lg font-bold text-sm hover:bg-auto-orange-dark transition">
+                        class="bg-orange-500 text-white px-6 py-2 rounded-lg font-bold text-sm hover:bg-orange-500-dark transition">
                     {% trans "Continuer vers le paiement" %}
                 </button>
             </form>

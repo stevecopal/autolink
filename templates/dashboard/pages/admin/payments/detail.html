@@ -6,26 +6,26 @@
 {% block content %}
 <div class="max-w-5xl mx-auto px-4 py-8 space-y-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <div><h1 class="text-2xl font-bold text-auto-dark">{% trans "Détail du paiement" %}</h1><p class="text-sm text-auto-500">{{ payment.created_at|date:"d/m/Y H:i" }}</p></div>
-        <a href="{% url 'administration:payments' %}" class="btn-outline">{% trans "Retour aux paiements" %}</a>
+        <div><h1 class="text-2xl font-bold text-navy-900">{% trans "Détail du paiement" %}</h1><p class="text-sm text-graphite-500">{{ payment.created_at|date:"d/m/Y H:i" }}</p></div>
+        <a href="{% url 'administration:payments' %}" class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50">{% trans "Retour aux paiements" %}</a>
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="card p-6 space-y-3">
             <h2 class="font-bold text-lg">{% trans "Paiement" %}</h2>
-            <p><span class="text-auto-600">{% trans "Référence interne" %}</span><br><strong>{{ payment.idempotency_key }}</strong></p>
-            <p><span class="text-auto-600">{% trans "Transaction provider" %}</span><br><strong>{{ payment.provider_transaction_id|default:"—" }}</strong></p>
-            <p><span class="text-auto-600">{% trans "Montant" %}</span><br><strong>{{ payment.amount|intcomma }} {{ payment.currency }}</strong></p>
-            <p><span class="text-auto-600">{% trans "Provider" %}</span><br><strong>{{ payment.get_provider_display }}</strong></p>
-            <p><span class="text-auto-600">{% trans "Statut" %}</span><br><strong>{{ payment.get_status_display }}</strong></p>
-            <p><span class="text-auto-600">{% trans "Confirmation" %}</span><br><strong>{{ payment.paid_at|date:"d/m/Y H:i"|default:"—" }}</strong></p>
+            <p><span class="text-graphite-600">{% trans "Référence interne" %}</span><br><strong>{{ payment.idempotency_key }}</strong></p>
+            <p><span class="text-graphite-600">{% trans "Transaction provider" %}</span><br><strong>{{ payment.provider_transaction_id|default:"—" }}</strong></p>
+            <p><span class="text-graphite-600">{% trans "Montant" %}</span><br><strong>{{ payment.amount|intcomma }} {{ payment.currency }}</strong></p>
+            <p><span class="text-graphite-600">{% trans "Provider" %}</span><br><strong>{{ payment.get_provider_display }}</strong></p>
+            <p><span class="text-graphite-600">{% trans "Statut" %}</span><br><strong>{{ payment.get_status_display }}</strong></p>
+            <p><span class="text-graphite-600">{% trans "Confirmation" %}</span><br><strong>{{ payment.paid_at|date:"d/m/Y H:i"|default:"—" }}</strong></p>
         </div>
         <div class="card p-6 space-y-3">
             <h2 class="font-bold text-lg">{% trans "Garage et propriétaire" %}</h2>
-            <p><span class="text-auto-600">{% trans "Garage" %}</span><br><strong>{{ payment.garage.name|default:"—" }}</strong></p>
-            <p><span class="text-auto-600">{% trans "Propriétaire" %}</span><br><strong>{{ payment.garage.owner.display_name|default:"—" }}</strong></p>
-            <p><span class="text-auto-600">{% trans "Client payeur" %}</span><br><strong>{{ payment.user.display_name }}</strong></p>
+            <p><span class="text-graphite-600">{% trans "Garage" %}</span><br><strong>{{ payment.garage.name|default:"—" }}</strong></p>
+            <p><span class="text-graphite-600">{% trans "Propriétaire" %}</span><br><strong>{{ payment.garage.owner.display_name|default:"—" }}</strong></p>
+            <p><span class="text-graphite-600">{% trans "Client payeur" %}</span><br><strong>{{ payment.user.display_name }}</strong></p>
         </div>
     </div>
-    {% if receipt %}<div class="card p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"><div><h2 class="font-bold">{% trans "Reçu" %}</h2><p class="text-sm text-auto-600">{{ receipt.reference }}</p></div><a class="btn-primary" href="{% url 'administration:receipt_detail' receipt.id %}">{% trans "Consulter le reçu" %}</a></div>{% endif %}
+    {% if receipt %}<div class="card p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"><div><h2 class="font-bold">{% trans "Reçu" %}</h2><p class="text-sm text-graphite-600">{{ receipt.reference }}</p></div><a class="btn bg-blue-500 hover:bg-blue-500/90 text-white" href="{% url 'administration:receipt_detail' receipt.id %}">{% trans "Consulter le reçu" %}</a></div>{% endif %}
 </div>
 {% endblock %}

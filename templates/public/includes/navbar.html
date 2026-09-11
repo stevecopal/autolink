@@ -1,64 +1,93 @@
 {% load i18n %}
-<nav class="bg-auto-deep-red text-white sticky top-0 z-50 shadow-nav">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6">
-        <div class="flex items-center justify-between h-16">
-            <a href="{% url 'core:home' %}" class="flex items-center space-x-2 group">
-                <div class="w-9 h-9 bg-auto-orange rounded-lg flex items-center justify-center group-hover:bg-auto-gold transition-all duration-200">
-                    <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+<header class="sticky top-0 z-50">
+<nav class="bg-navy-900/95 backdrop-blur border-b border-white/10" role="navigation" aria-label="{% trans 'Navigation principale' %}">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16 lg:h-[4.5rem]">
+            <!-- Logo -->
+            <a href="{% url 'core:home' %}" class="flex items-center gap-2.5 group shrink-0" aria-label="{% trans 'AutoLink - Accueil' %}">
+                <span class="w-9 h-9 bg-blue-500 rounded-lg flex items-center justify-center shadow-[0_4px_14px_rgba(28,109,208,0.4)] group-hover:bg-blue-500/90 transition-colors duration-200">
+                    <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/>
                     </svg>
-                </div>
-                <span class="text-xl font-bold tracking-tight text-white">Auto<span class="text-auto-gold">Link</span></span>
+                </span>
+                <span class="text-xl font-display font-bold text-white tracking-tight">Auto<span class="text-orange-500">Link</span></span>
             </a>
 
-            <div class="hidden md:flex items-center space-x-6">
-                <a href="{% url 'search:nearby_page' %}" class="nav-link text-white">{% trans "Mécaniciens" %}</a>
-                <a href="{% url 'garages:garage_list' %}" class="nav-link text-white">{% trans "Garages" %}</a>
-                <a href="{% url 'catalog:part_list' %}" class="nav-link text-white">{% trans "Pieces" %}</a>
-                
+            <!-- Desktop nav -->
+            <div class="hidden lg:flex items-center gap-1">
+                <a href="{% url 'search:nearby_page' %}" class="px-3.5 py-2 text-sm font-medium text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors duration-200">{% trans "Mécaniciens" %}</a>
+                <a href="{% url 'garages:garage_list' %}" class="px-3.5 py-2 text-sm font-medium text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors duration-200">{% trans "Garages" %}</a>
+                <a href="{% url 'catalog:part_list' %}" class="px-3.5 py-2 text-sm font-medium text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors duration-200">{% trans "Pièces" %}</a>
+
                 {% if user.is_authenticated %}
                     {% if user.role == 'ADMIN' or user.role == 'SUPERUSER' or user.is_superuser %}
-                        <a href="{% url 'administration:dashboard' %}" class="nav-link text-white">{% trans "Tableau de bord" %}</a>
+                        <a href="{% url 'administration:dashboard' %}" class="px-3.5 py-2 text-sm font-medium text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors duration-200">{% trans "Dashboard" %}</a>
                     {% elif user.role == 'CLIENT' %}
-                        <a href="{% url 'garages:garage_dashboard' %}" class="nav-link text-white">{% trans "Tableau de bord" %}</a>
+                        <a href="{% url 'garages:garage_dashboard' %}" class="px-3.5 py-2 text-sm font-medium text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors duration-200">{% trans "Dashboard" %}</a>
                     {% else %}
-                        <a href="{% url 'accounts:client_dashboard' %}" class="nav-link text-white">{% trans "Tableau de bord" %}</a>
+                        <a href="{% url 'accounts:client_dashboard' %}" class="px-3.5 py-2 text-sm font-medium text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors duration-200">{% trans "Dashboard" %}</a>
                     {% endif %}
-                {% else %}
-                    <a href="{% url 'accounts:login' %}" class="nav-link bg-auto-orange  px-5 py-2 hover:bg-auto-600 text-white rounded-lg transition-all duration-200 text-sm">{% trans "Connexion" %}</a>
-                    <a href="{% url 'accounts:register' %}" class="bg-auto-orange hover:bg-auto-600 text-white font-bold px-5 py-2 rounded-lg transition-all duration-200 text-sm">{% trans "S'inscrire" %}</a>
                 {% endif %}
             </div>
 
-            <button id="mobile-menu-btn" class="md:hidden text-white p-2 rounded-lg hover:bg-white/10 transition" aria-label="{% trans 'Basculer le menu' %}">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-            </button>
-        </div>
-
-        <div id="mobile-menu" class="hidden md:hidden pb-4 border-t border-white/10 mt-2 pt-3">
-            <a href="{% url 'search:nearby_page' %}" class="block py-2.5 nav-link text-white">{% trans "Mécaniciens" %}</a>
-            <a href="{% url 'garages:garage_list' %}" class="block py-2.5 nav-link text-white">{% trans "Garages" %}</a>
-            <a href="{% url 'catalog:part_list' %}" class="block py-2.5 nav-link text-white">{% trans "Pieces" %}</a>
-            
-            {% if user.is_authenticated %}
-                <div class="border-t border-white/10 my-2"></div>
-                {% if user.role == 'ADMIN' or user.role == 'SUPERUSER' or user.is_superuser %}
-                    <a href="{% url 'administration:dashboard' %}" class="block py-2.5 nav-link text-white">{% trans "Tableau d'administration" %}</a>
-                {% elif user.role == 'CLIENT' %}
-                    <a href="{% url 'garages:garage_dashboard' %}" class="block py-2.5 nav-link text-white">{% trans "Tableau du garage" %}</a>
-                    <a href="{% url 'catalog:garage_products' %}" class="block py-2.5 nav-link text-white">{% trans "Mes produits" %}</a>
+            <!-- Right actions -->
+            <div class="hidden lg:flex items-center gap-2">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'accounts:profile' %}" class="flex items-center gap-2 pl-2 pr-3.5 py-1.5 text-sm font-medium text-white/80 hover:bg-white/5 rounded-lg transition-colors duration-200">
+                        <span class="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center text-xs font-bold text-blue-400">{{ user.display_name|first|upper }}</span>
+                        <span class="hidden xl:inline max-w-[10rem] truncate">{{ user.display_name|truncatechars:18 }}</span>
+                    </a>
+                    <form method="post" action="{% url 'accounts:logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="inline-flex items-center gap-2 px-4 py-2 text-sm font-bold text-white bg-white/10 hover:bg-white/20 rounded-lg transition-colors duration-200" aria-label="{% trans 'Se déconnecter' %}">
+                            {% trans "Déconnexion" %}
+                        </button>
+                    </form>
                 {% else %}
-                    <a href="{% url 'accounts:client_dashboard' %}" class="block py-2.5 nav-link text-white">{% trans "Tableau de bord" %}</a>
+                    <a href="{% url 'accounts:login' %}" class="px-4 py-2 text-sm font-bold text-white/80 hover:text-white transition-colors duration-200">{% trans "Connexion" %}</a>
+                    <a href="{% url 'accounts:register' %}" class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-blue-500 hover:bg-blue-500/90 rounded-lg shadow-[0_4px_14px_rgba(28,109,208,0.35)] transition-colors duration-200">
+                        {% trans "S'inscrire" %}
+                    </a>
                 {% endif %}
-               
-                <a href="{% url 'accounts:profile' %}" class="block py-2.5 nav-link text-white">{% trans "Mon profil" %}</a>
-                <div class="border-t border-white/10 my-2"></div>
-                <a href="{% url 'accounts:logout' %}" class="block py-2.5 text-error-400 font-bold">{% trans "Deconnexion" %}</a>
-            {% else %}
-                <div class="border-t border-white/10 my-2"></div>
-                <a href="{% url 'accounts:login' %}" class="block py-2.5 text-auto-gold font-bold">{% trans "Connexion" %}</a>
-                <a href="{% url 'accounts:register' %}" class="block py-2.5 text-auto-gold font-bold">{% trans "S'inscrire" %}</a>
-            {% endif %}
+            </div>
+
+            <!-- Mobile toggle -->
+            <button id="mobile-menu-btn" class="lg:hidden p-2 text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors duration-200" aria-label="{% trans 'Basculer le menu' %}" aria-controls="mobile-menu" aria-expanded="false">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
         </div>
     </div>
 </nav>
+
+<!-- Mobile menu -->
+<div id="mobile-menu" class="hidden lg:hidden bg-navy-900 border-t border-white/10 shadow-nav" role="menu">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 space-y-1">
+        <a href="{% url 'search:nearby_page' %}" class="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors" role="menuitem">{% trans "Mécaniciens à proximité" %}</a>
+        <a href="{% url 'garages:garage_list' %}" class="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors" role="menuitem">{% trans "Trouver un garage" %}</a>
+        <a href="{% url 'catalog:part_list' %}" class="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors" role="menuitem">{% trans "Trouver une pièce" %}</a>
+
+        {% if user.is_authenticated %}
+            <div class="pt-3 mt-2 border-t border-white/10">
+                {% if user.role == 'ADMIN' or user.role == 'SUPERUSER' or user.is_superuser %}
+                    <a href="{% url 'administration:dashboard' %}" class="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors" role="menuitem">{% trans "Tableau d'administration" %}</a>
+                {% elif user.role == 'CLIENT' %}
+                    <a href="{% url 'garages:garage_dashboard' %}" class="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors" role="menuitem">{% trans "Tableau du garage" %}</a>
+                    <a href="{% url 'catalog:garage_products' %}" class="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors" role="menuitem">{% trans "Mes produits" %}</a>
+                {% else %}
+                    <a href="{% url 'accounts:client_dashboard' %}" class="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors" role="menuitem">{% trans "Tableau de bord" %}</a>
+                {% endif %}
+                <a href="{% url 'accounts:profile' %}" class="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors" role="menuitem">{% trans "Mon profil" %}</a>
+                <form method="post" action="{% url 'accounts:logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="w-full text-left px-4 py-3 text-sm font-bold text-orange-500 hover:bg-orange-500/10 rounded-lg transition-colors" role="menuitem">{% trans "Déconnexion" %}</button>
+                </form>
+            </div>
+        {% else %}
+            <div class="pt-3 mt-2 border-t border-white/10 grid grid-cols-1 gap-2">
+                <a href="{% url 'accounts:login' %}" class="btn bg-white/10 hover:bg-white/20 text-white w-full" role="menuitem">{% trans "Connexion" %}</a>
+                <a href="{% url 'accounts:register' %}" class="btn bg-blue-500 hover:bg-blue-500/90 text-white w-full" role="menuitem">{% trans "S'inscrire" %}</a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+</header>

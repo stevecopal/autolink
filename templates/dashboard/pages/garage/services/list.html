@@ -7,9 +7,9 @@
 <div class="max-w-2xl mx-auto px-4 py-8">
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-6">
         <div>
-            <h1 class="text-2xl md:text-3xl font-bold text-auto-dark">{% trans "Services" %}</h1>
+            <h1 class="text-2xl md:text-3xl font-bold text-navy-900">{% trans "Services" %}</h1>
         </div>
-        <a href="{% url 'garages:service_create' %}" class="btn-primary whitespace-nowrap">
+        <a href="{% url 'garages:service_create' %}" class="btn bg-blue-500 hover:bg-blue-500/90 text-white whitespace-nowrap">
             + {% trans "Ajouter un service" %}
         </a>
     </div>
@@ -34,16 +34,16 @@
         {% if services %}
             <div class="space-y-3">
                 {% for service in services %}
-                    <div class="flex items-center justify-between p-4 rounded-xl border border-auto-100 hover:bg-auto-50 transition">
+                    <div class="flex items-center justify-between p-4 rounded-xl border border-line-200 hover:bg-steel-50 transition">
                         <div class="min-w-0 flex-1">
-                            <div class="font-bold text-sm text-auto-dark">{{ service.name }}</div>
-                            <div class="text-xs text-auto-500 mt-0.5">{{ service.get_category_display }}</div>
+                            <div class="font-bold text-sm text-navy-900">{{ service.name }}</div>
+                            <div class="text-xs text-graphite-500 mt-0.5">{{ service.get_category_display }}</div>
                             {% if garages|length > 1 and not selected_garage %}
-                            <div class="text-xs text-auto-400 mt-0.5">{{ service.garage.name }}</div>
+                            <div class="text-xs text-graphite-500 mt-0.5">{{ service.garage.name }}</div>
                             {% endif %}
                         </div>
                         <div class="flex items-center gap-2 ml-3">
-                            <a href="{% url 'garages:service_edit' service.id %}" class="text-auto-orange hover:text-auto-orange-dark text-sm font-bold transition">
+                            <a href="{% url 'garages:service_edit' service.id %}" class="text-orange-500 hover:text-orange-600 text-sm font-bold transition">
                                 {% trans "Modifier" %}
                             </a>
                             <form method="post" action="{% url 'garages:service_delete' service.id %}" class="inline"
@@ -62,11 +62,11 @@
                 {% endfor %}
             </div>
         {% else %}
-            <div class="text-center py-12 text-auto-600">
+            <div class="text-center py-12 text-graphite-600">
                 <div class="text-4xl mb-3">🔧</div>
                 <p class="font-bold">{% trans "Aucun service ajouté." %}</p>
                 <p class="text-sm mt-1">{% trans "Ajoutez les services proposés par votre garage." %}</p>
-                <a href="{% url 'garages:service_create' %}" class="btn-primary mt-4 inline-block">
+                <a href="{% url 'garages:service_create' %}" class="btn bg-blue-500 hover:bg-blue-500/90 text-white mt-4 inline-block">
                     + {% trans "Ajouter un service" %}
                 </a>
             </div>
@@ -74,7 +74,7 @@
     </div>
 
     <div class="mt-6">
-        <a href="{% url 'garages:garage_dashboard' %}" class="text-auto-orange hover:text-auto-orange-dark font-bold text-sm transition">
+        <a href="{% url 'garages:garage_dashboard' %}" class="text-orange-500 hover:text-orange-600 font-bold text-sm transition">
             ← {% trans "Retour au tableau de bord" %}
         </a>
     </div>

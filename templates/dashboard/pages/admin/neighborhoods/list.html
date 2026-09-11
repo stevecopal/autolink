@@ -4,16 +4,16 @@
 {% block title %}{% trans "Quartiers" %} - AutoLink{% endblock %}
 
 {% block dashboard_header %}
-    <h1 class="text-sm font-bold text-auto-dark">{% trans "Géographie" %}</h1>
+    <h1 class="text-sm font-bold text-navy-900">{% trans "Géographie" %}</h1>
 {% endblock %}
 
 {% block dashboard_breadcrumb %}
-    <nav class="flex items-center space-x-2 text-sm text-auto-600">
-        <a href="{% url 'administration:dashboard' %}" class="hover:text-auto-orange transition">{% trans "Tableau de bord" %}</a>
-        <span class="text-auto-400">/</span>
-        <a href="{% url 'administration:geography' %}" class="hover:text-auto-orange transition">{% trans "Géographie" %}</a>
-        <span class="text-auto-400">/</span>
-        <span class="font-bold text-auto-dark">{% trans "Quartiers" %}</span>
+    <nav class="flex items-center space-x-2 text-sm text-graphite-600">
+        <a href="{% url 'administration:dashboard' %}" class="hover:text-orange-500 transition">{% trans "Tableau de bord" %}</a>
+        <span class="text-graphite-500">/</span>
+        <a href="{% url 'administration:geography' %}" class="hover:text-orange-500 transition">{% trans "Géographie" %}</a>
+        <span class="text-graphite-500">/</span>
+        <span class="font-bold text-navy-900">{% trans "Quartiers" %}</span>
     </nav>
 {% endblock %}
 
@@ -21,12 +21,12 @@
 <div class="space-y-6">
     <div class="flex items-center justify-between mb-6">
         <div>
-            <h1 class="text-2xl font-bold text-auto-dark">{% trans "Quartiers" %}</h1>
-            <p class="text-sm text-auto-600 mt-1">{% trans "Gérez les quartiers par ville." %}</p>
+            <h1 class="text-2xl font-bold text-navy-900">{% trans "Quartiers" %}</h1>
+            <p class="text-sm text-graphite-600 mt-1">{% trans "Gérez les quartiers par ville." %}</p>
         </div>
         <button type="button"
                 onclick="openNeighborhoodModal()"
-                class="btn-primary text-sm flex items-center gap-2">
+                class="btn bg-blue-500 hover:bg-blue-500/90 text-white text-sm flex items-center gap-2">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
             </svg>
@@ -49,9 +49,9 @@
                 <label class="form-label">{% trans "Recherche" %}</label>
                 <input type="text" name="q" value="{{ search_query }}" class="form-input" placeholder="{% trans 'Nom ou ville...' %}">
             </div>
-            <button type="submit" class="btn-primary text-sm">{% trans "Filtrer" %}</button>
+            <button type="submit" class="btn bg-blue-500 hover:bg-blue-500/90 text-white text-sm">{% trans "Filtrer" %}</button>
             {% if search_query or selected_city %}
-                <a href="{% url 'administration:neighborhoods' %}" class="btn-outline text-sm">{% trans "Réinitialiser" %}</a>
+                <a href="{% url 'administration:neighborhoods' %}" class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 text-sm">{% trans "Réinitialiser" %}</a>
             {% endif %}
         </form>
     </div>
@@ -59,8 +59,8 @@
     <div class="card overflow-hidden">
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
-                <thead class="bg-auto-50">
-                    <tr class="text-left text-auto-700">
+                <thead class="bg-steel-50">
+                    <tr class="text-left text-graphite-600">
                         <th class="px-4 py-3">{% trans "Quartier" %}</th>
                         <th class="px-4 py-3">{% trans "Ville" %}</th>
                         <th class="px-4 py-3">{% trans "Slug" %}</th>
@@ -70,13 +70,13 @@
                 </thead>
                 <tbody class="divide-y">
                     {% for neighborhood in neighborhoods %}
-                        <tr class="hover:bg-auto-50">
+                        <tr class="hover:bg-steel-50">
                             <td class="px-4 py-3 font-medium">{{ neighborhood.name }}</td>
                             <td class="px-4 py-3">{{ neighborhood.city.name }}</td>
-                            <td class="px-4 py-3 font-mono text-xs text-auto-500">{{ neighborhood.slug }}</td>
+                            <td class="px-4 py-3 font-mono text-xs text-graphite-500">{{ neighborhood.slug }}</td>
                             <td class="px-4 py-3">
                                 {% if neighborhood.is_active %}
-                                    <span class="badge-success text-[10px]">{% trans "Actif" %}</span>
+                                    <span class="bg-blue-100 text-blue-500 text-[10px]">{% trans "Actif" %}</span>
                                 {% else %}
                                     <span class="badge-gray text-[10px]">{% trans "Inactif" %}</span>
                                 {% endif %}
@@ -84,13 +84,13 @@
                             <td class="px-4 py-3">
                                 <button type="button"
                                         onclick="editNeighborhoodModal('{{ neighborhood.id }}')"
-                                        class="text-auto-orange font-medium hover:underline text-sm mr-3">
+                                        class="text-orange-500 font-medium hover:underline text-sm mr-3">
                                     {% trans "Modifier" %}
                                 </button>
                                 <form method="post" action="{% url 'administration:neighborhood_delete' neighborhood.id %}" class="inline delete-neighborhood-form" data-neighborhood-name="{{ neighborhood.name }}">
                                     {% csrf_token %}
                                     <button type="submit"
-                                            class="text-error-600 hover:text-error-700 text-sm">
+                                            class="text-orange-600 hover:text-orange-600 text-sm">
                                         {% trans "Supprimer" %}
                                     </button>
                                 </form>
@@ -98,7 +98,7 @@
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="5" class="px-4 py-8 text-center text-auto-600">{% trans "Aucun quartier trouvé." %}</td>
+                            <td colspan="5" class="px-4 py-8 text-center text-graphite-600">{% trans "Aucun quartier trouvé." %}</td>
                         </tr>
                     {% endfor %}
                 </tbody>
@@ -107,17 +107,17 @@
 
         {% if neighborhoods.has_other_pages %}
             <div class="px-4 py-3 border-t flex justify-between items-center flex-wrap gap-2">
-                <span class="text-sm text-auto-600">
+                <span class="text-sm text-graphite-600">
                     {% trans "Page" %} {{ neighborhoods.number }} {% trans "sur" %} {{ neighborhoods.paginator.num_pages }}
                 </span>
                 <div class="flex gap-2">
                     {% if neighborhoods.has_previous %}
                         <a href="?page={{ neighborhoods.previous_page_number }}{% if selected_city %}&city={{ selected_city }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}"
-                           class="btn-outline text-sm py-1 px-3">{% trans "Précédent" %}</a>
+                           class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 text-sm py-1 px-3">{% trans "Précédent" %}</a>
                     {% endif %}
                     {% if neighborhoods.has_next %}
                         <a href="?page={{ neighborhoods.next_page_number }}{% if selected_city %}&city={{ selected_city }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}"
-                           class="btn-outline text-sm py-1 px-3">{% trans "Suivant" %}</a>
+                           class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 text-sm py-1 px-3">{% trans "Suivant" %}</a>
                     {% endif %}
                 </div>
             </div>
@@ -140,7 +140,7 @@
             </div>
             <div class="al-modal-body">
                 <div id="neighborhood-form-spinner" class="hidden text-center py-8">
-                    <div class="animate-spin w-8 h-8 border-4 border-auto-orange border-t-transparent rounded-full mx-auto"></div>
+                    <div class="animate-spin w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full mx-auto"></div>
                 </div>
                 <form id="neighborhood-form" method="post" action="" data-async="true">
                     {% csrf_token %}
@@ -162,7 +162,7 @@
                         </div>
                         <div class="flex items-center gap-3 mb-4">
                             <label class="inline-flex items-center gap-2 cursor-pointer">
-                                <input type="checkbox" name="is_active" class="rounded border-auto-200 text-auto-orange focus:ring-auto-orange" checked>
+                                <input type="checkbox" name="is_active" class="rounded border-line-200 text-orange-500 focus:ring-orange-500" checked>
                                 <span class="text-sm font-medium">{% trans "Actif" %}</span>
                             </label>
                         </div>
@@ -170,8 +170,8 @@
                 </form>
             </div>
             <div class="al-modal-footer">
-                <button type="button" class="btn-outline text-sm" data-modal-close>{% trans "Annuler" %}</button>
-                <button type="submit" form="neighborhood-form" class="btn-primary text-sm">{% trans "Enregistrer" %}</button>
+                <button type="button" class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 text-sm" data-modal-close>{% trans "Annuler" %}</button>
+                <button type="submit" form="neighborhood-form" class="btn bg-blue-500 hover:bg-blue-500/90 text-white text-sm">{% trans "Enregistrer" %}</button>
             </div>
         </div>
     </div>
@@ -231,7 +231,7 @@ function editNeighborhoodModal(id) {
                 '</div>' +
                 '<div class="flex items-center gap-3 mb-4">' +
                 '<label class="inline-flex items-center gap-2 cursor-pointer">' +
-                '<input type="checkbox" name="is_active" class="rounded border-auto-200 text-auto-orange focus:ring-auto-orange" ' + (f.is_active ? 'checked' : '') + '>' +
+                '<input type="checkbox" name="is_active" class="rounded border-line-200 text-orange-500 focus:ring-orange-500" ' + (f.is_active ? 'checked' : '') + '>' +
                 '<span class="text-sm font-medium">{% trans "Actif" %}</span>' +
                 '</label>' +
                 '</div>';
@@ -248,7 +248,7 @@ function editNeighborhoodModal(id) {
 function clearNeighborhoodErrors() {
     var formBody = document.getElementById('neighborhood-form-body');
     formBody.querySelectorAll('.form-error').forEach(function(el) { el.textContent = ''; });
-    formBody.querySelectorAll('.border-error-500').forEach(function(el) { el.classList.remove('border-error-500'); });
+    formBody.querySelectorAll('.border-orange-500/30').forEach(function(el) { el.classList.remove('border-orange-500/30'); });
 }
 
 window.openNeighborhoodModal = openNeighborhoodModal;
