@@ -7,7 +7,6 @@
     <title>{% block title %}{% trans "AutoLink" %}{% endblock %}</title>
     <meta name="description" content="{% block description %}{% trans "Plateforme AutoLink - Réparation automobile" %}{% endblock %}">
     <link rel="stylesheet" href="{% static 'css/output.css' %}">
-    <link rel="stylesheet" href="{% static 'administration/css/admin.css' %}">
     <meta name="csrf-token" content="{{ csrf_token }}">
     {% block extra_css %}{% endblock %}
 </head>
@@ -112,7 +111,7 @@
     </div>
 
     <script src="{% static 'js/app.js' %}" defer></script>
-    <script src="{% static 'administration/js/admin.js' %}" defer></script>
+    <script src="{% static 'js/admin.js' %}" defer></script>
     {% block extra_js %}{% endblock %}
 
     <!-- ===== SCRIPT POUR LA SIDEBAR ===== -->
