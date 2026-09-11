@@ -5,18 +5,7 @@
 
 {% block content %}
 <div class="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
-    {# Breadcrumb #}
-    <nav class="flex flex-wrap items-center gap-2 text-sm text-graphite-600 mb-8" aria-label="{% trans 'Fil d\'ariane' %}">
-        <a href="{% url 'core:home' %}" class="hover:text-orange-500 transition">{% trans "Accueil" %}</a>
-        <span aria-hidden="true" class="text-graphite-500/60">/</span>
-        <a href="{% url 'catalog:part_list' %}" class="hover:text-orange-500 transition">{% trans "Pièces" %}</a>
-        <span aria-hidden="true" class="text-graphite-500/60">/</span>
-        {% if part.category %}
-        <a href="{% url 'catalog:category_detail' slug=part.category.slug %}" class="hover:text-orange-500 transition">{{ part.category.name }}</a>
-        <span aria-hidden="true" class="text-graphite-500/60">/</span>
-        {% endif %}
-        <span class="text-navy-900 font-bold truncate">{{ part.name }}</span>
-    </nav>
+   
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
         {# Image #}

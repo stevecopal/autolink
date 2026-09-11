@@ -90,7 +90,6 @@
 
                 <div class="min-w-0 flex-1">
                     <h1 class="font-display font-bold text-navy-900 text-sm sm:text-base lg:text-lg truncate">{% block dashboard_header %}{% trans "Tableau de bord" %}{% endblock %}</h1>
-                    <div class="hidden md:block text-xs text-graphite-500 truncate">{% block dashboard_breadcrumb %}{% endblock %}</div>
                 </div>
 
                 <a href="{% url 'accounts:notifications' %}" class="relative p-2 rounded-lg text-graphite-600 hover:bg-steel-50 transition" aria-label="{% trans 'Notifications' %}">

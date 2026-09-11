@@ -248,7 +248,7 @@ function editNeighborhoodModal(id) {
 function clearNeighborhoodErrors() {
     var formBody = document.getElementById('neighborhood-form-body');
     formBody.querySelectorAll('.form-error').forEach(function(el) { el.textContent = ''; });
-    formBody.querySelectorAll('.border-orange-500/30').forEach(function(el) { el.classList.remove('border-orange-500/30'); });
+    formBody.querySelectorAll('.border-orange-500\\2f30').forEach(function(el) { el.classList.remove('border-orange-500/30'); });
 }
 
 window.openNeighborhoodModal = openNeighborhoodModal;
