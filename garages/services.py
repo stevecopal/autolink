@@ -161,6 +161,90 @@ def suspend_garage(garage, admin_user=None):
     }
 
 
+def activate_garage(garage, admin_user=None):
+    """
+    Active manuellement un garage (côté admin).
+
+    Un garage doit être approuvé pour pouvoir être activé. L'activation
+    marque aussi le paiement comme PAID (l'activation manuelle dispense du
+    paiement en ligne).
+
+    Args:
+        garage: Instance du modèle Garage
+        admin_user: L'administrateur qui active (optionnel)
+
+    Returns:
+        dict avec 'success' (bool) et 'message' (str)
+    """
+    from garages.models import Garage
+
+    if garage.approval_status != Garage.ApprovalStatus.APPROVED:
+        return {
+            "success": False,
+            "message": "Seuls les garages approuvés peuvent être activés.",
+        }
+
+    garage.activation_status = Garage.ActivationStatus.ACTIVE
+    garage.payment_status = Garage.PaymentStatus.PAID
+    garage.is_active = True
+    garage.save(
+        update_fields=[
+            "activation_status",
+            "payment_status",
+            "is_active",
+            "updated_at",
+        ]
+    )
+
+    logger.info(
+        "Garage %s activé manuellement par %s",
+        garage.name,
+        admin_user.username if admin_user else "systeme",
+    )
+
+    return {
+        "success": True,
+        "message": f"Garage '{garage.name}' activé.",
+    }
+
+
+def deactivate_garage(garage, admin_user=None):
+    """
+    Désactive manuellement un garage (côté admin) — du coup il n'apparaît
+    plus dans les recherches publiques. Le paiement repasse en UNPAID.
+
+    Args:
+        garage: Instance du modèle Garage
+        admin_user: L'administrateur qui désactive (optionnel)
+
+    Returns:
+        dict avec 'message' (str)
+    """
+    from garages.models import Garage
+
+    garage.activation_status = Garage.ActivationStatus.INACTIVE
+    garage.payment_status = Garage.PaymentStatus.UNPAID
+    garage.is_active = False
+    garage.save(
+        update_fields=[
+            "activation_status",
+            "payment_status",
+            "is_active",
+            "updated_at",
+        ]
+    )
+
+    logger.info(
+        "Garage %s désactivé par %s",
+        garage.name,
+        admin_user.username if admin_user else "systeme",
+    )
+
+    return {
+        "message": f"Garage '{garage.name}' désactivé.",
+    }
+
+
 def update_garage_availability(garage, availability_status, message=""):
     """
     Met à jour la disponibilité d'un garage.

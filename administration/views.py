@@ -127,65 +127,6 @@ def admin_dashboard_view(request):
     return render(request, "dashboard/pages/admin/dashboard.html", context)
 
 
-@user_passes_test(is_admin)
-def admin_monitoring_view(request):
-    now = timezone.now()
-    thirty_days_ago = now - timedelta(days=30)
-    seven_days_ago = now - timedelta(days=7)
-
-    total_users = User.objects.count()
-    total_garages = Garage.objects.count()
-    total_revenue = (
-        Payment.objects.filter(status="SUCCESS").aggregate(total=Sum("amount"))["total"]
-        or 0
-    )
-
-    users_30d = User.objects.filter(date_joined__gte=thirty_days_ago).count()
-    revenue_30d = (
-        Payment.objects.filter(
-            status="SUCCESS", created_at__gte=thirty_days_ago
-        ).aggregate(total=Sum("amount"))["total"]
-        or 0
-    )
-    payments_30d = Payment.objects.filter(
-        status="SUCCESS", created_at__gte=thirty_days_ago
-    ).count()
-
-    recent_users = User.objects.order_by("-date_joined")[:10]
-    recent_payments = Payment.objects.select_related("garage", "garage__owner", "user").order_by(
-        "-created_at"
-    )[:15]
-
-    pending_garages = Garage.objects.filter(
-        approval_status=Garage.ApprovalStatus.PENDING
-    ).count()
-    pending_tickets = Ticket.objects.filter(status__in=["OPEN", "IN_PROGRESS"]).count()
-    failed_payments_7d = Payment.objects.filter(
-        status__in=["FAILED", "PENDING"], created_at__gte=seven_days_ago
-    ).count()
-
-    garage_cities = City.objects.annotate(
-        garage_count=Count(
-            "garages", filter=Q(garages__approval_status=Garage.ApprovalStatus.APPROVED)
-        )
-    ).order_by("-garage_count")[:8]
-
-    context = {
-        "total_users": total_users,
-        "total_garages": total_garages,
-        "total_revenue": total_revenue,
-        "users_30d": users_30d,
-        "revenue_30d": revenue_30d,
-        "payments_30d": payments_30d,
-        "recent_users": recent_users,
-        "recent_payments": recent_payments,
-        "pending_garages": pending_garages,
-        "pending_tickets": pending_tickets,
-        "failed_payments_7d": failed_payments_7d,
-        "garage_cities": garage_cities,
-    }
-    return render(request, "dashboard/pages/admin/monitoring/monitoring.html", context)
-
 
 @user_passes_test(is_admin)
 def admin_geography_view(request):
@@ -318,7 +259,13 @@ def admin_garages_view(request):
 
 @user_passes_test(is_admin)
 def admin_garage_verify_view(request, garage_id):
-    from garages.services import approve_garage, reject_garage, suspend_garage
+    from garages.services import (
+        activate_garage,
+        approve_garage,
+        deactivate_garage,
+        reject_garage,
+        suspend_garage,
+    )
 
     garage = get_object_or_404(Garage.objects.select_related("owner"), pk=garage_id)
 
@@ -335,8 +282,17 @@ def admin_garage_verify_view(request, garage_id):
         elif action == "suspend":
             result = suspend_garage(garage, admin_user=request.user)
             messages.warning(request, result["message"])
+        elif action == "activate":
+            result = activate_garage(garage, admin_user=request.user)
+            if result["success"]:
+                messages.success(request, result["message"])
+            else:
+                messages.error(request, result["message"])
+        elif action == "deactivate":
+            result = deactivate_garage(garage, admin_user=request.user)
+            messages.warning(request, result["message"])
 
-        return redirect("administration:garages")
+        return redirect("administration:garage_verify", garage_id=garage.pk)
 
     verifications = garage.verifications.select_related("verified_by").order_by(
         "-created_at"
@@ -893,6 +849,69 @@ def admin_ticket_detail_view(request, ticket_id):
     )
 
 
+@user_passes_test(is_admin)
+def admin_ticket_create_view(request):
+    """Créer un ticket de support depuis l'administration, adressé
+    soit à un utilisateur, soit à une boutique (garage)."""
+    from support.forms import AdminTicketCreateForm
+    from support.services import get_or_create_ticket_conversation, send_message
+    from accounts.models import Notification
+
+    if request.method == "POST":
+        form = AdminTicketCreateForm(request.POST)
+        if form.is_valid():
+            data = form.cleaned_data
+
+            if data["recipient_type"] == "GARAGE":
+                garage = data["garage"]
+                ticket_user = garage.owner
+                recipient_label = garage.name
+            else:
+                garage = None
+                ticket_user = data["user"]
+                recipient_label = ticket_user.display_name
+
+            ticket = Ticket.objects.create(
+                user=ticket_user,
+                garage=garage,
+                category=data["category"],
+                subject=data["subject"],
+                description=data["description"],
+            )
+
+            # Conversation liée au ticket + premier message envoyé par l'admin
+            try:
+                conversation = get_or_create_ticket_conversation(ticket)
+                send_message(conversation, request.user, data["description"])
+            except Exception:
+                pass  # le ticket existe déjà ; la conversation pourra être recréée
+
+            Notification.objects.create(
+                user=ticket_user,
+                notif_type=Notification.Type.TICKET_REPLY,
+                title=_("Message du support : %(subject)s") % {"subject": ticket.subject},
+                message=data["description"],
+                link=f"/support/tickets/{ticket.ticket_number}/",
+            )
+
+            messages.success(
+                request,
+                _("Ticket %(number)s créé et envoyé à %(recipient)s.")
+                % {"number": ticket.ticket_number, "recipient": recipient_label},
+            )
+            return redirect("administration:ticket_detail", ticket_id=ticket.pk)
+        messages.error(request, _("Veuillez corriger les erreurs du formulaire."))
+    else:
+        form = AdminTicketCreateForm()
+
+    return render(
+        request,
+        "dashboard/pages/admin/support/tickets/create.html",
+        {"form": form},
+    )
+
+
+@user_passes_test(is_admin)
 @user_passes_test(is_admin)
 @require_POST
 def admin_send_urgent_message_view(request, user_id):

@@ -50,15 +50,29 @@
         <div class="card p-6">
             <h2 class="font-bold text-lg mb-4">{% trans "Actions" %}</h2>
             <div class="space-y-3">
-                <form method="post">
+                <form method="post"
+                      {% if user_obj.is_active %}
+                      data-confirm
+                      data-confirm-title="{% trans "Désactiver l'utilisateur" %}"
+                      data-confirm-message="{% blocktrans with name=user_obj.display_name %}Désactiver l'utilisateur « {{ name }} » ? Il ne pourra plus se connecter.{% endblocktrans %}"
+                      data-confirm-label="{% trans "Désactiver" %}"
+                      data-confirm-variant="danger"
+                      {% else %}
+                      data-confirm
+                      data-confirm-title="{% trans "Activer l'utilisateur" %}"
+                      data-confirm-message="{% blocktrans with name=user_obj.display_name %}Activer l'utilisateur « {{ name }} » ? Il pourra se connecter à nouveau.{% endblocktrans %}"
+                      data-confirm-label="{% trans "Activer" %}"
+                      data-confirm-variant="success"
+                      {% endif %}
+                >
                     {% csrf_token %}
                     <input type="hidden" name="action" value="toggle_active">
                     {% if user_obj.is_active %}
-                        <button type="submit" class="btn-outline w-full text-sm" onclick="return confirm('{% trans "Désactiver cet utilisateur ?" %}')">
+                        <button type="submit" class="btn-outline w-full text-sm">
                             {% trans "Désactiver l'utilisateur" %}
                         </button>
                     {% else %}
-                        <button type="submit" class="btn-primary w-full text-sm" onclick="return confirm('{% trans "Activer cet utilisateur ?" %}')">
+                        <button type="submit" class="btn-primary w-full text-sm">
                             {% trans "Activer l'utilisateur" %}
                         </button>
                     {% endif %}

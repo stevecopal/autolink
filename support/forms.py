@@ -2,10 +2,15 @@ import os
 import mimetypes
 
 from django import forms
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
+from garages.models import Garage
+
 from .models import Ticket, TicketMessage, AssistanceRequest
+
+User = get_user_model()
 
 ALLOWED_MIME_TYPES = [
     'image/jpeg', 'image/png', 'image/gif', 'image/webp',
@@ -163,6 +168,81 @@ class AdminTicketReplyForm(forms.Form):
                     _('Type de fichier non autorisé.')
                 )
         return attachment
+
+
+class AdminTicketCreateForm(forms.Form):
+    """Formulaire d'administration pour créer un ticket de support
+    et l'adresser soit à un utilisateur, soit à une boutique (garage)."""
+
+    RECIPIENT_CHOICES = [
+        ("USER", _("Utilisateur")),
+        ("GARAGE", _("Boutique (garage)")),
+    ]
+
+    recipient_type = forms.ChoiceField(
+        label=_("Envoyer à"),
+        choices=RECIPIENT_CHOICES,
+        initial="USER",
+        widget=forms.RadioSelect(attrs={"class": "peer sr-only"}),
+    )
+    user = forms.ModelChoiceField(
+        label=_("Utilisateur concerné"),
+        queryset=User.objects.none(),
+        required=False,
+        empty_label=_("— Choisir un utilisateur —"),
+        widget=forms.Select(attrs={"class": "form-input w-full"}),
+    )
+    garage = forms.ModelChoiceField(
+        label=_("Boutique (garage) concernée"),
+        queryset=Garage.objects.none(),
+        required=False,
+        empty_label=_("— Choisir une boutique —"),
+        widget=forms.Select(attrs={"class": "form-input w-full"}),
+    )
+    category = forms.ChoiceField(
+        label=_("Catégorie"),
+        choices=Ticket.Category.choices,
+        initial=Ticket.Category.PLATFORM,
+        widget=forms.Select(attrs={"class": "form-input w-full"}),
+    )
+    subject = forms.CharField(
+        label=_("Sujet (le concerné)"),
+        max_length=300,
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-input w-full",
+                "placeholder": _("Ex. : Votre compte a été suspendu"),
+            }
+        ),
+    )
+    description = forms.CharField(
+        label=_("Message"),
+        widget=forms.Textarea(
+            attrs={
+                "class": "form-input w-full",
+                "rows": 5,
+                "placeholder": _("Entrez le message à transmettre..."),
+            }
+        ),
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        from garages.models import Garage as GarageModel
+
+        self.fields["user"].queryset = (
+            User.objects.filter(is_active=True).order_by("username")
+        )
+        self.fields["garage"].queryset = GarageModel.objects.order_by("name")
+
+    def clean(self):
+        cleaned = super().clean()
+        recipient_type = cleaned.get("recipient_type")
+        if recipient_type == "USER" and not cleaned.get("user"):
+            self.add_error("user", _("Sélectionnez l'utilisateur à qui envoyer le ticket."))
+        if recipient_type == "GARAGE" and not cleaned.get("garage"):
+            self.add_error("garage", _("Sélectionnez la boutique à qui envoyer le ticket."))
+        return cleaned
 
 
 class AssistanceRequestForm(forms.ModelForm):

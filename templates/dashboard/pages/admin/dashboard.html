@@ -186,23 +186,7 @@
             </div>
         </div>
 
-        <div class="card p-6">
-            <h2 class="font-bold text-lg mb-4">{% trans "Monitoring" %}</h2>
-            <div class="space-y-3">
-                <a href="{% url 'administration:monitoring' %}"
-                   class="block p-4 rounded-lg border border-auto-100 hover:bg-auto-light transition">
-                    <div class="flex items-center justify-between">
-                        <span class="font-bold text-sm">{% trans "Vue detaillee" %}</span>
-                        <svg class="w-5 h-5 text-auto-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
-                        </svg>
-                    </div>
-                </a>
-                <div class="text-xs text-auto-600 space-y-1">
-                    <p>{% trans "Statistiques, activite, alertes et repartition saisonniere." %}</p>
-                </div>
-            </div>
-        </div>
+        
     </div>
 </div>
 {% endblock %}

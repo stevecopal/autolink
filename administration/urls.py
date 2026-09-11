@@ -6,7 +6,6 @@ app_name = "administration"
 
 urlpatterns = [
     path("dashboard/", views.admin_dashboard_view, name="dashboard"),
-    path("monitoring/", views.admin_monitoring_view, name="monitoring"),
     path("geography/", views.admin_geography_view, name="geography"),
     path("users/", views.admin_users_view, name="users"),
     path("users/<uuid:user_id>/", views.admin_user_detail_view, name="user_detail"),
@@ -52,6 +51,11 @@ urlpatterns = [
         name="receipt_detail",
     ),
     path("support/", views.admin_support_view, name="support"),
+    path(
+        "support/create/",
+        views.admin_ticket_create_view,
+        name="ticket_create",
+    ),
     path(
         "support/<uuid:ticket_id>/",
         views.admin_ticket_detail_view,

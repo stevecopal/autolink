@@ -145,6 +145,8 @@ def search_nearby_garages(
     queryset = Garage.objects.filter(
         is_active=True,
         verification_status=Garage.VerificationStatus.APPROVED,
+        payment_status=Garage.PaymentStatus.PAID,
+        
     ).exclude(
         latitude__isnull=True,
         longitude__isnull=True,

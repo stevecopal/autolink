@@ -47,7 +47,11 @@
                                 {% trans "Modifier" %}
                             </a>
                             <form method="post" action="{% url 'garages:service_delete' service.id %}" class="inline"
-                                  onsubmit="return confirm('{% trans "Supprimer ce service ?" %}')">
+                                  data-confirm
+                                  data-confirm-title="{% trans 'Supprimer le service' %}"
+                                  data-confirm-message="{% blocktrans with name=service.name %}Voulez-vous vraiment supprimer le service « {{ name }} » ? Cette action est irréversible.{% endblocktrans %}"
+                                  data-confirm-label="{% trans 'Supprimer' %}"
+                                  data-confirm-variant="danger">
                                 {% csrf_token %}
                                 <button type="submit" class="text-red-500 hover:text-red-700 text-sm font-bold transition">
                                     {% trans "Supprimer" %}

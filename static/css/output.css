@@ -1556,10 +1556,6 @@ input[type="file"] {
   max-width: 80rem;
 }
 
-.max-w-\[120px\] {
-  max-width: 120px;
-}
-
 .max-w-\[200px\] {
   max-width: 200px;
 }
@@ -2123,10 +2119,6 @@ input[type="file"] {
 .bg-auto-500 {
   --tw-bg-opacity: 1;
   background-color: rgb(205 129 53 / var(--tw-bg-opacity, 1));
-}
-
-.bg-auto-coral\/10 {
-  background-color: rgb(212 84 55 / 0.1);
 }
 
 .bg-auto-cream {
@@ -3536,6 +3528,15 @@ input[type="file"] {
 .group:hover .group-hover\:text-white {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity, 1));
+}
+
+.peer:checked ~ .peer-checked\:border-auto-orange {
+  --tw-border-opacity: 1;
+  border-color: rgb(205 129 53 / var(--tw-border-opacity, 1));
+}
+
+.peer:checked ~ .peer-checked\:bg-auto-orange\/5 {
+  background-color: rgb(205 129 53 / 0.05);
 }
 
 @media (min-width: 640px) {

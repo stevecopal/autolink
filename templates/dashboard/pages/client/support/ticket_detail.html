@@ -210,12 +210,16 @@
             <div class="card p-5 border border-error-100 bg-error-50">
                 <h4 class="font-bold text-sm text-error-700 mb-2">{% trans "Supprimer ce ticket" %}</h4>
                 <p class="text-xs text-error-600 mb-3">{% trans "Cette action est irréversible." %}</p>
-                <form method="post" action="{% url 'support:ticket_detail' ticket.ticket_number %}">
+                <form method="post" action="{% url 'support:ticket_detail' ticket.ticket_number %}"
+                          data-confirm
+                          data-confirm-title="{% trans "Supprimer le ticket" %}"
+                          data-confirm-message="{% blocktrans with num=ticket.ticket_number %}Supprimer le ticket {{ num }} ? Cette action est irréversible.{% endblocktrans %}"
+                          data-confirm-label="{% trans "Supprimer" %}"
+                          data-confirm-variant="danger">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="delete">
                     <button type="submit"
-                            class="bg-error-500 text-white px-4 py-2 rounded-lg font-bold text-xs hover:bg-error-600 transition w-full"
-                            onclick="return confirm('{% trans 'Supprimer ce ticket ? Cette action est irréversible.' %}')">
+                            class="bg-error-500 text-white px-4 py-2 rounded-lg font-bold text-xs hover:bg-error-600 transition w-full">
                         {% trans "Supprimer" %}
                     </button>
                 </form>

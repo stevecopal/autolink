@@ -1,0 +1,123 @@
+{% extends 'dashboard/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Nouveau ticket de support" %} - AutoLink{% endblock %}
+
+{% block dashboard_header %}
+    <h1 class="text-sm font-bold text-auto-dark">{% trans "Nouveau ticket" %}</h1>
+{% endblock %}
+
+{% block dashboard_breadcrumb %}
+    <nav class="flex items-center space-x-2 text-sm text-auto-600">
+        <a href="{% url 'administration:dashboard' %}" class="hover:text-auto-orange transition">{% trans "Tableau de bord" %}</a>
+        <span class="text-auto-400">/</span>
+        <a href="{% url 'administration:support' %}" class="hover:text-auto-orange transition">{% trans "Support" %}</a>
+        <span class="text-auto-400">/</span>
+        <span class="font-bold text-auto-dark">{% trans "Créer" %}</span>
+    </nav>
+{% endblock %}
+
+{% block content %}
+<div class="space-y-6 max-w-3xl">
+    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div>
+            <h2 class="text-lg font-bold text-auto-dark">{% trans "Créer un ticket de support" %}</h2>
+            <p class="text-sm text-auto-600 mt-1">{% trans "Adressez un message officiel à un utilisateur ou à une boutique. Il pourra vous répondre depuis son espace." %}</p>
+        </div>
+        <a href="{% url 'administration:support' %}" class="btn-outline text-sm">{% trans "Retour à la liste" %}</a>
+    </div>
+
+    <form method="post" class="card p-6 space-y-6">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+        <div class="bg-red-50 border border-red-200 rounded-xl p-3 text-sm text-red-600">
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        <!-- Destinataire -->
+        <div>
+            <label class="block text-sm font-bold text-auto-dark mb-2">{% trans "Envoyer à" %}</label>
+            <div class="grid grid-cols-2 gap-3" id="recipient-toggle">
+                <label class="cursor-pointer">
+                    <input type="radio" name="recipient_type" value="USER"
+                           class="peer sr-only" {% if form.recipient_type.value != 'GARAGE' %}checked{% endif %}>
+                    <div class="border-2 border-auto-200 peer-checked:border-auto-orange peer-checked:bg-auto-orange/5 rounded-xl p-4 text-center transition-all">
+                        <div class="text-2xl mb-1">👤</div>
+                        <div class="text-sm font-bold text-auto-dark">{% trans "Utilisateur" %}</div>
+                    </div>
+                </label>
+                <label class="cursor-pointer">
+                    <input type="radio" name="recipient_type" value="GARAGE"
+                           class="peer sr-only" {% if form.recipient_type.value == 'GARAGE' %}checked{% endif %}>
+                    <div class="border-2 border-auto-200 peer-checked:border-auto-orange peer-checked:bg-auto-orange/5 rounded-xl p-4 text-center transition-all">
+                        <div class="text-2xl mb-1">🏪</div>
+                        <div class="text-sm font-bold text-auto-dark">{% trans "Boutique (garage)" %}</div>
+                    </div>
+                </label>
+            </div>
+        </div>
+
+        <!-- Sélection destinataire -->
+        <div id="user-field" class="{% if form.recipient_type.value == 'GARAGE' %}hidden{% endif %}">
+            <label for="{{ form.user.id_for_label }}" class="block text-sm font-bold text-auto-dark mb-1.5">{{ form.user.label }}</label>
+            {{ form.user }}
+            {% for error in form.user.errors %}<p class="text-xs text-red-600 mt-1">{{ error }}</p>{% endfor %}
+        </div>
+
+        <div id="garage-field" class="{% if form.recipient_type.value != 'GARAGE' %}hidden{% endif %}">
+            <label for="{{ form.garage.id_for_label }}" class="block text-sm font-bold text-auto-dark mb-1.5">{{ form.garage.label }}</label>
+            {{ form.garage }}
+            {% for error in form.garage.errors %}<p class="text-xs text-red-600 mt-1">{{ error }}</p>{% endfor %}
+        </div>
+
+        <!-- Catégorie -->
+        <div>
+            <label for="{{ form.category.id_for_label }}" class="block text-sm font-bold text-auto-dark mb-1.5">{{ form.category.label }}</label>
+            {{ form.category }}
+            {% for error in form.category.errors %}<p class="text-xs text-red-600 mt-1">{{ error }}</p>{% endfor %}
+        </div>
+
+        <!-- Sujet -->
+        <div>
+            <label for="{{ form.subject.id_for_label }}" class="block text-sm font-bold text-auto-dark mb-1.5">{{ form.subject.label }}</label>
+            {{ form.subject }}
+            {% for error in form.subject.errors %}<p class="text-xs text-red-600 mt-1">{{ error }}</p>{% endfor %}
+        </div>
+
+        <!-- Message -->
+        <div>
+            <label for="{{ form.description.id_for_label }}" class="block text-sm font-bold text-auto-dark mb-1.5">{{ form.description.label }}</label>
+            {{ form.description }}
+            {% for error in form.description.errors %}<p class="text-xs text-red-600 mt-1">{{ error }}</p>{% endfor %}
+        </div>
+
+        <div class="flex justify-end gap-3 pt-2 border-t border-auto-100">
+            <a href="{% url 'administration:support' %}" class="btn-outline text-sm">{% trans "Annuler" %}</a>
+            <button type="submit" class="btn-primary text-sm">{% trans "Créer et envoyer" %}</button>
+        </div>
+    </form>
+</div>
+
+<script>
+(function () {
+    'use strict';
+    var radios = document.querySelectorAll('#recipient-toggle input[name="recipient_type"]');
+    var userField = document.getElementById('user-field');
+    var garageField = document.getElementById('garage-field');
+
+    function toggleFields() {
+        var selected = document.querySelector('#recipient-toggle input[name="recipient_type"]:checked');
+        if (!selected || !userField || !garageField) return;
+        var isGarage = selected.value === 'GARAGE';
+        userField.classList.toggle('hidden', isGarage);
+        garageField.classList.toggle('hidden', !isGarage);
+    }
+
+    radios.forEach(function (radio) {
+        radio.addEventListener('change', toggleFields);
+    });
+})();
+</script>
+{% endblock %}
