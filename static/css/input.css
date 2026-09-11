@@ -2,372 +2,221 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap");
 
 :root {
-  --color-primary: #10B981;      /* Vert émeraude (CTA) */
-  --color-primary-dark: #059669;
-  --color-bg-dark: #0F172A;       /* Fond principal sombre */
-  --color-bg-secondary: #1E293B; /* Fond secondaire */
-  --color-text-primary: #F8FAFC; /* Texte principal (blanc cassé) */
-  --color-text-secondary: #94A3B8;
-  --color-border: #334155;
-  --color-error: #EF4444;
-  --color-warning: #F59E0B;
-  --color-info: #3B82F6;
-  --font-display: "Space Grotesk", sans-serif;
-  --font-body: "IBM Plex Sans", sans-serif;
-  --font-mono: "IBM Plex Mono", monospace;
+  --color-autolink-light: #ebebeb;
+  --color-autolink-gold: #e2a95c;
+  --color-autolink-orange: #cd8135;
+  --color-autolink-coral: #d45437;
+  --color-autolink-deep-red: #762011;
+  --font-family-primary: "Space Mono", monospace;
 }
 
 @layer base {
   * {
-    @apply border-slate-800;
+    @apply font-mono;
   }
   body {
-    @apply bg-slate-950 text-neutral-50 antialiased;
-    font-family: var(--font-body);
+    @apply bg-auto-cream text-auto-dark antialiased;
+    font-family: "Space Mono", monospace;
     line-height: 1.6;
   }
-  h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-display);
-    font-weight: 600;
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: "Space Mono", monospace;
+    font-weight: 700;
     letter-spacing: -0.01em;
   }
-  h1 { @apply text-4xl md:text-5xl; }
-  h2 { @apply text-3xl md:text-4xl; }
-  h3 { @apply text-2xl md:text-3xl; }
-  h4 { @apply text-xl md:text-2xl; }
+  h1 {
+    @apply text-3xl md:text-4xl;
+  }
+  h2 {
+    @apply text-2xl md:text-3xl;
+  }
+  h3 {
+    @apply text-xl md:text-2xl;
+  }
+  h4 {
+    @apply text-lg md:text-xl;
+  }
   :focus-visible {
-    @apply outline-2 outline-offset-2 outline-emerald-500;
+    @apply outline-2 outline-offset-2 outline-auto-orange;
   }
 }
 
 @layer components {
   /* --- Buttons --- */
   .btn {
-    @apply font-semibold px-6 py-3 rounded-lg transition-all duration-200 active:scale-[0.98] inline-flex items-center justify-center gap-2;
-    min-height: 2.75rem;
+    @apply font-bold px-6 py-3 rounded-lg transition-all duration-200 active:scale-[0.98] inline-flex items-center justify-center gap-2;
   }
   .btn-primary {
-    @apply bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/20;
+    @apply bg-auto-orange hover:bg-auto-600 text-white font-bold px-6 py-3 rounded-lg transition-all duration-200 shadow-sm active:scale-[0.98] inline-flex items-center justify-center gap-2;
   }
   .btn-secondary {
-    @apply bg-slate-800 hover:bg-slate-700 text-neutral-50 border border-slate-700;
+    @apply bg-auto-deep-red hover:bg-auto-900 text-white font-bold px-6 py-3 rounded-lg transition-all duration-200 active:scale-[0.98] inline-flex items-center justify-center gap-2;
   }
   .btn-outline {
-    @apply border-2 border-emerald-500 text-emerald-500 hover:bg-emerald-500 hover:text-white;
+    @apply border-2 border-auto-orange text-auto-orange hover:bg-auto-orange hover:text-white font-bold px-6 py-3 rounded-lg transition-all duration-200 active:scale-[0.98] inline-flex items-center justify-center gap-2;
   }
   .btn-danger {
-    @apply bg-red-500 hover:bg-red-600 text-white;
+    @apply bg-error-600 hover:bg-error-700 text-white font-bold px-6 py-3 rounded-lg transition-all duration-200 active:scale-[0.98] inline-flex items-center justify-center gap-2;
   }
   .btn-ghost {
-    @apply text-neutral-300 hover:bg-slate-800 hover:text-neutral-50;
+    @apply text-auto-dark hover:bg-auto-100 font-bold px-6 py-3 rounded-lg transition-all duration-200 inline-flex items-center justify-center gap-2;
   }
-  .btn-sm { @apply !px-4 !py-2 text-sm; }
-  .btn-xs { @apply !px-3 !py-1.5 text-xs; }
+  .btn-sm {
+    @apply !px-4 !py-2 text-sm;
+  }
+  .btn-xs {
+    @apply !px-3 !py-1.5 text-xs;
+  }
+
+  /* Keep primary controls comfortable for touch interaction. */
+  .btn,
+  .btn-primary,
+  .btn-secondary,
+  .btn-outline,
+  .btn-danger,
+  .btn-ghost {
+    min-height: 2.75rem;
+  }
 
   /* --- Form Inputs --- */
   .form-input {
-    @apply w-full px-4 py-3 rounded-lg border border-slate-700 bg-slate-900 text-neutral-50
-           focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition-all;
+    @apply w-full px-4 py-3 border border-auto-200 rounded-lg focus:ring-2 focus:ring-auto-orange focus:border-auto-orange outline-none transition-all duration-200 font-mono bg-white;
   }
+
   input[type="file"] {
     min-height: 2.75rem;
   }
   .form-label {
-    @apply block text-sm font-semibold text-neutral-300 mb-2;
+    @apply block text-sm font-bold text-auto-dark mb-2;
   }
   .form-error {
-    @apply text-red-500 text-sm mt-1;
+    @apply text-error-600 text-sm mt-1;
   }
 
   /* --- Cards --- */
   .card {
-    @apply bg-slate-900 rounded-xl border border-slate-800 shadow-lg hover:shadow-xl hover:border-emerald-500/30 transition-all;
+    @apply bg-white rounded-xl shadow-card border border-auto-100/50 overflow-hidden hover:shadow-card-hover transition-all duration-200;
   }
 
   /* --- Badges --- */
   .badge {
-    @apply text-xs font-semibold px-2.5 py-0.5 rounded-full;
+    @apply text-xs font-bold px-2.5 py-0.5 rounded-full inline-flex items-center;
   }
   .badge-success {
-    @apply bg-emerald-100/10 text-emerald-500;
+    @apply bg-success-100 text-success-700;
   }
   .badge-warning {
-    @apply bg-amber-500/10 text-amber-500;
+    @apply bg-warning-100 text-warning-700;
   }
   .badge-error {
-    @apply bg-red-500/10 text-red-500;
+    @apply bg-error-100 text-error-700;
   }
   .badge-info {
-    @apply bg-blue-500/10 text-blue-500;
+    @apply bg-info-100 text-info-700;
   }
-  .badge-available {
-    @apply bg-emerald-500/20 text-emerald-400; /* Pour les garages disponibles */
+  .badge-neutral {
+    @apply bg-auto-100 text-auto-700;
   }
+  .badge-orange {
+    @apply bg-auto-orange/10 text-auto-orange;
+  }
+  .badge-gold {
+    @apply bg-auto-gold/10 text-auto-700;
+  }
+  .badge-green {
+    @apply bg-success-100 text-success-700;
+  }
+  .badge-red {
+    @apply bg-error-100 text-error-700;
+  }
+  .badge-blue {
+    @apply bg-info-100 text-info-700;
+  }
+  .badge-gray {
+    @apply bg-auto-100 text-auto-700;
+  }
+  .badge-dark {
+    @apply bg-auto-deep-red text-white;
+  }
+
+  /* --- Role Badges --- */
   .badge-user {
-    @apply bg-slate-800 text-neutral-300;
+    @apply bg-auto-100 text-auto-700;
   }
   .badge-client {
-    @apply bg-emerald-100/10 text-emerald-500;
+    @apply bg-success-100 text-success-700;
   }
   .badge-admin {
-    @apply bg-blue-500/10 text-blue-500;
+    @apply bg-info-100 text-info-700;
   }
   .badge-superuser {
-    @apply bg-slate-700 text-neutral-50;
+    @apply bg-auto-deep-red text-white;
   }
 
   /* --- Navigation --- */
   .nav-link {
-    @apply hover:text-emerald-500 transition-all text-neutral-300;
+    @apply hover:text-auto-gold transition-all duration-200 font-bold;
   }
   .nav-link-active {
-    @apply text-emerald-500;
+    @apply text-auto-gold font-bold;
   }
 
   /* --- Tables --- */
   .table-container {
-    @apply overflow-x-auto rounded-xl border border-slate-800;
+    @apply overflow-x-auto rounded-xl border border-auto-100/50;
   }
   .table {
     @apply w-full text-sm;
   }
   .table th {
-    @apply px-4 py-3 text-left font-semibold text-neutral-50 bg-slate-900 border-b border-slate-800;
+    @apply px-4 py-3 text-left font-bold text-white bg-auto-deep-red border-b border-auto-800;
   }
   .table td {
-    @apply px-4 py-3 border-b border-slate-800;
+    @apply px-4 py-3 border-b border-auto-100;
   }
   .table tr:hover td {
-    @apply bg-slate-800/50;
+    @apply bg-auto-50;
   }
 
   /* --- Stats Cards --- */
   .stat-card {
-    @apply bg-slate-900 rounded-xl p-5 border border-slate-800 shadow-lg;
+    @apply bg-white rounded-xl p-5 border border-auto-100/50 shadow-card;
   }
   .stat-value {
-    @apply text-3xl font-bold text-emerald-500;
+    @apply text-2xl md:text-3xl font-bold text-auto-deep-red;
   }
   .stat-label {
-    @apply text-sm text-neutral-400 mt-1;
+    @apply text-sm text-auto-600 mt-1;
   }
 
   /* --- Section Headers --- */
   .section-header {
-    @apply bg-slate-900 text-neutral-50 py-6 md:py-8 border-b border-slate-800;
+    @apply bg-auto-deep-red text-white py-6 md:py-8;
   }
 
   /* --- Status Indicators --- */
   .status-dot {
-    @apply w-2.5 h-2.5 rounded-full;
+    @apply w-2.5 h-2.5 rounded-full inline-block;
   }
   .status-available {
-    @apply bg-emerald-500; /* Vert pour disponibilité */
+    @apply bg-success-500;
   }
   .status-busy {
-    @apply bg-amber-500;
+    @apply bg-warning-500;
   }
   .status-closed {
-    @apply bg-red-500;
+    @apply bg-error-500;
   }
   .status-temporary {
-    @apply bg-neutral-600;
-  }
-}
-
-/* --- Modal Admin (adapté au thème sombre) --- */
-.al-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 9998;
-}
-
-.al-modal-backdrop {
-  position: absolute;
-  inset: 0;
-  background-color: rgba(15, 23, 42, 0.8);
-  opacity: 0;
-  transition: opacity 250ms cubic-bezier(0.4, 0, 0.2, 1);
-  backdrop-filter: blur(4px);
-}
-
-.al-modal-panel {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1rem;
-  opacity: 0;
-  transform: scale(0.95) translateY(10px);
-  transition:
-    opacity 250ms cubic-bezier(0.4, 0, 0.2, 1),
-    transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.al-modal-dialog {
-  width: 100%;
-  max-width: 24rem;
-  background: #1E293B;
-  border-radius: 0.75rem;
-  border: 1px solid #334155;
-  box-shadow: 0 20px 60px -12px rgba(0, 0, 0, 0.5);
-  display: flex;
-  flex-direction: column;
-  max-height: calc(100vh - 2rem);
-  max-height: calc(100dvh - 2rem);
-  overflow: hidden;
-}
-
-.al-modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem 1.25rem;
-  border-bottom: 1px solid #334155;
-  flex-shrink: 0;
-}
-
-.al-modal-title {
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: #F8FAFC;
-  margin: 0;
-}
-
-.al-modal-close {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 0.25rem;
-  border-radius: 0.375rem;
-  color: #94A3B8;
-  transition: background-color 150ms ease;
-}
-
-.al-modal-close:hover {
-  background-color: #334155;
-  color: #F8FAFC;
-}
-
-.al-modal-body {
-  padding: 1.25rem;
-  overflow-y: auto;
-  flex: 1 1 auto;
-}
-
-.al-modal-body .form-input {
-  background: #0F172A;
-  border-color: #334155;
-}
-
-.al-modal-body .form-input:focus {
-  border-color: #10B981;
-  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.25);
-}
-
-.al-modal-body .form-error {
-  color: #EF4444;
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
-}
-
-.al-modal-footer {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 0.75rem;
-  padding: 1rem 1.25rem;
-  border-top: 1px solid #334155;
-  flex-shrink: 0;
-}
-
-/* Spinner pour les boutons de soumission */
-.al-spinner {
-  display: inline-block;
-  width: 1rem;
-  height: 1rem;
-  border: 2px solid rgba(255, 255, 255, 0.4);
-  border-top-color: #10B981;
-  border-radius: 50%;
-  animation: al-spin 0.6s linear infinite;
-}
-
-@keyframes al-spin {
-  to { transform: rotate(360deg); }
-}
-
-/* Bannière de confirmation */
-.admin-confirm-banner {
-  background-color: rgba(16, 185, 129, 0.1);
-  border: 1px solid #10B981;
-  color: #10B981;
-  padding: 0.625rem 1rem;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-/* Indicateurs de chargement */
-.admin-delete-loading {
-  opacity: 0.6;
-  pointer-events: none;
-}
-
-.al-modal-body > :last-child {
-  margin-bottom: 0;
-}
-
-/* Responsive: Modales sur mobile */
-@media (max-width: 640px) {
-  .al-modal-panel {
-    align-items: flex-start;
-    padding: 0.5rem;
-    overflow-y: auto;
-  }
-  .al-modal-dialog {
-    width: min(100%, 32rem);
-    max-width: calc(100vw - 1rem);
-    max-height: calc(100dvh - 1rem);
-    margin: 0;
-    border-radius: 0.75rem;
-  }
-  .al-modal-body {
-    padding: 1rem;
-  }
-  .al-modal-header {
-    padding: 0.75rem 1rem;
-  }
-  .al-modal-footer {
-    padding: 0.75rem 1rem;
-    flex-wrap: wrap;
-  }
-  .al-modal-footer button {
-    flex: 1;
-    min-width: 0;
-    min-height: 2.75rem;
-  }
-}
-
-/* Responsive: Tableaux sur mobile */
-@media (max-width: 768px) {
-  .admin-table-actions {
-    flex-wrap: wrap;
-  }
-  .card table {
-    font-size: 0.75rem;
-  }
-  .card table th,
-  .card table td {
-    padding: 0.5rem 0.625rem;
-    white-space: nowrap;
-  }
-  .card table th:last-child,
-  .card table td:last-child {
-    white-space: normal;
+    @apply bg-gray-400;
   }
 }
 
@@ -398,5 +247,221 @@
       animation-iteration-count: 1 !important;
       transition-duration: 0.01ms !important;
     }
+  }
+}
+
+
+/* ============================================================
+   Administration - Modal + UI additions
+   (complements Tailwind output + existing app.js modal system)
+   ============================================================ */
+
+/* Modal Backdrop (shared with app.js expectations) */
+.al-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+}
+
+.al-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transition: opacity 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  backdrop-filter: blur(2px);
+}
+
+.al-modal-panel {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  opacity: 0;
+  transform: scale(0.95) translateY(10px);
+  transition:
+    opacity 250ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.al-modal-dialog {
+  width: 100%;
+  max-width: 24rem;
+  background: #ffffff;
+  border-radius: 0.75rem;
+  border: 1px solid rgb(250 224 216 / 0.5);
+  box-shadow: 0 20px 60px -12px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100vh - 2rem);
+  max-height: calc(100dvh - 2rem);
+  overflow: hidden;
+}
+
+.al-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgb(250 224 216 / 0.5);
+  flex-shrink: 0;
+}
+
+.al-modal-title {
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: rgb(118 32 17 / 1);
+  margin: 0;
+}
+
+.al-modal-close {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 0.375rem;
+  color: rgb(181 112 45 / 1);
+  transition: background-color 150ms ease;
+}
+
+.al-modal-close:hover {
+  background-color: rgb(250 224 216 / 1);
+}
+
+.al-modal-body {
+  padding: 1.25rem;
+  overflow-y: auto;
+  flex: 1 1 auto;
+}
+
+.al-modal-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-top: 1px solid rgb(250 224 216 / 0.5);
+  flex-shrink: 0;
+}
+
+/* Form inside modals */
+.al-modal-body .form-input {
+  border-color: rgb(244 187 164 / 1);
+}
+
+.al-modal-body .form-input:focus {
+  border-color: rgb(205 129 53 / 1);
+  box-shadow: 0 0 0 2px rgb(205 129 53 / 0.25);
+}
+
+.al-modal-body .form-error {
+  color: rgb(220 38 38 / 1);
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+/* Spinner for modal submit buttons */
+.al-spinner {
+  display: inline-block;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid rgb(255 255 255 / 0.4);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: al-spin 0.6s linear infinite;
+}
+
+@keyframes al-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Small helpers for admin tables */
+.admin-table-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* Confirmation prompt styling consistency */
+.admin-confirm-banner {
+  background-color: rgb(254 243 199 / 1);
+  border: 1px solid rgb(245 158 11 / 1);
+  color: rgb(180 83 9 / 1);
+  padding: 0.625rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+/* Inline loading indicator for async delete buttons */
+.admin-delete-loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+/* Scrollable modal content */
+.al-modal-body > :last-child {
+  margin-bottom: 0;
+}
+
+/* Responsive: small modals stay readable */
+@media (max-width: 640px) {
+  .al-modal-panel {
+    align-items: flex-start;
+    padding: 0.5rem;
+    overflow-y: auto;
+  }
+
+  .al-modal-dialog {
+    width: min(100%, 32rem);
+    max-width: calc(100vw - 1rem);
+    max-height: calc(100dvh - 1rem);
+    margin: 0;
+    border-radius: 0.75rem;
+  }
+
+  .al-modal-body {
+    padding: 1rem;
+  }
+
+  .al-modal-header {
+    padding: 0.75rem 1rem;
+  }
+
+  .al-modal-footer {
+    padding: 0.75rem 1rem;
+    flex-wrap: wrap;
+  }
+
+  .al-modal-footer button {
+    flex: 1;
+    min-width: 0;
+    min-height: 2.75rem;
+  }
+}
+
+/* Responsive: tables on mobile */
+@media (max-width: 768px) {
+  .admin-table-actions {
+    flex-wrap: wrap;
+  }
+
+  .card table {
+    font-size: 0.75rem;
+  }
+
+  .card table th,
+  .card table td {
+    padding: 0.5rem 0.625rem;
+    white-space: nowrap;
+  }
+
+  .card table th:last-child,
+  .card table td:last-child {
+    white-space: normal;
   }
 }
