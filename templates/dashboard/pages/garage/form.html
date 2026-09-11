@@ -156,6 +156,10 @@
                 </button>
 
                 <div id="location-info"></div>
+
+                <!-- Textes traduits pour usage JS (évite les conflits d'apostrophes) -->
+                <span id="i18n-limit-warning" class="hidden">{% trans "Pour plus de précision, activez le GPS ou sortez à l'extérieur." %}</span>
+
                 <div id="location-map" style="display:none;height:320px;border-radius:12px;overflow:hidden;" class="mt-4"></div>
 
                 <div id="location-confirm" style="display:none;" class="mt-4">
@@ -219,8 +223,11 @@
 
     // Précision cible (mètres). En dessous, la position est considérée fiable.
     var TARGET_ACCURACY = 20;
+    // Timeout maximum avant de forcer la capture (10 secondes)
+    var MAX_WAIT_MS = 10000;
     var watchId = null;
     var bestFix = null;
+    var captureTimer = null;
 
     var map = null;
     var userMarker = null;
@@ -253,6 +260,10 @@
         if (watchId !== null) {
             navigator.geolocation.clearWatch(watchId);
             watchId = null;
+        }
+        if (captureTimer !== null) {
+            clearTimeout(captureTimer);
+            captureTimer = null;
         }
     }
 
@@ -366,6 +377,7 @@
 
     function onError(error) {
         if (error.code === error.TIMEOUT && bestFix) {
+            stopWatching();
             capturePosition();
             locationStatus.textContent =
                 '{% trans "Position capturée (précision limitée :" %} ' +
@@ -413,8 +425,23 @@
             watchId = navigator.geolocation.watchPosition(
                 onWatch,
                 onError,
-                { enableHighAccuracy: true, timeout: 60000, maximumAge: 0 }
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
             );
+
+            // Fallback : après MAX_WAIT_MS, capture la meilleure position obtenue
+            captureTimer = setTimeout(function() {
+                if (watchId !== null && bestFix) {
+                    var extMsg = document.getElementById('i18n-limit-warning').textContent;
+                    var warningMsg = bestFix.accuracy > 100
+                        ? '{% trans "Position capturée. Précision limitée (" %}' + Math.round(bestFix.accuracy) + ' m). ' + extMsg
+                        : '{% trans "Position capturée avec succès." %}';
+                    capturePosition();
+                    locationStatus.textContent = warningMsg;
+                    locationStatus.className = bestFix.accuracy > 100
+                        ? 'text-sm text-orange-600 font-medium mb-2'
+                        : 'text-sm text-green-600 font-medium mb-2';
+                }
+            }, MAX_WAIT_MS);
         });
     }
 
