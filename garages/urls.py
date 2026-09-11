@@ -13,6 +13,7 @@ urlpatterns = [
         name="garage_search_suggestions",
     ),
     path("creer/", views.garage_create_view, name="garage_create"),
+    path("mes-garages/", views.garage_my_list_view, name="garage_my_list"),
     path("<uuid:garage_id>/modifier/", views.garage_edit_view, name="garage_edit"),
     path("<uuid:garage_id>/supprimer/", views.garage_delete_view, name="garage_delete"),
     path("mon-dashboard/", views.garage_dashboard_view, name="garage_dashboard"),

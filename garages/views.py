@@ -560,6 +560,28 @@ def garage_create_view(request):
 
 
 @login_required
+def garage_my_list_view(request):
+    """List all garages owned by the current user."""
+    garages = (
+        Garage.objects.filter(owner=request.user)
+        .select_related("city", "neighborhood")
+        .order_by("-created_at")
+    )
+
+    if not garages.exists():
+        return redirect("garages:garage_create")
+
+    context = {
+        "garages": garages,
+    }
+    return render(
+        request,
+        "dashboard/pages/garage/my_list.html",
+        context,
+    )
+
+
+@login_required
 def garage_edit_view(request, garage_id):
     garage = get_object_or_404(Garage, pk=garage_id, owner=request.user)
     if request.method == "POST":

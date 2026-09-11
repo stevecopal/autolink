@@ -128,9 +128,9 @@
     </a>
 
     <!-- Gérer mes garages -->
-    <a href="{% url 'garages:garage_dashboard' %}"
+    <a href="{% url 'garages:garage_my_list' %}"
        class="flex items-center gap-2 px-3 py-2.5 rounded-lg hover:bg-auto-light/80 text-sm font-medium transition text-auto-dark
-              {% if request.resolver_match.url_name == 'garage_dashboard' %}
+              {% if request.resolver_match.url_name == 'garage_my_list' or request.resolver_match.url_name == 'garage_dashboard' %}
                  bg-auto-light text-auto-orange font-bold shadow-sm
               {% endif %}">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">

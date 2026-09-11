@@ -2308,6 +2308,16 @@ input[type="file"] {
   background-color: rgb(254 252 232 / var(--tw-bg-opacity, 1));
 }
 
+.bg-gray-100 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(243 244 246 / var(--tw-bg-opacity, 1));
+}
+
+.bg-green-100 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(220 252 231 / var(--tw-bg-opacity, 1));
+}
+
 .bg-\[radial-gradient\(ellipse_at_center\2c rgba\(205\2c 129\2c 53\2c 0\.1\)\2c transparent_70\%\)\] {
   background-image: radial-gradient(ellipse at center,rgba(205,129,53,0.1),transparent 70%);
 }
@@ -2980,6 +2990,11 @@ input[type="file"] {
 .text-blue-600 {
   --tw-text-opacity: 1;
   color: rgb(37 99 235 / var(--tw-text-opacity, 1));
+}
+
+.text-yellow-700 {
+  --tw-text-opacity: 1;
+  color: rgb(161 98 7 / var(--tw-text-opacity, 1));
 }
 
 .underline {

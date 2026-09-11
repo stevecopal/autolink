@@ -1,9 +1,11 @@
 import hashlib
 import hmac
+import io
 import json
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from django.urls import reverse
 
@@ -33,13 +35,25 @@ class GarageCRUDPermissionTest(TestCase):
             "name": name,
             "description": "Réparation automobile",
             "phone": "+237600000000",
+            "whatsapp": "+237600000001",
+            "email": "garage@test.com",
             "address": "Akwa",
             "city": str(self.city.pk),
             "neighborhood": str(self.neighborhood.pk),
             "latitude": "4.0511",
             "longitude": "9.7679",
             "gps_accuracy": "10",
+            "photo": self._fake_jpeg(),
         }
+
+    @staticmethod
+    def _fake_jpeg():
+        """Return a minimal valid JPEG via Pillow."""
+        from PIL import Image
+        buf = io.BytesIO()
+        Image.new("RGB", (1, 1), "red").save(buf, format="JPEG")
+        buf.seek(0)
+        return SimpleUploadedFile("garage.jpg", buf.read(), content_type="image/jpeg")
 
     def test_create_generates_slug_promotes_user_and_starts_inactive(self):
         self.client.login(username="garage-user", password="pass")
