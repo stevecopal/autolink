@@ -156,7 +156,7 @@
                 </button>
 
                 <div id="location-info"></div>
-                <div id="location-map" style="display:none;" class="mt-4"></div>
+                <div id="location-map" style="display:none;height:320px;border-radius:12px;overflow:hidden;" class="mt-4"></div>
 
                 <div id="location-confirm" style="display:none;" class="mt-4">
                     <p class="text-sm text-green-700 font-medium">
@@ -176,8 +176,12 @@
     </div>
 </div>
 
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
 <script>
 (function() {
+    'use strict';
+
     var citySelect = document.getElementById('id_city');
     var neighborhoodSelect = document.getElementById('id_neighborhood');
 
@@ -208,9 +212,188 @@
     var locationStatus = document.getElementById('location-status');
     var locationInfo = document.getElementById('location-info');
     var locationConfirm = document.getElementById('location-confirm');
+    var locationMapEl = document.getElementById('location-map');
     var latInput = document.getElementById('id_latitude');
     var lngInput = document.getElementById('id_longitude');
     var accInput = document.getElementById('id_gps_accuracy');
+
+    // Précision cible (mètres). En dessous, la position est considérée fiable.
+    var TARGET_ACCURACY = 20;
+    var watchId = null;
+    var bestFix = null;
+
+    var map = null;
+    var userMarker = null;
+    var garageMarker = null;
+    var accuracyCircle = null;
+
+    // 6 décimales = même precision que le DecimalField du modèle :
+    // la chaîne affichée, envoyée au formulaire et stockée en base est identique.
+    function fmtCoord(value) {
+        return value.toFixed(6);
+    }
+
+    var btnIdle =
+        '<svg class="w-5 h-5 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">' +
+        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>' +
+        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>' +
+        '</svg> {% trans "Obtenir ma position" %}';
+    var btnRefresh =
+        '<svg class="w-5 h-5 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">' +
+        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>' +
+        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>' +
+        '</svg> {% trans "Rafraîchir la position" %}';
+
+    function setLoading(loading, label) {
+        locationBtn.disabled = loading;
+        locationBtn.innerHTML = label;
+    }
+
+    function stopWatching() {
+        if (watchId !== null) {
+            navigator.geolocation.clearWatch(watchId);
+            watchId = null;
+        }
+    }
+
+    function capturePosition() {
+        if (!bestFix) return;
+        stopWatching();
+
+        var latText = fmtCoord(bestFix.lat);
+        var lngText = fmtCoord(bestFix.lng);
+
+        // Une seule source de vérité : le même texte va dans l'input
+        // (donc en base) et dans la carte de vérification.
+        latInput.value = latText;
+        lngInput.value = lngText;
+        accInput.value = bestFix.accuracy.toFixed(2);
+
+        locationStatus.textContent = '{% trans "Position capturée avec succès." %}';
+        locationStatus.className = 'text-sm text-green-600 font-medium mb-2';
+
+        locationInfo.innerHTML =
+            '<p class="text-sm text-auto-600 mt-2">' +
+            '{% trans "Latitude" %} : ' + latText + '<br>' +
+            '{% trans "Longitude" %} : ' + lngText + '<br>' +
+            '{% trans "Précision" %} : ' + bestFix.accuracy.toFixed(1) + ' m' +
+            '</p>';
+
+        locationConfirm.style.display = 'block';
+        showVerificationMap(latText, lngText, bestFix.accuracy);
+
+        setLoading(false, btnRefresh);
+    }
+
+    function showVerificationMap(latText, lngText, accuracy) {
+        if (!locationMapEl || typeof L === 'undefined') return;
+
+        var latlng = [parseFloat(latText), parseFloat(lngText)];
+
+        locationMapEl.style.display = 'block';
+        if (!map) {
+            map = L.map(locationMapEl, { zoomControl: true, scrollWheelZoom: false });
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+                maxZoom: 19,
+            }).addTo(map);
+        }
+
+        map.setView(latlng, 18);
+
+        // Marqueur utilisateur (rouge)
+        if (!userMarker) {
+            userMarker = L.marker(latlng, {
+                icon: L.divIcon({
+                    className: 'user-marker',
+                    html: '<div style="width:22px;height:22px;background:#EF4444;border:3px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>',
+                    iconSize: [22, 22],
+                    iconAnchor: [11, 11],
+                }),
+                zIndexOffset: 1000,
+            }).bindPopup('<strong>{% trans "Votre position actuelle" %}</strong>').addTo(map);
+        } else {
+            userMarker.setLatLng(latlng);
+        }
+
+        // Marqueur garage (vert) — MÊMES coordonnées que le marqueur utilisateur.
+        if (!garageMarker) {
+            garageMarker = L.marker(latlng, {
+                icon: L.divIcon({
+                    className: 'garage-marker',
+                    html: '<div style="width:28px;height:28px;background:#10B981;border:3px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;font-size:14px;">🔧</div>',
+                    iconSize: [28, 28],
+                    iconAnchor: [14, 14],
+                }),
+            }).bindPopup('<strong>{% trans "Position du garage enregistrée" %}</strong>').addTo(map);
+        } else {
+            garageMarker.setLatLng(latlng);
+        }
+
+        if (!accuracyCircle) {
+            accuracyCircle = L.circle(latlng, {
+                radius: accuracy,
+                color: '#EF4444',
+                weight: 1,
+                fillOpacity: 0.08,
+            }).addTo(map);
+        } else {
+            accuracyCircle.setLatLng(latlng);
+            accuracyCircle.setRadius(accuracy);
+        }
+
+        setTimeout(function() { map.invalidateSize(); }, 50);
+    }
+
+    function onWatch(position) {
+        var fix = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+            accuracy: position.coords.accuracy,
+        };
+        if (!bestFix || fix.accuracy < bestFix.accuracy) {
+            bestFix = fix;
+        }
+        locationStatus.className = 'text-sm text-auto-500 mb-2';
+        locationStatus.textContent =
+            '{% trans "Précision actuelle" %} : ' + Math.round(fix.accuracy) + ' m' +
+            ' — {% trans "meilleure" %} : ' + Math.round(bestFix.accuracy) + ' m';
+
+        if (bestFix.accuracy <= TARGET_ACCURACY) {
+            capturePosition();
+        }
+    }
+
+    function onError(error) {
+        if (error.code === error.TIMEOUT && bestFix) {
+            capturePosition();
+            locationStatus.textContent =
+                '{% trans "Position capturée (précision limitée :" %} ' +
+                Math.round(bestFix.accuracy) + ' m). {% trans "Réessayez en extérieur pour plus de précision." %}';
+            locationStatus.className = 'text-sm text-orange-600 font-medium mb-2';
+            return;
+        }
+
+        stopWatching();
+        var msg = '';
+        switch (error.code) {
+            case error.PERMISSION_DENIED:
+                msg = "{% trans "Accès à la localisation refusé. Veuillez autoriser la géolocalisation dans les paramètres de votre navigateur." %}";
+                break;
+            case error.POSITION_UNAVAILABLE:
+                msg = '{% trans "Position non disponible. Vérifiez que le GPS est activé." %}';
+                break;
+            case error.TIMEOUT:
+                msg = "{% trans "Délai d'attente dépassé. Veuillez vous placer à l'extérieur et réessayer." %}";
+                break;
+            default:
+                msg = '{% trans "Erreur de géolocalisation." %}';
+                break;
+        }
+        locationStatus.textContent = msg;
+        locationStatus.className = 'text-sm text-red-600 mb-2';
+        setLoading(false, btnIdle);
+    }
 
     if (locationBtn) {
         locationBtn.addEventListener('click', function() {
@@ -220,83 +403,29 @@
                 return;
             }
 
-            locationBtn.disabled = true;
-            locationBtn.innerHTML = '<svg class="w-5 h-5 mr-2 inline animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> {% trans "Localisation en cours..." %}';
-            locationStatus.textContent = '{% trans "Recherche de votre position..." %}';
+            bestFix = null;
+            setLoading(true,
+                '<svg class="w-5 h-5 mr-2 inline animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> {% trans "Recherche GPS de précision…" %}');
+            locationStatus.textContent = '{% trans "Recherche de votre position GPS… Restez immobile." %}';
             locationStatus.className = 'text-sm text-auto-500 mb-2';
 
-            function onSuccess(position) {
-                var lat = position.coords.latitude;
-                var lng = position.coords.longitude;
-                var accuracy = position.coords.accuracy;
-
-                latInput.value = lat.toFixed(6);
-                lngInput.value = lng.toFixed(6);
-                accInput.value = accuracy.toFixed(2);
-
-                locationStatus.textContent = '{% trans "Localisation effectuée avec succès." %}';
-                locationStatus.className = 'text-sm text-green-600 font-medium mb-2';
-
-                locationInfo.innerHTML =
-                    '<p class="text-sm text-auto-600 mt-2">' +
-                    '{% trans "Latitude" %} : ' + lat.toFixed(6) + '<br>' +
-                    '{% trans "Longitude" %} : ' + lng.toFixed(6) + '<br>' +
-                    '{% trans "Précision" %} : ' + accuracy.toFixed(1) + ' m' +
-                    '</p>';
-
-                locationConfirm.style.display = 'block';
-
-                locationBtn.disabled = false;
-                locationBtn.innerHTML =
-                    '<svg class="w-5 h-5 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">' +
-                    '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>' +
-                    '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>' +
-                    '</svg> {% trans "Rafraîchir la position" %}';
-            }
-
-            function onError(error) {
-                if (error.code === error.TIMEOUT && !locationBtn.dataset.retried) {
-                    locationBtn.dataset.retried = '1';
-                    locationStatus.textContent = '{% trans "Nouvelle tentative..." %}';
-                    navigator.geolocation.getCurrentPosition(
-                        onSuccess,
-                        function(err) { onError(err); },
-                        { enableHighAccuracy: false, timeout: 30000, maximumAge: 60000 }
-                    );
-                    return;
-                }
-                delete locationBtn.dataset.retried;
-
-                var msg = '';
-                switch(error.code) {
-                    case error.PERMISSION_DENIED:
-                        msg = '{% trans "Accès à la localisation refusé. Veuillez autoriser la géolocalisation dans les paramètres de votre navigateur." %}';
-                        break;
-                    case error.POSITION_UNAVAILABLE:
-                        msg = '{% trans "Position non disponible. Vérifiez que le GPS est activé." %}';
-                        break;
-                    case error.TIMEOUT:
-                        msg = "{% trans "Délai d'attente dépassé. Veuillez vous placer à l'extérieur et réessayer." %}";
-                        break;
-                    default:
-                        msg = '{% trans "Erreur de géolocalisation." %}';
-                        break;
-                }
-                locationStatus.textContent = msg;
-                locationStatus.className = 'text-sm text-red-600 mb-2';
-                locationBtn.disabled = false;
-                locationBtn.innerHTML =
-                    '<svg class="w-5 h-5 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">' +
-                    '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>' +
-                    '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>' +
-                    '</svg> {% trans "Obtenir ma position" %}';
-            }
-
-            navigator.geolocation.getCurrentPosition(
-                onSuccess,
+            stopWatching();
+            watchId = navigator.geolocation.watchPosition(
+                onWatch,
                 onError,
-                { enableHighAccuracy: true, timeout: 30000, maximumAge: 0 }
+                { enableHighAccuracy: true, timeout: 60000, maximumAge: 0 }
             );
+        });
+    }
+
+    // Sécurité : si l'utilisateur soumet pendant la recherche, on fige
+    // la meilleure position déjà reçue.
+    var garageForm = document.getElementById('garage-form');
+    if (garageForm) {
+        garageForm.addEventListener('submit', function() {
+            if (!latInput.value && bestFix) {
+                capturePosition();
+            }
         });
     }
 })();

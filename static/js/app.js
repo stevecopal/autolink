@@ -368,7 +368,10 @@
                     });
                 },
                 function(err) { reject(err); },
-                { enableHighAccuracy: false, timeout: 10000, maximumAge: 300000 }
+                // Haute précision + aucun cache : la position "utilisateur"
+                // affichée sur les cartes est aussi proche que possible de la
+                // position réelle, comme celle capturée à la création d'un garage.
+                { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
             );
         });
     };
