@@ -2,6 +2,10 @@ from .base import (
     CamPayCollectResult,
     CamPayProvider,
     CamPayError,
+    CampayProvider,
+    PaymentInitialization,
+    ProviderError,
+    ProviderUnavailable,
 )
 
 
@@ -34,6 +38,8 @@ def set_cam_pay_provider_for_tests(provider: CamPayProvider) -> None:
 __all__ = [
     "CamPayProvider",
     "CamPayError",
+    "CamPayCollectResult",
     "provider_unavailable",
     "get_provider",
+    "set_cam_pay_provider_for_tests",
 ]

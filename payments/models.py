@@ -5,8 +5,6 @@ from django.utils.translation import gettext_lazy as _
 
 
 class Payment(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-
     class Status(models.TextChoices):
         INITIATED = "INITIATED", _("Initié")
         PENDING = "PENDING", _("En attente")
@@ -14,85 +12,43 @@ class Payment(models.Model):
         SUCCESS = "SUCCESS", _("Réussi")
         FAILED = "FAILED", _("Échoué")
         CANCELLED = "CANCELLED", _("Annulé")
-        REFUNDED = "REFUNDED", _("Remboursé")
 
     class Provider(models.TextChoices):
-        CAMPAY = "CAMPAY", _("CamPay")
+        CAMPAY = "CAMPAY", _("Campay")
 
-    # Clé d'idempotence (unique pour éviter les doubles paiements)
-    idempotency_key = models.CharField(max_length=64, unique=True, editable=False)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     garage = models.ForeignKey(
-        "garages.Garage",
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name="activation_payments",
+        "garages.Garage", on_delete=models.SET_NULL, null=True, blank=True
     )
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="payments"
-    )
-
-    # Montant en FCFA (ex: 1000.00)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     amount = models.DecimalField(
-        _("Montant"),
-        max_digits=10,
-        decimal_places=2,  # CORRECTION : 2 décimales pour les FCFA
-        default=0,
-    )
-    currency = models.CharField(
-        _("Devise"),
-        max_length=3,
-        default="XAF",  # FCFA
-    )
+        _("Montant"), max_digits=10, decimal_places=2
+    )  # Ex: 1000.00 XAF
+    currency = models.CharField(_("Devise"), max_length=3, default="XAF")
     provider = models.CharField(
-        _("Fournisseur"),
-        max_length=20,
-        choices=Provider.choices,
-        default=Provider.CAMPAY,
+        _("Fournisseur"), max_length=20, choices=Provider.choices
     )
-    # Référence retournée/créée côté fournisseur (ext_provider_reference / id)
-    provider_reference = models.CharField(
-        _("Référence Fournisseur"),
-        max_length=100,
-        blank=True,
+    idempotency_key = models.CharField(
+        _("Clé d'idempotence"), max_length=64, unique=True
     )
-    phone_number = models.CharField(_("Numéro de téléphone"), max_length=20, blank=True)
-
+    provider_transaction_id = models.CharField(
+        _("ID Transaction"), max_length=100, blank=True, default=""
+    )
+    provider_reference = models.CharField(_("Référence"), max_length=100, blank=True)
+    phone_number = models.CharField(_("Téléphone"), max_length=20, blank=True)
     status = models.CharField(
         _("Statut"), max_length=20, choices=Status.choices, default=Status.INITIATED
     )
-    status_message = models.TextField(_("Message de statut"), blank=True)
-
-    # Métadonnées (pour le reçu, etc.)
+    status_message = models.TextField(_("Message"), blank=True)
     metadata = models.JSONField(_("Métadonnées"), default=dict, blank=True)
-
-    created_at = models.DateTimeField(_("Créé le"), auto_now_add=True)
-    updated_at = models.DateTimeField(_("Mis à jour le"), auto_now=True)
-    paid_at = models.DateTimeField(_("Payé le"), null=True, blank=True)
-
-    class Meta:
-        ordering = ["-created_at"]
-        verbose_name = _("Paiement")
-        verbose_name_plural = _("Paiements")
-
-    def __str__(self):
-        return f"Paiement {self.idempotency_key[:8]} - {self.amount} {self.currency}"
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    paid_at = models.DateTimeField(null=True, blank=True)
 
     def save(self, *args, **kwargs):
         if not self.idempotency_key:
-            # Générer une clé unique (format: pay_ + UUID)
             self.idempotency_key = f"pay_{uuid.uuid4().hex}"
-        if not self.provider_reference and self.provider:
-            # Référence par défaut pour les providers qui n'en imposent pas un autre.
-            self.provider_reference = f"{self.provider}_{self.idempotency_key}"
         super().save(*args, **kwargs)
-
-    @property
-    def is_successful(self):
-        return self.status == self.Status.SUCCESS
-
-
-
 
 
 

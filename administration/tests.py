@@ -144,7 +144,7 @@ class AdminPaymentAndSuspensionTest(TestCase):
             garage=self.garage,
             user=self.client_user,
             amount=1000,
-            provider=Payment.Provider.PAYUNIT,
+            provider=Payment.Provider.CAMPAY,
             status=Payment.Status.SUCCESS,
             provider_transaction_id="admin-tx-1",
         )
@@ -160,7 +160,7 @@ class AdminPaymentAndSuspensionTest(TestCase):
         self.client.login(username="payment-admin", password="pass")
         response = self.client.get(
             reverse("administration:payments")
-            + f"?status=SUCCESS&garage={self.garage.pk}&provider=PAYUNIT&client=payment-client"
+            + f"?status=SUCCESS&garage={self.garage.pk}&provider=CAMPAY&client=payment-client"
         )
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "admin-tx-1")

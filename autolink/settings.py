@@ -14,7 +14,6 @@ ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="*").split(",")
 CSRF_TRUSTED_ORIGINS = config("CSRF_TRUSTED_ORIGINS", default="").split(",")
 
 # Payment provider credentials — all stored in .env, never committed.
-PAYMENT_WEBHOOK_SECRET = config("PAYMENT_WEBHOOK_SECRET", default="")
 
 # CamPay configuration
 CAMPAY_ENVIRONMENT = config("CAMPAY_ENVIRONMENT", default="DEV")  # DEV or PROD
@@ -119,7 +118,6 @@ LOCALE_PATHS = [BASE_DIR / "locale"]
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [
     BASE_DIR / "static",
-    BASE_DIR / "administration" / "static",
 ]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 

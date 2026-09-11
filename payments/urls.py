@@ -18,8 +18,8 @@ urlpatterns = [
     ),
     path(
         "garages/<uuid:garage_id>/activation/",
-        views.garage_payment_init_view,
-        name="garage_payment_activation",
+        views.garage_activation_payment_view,
+        name="garage_activation_payment",
     ),
     path(
         "garages/<uuid:garage_id>/retry/",
@@ -35,5 +35,10 @@ urlpatterns = [
         "recu/<uuid:receipt_id>/",
         views.receipt_download_view,
         name="receipt_download",
+    ),
+    path(
+        "payments/<uuid:payment_id>/make/<str:gateway>/",
+        views.make_payment_view,
+        name="make_payment",
     ),
 ]

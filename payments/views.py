@@ -10,10 +10,12 @@ from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
+from autolink import settings
 from garages.models import Garage
+from payments.providers.base import ProviderUnavailable
 
 from .constants import GARAGE_ACTIVATION_AMOUNT, GARAGE_ACTIVATION_CURRENCY
-from .models import Payment
+from .models import Payment, Receipt
 from .providers import CamPayError, get_provider
 from .services import PaymentWebhookError, process_webhook
 
@@ -25,6 +27,20 @@ def _response_json(request, success, message, status_code=200, data=None):
     if data:
         payload.update(data)
     return JsonResponse(payload, status=status_code)
+
+
+def _mark_garage_payment_failed(payment):
+    """
+    Réinitialise le statut de paiement du garage en FAILED quand un collect
+    CamPay échoue. Sans cela le garage reste bloqué en PENDING et ne peut
+    plus être relancé (can_activate() refuse PENDING).
+    """
+    if payment is None or not payment.garage_id:
+        return
+    garage = payment.garage
+    if garage.payment_status == Garage.PaymentStatus.PENDING:
+        garage.payment_status = Garage.PaymentStatus.FAILED
+        garage.save(update_fields=["payment_status", "updated_at"])
 
 
 # =============================================================================
@@ -180,7 +196,8 @@ def garage_payment_retry_view(request, garage_id):
     """
     Nouvelle tentative de paiement CamPay.
 
-    Chaque retry recrée un Payment indépendant et relance un collect.
+    Depuis un état d'échec (FAILED) ou non payé (UNPAID), on relance
+    une initialisation : RETRY → INITIALIZE (choix du moyen de paiement).
     """
     try:
         garage = get_object_or_404(Garage, pk=garage_id, owner=request.user)
@@ -193,16 +210,19 @@ def garage_payment_retry_view(request, garage_id):
                 400,
             )
 
-        # Autoriser le retry depuis un état terminal d'échec ou non payé.
-        if garage.payment_status not in (Garage.PaymentStatus.FAILED, Garage.PaymentStatus.UNPAID):
+        # Un garage payé/actif ne doit pas être re-facturé.
+        if garage.payment_status == Garage.PaymentStatus.PAID:
             return _response_json(
                 request,
                 False,
-                _("Impossible de relancer le paiement dans l'état actuel."),
+                _("Ce garage est déjà payé et actif."),
                 409,
             )
 
-        return garage_payment_init_view(request, garage_id)
+        # Tout autre état (UNPAID, FAILED, PENDING, PROCESSING) est relançable.
+        # garage_activation_payment_view clôture les éventuels paiements non
+        # confirmés et en crée un nouveau.
+        return garage_activation_payment_view(request, garage_id)
 
     except Exception as e:
         logger.exception(
@@ -236,7 +256,7 @@ def payment_webhook_view(request):
     """
     provider = get_provider("CAMPAY")
 
-    if not provider.verify_webhook_signature(request):
+    if not provider.verify_webhook(request):
         logger.warning("Tentative de webhook non autorisée ou signature invalide.")
         return JsonResponse({"success": False, "message": "Invalid Signature"}, status=403)
 
@@ -253,6 +273,7 @@ def payment_webhook_view(request):
         amount = parsed.get("amount")
         currency = parsed.get("currency")
         provider_reference = parsed.get("provider_reference", "")
+        provider_transaction_id = parsed.get("transaction_id", "")
         phone_number = parsed.get("phone_number", "")
 
         if not external_reference:
@@ -267,6 +288,7 @@ def payment_webhook_view(request):
             amount=amount,
             currency=currency,
             provider_reference=provider_reference,
+            provider_transaction_id=provider_transaction_id,
             metadata={"phone_number": phone_number, "provider": "CAMPAY"},
         )
 
@@ -279,15 +301,6 @@ def payment_webhook_view(request):
     except Exception as e:
         logger.exception("Webhook critical error: %s", e)
         return JsonResponse({"success": False, "message": "Internal Server Error"}, status=500)
-
-
-@login_required
-@require_POST
-def payment_webhook_view(request):
-    """
-    Alias maintenu pour compatibilité des anciennes références.
-    """
-    return payment_webhook_view(request)
 
 
 # =============================================================================
@@ -349,3 +362,228 @@ def receipt_download_view(request, receipt_id):
         "dashboard/pages/client/payments/receipt_print.html",
         {"receipt": receipt},
     )
+
+
+
+
+
+
+@login_required
+@require_POST
+def garage_activation_payment_view(request, garage_id):
+    """
+    Vue pour initier un paiement Campay pour l'activation d'un garage.
+    """
+    try:
+        garage = get_object_or_404(Garage, pk=garage_id, owner=request.user)
+
+        # Un garage payé/actif ne doit pas être re-facturé.
+        if garage.payment_status == Garage.PaymentStatus.PAID:
+            return JsonResponse(
+                {
+                    "success": True,
+                    "message": _("Ce garage est déjà payé et actif."),
+                },
+                status=200,
+            )
+
+        # Le garage doit être approuvé pour être activé (payé).
+        if garage.approval_status != Garage.ApprovalStatus.APPROVED:
+            return JsonResponse(
+                {
+                    "success": False,
+                    "message": _(
+                        "Ce garage doit être approuvé avant le paiement."
+                    ),
+                },
+                status=400,
+            )
+
+        with transaction.atomic():
+            garage = Garage.objects.select_for_update().get(pk=garage.pk)
+
+            # Si un paiement précédent n'a jamais été confirmé (initié/en attente),
+            # on le clôture en FAILED avant d'en créer un nouveau. Cela évite de
+            # bloquer le garage en PENDING après un collect échoué.
+            Payment.objects.filter(
+                garage=garage,
+                provider=Payment.Provider.CAMPAY,
+                status__in=[
+                    Payment.Status.INITIATED,
+                    Payment.Status.PENDING,
+                    Payment.Status.PROCESSING,
+                ],
+            ).update(
+                status=Payment.Status.FAILED,
+                status_message=_("Remplacé par une nouvelle tentative de paiement."),
+            )
+
+            payment = Payment.objects.create(
+                garage=garage,
+                user=request.user,
+                amount=GARAGE_ACTIVATION_AMOUNT,
+                currency=GARAGE_ACTIVATION_CURRENCY,
+                provider=Payment.Provider.CAMPAY,
+                status=Payment.Status.PENDING,
+            )
+
+            # CamPay renvoie external_reference = idempotency_key dans le webhook.
+            payment.provider_reference = payment.idempotency_key
+
+            # Initialiser le paiement via Campay (valide montant + identifiants API)
+            provider = get_provider("CAMPAY")
+            init_result = provider.initialize(payment)
+
+            if init_result:
+                payment.status = Payment.Status.PROCESSING
+                payment.save(
+                    update_fields=[
+                        "provider_reference",
+                        "status",
+                        "updated_at",
+                    ]
+                )
+
+                garage.payment_status = Garage.PaymentStatus.PENDING
+                garage.save(update_fields=["payment_status", "updated_at"])
+
+                return JsonResponse(
+                    {
+                        "success": True,
+                        "payment_id": str(payment.pk),
+                        "active_gateways": [
+                            "ORANGE_CM",
+                            "MTN_CM",
+                        ],  # Gateways disponibles
+                        "providers": [
+                            {
+                                "shortcode": "ORANGE_CM",
+                                "name": "Orange Money",
+                                "status": "ACTIVE",
+                            },
+                            {
+                                "shortcode": "MTN_CM",
+                                "name": "MTN Mobile Money",
+                                "status": "ACTIVE",
+                            },
+                        ],
+                        "message": _("Sélectionnez un moyen de paiement."),
+                    }
+                )
+            else:
+                raise ProviderUnavailable("Initialisation Campay échouée.")
+
+    except ProviderUnavailable as e:
+        logger.error(f"Erreur initialisation paiement: {e}")
+        return JsonResponse(
+            {
+                "success": False,
+                "message": str(e),
+            },
+            status=500 if "Erreur réseau" in str(e) else 400,
+        )
+    except Exception as e:
+        logger.error(f"Erreur inattendue: {e}")
+        return JsonResponse(
+            {
+                "success": False,
+                "message": _("Une erreur est survenue. Veuillez réessayer."),
+            },
+            status=500,
+        )
+
+
+@login_required
+@require_POST
+def make_payment_view(request, payment_id, gateway):
+    """
+    Vue pour effectuer un paiement Campay via USSD.
+    """
+    try:
+        payment = get_object_or_404(Payment, pk=payment_id, user=request.user)
+        if payment.status != Payment.Status.PROCESSING:
+            return JsonResponse(
+                {
+                    "success": False,
+                    "message": _("Paiement non valide pour le paiement USSD."),
+                },
+                status=400,
+            )
+
+        phone_number = request.POST.get("phone_number", "").strip()
+        if not phone_number:
+            return JsonResponse(
+                {
+                    "success": False,
+                    "message": _("Numéro de téléphone requis."),
+                },
+                status=400,
+            )
+
+        # Vérifier le format du numéro (+237 suivi de 9 chiffres)
+        if not phone_number.startswith("+237") or len(phone_number) != 13:
+            return JsonResponse(
+                {
+                    "success": False,
+                    "message": _(
+                        "Numéro de téléphone invalide. Format: +237XXXXXXXXX."
+                    ),
+                },
+                status=400,
+            )
+
+        provider = get_provider("CAMPAY")
+        provider_transaction_id = provider.make_payment(
+            payment,
+            phone_number=phone_number,
+            gateway=gateway,
+        )
+
+        if provider_transaction_id:
+            payment.provider_transaction_id = provider_transaction_id
+            payment.save(update_fields=["provider_transaction_id", "updated_at"])
+            return JsonResponse(
+                {
+                    "success": True,
+                    "message": _(
+                        "Paiement en cours. Vous allez recevoir un SMS pour confirmation."
+                    ),
+                    "status": "pending",
+                    "retry_allowed": True,
+                }
+            )
+        else:
+            _mark_garage_payment_failed(payment)
+            return JsonResponse(
+                {
+                    "success": False,
+                    "message": _("Échec du paiement USSD."),
+                    "retry_allowed": True,
+                },
+                status=500,
+            )
+
+    except ProviderUnavailable as e:
+        logger.error(f"Erreur paiement USSD: {e}")
+        _mark_garage_payment_failed(payment)
+        return JsonResponse(
+            {
+                "success": False,
+                "message": str(e),
+                "retry_allowed": True,
+            },
+            status=500 if "Erreur réseau" in str(e) else 400,
+        )
+    except Exception as e:
+        logger.error(f"Erreur inattendue: {e}")
+        _mark_garage_payment_failed(payment)
+        return JsonResponse(
+            {
+                "success": False,
+                "message": _("Une erreur est survenue. Veuillez réessayer."),
+                "retry_allowed": True,
+            },
+            status=500,
+        )
+
+

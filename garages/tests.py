@@ -1,3 +1,5 @@
+import hashlib
+import hmac
 import json
 
 from django.conf import settings
@@ -114,23 +116,35 @@ class GarageCRUDPermissionTest(TestCase):
             user=self.user,
             amount=GARAGE_ACTIVATION_AMOUNT,
             currency=GARAGE_ACTIVATION_CURRENCY,
-            provider=Payment.Provider.PAYUNIT,
+            provider=Payment.Provider.CAMPAY,
             status=Payment.Status.PENDING,
+            provider_reference="campay_ref_activate",
         )
         response = self.client.post(
             reverse("payments:payment_webhook"),
             data=json.dumps(
                 {
-                    "provider": "PAYUNIT",
-                    "provider_transaction_id": "tx-approved",
-                    "payment_id": str(payment.pk),
+                    "external_reference": "campay_ref_activate",
                     "status": "SUCCESS",
                     "amount": str(GARAGE_ACTIVATION_AMOUNT),
                     "currency": GARAGE_ACTIVATION_CURRENCY,
+                    "phone_number": "23760000000",
                 }
-            ),
+            ).encode("utf-8"),
             content_type="application/json",
-            HTTP_X_WEBHOOK_SECRET=getattr(settings, "PAYMENT_WEBHOOK_SECRET", ""),
+            HTTP_X_CAMPAY_SIGNATURE=hmac.new(
+                (settings.CAMPAY_WEBHOOK_SECRET or "").encode(),
+                json.dumps(
+                    {
+                        "external_reference": "campay_ref_activate",
+                        "status": "SUCCESS",
+                        "amount": str(GARAGE_ACTIVATION_AMOUNT),
+                        "currency": GARAGE_ACTIVATION_CURRENCY,
+                        "phone_number": "23760000000",
+                    }
+                ).encode("utf-8"),
+                hashlib.sha256,
+            ).hexdigest(),
         )
         self.assertEqual(response.status_code, 200)
         garage.refresh_from_db()

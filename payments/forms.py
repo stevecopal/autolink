@@ -6,7 +6,7 @@ from .models import Payment
 
 class PaymentForm(forms.Form):
     provider = forms.ChoiceField(
-        choices=[(c, l) for c, l in Payment.Provider.choices if c != Payment.Provider.CASH],
+        choices=[(c, l) for c, l in Payment.Provider.choices],
         widget=forms.RadioSelect(),
     )
     phone_number = forms.CharField(

@@ -29,10 +29,10 @@
     <div class="bg-auto-gold/10 border border-auto-gold/30 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
             <p class="font-bold text-auto-dark">{% trans "Votre garage est approuvé" %}</p>
-            <p class="text-sm text-auto-700">{% blocktrans with amount=garage_activation_amount currency=garage_activation_currency %}Payer {{ amount }} {{ currency }} pour activer votre garage{% endblocktrans %}</p>
+            <p class="text-sm text-auto-700">{% blocktrans with amount=garage_activation_amount|floatformat:0 currency=garage_activation_currency %}Payer {{ amount }} {{ currency }} pour activer votre garage{% endblocktrans %}</p>
         </div>
         <button type="button" onclick="openPaymentModal()" class="btn-primary whitespace-nowrap">
-            {% blocktrans with amount=garage_activation_amount currency=garage_activation_currency %}Payer {{ amount }} {{ currency }}{% endblocktrans %}
+            {% blocktrans with amount=garage_activation_amount|floatformat:0 currency=garage_activation_currency %}Payer {{ amount }} {{ currency }}{% endblocktrans %}
         </button>
     </div>
     {% endif %}
@@ -156,7 +156,7 @@
             <!-- Montant fixe -->
             <div class="mx-6 mb-4 bg-auto-gold/10 border border-auto-gold/30 rounded-xl p-4 text-center">
                 <p class="text-sm text-auto-700 mb-1">{% trans "Montant à payer" %}</p>
-                <p class="text-3xl font-extrabold text-auto-dark">1 000 <span class="text-lg">FCFA</span></p>
+                <p class="text-3xl font-extrabold text-auto-dark">{{ garage_activation_amount|floatformat:0 }} <span class="text-lg">{{ garage_activation_currency }}</span></p>
                 <p class="text-xs text-auto-500 mt-1">{% trans "Montant fixe – non modifiable" %}</p>
             </div>
 
@@ -245,695 +245,322 @@
     var currentPuTransactionId = null;
     var currentActiveGateways = [];
 
-    /*
-     * ============================================================
-     * OUVRIR LE MODAL
-     * ============================================================
-     */
     window.openPaymentModal = function () {
-        if (!modal) {
-            console.error('Payment modal introuvable.');
-            return;
-        }
-
+        if (!modal) return;
         modal.classList.remove('hidden');
         document.body.style.overflow = 'hidden';
 
-        if (errorBox) {
-            errorBox.classList.add('hidden');
-        }
-
-        if (successBox) {
-            successBox.classList.add('hidden');
-        }
-
+        if (errorBox) errorBox.classList.add('hidden');
+        if (successBox) successBox.classList.add('hidden');
         if (gatewaysContainer) {
             gatewaysContainer.innerHTML =
-                '<p class="text-sm text-auto-500 text-center">' +
-                '{% trans "Chargement des moyens de paiement…" %}' +
-                '</p>';
+                '<p class="text-sm text-auto-500 text-center">{% trans "Chargement des moyens de paiement…" %}</p>';
         }
+        setLoading(true);
 
-        if (submitBtn) {
-            submitBtn.disabled = true;
-        }
-
-        if (btnText) {
-            btnText.textContent =
-                '{% trans "Chargement…" %}';
-        }
-
-        if (btnSpinner) {
-            btnSpinner.classList.remove('hidden');
-        }
-
-        /*
-         * On initialise le paiement après l'ouverture du modal.
-         * Le numéro doit être saisi avant l'appel.
-         */
         setTimeout(function () {
             var phoneInput = document.getElementById('payment-phone');
-
-            if (phoneInput) {
-                phoneInput.focus();
-            }
-
-            /*
-             * Ne pas initialiser immédiatement si aucun numéro
-             * n'est encore saisi.
-             */
+            if (phoneInput) phoneInput.focus();
             if (phoneInput && phoneInput.value.trim()) {
                 initializePayment();
             } else {
                 setLoading(false);
-                renderGateways([]);
+                if (gatewaysContainer) {
+                    gatewaysContainer.innerHTML =
+                        '<p class="text-sm text-auto-500 text-center">{% trans "Saisissez votre numéro pour charger les moyens de paiement." %}</p>';
+                }
             }
         }, 100);
     };
 
-
-    /*
-     * ============================================================
-     * FERMER LE MODAL
-     * ============================================================
-     */
     window.closePaymentModal = function () {
-        if (!modal) {
-            return;
-        }
-
+        if (!modal) return;
         modal.classList.add('hidden');
         document.body.style.overflow = '';
-
         resetForm();
     };
 
-
-    /*
-     * ============================================================
-     * RESET
-     * ============================================================
-     */
     function resetForm() {
-        if (form) {
-            form.reset();
-        }
-
-        if (errorBox) {
-            errorBox.classList.add('hidden');
-        }
-
-        if (successBox) {
-            successBox.classList.add('hidden');
-        }
-
-        if (btnText) {
-            btnText.textContent =
-                '{% trans "Payer maintenant" %}';
-        }
-
-        if (btnSpinner) {
-            btnSpinner.classList.add('hidden');
-        }
-
-        if (submitBtn) {
-            submitBtn.disabled = true;
-        }
-
+        if (form) form.reset();
+        if (errorBox) errorBox.classList.add('hidden');
+        if (successBox) successBox.classList.add('hidden');
+        if (btnText) btnText.textContent = '{% trans "Payer maintenant" %}';
+        if (btnSpinner) btnSpinner.classList.add('hidden');
+        if (submitBtn) submitBtn.disabled = false;
         if (gatewaysContainer) {
             gatewaysContainer.innerHTML =
-                '<p class="text-sm text-auto-500 text-center">' +
-                '{% trans "Saisissez votre numéro pour charger les moyens de paiement." %}' +
-                '</p>';
+                '<p class="text-sm text-auto-500 text-center">{% trans "Saisissez votre numéro pour charger les moyens de paiement." %}</p>';
         }
-
         currentPaymentId = null;
         currentPuTransactionId = null;
         currentActiveGateways = [];
     }
 
-
-    /*
-     * ============================================================
-     * ERREUR
-     * ============================================================
-     */
     function showError(msg) {
-        if (errorText) {
-            errorText.textContent = msg;
-        }
-
-        if (errorBox) {
-            errorBox.classList.remove('hidden');
-        }
-
-        if (successBox) {
-            successBox.classList.add('hidden');
-        }
-
-        if (submitBtn) {
-            submitBtn.disabled = false;
-        }
-
-        if (btnText) {
-            btnText.textContent =
-                '{% trans "Payer maintenant" %}';
-        }
-
-        if (btnSpinner) {
-            btnSpinner.classList.add('hidden');
-        }
+        if (errorText) errorText.textContent = msg;
+        if (errorBox) errorBox.classList.remove('hidden');
+        if (successBox) successBox.classList.add('hidden');
+        setLoading(false);
     }
 
-
-    /*
-     * ============================================================
-     * SUCCÈS
-     * ============================================================
-     */
     function showSuccess(msg) {
-        if (successText) {
-            successText.textContent = msg;
-        }
-
-        if (successBox) {
-            successBox.classList.remove('hidden');
-        }
-
-        if (errorBox) {
-            errorBox.classList.add('hidden');
-        }
+        if (successText) successText.textContent = msg;
+        if (successBox) successBox.classList.remove('hidden');
+        if (errorBox) errorBox.classList.add('hidden');
     }
 
-
-    /*
-     * ============================================================
-     * LOADING
-     * ============================================================
-     */
     function setLoading(loading) {
         if (loading) {
-            if (btnText) {
-                btnText.textContent =
-                    '{% trans "Traitement en cours…" %}';
-            }
-
-            if (btnSpinner) {
-                btnSpinner.classList.remove('hidden');
-            }
-
-            if (submitBtn) {
-                submitBtn.disabled = true;
-            }
+            if (btnText) btnText.textContent = '{% trans "Traitement en cours…" %}';
+            if (btnSpinner) btnSpinner.classList.remove('hidden');
+            if (submitBtn) submitBtn.disabled = true;
         } else {
-            if (btnText) {
-                btnText.textContent =
-                    '{% trans "Payer maintenant" %}';
-            }
-
-            if (btnSpinner) {
-                btnSpinner.classList.add('hidden');
-            }
-
-            if (submitBtn) {
-                submitBtn.disabled = false;
-            }
+            if (btnText) btnText.textContent = '{% trans "Payer maintenant" %}';
+            if (btnSpinner) btnSpinner.classList.add('hidden');
+            if (submitBtn) submitBtn.disabled = false;
         }
     }
 
-
-    /*
-     * ============================================================
-     * AFFICHER LES MOYENS DE PAIEMENT
-     * ============================================================
-     */
     function renderGateways(providers) {
-        if (!gatewaysContainer) {
-            return;
-        }
-
+        if (!gatewaysContainer) return;
         if (!providers || providers.length === 0) {
             gatewaysContainer.innerHTML =
-                '<p class="text-sm text-auto-500 text-center">' +
-                '{% trans "Aucun moyen de paiement disponible." %}' +
-                '</p>';
-
-            if (submitBtn) {
-                submitBtn.disabled = true;
-            }
-
+                '<p class="text-sm text-auto-500 text-center">{% trans "Aucun moyen de paiement disponible." %}</p>';
+            if (submitBtn) submitBtn.disabled = true;
             return;
         }
 
         var html = '<div class="grid grid-cols-2 gap-3">';
-
         providers.forEach(function (p) {
             var shortcode = p.shortcode || '';
             var name = p.name || shortcode;
             var status = (p.status || '').toUpperCase();
+            if (status !== 'ACTIVE') return;
 
-            if (status !== 'ACTIVE') {
-                return;
-            }
+            var isOrange = shortcode === 'ORANGE_CM';
+            var borderColor = isOrange ? 'border-orange-500 bg-orange-50' : 'border-yellow-500 bg-yellow-50';
+            var logoColor = isOrange ? 'text-orange-600' : 'text-yellow-600';
+            var bgColor = isOrange ? 'bg-orange-100' : 'bg-yellow-100';
 
-            var isOrange = shortcode === 'CM_ORANGE';
-
-            var borderColor = isOrange
-                ? 'border-orange-500 bg-orange-50'
-                : 'border-yellow-500 bg-yellow-50';
-
-            var logoColor = isOrange
-                ? 'text-orange-600'
-                : 'text-yellow-600';
-
-            var bgColor = isOrange
-                ? 'bg-orange-100'
-                : 'bg-yellow-100';
-
-            html +=
-                '<label class="cursor-pointer">' +
-                    '<input ' +
-                        'type="radio" ' +
-                        'name="gateway" ' +
-                        'value="' + shortcode + '" ' +
-                        'required ' +
-                        'class="peer sr-only">' +
-
-                    '<div class="border-2 border-auto-200 ' +
-                        'peer-checked:' + borderColor + ' ' +
-                        'rounded-xl p-4 text-center transition-all ' +
-                        'hover:border-auto-300">' +
-
-                        '<div class="w-10 h-10 mx-auto mb-2 rounded-full ' +
-                            bgColor +
-                            ' flex items-center justify-center">' +
-
-                            '<svg class="w-6 h-6 ' +
-                                logoColor +
-                                '" fill="currentColor" ' +
-                                'viewBox="0 0 24 24">' +
-
-                                '<circle cx="12" cy="12" r="10"></circle>' +
-
-                            '</svg>' +
-
-                        '</div>' +
-
-                        '<div class="text-sm font-bold text-auto-dark">' +
-                            escapeHtml(name) +
-                        '</div>' +
-
-                    '</div>' +
-                '</label>';
+            html += `
+                <label class="cursor-pointer">
+                    <input type="radio" name="gateway" value="${shortcode}" required class="peer sr-only">
+                    <div class="border-2 border-auto-200 peer-checked:${borderColor} rounded-xl p-4 text-center transition-all hover:border-auto-300">
+                        <div class="w-10 h-10 mx-auto mb-2 rounded-full ${bgColor} flex items-center justify-center">
+                            <svg class="w-6 h-6 ${logoColor}" fill="currentColor" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10"></circle>
+                            </svg>
+                        </div>
+                        <div class="text-sm font-bold text-auto-dark">${escapeHtml(name)}</div>
+                    </div>
+                </label>
+            `;
         });
-
         html += '</div>';
-
         gatewaysContainer.innerHTML = html;
-
-        if (submitBtn) {
-            submitBtn.disabled = false;
-        }
-
-        if (btnText) {
-            btnText.textContent =
-                '{% trans "Payer maintenant" %}';
-        }
-
-        if (btnSpinner) {
-            btnSpinner.classList.add('hidden');
-        }
+        if (submitBtn) submitBtn.disabled = false;
+        setLoading(false);
     }
 
-
-    /*
-     * ============================================================
-     * PROTECTION DU HTML
-     * ============================================================
-     */
     function escapeHtml(value) {
         var div = document.createElement('div');
         div.textContent = value;
         return div.innerHTML;
     }
 
-
-    /*
-     * ============================================================
-     * INITIALISATION DU PAIEMENT
-     * ============================================================
-     */
     function initializePayment() {
         var phoneInput = document.getElementById('payment-phone');
-
         if (!phoneInput) {
-            showError(
-                '{% trans "Champ téléphone introuvable." %}'
-            );
+            showError('{% trans "Champ téléphone introuvable." %}');
             return;
         }
 
         var phone = phoneInput.value.trim();
-
         if (!phone || !/^6[0-9]{8}$/.test(phone)) {
             setLoading(false);
-
             if (gatewaysContainer) {
                 gatewaysContainer.innerHTML =
-                    '<p class="text-sm text-auto-500 text-center">' +
-                    '{% trans "Saisissez un numéro de téléphone valide pour continuer." %}' +
-                    '</p>';
+                    '<p class="text-sm text-auto-500 text-center">{% trans "Saisissez un numéro de téléphone valide pour continuer." %}</p>';
             }
-
             return;
         }
 
-        var csrfElement =
-            document.querySelector('meta[name="csrf-token"]');
-
+        var csrfElement = document.querySelector('meta[name="csrf-token"]');
         if (!csrfElement) {
-            showError(
-                '{% trans "Token CSRF introuvable." %}'
-            );
+            showError('{% trans "Token CSRF introuvable." %}');
             return;
         }
 
-        var csrfToken = csrfElement.getAttribute('content');var url = '{% url "payments:garage_payment_activation" garage.id %}';
-
+        var csrfToken = csrfElement.getAttribute('content');
+        var url = '{% url "payments:garage_activation_payment" garage.id %}';
         var formData = new FormData();
-
-        formData.append(
-            'phone_number',
-            '+237' + phone
-        );
+        formData.append('phone_number', '+237' + phone);
 
         setLoading(true);
-
-        if (errorBox) {
-            errorBox.classList.add('hidden');
-        }
-
-        if (successBox) {
-            successBox.classList.add('hidden');
-        }
+        if (errorBox) errorBox.classList.add('hidden');
+        if (successBox) successBox.classList.add('hidden');
 
         fetch(url, {
             method: 'POST',
-
             headers: {
                 'X-CSRFToken': csrfToken,
                 'X-Requested-With': 'XMLHttpRequest'
             },
-
             body: formData
         })
         .then(function (response) {
             if (!response.ok) {
-                throw new Error(
-                    'HTTP ' + response.status
-                );
+                return response.json().then(function (data) {
+                    throw new Error(data.message || 'HTTP ' + response.status);
+                }).catch(function () {
+                    throw new Error('HTTP ' + response.status);
+                });
             }
-
             return response.json();
         })
         .then(function (data) {
             if (data.success) {
                 currentPaymentId = data.payment_id;
-                currentPuTransactionId =
-                    data.pu_transaction_id;
-
-                currentActiveGateways =
-                    data.active_gateways || [];
-
-                renderGateways(
-                    data.providers || []
-                );
+                currentPuTransactionId = data.pu_transaction_id;
+                currentActiveGateways = data.active_gateways || [];
+                renderGateways(data.providers || []);
             } else {
                 showError(
-                    data.message ||
-                    '{% trans "Impossible d’initialiser le paiement." %}'
+                    data.message || '{% trans "Impossible d’initialiser le paiement." %}'
                 );
             }
         })
         .catch(function (error) {
-            console.error(
-                'Erreur initialisation paiement:',
-                error
-            );
-
+            console.error('Erreur initialisation paiement:', error);
             showError(
                 '{% trans "Une erreur réseau est survenue. Veuillez réessayer." %}'
             );
         });
     }
 
-
-    /*
-     * ============================================================
-     * BOUTON PAYER
-     * ============================================================
-     */
     if (submitBtn) {
         submitBtn.addEventListener('click', function (e) {
             e.preventDefault();
-
-            var phoneInput =
-                document.getElementById('payment-phone');
-
-            if (!phoneInput) {
-                return;
-            }
+            var phoneInput = document.getElementById('payment-phone');
+            if (!phoneInput) return;
 
             var phone = phoneInput.value.trim();
-
-            var selectedGateway =
-                form.querySelector(
-                    'input[name="gateway"]:checked'
-                );
+            var selectedGateway = form.querySelector('input[name="gateway"]:checked');
 
             if (!phone || !/^6[0-9]{8}$/.test(phone)) {
-                showError(
-                    '{% trans "Veuillez saisir un numéro de téléphone valide." %}'
-                );
+                showError('{% trans "Veuillez saisir un numéro de téléphone valide." %}');
                 return;
             }
 
             if (!selectedGateway) {
-                showError(
-                    '{% trans "Veuillez sélectionner un moyen de paiement." %}'
-                );
+                showError('{% trans "Veuillez sélectionner un moyen de paiement." %}');
                 return;
             }
 
             var gateway = selectedGateway.value;
-
-            if (
-                currentActiveGateways.indexOf(gateway) === -1
-            ) {
-                showError(
-                    '{% trans "Ce moyen de paiement n’est pas disponible." %}'
-                );
+            if (currentActiveGateways.indexOf(gateway) === -1) {
+                showError('{% trans "Ce moyen de paiement n’est pas disponible." %}');
                 return;
             }
 
-            var csrfElement =
-                document.querySelector(
-                    'meta[name="csrf-token"]'
-                );
-
+            var csrfElement = document.querySelector('meta[name="csrf-token"]');
             if (!csrfElement) {
-                showError(
-                    '{% trans "Token CSRF introuvable." %}'
-                );
+                showError('{% trans "Token CSRF introuvable." %}');
                 return;
             }
 
-            var csrfToken =
-                csrfElement.getAttribute('content');var url = '{% url "payments:garage_payment_retry" garage.id %}';
+            var csrfToken = csrfElement.getAttribute('content');
+            var url = '{% url "payments:make_payment" payment_id="00000000-0000-0000-0000-000000000000" gateway="PLACEHOLDER" %}'
+                .replace('00000000-0000-0000-0000-000000000000', currentPaymentId)
+                .replace('PLACEHOLDER', gateway);
 
             var formData = new FormData();
-
-            formData.append(
-                'phone_number',
-                '+237' + phone
-            );
-
-            formData.append(
-                'gateway',
-                gateway
-            );
+            formData.append('phone_number', '+237' + phone);
+            formData.append('gateway', gateway);
 
             setLoading(true);
-
-            if (errorBox) {
-                errorBox.classList.add('hidden');
-            }
-
-            if (successBox) {
-                successBox.classList.add('hidden');
-            }
+            if (errorBox) errorBox.classList.add('hidden');
+            if (successBox) successBox.classList.add('hidden');
 
             fetch(url, {
                 method: 'POST',
-
                 headers: {
                     'X-CSRFToken': csrfToken,
                     'X-Requested-With': 'XMLHttpRequest'
                 },
-
                 body: formData
             })
             .then(function (response) {
                 if (!response.ok) {
-                    throw new Error(
-                        'HTTP ' + response.status
-                    );
+                    return response.json().then(function (data) {
+                        throw new Error(data.message || 'HTTP ' + response.status);
+                    }).catch(function () {
+                        throw new Error('HTTP ' + response.status);
+                    });
                 }
-
                 return response.json();
             })
             .then(function (data) {
                 if (data.success) {
-
-                    if (
-                        data.status === 'pending' ||
-                        data.status === 'processing'
-                    ) {
+                    if (data.status === 'pending' || data.status === 'processing') {
                         showSuccess(
-                            data.message ||
-                            '{% trans "Paiement en attente. Vérifiez votre téléphone." %}'
+                            data.message || '{% trans "Paiement en attente. Vérifiez votre téléphone." %}'
                         );
-
-                        if (btnText) {
-                            btnText.textContent =
-                                '{% trans "Paiement en cours…" %}';
-                        }
-
-                        if (submitBtn) {
-                            submitBtn.disabled = true;
-                        }
-
-                        if (btnSpinner) {
-                            btnSpinner.classList.add('hidden');
-                        }
-
+                        setLoading(false);
                     } else {
                         showSuccess(
-                            data.message ||
-                            '{% trans "Paiement accepté." %}'
+                            data.message || '{% trans "Paiement accepté." %}'
                         );
-
-                        if (btnText) {
-                            btnText.textContent =
-                                '{% trans "Paiement accepté" %}';
-                        }
-
-                        if (submitBtn) {
-                            submitBtn.disabled = true;
-                        }
-
-                        if (btnSpinner) {
-                            btnSpinner.classList.add('hidden');
-                        }
+                        // Fermer le modal après 3 secondes si succès
+                        setTimeout(function () {
+                            closePaymentModal();
+                            // Recharger la page pour mettre à jour le statut du garage
+                            window.location.reload();
+                        }, 3000);
                     }
-
                 } else {
                     showError(
-                        data.message ||
-                        '{% trans "Le paiement a échoué." %}'
+                        data.message || '{% trans "Le paiement a échoué." %}'
                     );
-
                     if (data.retry_allowed) {
-                        if (btnText) {
-                            btnText.textContent =
-                                '{% trans "Réessayer" %}';
-                        }
-
-                        if (submitBtn) {
-                            submitBtn.disabled = false;
-                        }
-
-                        if (btnSpinner) {
-                            btnSpinner.classList.add('hidden');
-                        }
+                        setLoading(false);
                     }
                 }
             })
             .catch(function (error) {
-                console.error(
-                    'Erreur paiement:',
-                    error
-                );
-
+                console.error('Erreur paiement:', error);
                 showError(
                     '{% trans "Une erreur réseau est survenue." %}'
                 );
-
                 setLoading(false);
             });
         });
     }
 
-
-    /*
-     * ============================================================
-     * REINITIALISER LES MOYENS DE PAIEMENT
-     * LORSQUE LE TELEPHONE CHANGE
-     * ============================================================
-     */
-    var phoneInput =
-        document.getElementById('payment-phone');
-
+    var phoneInput = document.getElementById('payment-phone');
     if (phoneInput) {
-        phoneInput.addEventListener(
-            'input',
-            function () {
-
-                var phone =
-                    phoneInput.value.trim();
-
-                if (
-                    /^6[0-9]{8}$/.test(phone)
-                ) {
-                    initializePayment();
-                } else {
-                    currentPaymentId = null;
-                    currentPuTransactionId = null;
-                    currentActiveGateways = [];
-
-                    if (submitBtn) {
-                        submitBtn.disabled = true;
-                    }
-
-                    if (gatewaysContainer) {
-                        gatewaysContainer.innerHTML =
-                            '<p class="text-sm text-auto-500 text-center">' +
-                            '{% trans "Saisissez un numéro valide pour charger les moyens de paiement." %}' +
-                            '</p>';
-                    }
+        phoneInput.addEventListener('input', function () {
+            var phone = phoneInput.value.trim();
+            if (/^6[0-9]{8}$/.test(phone)) {
+                initializePayment();
+            } else {
+                currentPaymentId = null;
+                currentPuTransactionId = null;
+                currentActiveGateways = [];
+                if (submitBtn) submitBtn.disabled = true;
+                if (gatewaysContainer) {
+                    gatewaysContainer.innerHTML =
+                        '<p class="text-sm text-auto-500 text-center">{% trans "Saisissez un numéro valide pour charger les moyens de paiement." %}</p>';
                 }
             }
-        );
+        });
     }
 
-
-    /*
-     * ============================================================
-     * FERMER AVEC ESCAPE
-     * ============================================================
-     */
-    document.addEventListener(
-        'keydown',
-        function (e) {
-            if (
-                e.key === 'Escape' &&
-                modal &&
-                !modal.classList.contains('hidden')
-            ) {
-                window.closePaymentModal();
-            }
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && modal && !modal.classList.contains('hidden')) {
+            window.closePaymentModal();
         }
-    );
+    });
 
 })();
 </script>

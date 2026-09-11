@@ -1,26 +1,10 @@
-"""
-CamPay payment provider — single provider for AutoLink.
-
-Environment variables (in .env or .env.example):
-  CAMPAY_ENVIRONMENT     – DEV or PROD (default DEV)
-  CAMPAY_APP_USERNAME    – App username
-  CAMPAY_APP_PASSWORD    – App password
-  CAMPAY_WEBHOOK_SECRET  – Secret used to validate webhooks (HMAC)
-  CAMPAY_BASE_URL        – optional override for the base API URL
-
-Docs flow used here:
-  1. POST {BASE_URL}/token/  -> token
-  2. POST {BASE_URL}/collect/ -> create payment (PENDING)
-  3. Webhook -> status update (SUCCESS/FAILED)
-"""
-
-from __future__ import annotations
-
+# payments/providers/campay.py
 import hashlib
 import hmac
+import json
 import logging
 from dataclasses import dataclass
-from typing import Any, Dict, Optional
+from decimal import Decimal, InvalidOperation
 
 import requests
 from django.conf import settings
@@ -28,365 +12,278 @@ from django.conf import settings
 logger = logging.getLogger("payments")
 
 
-class CamPayError(Exception):
-    """Base error raised by the CamPay adapter."""
+class ProviderError(Exception):
+    """Erreur de base levée par un fournisseur de paiement."""
+
+    pass
 
 
-class CamPayUnavailable(CamPayError):
-    """Credentials, network or API are unavailable."""
+class ProviderUnavailable(ProviderError):
+    """Le fournisseur est indisponible (clés ou réseau)."""
+
+    pass
 
 
 @dataclass(frozen=True)
-class CamPayCollectResult:
-    """Result of a CamPay collect (init) call."""
-
-    success: bool
-    # CamPay's external_reference is our local transaction id (mirror).
-    external_reference: str
-    # Optional raw provider id / message if useful for logs/support.
-    provider_id: Optional[str] = None
-    message: Optional[str] = None
+class PaymentInitialization:
+    transaction_id: str
+    checkout_url: str = ""
 
 
-class CamPayProvider:
+class CampayProvider:
     name = "CAMPAY"
 
-    # ── environment ────────────────────────────────────────────────────
+    def __init__(self):
+        self._cached_token = None
 
-    def _environment(self) -> str:
-        env = getattr(settings, "CAMPAY_ENVIRONMENT", "DEV") or "DEV"
-        env = env.strip().upper()
-        if env not in {"DEV", "PROD"}:
-            raise CamPayUnavailable("CAMPAY_ENVIRONMENT must be DEV or PROD")
-        return env
-
-    def _base_url(self) -> str:
-        override = getattr(settings, "CAMPAY_BASE_URL", "") or ""
-        if override:
-            return override.rstrip("/")
+    def _base_url(self):
+        env = getattr(settings, "CAMPAY_ENVIRONMENT", "DEV")
         return (
-            "https://demo.campay.net/api"
-            if self._environment() == "DEV"
-            else "https://www.campay.net/api"
+            "https://www.campay.net/api" if env == "PROD" else "https://demo.campay.net/api"
         )
 
-    def _username(self) -> str:
-        u = getattr(settings, "CAMPAY_APP_USERNAME", "") or ""
-        if not u:
-            raise CamPayUnavailable("CAMPAY_APP_USERNAME is not configured in .env")
-        return u
-
-    def _password(self) -> str:
-        p = getattr(settings, "CAMPAY_APP_PASSWORD", "") or ""
-        if not p:
-            raise CamPayUnavailable("CAMPAY_APP_PASSWORD is not configured in .env")
-        return p
-
-    def _webhook_secret(self) -> str:
-        return getattr(settings, "CAMPAY_WEBHOOK_SECRET", "") or ""
-
-    # ── authentication ──────────────────────────────────────────────────
-
-    def get_token(self) -> str:
-        """
-        Retourne un token temporaire CamPay.
-        POST {BASE_URL}/token/
-        {"username": "...", "password": "..."}
-        """
-        try:
-            payload = {"username": self._username(), "password": self._password()}
-
-            resp = requests.post(
-                f"{self._base_url()}/token/",
-                json=payload,
-                headers={"Content-Type": "application/json"},
-                timeout=30,
+    def _auth(self):
+        username = getattr(settings, "CAMPAY_APP_USERNAME", "")
+        password = getattr(settings, "CAMPAY_APP_PASSWORD", "")
+        if not username or not password:
+            raise ProviderUnavailable(
+                "CAMPAY_APP_USERNAME ou CAMPAY_APP_PASSWORD non configurés."
             )
+        return username, password
 
-            try:
-                body = resp.json()
-            except ValueError:
-                logger.error(
-                    "CAMPAY TOKEN | invalid_json status=%s response=%s",
-                    resp.status_code,
-                    resp.text,
-                )
-                raise CamPayUnavailable("Réponse CamPay invalide (token)")
-
-            if resp.status_code != 200:
-                logger.error(
-                    "CAMPAY TOKEN | non_200 status=%s response=%s",
-                    resp.status_code,
-                    resp.text,
-                )
-                if resp.status_code in (401, 403):
-                    raise CamPayUnavailable("Credentials CamPay invalides")
-                if resp.status_code == 404:
-                    raise CamPayUnavailable("Endpoint CamPay /token/ introuvable")
-                raise CamPayUnavailable(
-                    f"Erreur API CamPay (HTTP {resp.status_code})"
-                )
-
-            if not isinstance(body, dict):
-                logger.error("CAMPAY TOKEN | invalid_response_shape=%s", body)
-                raise CamPayUnavailable("Réponse CamPay invattendue pour le token")
-
-            token = (
-                body.get("token")
-                or body.get("access_token")
-                or body.get("token_key")
-                or ""
-            )
-            if not token:
-                logger.error("CAMPAY TOKEN | missing_token response=%s", body)
-                raise CamPayUnavailable("CamPay n'a pas retourné de token")
-            return str(token)
-
-        except CamPayError:
-            # Erreur métier CamPay déjà explicite : on la propage telle quelle.
-            raise
-        except Exception as e:
-            # Toute autre erreur (réseau, config, bug interne) est loguée
-            # avec la trace complète puis convertie en erreur gérable.
-            logger.exception("Erreur CamPay : %s", e)
-            raise CamPayError(str(e)) from e
-
-    # ── collect (init) ─────────────────────────────────────────────────
-
-    def collect(self, payment, phone_number: str) -> CamPayCollectResult:
+    def get_token(self, force=False):
         """
-        Étape 1 : initialisation du paiement CamPay (collect).
-        POST {BASE_URL}/collect/
-
-        Payload strict attendu par CamPay (valeurs = chaînes de caractères) :
-          {
-            "amount": "1000",
-            "currency": "XAF",
-            "from": "237XXXXXXXXX",
-            "description": "Activation garage Autolink",
-            "external_reference": "<str(payment.id)>"
-          }
-
-        Headers:
-          Authorization: Token <token>   (token obtenu via POST /token/)
-          Content-Type: application/json
-
-        Si HTTP 200, on considère que la transaction est créée et on passe
-        le Payment en PENDING côté notre base.
+        Obtenir (et mettre en cache) le jeton d'accès Campay.
+        POST {BASE_URL}/token/  →  Authorization: Token <token>
         """
-        token = self.get_token()
-        headers = {
-            "Authorization": f"Token {token}",
-            "Content-Type": "application/json",
-        }
+        if not force and self._cached_token:
+            return self._cached_token
 
-        clean_phone = self._normalize_phone(phone_number)
-
-        external_reference = str(payment.id)
-        # Payload strict : toutes les valeurs sont des chaînes de caractères.
-        payload = {
-            "amount": "1000",
-            "currency": "XAF",
-            "from": clean_phone,
-            "description": "Activation garage Autolink",
-            "external_reference": external_reference,
-        }
-
-        logger.info(
-            "CAMPAY COLLECT | internal_id=%s | phone=%s",
-            external_reference,
-            clean_phone,
-        )
-        logger.debug("CAMPAY COLLECT | request_payload=%s", payload)
-
+        username, password = self._auth()
+        url = f"{self._base_url()}/token/"
         try:
             resp = requests.post(
-                f"{self._base_url()}/collect/",
-                json=payload,
-                headers=headers,
+                url,
+                json={"username": username, "password": password},
+                headers={"Content-Type": "application/json", "Accept": "application/json"},
                 timeout=30,
             )
+            resp.raise_for_status()
+            body = resp.json()
+        except (requests.exceptions.RequestException, ValueError) as e:
+            logger.error(f"Campay Token Error: {e}")
+            raise ProviderUnavailable(f"Erreur réseau Campay: {e}")
 
-            try:
-                body = resp.json()
-            except ValueError:
-                logger.error(
-                    "CAMPAY COLLECT | invalid_json status=%s response=%s",
-                    resp.status_code,
-                    resp.text,
-                )
-                raise CamPayUnavailable("Réponse CamPay invalide (collect)")
-
-            logger.debug(
-                "CAMPAY COLLECT | status=%s response=%s",
-                resp.status_code,
-                resp.text,
+        token = body.get("token") or body.get("access")
+        if not token:
+            logger.error(f"Campay Token refusé: {body}")
+            raise ProviderUnavailable(
+                f"Authentification Campay refusée: {body}"
             )
+        self._cached_token = token
+        return token
 
-            if resp.status_code != 200:
-                msg = body.get("message") if isinstance(body, dict) else None
-                error_msg = body.get("error") if isinstance(body, dict) else None
-                logger.error(
-                    "CAMPAY COLLECT | non_200 status=%s response=%s message=%s error=%s",
-                    resp.status_code,
-                    resp.text,
-                    msg,
-                    error_msg,
-                )
-                if resp.status_code in (401, 403):
-                    raise CamPayUnavailable("Credentials CamPay invalides")
-                if resp.status_code == 404:
-                    raise CamPayUnavailable("Endpoint CamPay /collect/ introuvable")
-                if resp.status_code == 422:
-                    raise CamPayUnavailable(
-                        f"Payload CamPay invalide : {msg or error_msg or resp.text}"
-                    )
-                if resp.status_code == 429:
-                    raise CamPayUnavailable("CamPay rate limit atteint")
-                raise CamPayUnavailable(
-                    f"Erreur API CamPay (HTTP {resp.status_code})"
-                )
-
-            if not isinstance(body, dict):
-                logger.error("CAMPAY COLLECT | invalid_response_shape=%s", body)
-                raise CamPayUnavailable("Réponse CamPay invattendue")
-
-            provider_id = (
-                body.get("id")
-                or body.get("transaction_id")
-                or body.get("external_reference")
-                or ""
-            )
-
-            return CamPayCollectResult(
-                success=True,
-                external_reference=external_reference,
-                provider_id=provider_id or None,
-                message=body.get("message") or body.get("status") or None,
-            )
-
-        except CamPayError:
-            # Erreur métier CamPay déjà explicite : on la propage telle quelle.
-            raise
-        except Exception as e:
-            # Toute autre erreur (réseau, payload, bug interne) est loguée
-            # avec la trace complète puis convertie en erreur gérable.
-            logger.exception("Erreur CamPay : %s", e)
-            raise CamPayError(str(e)) from e
-
-    # ── webhook ────────────────────────────────────────────────────────
-
-    def verify_webhook_signature(self, request) -> bool:
-        """
-        Vérifie la signature du webhook CamPay via HMAC.
-        Compatible avec les payloads JSON bruts.
-        En mode dev (secret vide), on accepte le webhook.
-        """
-        secret = self._webhook_secret()
-        if not secret:
-            logger.warning(
-                "CAMPAY_WEBHOOK_SECRET non configuré. Validation du webhook ignorée (mode développement)."
-            )
-            return True
-
-        # Plusieurs conventions d'en-tête sont possibles selon la config CamPay.
-        signature = (
-            request.META.get("HTTP_X_CAMPAY_SIGNATURE")
-            or request.META.get("HTTP_X_WEBHOOK_SIGNATURE")
-            or request.META.get("HTTP_X_PAYMENT_WEBHOOK_SECRET")
-            or request.META.get("HTTP_X_WEBHOOK_SECRET")
-            or request.headers.get("X-Campay-Signature")
-            or request.headers.get("X-Webhook-Signature")
-            or request.headers.get("X-Payment-Webhook-Secret")
-            or request.headers.get("X-Webhook-Secret")
-        )
-
-        if not signature:
-            logger.error("CAMPAY WEBHOOK | aucune signature trouvée")
-            return False
-
-        try:
-            raw_body = request.body
-            expected_signature = hmac.new(
-                secret.encode("utf-8"), raw_body, hashlib.sha256
-            ).hexdigest()
-            return hmac.compare_digest(signature, expected_signature)
-        except Exception as e:
-            logger.error("CAMPAY WEBHOOK | erreur vérification signature=%s", e)
-            return False
-
-    def parse_webhook(self, payload: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Normalise le payload webhook CamPay en un dictionnaire standardisé.
-
-        Champs attendus (adaptés à la doc fournie) :
-          - external_reference : notre transaction locale
-          - status : SUCCESSFUL / FAILED (ou équivalent)
-          - amount, currency, phone_number, message, etc.
-        """
-        if not isinstance(payload, dict):
-            return {}
-
-        # Le webhook peut placer les données à la racine ou dans un bloc "data".
-        data = payload.get("data") or payload
-
-        status_raw = (
-            data.get("status")
-            or payload.get("status")
-            or data.get("payment_status")
-            or payload.get("payment_status")
-            or ""
-        )
-
-        status_map = {
-            "SUCCESSFUL": "SUCCESS",
-            "SUCCESS": "SUCCESS",
-            "FAILED": "FAILED",
-            "FAIL": "FAILED",
-            "CANCELLED": "CANCELLED",
-            "PENDING": "PENDING",
-        }
-        status = status_map.get(str(status_raw).upper(), str(status_raw).upper())
-
-        external_reference = (
-            data.get("external_reference") or payload.get("external_reference") or ""
-        )
-
+    def _headers(self):
         return {
-            "external_reference": external_reference,
-            "transaction_id": external_reference,  # compatibilité avec process_webhook existant
-            "status": status,
-            "amount": data.get("amount") or payload.get("amount"),
-            "currency": data.get("currency") or payload.get("currency") or "XAF",
-            "provider_reference": data.get("id")
-            or data.get("transaction_id")
-            or payload.get("transaction_id")
-            or "",
-            "message": data.get("message") or payload.get("message") or "",
-            "phone_number": data.get("from")
-            or data.get("phone_number")
-            or payload.get("phone_number")
-            or "",
-            "raw_payload": payload,
+            "Content-Type": "application/json",
+            "Authorization": f"Token {self.get_token()}",
+            "Accept": "application/json",
         }
 
-    # ── helpers ────────────────────────────────────────────────────────
+    def _post(self, path, payload, timeout=30):
+        url = f"{self._base_url()}{path}"
+        logger.debug(f"Campay Request: {url} | Payload: {json.dumps(payload, indent=2)}")
+        try:
+            resp = requests.post(url, json=payload, headers=self._headers(), timeout=timeout)
+            if resp.status_code == 401:
+                # Jeton expiré ou invalide : régénérer puis réessayer une seule fois.
+                logger.warning("Campay 401: renouvellement du jeton puis nouvel essai.")
+                self._cached_token = None
+                resp = requests.post(
+                    url, json=payload, headers=self._headers(), timeout=timeout
+                )
+
+            if resp.status_code >= 400:
+                # Capturer le message d'erreur renvoyé par Campay (JSON) pour
+                # pouvoir diagnostiquer le refus (ex: numéro invalide, montant…).
+                detail = ""
+                try:
+                    err = resp.json()
+                    detail = err.get("message") or err.get("detail") or err.get("error") or ""
+                except ValueError:
+                    err = None
+                if detail:
+                    logger.error(
+                        "Campay Error %s %s: %s (Payload: %s)",
+                        resp.status_code, url, detail, payload,
+                    )
+                    raise ProviderUnavailable(f"Erreur Campay (%s): %s" % (resp.status_code, detail))
+                logger.error(f"Campay Request Error {url}: HTTP {resp.status_code} {resp.text}")
+                raise ProviderUnavailable(
+                    f"Erreur réseau Campay: HTTP {resp.status_code} {resp.reason}"
+                )
+
+            return resp.json()
+        except (requests.exceptions.RequestException, ValueError) as e:
+            logger.error(f"Campay Request Error {url}: {e}")
+            raise ProviderUnavailable(f"Erreur réseau Campay: {e}")
 
     @staticmethod
-    def _normalize_phone(phone: str) -> str:
+    def _check_body_error(body, payload):
+        status = (body.get("status") or "").lower()
+        if status and status not in ("success", "successful", "ok"):
+            error_msg = body.get("message") or body.get("detail") or "Erreur Campay inconnue"
+            logger.error(
+                f"Campay Error: {error_msg} (Payload: {json.dumps(payload, indent=2)})"
+            )
+            raise ProviderUnavailable(f"Erreur Campay: {error_msg}")
+
+    @staticmethod
+    def _as_amount(amount):
+        try:
+            value = int(Decimal(str(amount)))
+        except (InvalidOperation, ValueError, TypeError):
+            raise ProviderUnavailable("Montant invalide.")
+        if value <= 0:
+            raise ProviderUnavailable("Le montant doit être supérieur à 0.")
+        # Le sandbox Campay (DEV) plafonne à 25 XAF (erreur ER201 sinon).
+        if settings.CAMPAY_ENVIRONMENT == "DEV" and value > 25:
+            raise ProviderUnavailable(
+                f"En mode DEV, le montant max est 25 XAF. Reçu: {value} XAF."
+            )
+        return value
+
+    def _site_url(self):
+        return getattr(settings, "SITE_URL", "http://localhost:8000")
+
+    def initialize(self, payment):
         """
-        Accepte +237XXXXXXXXX, 237XXXXXXXXX ou 9 chiffres.
-        Retourne 237XXXXXXXXX (12 caractères) comme semble l'attendre CamPay.
+        Étape 1 (INITIALIZE) : valide le paiement et les identifiants Campay.
+        N'appelle PAS /collect/ (il n'y a pas encore de numéro de téléphone) :
+        les opérateurs disponibles (ORANGE_CM / MTN_CM) sont renvoyés par la vue,
+        puis le vrai collect a lieu dans make_payment() lors du choix de l'opérateur.
+        Le token Campay est sollicité ici pour vérifier la connexion/l'accès API.
         """
-        raw = phone.replace(" ", "").replace("-", "").replace(".", "")
-        if raw.startswith("+237"):
-            raw = raw[4:]
-        elif raw.startswith("237") and len(raw) > 9:
-            raw = raw[3:]
-        if not raw.isdigit() or len(raw) != 9:
-            raise CamPayUnavailable("Numéro de téléphone invalide")
-        return "237" + raw
+        if not payment.amount:
+            raise ProviderUnavailable("Montant manquant.")
+        if not payment.currency:
+            raise ProviderUnavailable("Devise manquante.")
+        if not payment.idempotency_key:
+            raise ProviderUnavailable("Clé d'idempotence manquante.")
+
+        self._as_amount(payment.amount)
+        # Vérifie l'authentification (lévera ProviderUnavailable si invalide).
+        self.get_token()
+
+        return PaymentInitialization(
+            transaction_id=payment.idempotency_key,
+            checkout_url=(
+                f"{self._site_url()}/paiement/{payment.pk}/?provider={payment.provider}"
+            ),
+        )
+
+    def make_payment(self, payment, phone_number, gateway="ORANGE_CM"):
+        """
+        Étape 2 (MAKE PAYMENT) : déclencher le collect USSD sur Campay.
+        POST {BASE_URL}/collect/  (fields documentés de l'API Campay)
+        Retourne la référence transactionnelle Campay (provider_transaction_id).
+        """
+        if not payment.idempotency_key:
+            raise ProviderUnavailable("Clé d'idempotence manquante.")
+
+        # L'API Campay attend le champ "from" SANS le signe '+' en tête :
+        # "2376XXXXXXXX" (indicatif pays 237 inclus). Un numéro "+2376…"
+        # est rejeté par /collect/ avec une erreur HTTP 400 Bad Request.
+        normalized_phone = str(phone_number or "").replace(" ", "").lstrip("+")
+        if not normalized_phone.startswith("237"):
+            normalized_phone = "237" + normalized_phone.lstrip("0")
+
+        amount = self._as_amount(payment.amount)
+        payload = {
+            # Campay attend le montant en FCFA (entier, pas en centimes).
+            "amount": amount,
+            "currency": payment.currency,
+            "from": normalized_phone,  # "2376XXXXXXXX" (indicatif pays, sans '+')
+            "description": "Activation de votre garage sur AutoLink",
+            "external_reference": payment.idempotency_key,  # Référence métier unique
+        }
+
+        body = self._post("/collect/", payload)
+        self._check_body_error(body, payload)
+
+        return body.get("transaction_id") or body.get("reference") or payment.idempotency_key
+
+    def collect(self, payment, phone_number, gateway="ORANGE_CM"):
+        """
+        Collect CamPay (rétrocompatibilité) : effectue un paiement mobile money.
+        Retourne le résultat de la transaction.
+        """
+        transaction_id = self.make_payment(
+            payment, phone_number, gateway=gateway
+        )
+        return PaymentInitialization(
+            transaction_id=transaction_id,
+        )
+
+    def verify_webhook(self, request):
+        """
+        Vérifier la signature du webhook Campay.
+        """
+        try:
+            secret = getattr(settings, "CAMPAY_WEBHOOK_SECRET", "")
+            if not secret:
+                logger.warning(
+                    "CAMPAY_WEBHOOK_SECRET non configuré. Mode développement."
+                )
+                return True
+
+            signature = request.headers.get("X-CamPay-Signature")
+            if not signature:
+                logger.error("Signature webhook manquante.")
+                return False
+
+            raw_body = request.body
+            expected_signature = hmac.new(
+                secret.encode(), raw_body, hashlib.sha256
+            ).hexdigest()
+
+            return hmac.compare_digest(signature, expected_signature)
+
+        except Exception as e:
+            logger.error(f"Erreur vérification webhook: {e}")
+            return False
+
+    def parse_webhook(self, payload):
+        """
+        Parser le payload du webhook Campay.
+        """
+        status_raw = payload.get("status", "").lower()
+        status_map = {
+            "success": "SUCCESS",
+            "successful": "SUCCESS",
+            "failed": "FAILED",
+            "cancelled": "CANCELLED",
+            "pending": "PENDING",
+        }
+        return {
+            "transaction_id": payload.get("transaction_id", ""),
+            # CamPay renvoie external_reference = idempotency_key du paiement.
+            "external_reference": payload.get("external_reference", ""),
+            # Référence CamPay (prestation) utilisée comme provider_reference.
+            "provider_reference": payload.get("reference", ""),
+            "status": status_map.get(status_raw, status_raw),
+            "amount": payload.get("amount"),
+            "currency": payload.get("currency", "XAF"),
+            "provider": payload.get("provider", ""),
+            "phone_number": payload.get("phone_number", ""),
+        }
 
 
-# Singleton
-_cam_pay_provider = CamPayProvider()
+campay_provider = CampayProvider()
+
+# ── Compatibility aliases ──────────────────────────────────────────────────────
+# These aliases let __init__.py, views.py, and tests.py import the names they
+# expect while base.py keeps the original CamPay naming.
+CamPayProvider = CampayProvider
+CamPayCollectResult = PaymentInitialization
+CamPayError = ProviderError

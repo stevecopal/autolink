@@ -234,6 +234,17 @@ class Garage(models.Model):
     def is_in_pending_review(self):
         return self.approval_status == self.ApprovalStatus.PENDING
 
+    def can_activate(self):
+        """Un garage peut être activé (payer) s'il est approuvé, non payé et inactif."""
+        return (
+            self.approval_status == self.ApprovalStatus.APPROVED
+            and self.payment_status in (
+                self.PaymentStatus.UNPAID,
+                self.PaymentStatus.FAILED,
+            )
+            and self.activation_status != self.ActivationStatus.ACTIVE
+        )
+
 
 class GarageService(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
