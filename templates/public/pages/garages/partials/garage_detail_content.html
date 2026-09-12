@@ -8,16 +8,10 @@
 
 <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-5 mb-6">
     <div class="flex items-start gap-4 min-w-0">
-        {% if garage.photo %}
-        <img src="{{ garage.photo.url }}" alt="{{ garage.name }}"
-             class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover border-2 border-white ring-1 ring-line-200 shadow-card flex-shrink-0">
-        {% else %}
-        <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-blue-100 flex items-center justify-center shadow-card flex-shrink-0">
-            <svg class="w-8 h-8 sm:w-9 sm:h-9 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-        </div>
-        {% endif %}
+        
         <div class="min-w-0">
             <div class="flex items-center gap-2 mb-1 flex-wrap">
+                <h1 class="font-display text-2xl sm:text-3xl font-bold text-navy-900 leading-tight mb-1">{{ garage.name }}</h1>
                 {% if garage.verification_status == 'APPROVED' %}
                 <span class="badge bg-blue-100 text-blue-500">{% trans "Vérifié" %}</span>
                 {% elif garage.verification_status == 'PENDING' %}
@@ -27,7 +21,6 @@
                 <span class="badge bg-blue-500 text-white">{% trans "Recommandé" %}</span>
                 {% endif %}
             </div>
-            <h1 class="font-display text-2xl sm:text-3xl font-bold text-navy-900 leading-tight mb-1">{{ garage.name }}</h1>
             <div class="flex flex-wrap items-center gap-2 text-sm text-graphite-600">
                 <svg class="w-4 h-4 text-graphite-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                 <span>{{ garage.neighborhood.name|default:garage.city.name }}{% if garage.city and garage.neighborhood %}, {{ garage.city.name }}{% endif %}</span>
@@ -107,30 +100,7 @@
 {% endif %}
 
 <div class="flex flex-wrap gap-3 mb-8">
-    {% if garage.phone %}
-    <a href="tel:{{ garage.phone }}"
-       class="inline-flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-steel-50 border border-line-200 rounded-xl text-sm font-bold text-navy-900 transition">
-        <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
-        {% trans "Appeler" %} {{ garage.phone|slice:":20" }}
-    </a>
-    {% endif %}
 
-    {% if garage.whatsapp %}
-    <a href="https://wa.me/{{ garage.whatsapp }}"
-       class="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-bold transition"
-       target="_blank" rel="noopener noreferrer">
-        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.454.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.472.099-.174.05-.372-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.372-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.67-.297-.472-.61-1.47-.94-2.205-.297-.67-.396-.766-.47-.866-.05-.075-.124-.173-.223-.199-.099-.024-.174 0-.372.074z"/></svg>
-        {% trans "WhatsApp" %}
-    </a>
-    {% endif %}
-
-    {% if garage.email %}
-    <a href="mailto:{{ garage.email }}"
-       class="inline-flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-steel-50 border border-line-200 rounded-xl text-sm font-bold text-navy-900 transition">
-        <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-        {{ garage.email }}
-    </a>
-    {% endif %}
 
     {% if request.user.is_authenticated and not garage.owner == request.user %}
     <a href="{% url 'support:ticket_create' %}?garage={{ garage.pk }}"
@@ -251,7 +221,6 @@
             {% endif %}
             <div class="min-w-0">
                 <div class="font-bold text-sm text-navy-900 truncate">{{ garage.owner.display_name }}</div>
-                <div class="text-xs text-graphite-500">{{ garage.owner.role|title }} · {{ garage.owner.city|default:"" }}</div>
             </div>
         </div>
     </div>

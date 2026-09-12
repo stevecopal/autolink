@@ -226,23 +226,9 @@
                             '<h3 class="font-bold text-navy-900 text-sm truncate">' + escapeHtml(garage.name) + '</h3>' +
                             '<span class="text-blue-500 font-bold text-sm whitespace-nowrap">' + escapeHtml(garage.distance_display) + '</span>' +
                         '</div>' +
-                        '<p class="text-blue-600 text-xs mt-1 truncate">📍 ' + escapeHtml(garage.neighborhood || garage.city || '') + '</p>' +
-                        '<div class="flex items-center gap-2 mt-2">' +
-                            availabilityBadge +
-                            openBadge +
-                        '</div>' +
-                        '<div class="flex items-center gap-2 mt-3 pt-2 border-t border-blue-100">' +
-                            (garage.phone
-                                ? '<a href="tel:' + escapeHtml(garage.phone) + '" class="text-blue-500 hover:text-blue-500-dark font-bold text-xs transition flex items-center gap-1" aria-label="' + getText('call') + ' ' + escapeHtml(garage.name) + '">' +
-                                    '<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path></svg>' +
-                                    '<span class="hidden sm:inline">' + getText('call') + '</span>' +
-                                  '</a>'
-                                : '') +
-                            '<a href="' + garage.url + '" class="text-navy-900 hover:text-blue-500 font-bold text-xs transition flex items-center gap-1">' +
-                                getText('view') +
-                                ' <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>' +
-                            '</a>' +
-                        '</div>' +
+                        '<p class="text-blue-600 text-xs mt-1 truncate"> ' + escapeHtml(garage.neighborhood || garage.city || '') + '</p>' +
+                        
+                        
                     '</div>' +
                 '</div>';
 
