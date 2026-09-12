@@ -9,9 +9,9 @@
 
 {% block dashboard_breadcrumb %}
     <nav class="flex items-center space-x-2 text-sm text-graphite-600">
-        <a href="{% url 'administration:dashboard' %}" class="hover:text-orange-500 transition">{% trans "Tableau de bord" %}</a>
+        <a href="{% url 'administration:dashboard' %}" class="hover:text-blue-500 transition">{% trans "Tableau de bord" %}</a>
         <span class="text-graphite-500">/</span>
-        <a href="{% url 'administration:support' %}" class="hover:text-orange-500 transition">{% trans "Tickets" %}</a>
+        <a href="{% url 'administration:support' %}" class="hover:text-blue-500 transition">{% trans "Tickets" %}</a>
         <span class="text-graphite-500">/</span>
         <span class="font-bold text-navy-900">{{ ticket.ticket_number }}</span>
     </nav>
@@ -24,11 +24,11 @@
             <div class="flex items-center gap-2 mb-1 flex-wrap">
                 <span class="font-mono text-sm text-graphite-500">{{ ticket.ticket_number }}</span>
                 {% if ticket.status == 'OPEN' %}
-                    <span class="bg-orange-100 text-orange-600 text-[10px]">{% trans "Ouvert" %}</span>
+                    <span class="bg-blue-100 text-blue-600 text-[10px]">{% trans "Ouvert" %}</span>
                 {% elif ticket.status == 'IN_PROGRESS' %}
                     <span class="bg-blue-100 text-blue-500 text-[10px]">{% trans "En cours" %}</span>
                 {% elif ticket.status == 'WAITING_CLIENT' %}
-                    <span class="bg-orange-100 text-orange-600 text-[10px]">{% trans "En attente du client" %}</span>
+                    <span class="bg-blue-100 text-blue-600 text-[10px]">{% trans "En attente du client" %}</span>
                 {% elif ticket.status == 'RESOLVED' %}
                     <span class="bg-blue-100 text-blue-500 text-[10px]">{% trans "Résolu" %}</span>
                 {% else %}
@@ -51,7 +51,7 @@
             <form method="post" action="{% url 'administration:ticket_detail' ticket.pk %}" class="inline-flex">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="assign">
-                <button type="submit" class="bg-orange-500 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-orange-500-dark transition">
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-blue-500-dark transition">
                     {% trans "Prendre en charge" %}
                 </button>
             </form>
@@ -60,7 +60,7 @@
             <form method="post" action="{% url 'administration:ticket_detail' ticket.pk %}" class="inline-flex gap-2">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="waiting">
-                <button type="submit" class="bg-orange-500/100 text-white px-3 py-2 rounded-lg font-bold text-sm hover:bg-warning-600 transition">
+                <button type="submit" class="bg-blue-500/100 text-white px-3 py-2 rounded-lg font-bold text-sm hover:bg-warning-600 transition">
                     {% trans "En attente" %}
                 </button>
                 <input type="hidden" name="action" value="resolve">
@@ -73,7 +73,7 @@
             <form method="post" action="{% url 'administration:ticket_detail' ticket.pk %}" class="inline-flex">
                 {% csrf_token %}
                 <input type="hidden" name="action" value="close">
-                <button type="submit" class="bg-orange-500/100 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-error-600 transition">
+                <button type="submit" class="bg-blue-500/100 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-error-600 transition">
                     {% trans "Fermer" %}
                 </button>
             </form>
@@ -92,7 +92,7 @@
                 {% if ticket.part %}
                 <div class="mt-3 p-4 rounded-xl bg-steel-50 border border-line-200">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center flex-shrink-0">
+                        <div class="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center flex-shrink-0">
                             {% if ticket.part.photo %}
                             <img src="{{ ticket.part.photo.url }}" class="w-full h-full object-cover rounded-xl">
                             {% else %}
@@ -111,7 +111,7 @@
                 {% if ticket.garage %}
                 <div class="mt-3 p-4 rounded-xl bg-steel-50 border border-line-200">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center flex-shrink-0">
+                        <div class="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center flex-shrink-0">
                             {% if ticket.garage.photo %}
                             <img src="{{ ticket.garage.photo.url }}" class="w-full h-full object-cover rounded-xl">
                             {% else %}
@@ -133,12 +133,12 @@
                 {% if ticket_messages %}
                 <div class="space-y-4">
                     {% for message in ticket_messages %}
-                    <div class="p-4 rounded-xl {% if message.sender == ticket.user %}bg-steel-50 border-l-4 border-l-orange-500{% else %}bg-orange-500/10 border-l-4 border-l-orange-600{% endif %}">
+                    <div class="p-4 rounded-xl {% if message.sender == ticket.user %}bg-steel-50 border-l-4 border-l-blue-500{% else %}bg-blue-500/10 border-l-4 border-l-blue-600{% endif %}">
                         <div class="flex items-center gap-2 mb-2">
                             {% if message.sender.avatar %}
                             <img src="{{ message.sender.avatar.url }}" class="w-6 h-6 rounded-full object-cover">
                             {% else %}
-                            <div class="w-6 h-6 rounded-full bg-orange-500/10 flex items-center justify-center text-xs font-bold text-navy-900">
+                            <div class="w-6 h-6 rounded-full bg-blue-500/10 flex items-center justify-center text-xs font-bold text-navy-900">
                                 {{ message.sender.display_name|first|upper }}
                             </div>
                             {% endif %}
@@ -155,7 +155,7 @@
                         <div class="mt-3">
                             <a href="{{ message.attachment.url }}" target="_blank" rel="noopener noreferrer"
                                class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-line-200 hover:bg-steel-50 transition text-sm">
-                                <svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586-6.586a2 2 0 112.828-2.828l6.414 6.414a4 4 0 00-5.656-5.656l-6.415-6.414a6 6 0 118.486 8.486L20.5 13"/></svg>
+                                <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586-6.586a2 2 0 112.828-2.828l6.414 6.414a4 4 0 00-5.656-5.656l-6.415-6.414a6 6 0 118.486 8.486L20.5 13"/></svg>
                                 <span class="text-navy-900 font-medium truncate max-w-[200px]">{{ message.attachment.name|cut:"tickets/attachments/" }}</span>
                             </a>
                         </div>
@@ -182,7 +182,7 @@
                               required></textarea>
                     <div class="flex justify-end mt-3">
                         <button type="submit"
-                                class="bg-orange-500 text-white px-6 py-2 rounded-lg font-bold text-sm hover:bg-orange-500-dark transition">
+                                class="bg-blue-500 text-white px-6 py-2 rounded-lg font-bold text-sm hover:bg-blue-500-dark transition">
                             {% trans "Répondre" %}
                         </button>
                     </div>
@@ -196,9 +196,9 @@
                 <h4 class="font-bold text-sm uppercase tracking-wider text-graphite-600 mb-3">{% trans "Client" %}</h4>
                 <div class="flex items-center gap-3">
                     {% if ticket.user.avatar %}
-                    <img src="{{ ticket.user.avatar.url }}" class="w-10 h-10 rounded-full object-cover border-2 border-orange-500">
+                    <img src="{{ ticket.user.avatar.url }}" class="w-10 h-10 rounded-full object-cover border-2 border-blue-500">
                     {% else %}
-                    <div class="w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center text-lg font-bold text-navy-900 border-2 border-line-200">
+                    <div class="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-lg font-bold text-navy-900 border-2 border-line-200">
                         {{ ticket.user.display_name|first|upper }}
                     </div>
                     {% endif %}
@@ -225,11 +225,11 @@
                     <div class="flex justify-between">
                         <span class="text-graphite-500">{% trans "Statut" %}</span>
                         {% if ticket.status == 'OPEN' %}
-                            <span class="bg-orange-100 text-orange-600 text-[10px]">{% trans "Ouvert" %}</span>
+                            <span class="bg-blue-100 text-blue-600 text-[10px]">{% trans "Ouvert" %}</span>
                         {% elif ticket.status == 'IN_PROGRESS' %}
                             <span class="bg-blue-100 text-blue-500 text-[10px]">{% trans "En cours" %}</span>
                         {% elif ticket.status == 'WAITING_CLIENT' %}
-                            <span class="bg-orange-100 text-orange-600 text-[10px]">{% trans "En attente" %}</span>
+                            <span class="bg-blue-100 text-blue-600 text-[10px]">{% trans "En attente" %}</span>
                         {% elif ticket.status == 'RESOLVED' %}
                             <span class="bg-blue-100 text-blue-500 text-[10px]">{% trans "Résolu" %}</span>
                         {% else %}

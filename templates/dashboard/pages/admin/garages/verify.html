@@ -154,7 +154,7 @@
     {% if garage.approval_status == 'APPROVED' and garage.activation_status == 'ACTIVE' %}
     <div class="card p-6 mt-6">
         <h2 class="font-bold text-lg mb-4">{% trans "Page publique" %}</h2>
-        <a href="{% url 'garages:garage_detail' garage.slug %}" class="text-orange-500 hover:underline">
+        <a href="{% url 'garages:garage_detail' garage.slug %}" class="text-blue-500 hover:underline">
             {% trans "Voir la page publique du garage" %} →
         </a>
     </div>

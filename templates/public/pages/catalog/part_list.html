@@ -78,7 +78,7 @@
                         {% if part.stock_status == 'IN_STOCK' %}
                         <span class="badge bg-blue-100 text-blue-500 !px-2 !py-1">{% trans "Disponible" %}</span>
                         {% elif part.stock_status == 'LOW_STOCK' %}
-                        <span class="badge bg-orange-100 text-orange-600 !px-2 !py-1">{% trans "Stock faible" %}</span>
+                        <span class="badge bg-blue-100 text-blue-600 !px-2 !py-1">{% trans "Stock faible" %}</span>
                         {% else %}
                         <span class="badge bg-graphite-500/10 text-graphite-600 !px-2 !py-1">{% trans "Indisponible" %}</span>
                         {% endif %}
@@ -108,7 +108,7 @@
                 <p class="text-graphite-500/70 text-xs mt-0.5 truncate">{{ part.garage.name }}</p>
                 {% endif %}
                 <div class="flex items-center justify-between mt-3 pt-2 border-t border-line-200">
-                    <span class="font-bold text-orange-600 text-base">{{ part.price|intcomma }} <span class="text-xs font-normal text-graphite-500">FCFA</span></span>
+                    <span class="font-bold text-blue-600 text-base">{{ part.price|intcomma }} <span class="text-xs font-normal text-graphite-500">FCFA</span></span>
                 </div>
             </div>
         </article>

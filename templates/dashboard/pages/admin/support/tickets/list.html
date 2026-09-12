@@ -9,7 +9,7 @@
 
 {% block dashboard_breadcrumb %}
     <nav class="flex items-center space-x-2 text-sm text-graphite-600">
-        <a href="{% url 'administration:dashboard' %}" class="hover:text-orange-500 transition">{% trans "Tableau de bord" %}</a>
+        <a href="{% url 'administration:dashboard' %}" class="hover:text-blue-500 transition">{% trans "Tableau de bord" %}</a>
         <span class="text-graphite-500">/</span>
         <span class="font-bold text-navy-900">{% trans "Support" %}</span>
     </nav>
@@ -34,7 +34,7 @@
                 </div>
                 <input type="text" name="q" value="{{ search_query }}"
                        placeholder="{% trans 'Rechercher...' %}"
-                       class="w-full pl-10 pr-4 py-2.5 border border-line-200 rounded-xl text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none">
+                       class="w-full pl-10 pr-4 py-2.5 border border-line-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none">
             </div>
             <div class="flex flex-wrap gap-3 items-end">
                 <div>
@@ -72,11 +72,11 @@
     <!-- Tabs -->
     <div class="flex border-b border-line-200">
         <a href="?tab=tickets{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}"
-           class="px-4 py-3 text-sm font-bold border-b-2 transition {% if active_tab == 'tickets' %}border-orange-500 text-orange-500{% else %}border-transparent text-graphite-500 hover:text-graphite-600{% endif %}">
+           class="px-4 py-3 text-sm font-bold border-b-2 transition {% if active_tab == 'tickets' %}border-blue-500 text-blue-500{% else %}border-transparent text-graphite-500 hover:text-graphite-600{% endif %}">
             {% trans "Tickets" %} ({{ tickets.paginator.count }})
         </a>
         <a href="?tab=conversations{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if search_query %}&q={{ search_query }}{% endif %}"
-           class="px-4 py-3 text-sm font-bold border-b-2 transition {% if active_tab == 'conversations' %}border-orange-500 text-orange-500{% else %}border-transparent text-graphite-500 hover:text-graphite-600{% endif %}">
+           class="px-4 py-3 text-sm font-bold border-b-2 transition {% if active_tab == 'conversations' %}border-blue-500 text-blue-500{% else %}border-transparent text-graphite-500 hover:text-graphite-600{% endif %}">
             {% trans "Conversations" %} ({{ conversations.paginator.count }})
         </a>
     </div>
@@ -102,7 +102,7 @@
                     <tr class="hover:bg-steel-50">
                         <td class="px-4 py-3 font-mono text-xs">{{ ticket.ticket_number }}</td>
                         <td class="px-4 py-3">
-                            <a href="{% url 'administration:ticket_detail' ticket.pk %}" class="text-orange-500 hover:underline font-medium">
+                            <a href="{% url 'administration:ticket_detail' ticket.pk %}" class="text-blue-500 hover:underline font-medium">
                                 {{ ticket.subject|truncatewords:8 }}
                             </a>
                         </td>
@@ -115,11 +115,11 @@
                         </td>
                         <td class="px-4 py-3">
                             {% if ticket.status == 'OPEN' %}
-                                <span class="bg-orange-100 text-orange-600 text-[10px]">{% trans "Ouvert" %}</span>
+                                <span class="bg-blue-100 text-blue-600 text-[10px]">{% trans "Ouvert" %}</span>
                             {% elif ticket.status == 'IN_PROGRESS' %}
                                 <span class="bg-blue-100 text-blue-500 text-[10px]">{% trans "En cours" %}</span>
                             {% elif ticket.status == 'WAITING_CLIENT' %}
-                                <span class="bg-orange-100 text-orange-600 text-[10px]">{% trans "En attente" %}</span>
+                                <span class="bg-blue-100 text-blue-600 text-[10px]">{% trans "En attente" %}</span>
                             {% elif ticket.status == 'RESOLVED' %}
                                 <span class="bg-blue-100 text-blue-500 text-[10px]">{% trans "Résolu" %}</span>
                             {% else %}
@@ -178,7 +178,7 @@
                     {% for conv in conversations %}
                     <tr class="hover:bg-steel-50">
                         <td class="px-4 py-3">
-                            <a href="{% url 'support:conversation_detail' conv.pk %}" class="text-orange-500 hover:underline font-medium">
+                            <a href="{% url 'support:conversation_detail' conv.pk %}" class="text-blue-500 hover:underline font-medium">
                                 {{ conv.subject|truncatewords:8 }}
                             </a>
                         </td>
@@ -198,7 +198,7 @@
                         </td>
                         <td class="px-4 py-3">
                             {% if conv.unread_count > 0 %}
-                                <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-orange-500 rounded-full">{{ conv.unread_count }}</span>
+                                <span class="inline-flex items-center justify-center w-5 h-5 text-xs font-bold text-white bg-blue-500 rounded-full">{{ conv.unread_count }}</span>
                             {% else %}
                                 <span class="text-graphite-500">0</span>
                             {% endif %}

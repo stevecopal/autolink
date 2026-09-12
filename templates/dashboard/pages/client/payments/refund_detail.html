@@ -9,9 +9,9 @@
 
 {% block dashboard_breadcrumb %}
     <nav class="flex items-center space-x-2 text-sm text-graphite-600">
-        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-orange-500 transition">{% trans "Tableau de bord" %}</a>
+        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-blue-500 transition">{% trans "Tableau de bord" %}</a>
         <span class="text-graphite-500">/</span>
-        <a href="{% url 'payments:payment_list' %}" class="hover:text-orange-500 transition">{% trans "Mes paiements" %}</a>
+        <a href="{% url 'payments:payment_list' %}" class="hover:text-blue-500 transition">{% trans "Mes paiements" %}</a>
         <span class="text-graphite-500">/</span>
         <span class="font-bold text-navy-900">{% trans "Remboursement" %}</span>
     </nav>
@@ -37,11 +37,11 @@
             <div class="flex items-center gap-2 mt-1">
                 <span class="badge-{{ refund.status_color }} text-[10px]">{{ refund.get_status_display }}</span>
                 {% if refund.status == 'PENDING' %}
-                    <span class="text-xs text-orange-600">{% trans "En attente de traitement." %}</span>
+                    <span class="text-xs text-blue-600">{% trans "En attente de traitement." %}</span>
                 {% elif refund.status == 'APPROVED' %}
                     <span class="text-xs text-emerald-600">{% trans "Remboursement approuvé." %}</span>
                 {% elif refund.status == 'REJECTED' %}
-                    <span class="text-xs text-orange-600">{% trans "Remboursement refusé." %}</span>
+                    <span class="text-xs text-blue-600">{% trans "Remboursement refusé." %}</span>
                 {% elif refund.status == 'COMPLETED' %}
                     <span class="text-xs text-emerald-600">{% trans "Remboursement effectué." %}</span>
                 {% endif %}
@@ -60,7 +60,7 @@
             <div class="space-y-4">
                 <div class="flex justify-between items-center py-2 border-b border-line-200">
                     <span class="text-graphite-600">{% trans "Montant" %}</span>
-                    <span class="font-bold text-lg text-orange-600">{{ refund.amount|intcomma }} FCFA</span>
+                    <span class="font-bold text-lg text-blue-600">{{ refund.amount|intcomma }} FCFA</span>
                 </div>
                 <div class="flex justify-between items-center py-2 border-b border-line-200">
                     <span class="text-graphite-600">{% trans "Raison" %}</span>
@@ -69,7 +69,7 @@
                 <div class="flex justify-between items-center py-2 border-b border-line-200">
                     <span class="text-graphite-600">{% trans "Paiement concerné" %}</span>
                     <a href="{% url 'payments:payment_detail' refund.payment.id %}"
-                       class="font-bold text-orange-500 hover:underline text-sm">
+                       class="font-bold text-blue-500 hover:underline text-sm">
                         #{{ refund.payment.id }}
                     </a>
                 </div>
@@ -104,7 +104,7 @@
 
             <div class="flex justify-between items-center pt-3 border-t border-line-200">
                 <span class="text-sm text-graphite-600">{% trans "Montant du paiement" %}</span>
-                <span class="font-bold text-lg text-orange-600">{{ refund.payment.amount|intcomma }} FCFA</span>
+                <span class="font-bold text-lg text-blue-600">{{ refund.payment.amount|intcomma }} FCFA</span>
             </div>
         </div>
 
@@ -150,7 +150,7 @@
                     <button type="submit"
                             name="action"
                             value="cancel"
-                            class="bg-orange-500/100 text-white px-6 py-3 rounded-lg font-bold text-sm hover:bg-error-600 transition">
+                            class="bg-blue-500/100 text-white px-6 py-3 rounded-lg font-bold text-sm hover:bg-error-600 transition">
                         {% trans "Annuler la demande" %}
                     </button>
                 </form>

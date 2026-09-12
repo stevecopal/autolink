@@ -382,7 +382,7 @@
             locationStatus.textContent =
                 '{% trans "Position capturée (précision limitée :" %} ' +
                 Math.round(bestFix.accuracy) + ' m). {% trans "Réessayez en extérieur pour plus de précision." %}';
-            locationStatus.className = 'text-sm text-orange-600 font-medium mb-2';
+            locationStatus.className = 'text-sm text-blue-600 font-medium mb-2';
             return;
         }
 
@@ -438,7 +438,7 @@
                     capturePosition();
                     locationStatus.textContent = warningMsg;
                     locationStatus.className = bestFix.accuracy > 100
-                        ? 'text-sm text-orange-600 font-medium mb-2'
+                        ? 'text-sm text-blue-600 font-medium mb-2'
                         : 'text-sm text-green-600 font-medium mb-2';
                 }
             }, MAX_WAIT_MS);

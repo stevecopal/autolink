@@ -9,7 +9,7 @@
 
 {% block dashboard_breadcrumb %}
     <nav class="flex items-center space-x-2 text-sm text-graphite-600">
-        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-orange-500 transition">{% trans "Tableau de bord" %}</a>
+        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-blue-500 transition">{% trans "Tableau de bord" %}</a>
         <span class="text-graphite-500">/</span>
         <span class="font-bold text-navy-900">{% trans "Mes paiements" %}</span>
     </nav>
@@ -49,7 +49,7 @@
                                     {% if payment.status == 'SUCCESS' %}
                                     <span class="bg-blue-100 text-blue-500 text-[10px]">{% trans "Paye" %}</span>
                                     {% elif payment.status == 'PENDING' or payment.status == 'PROCESSING' %}
-                                    <span class="bg-orange-100 text-orange-600 text-[10px]">{% trans "En cours" %}</span>
+                                    <span class="bg-blue-100 text-blue-600 text-[10px]">{% trans "En cours" %}</span>
                                     {% elif payment.status == 'FAILED' %}
                                     <span class="badge-danger text-[10px]">{% trans "Echoue" %}</span>
                                     {% elif payment.status == 'CANCELLED' %}
@@ -61,7 +61,7 @@
                                 <td class="py-3 text-graphite-600 text-sm hidden md:table-cell">{{ payment.created_at|date:"d/m/Y H:i" }}</td>
                                 <td class="py-3 text-right">
                                     <a href="{% url 'payments:payment_detail' payment.pk %}"
-                                       class="text-orange-500 font-bold text-sm hover:underline">
+                                       class="text-blue-500 font-bold text-sm hover:underline">
                                         {% trans "Voir" %}
                                     </a>
                                 </td>

@@ -17,14 +17,14 @@
                 <span class="badge bg-blue-100 text-blue-500 !px-2 !py-1" title="{% trans 'Garage vérifié' %}">✓</span>
                 {% endif %}
                 {% if garage.is_featured %}
-                <span class="badge bg-orange-500 text-white !px-2 !py-1" title="{% trans 'Garage mis en avant' %}">★</span>
+                <span class="badge bg-blue-500 text-white !px-2 !py-1" title="{% trans 'Garage mis en avant' %}">★</span>
                 {% endif %}
             </div>
             <div class="absolute bottom-2 left-2 right-2 flex justify-between">
                 {% if garage.availability_status == 'AVAILABLE' %}
                 <span class="badge bg-emerald-600 text-white !px-2 !py-1">{% trans 'Disponible' %}</span>
                 {% elif garage.availability_status == 'UNAVAILABLE' %}
-                <span class="badge bg-orange-500 text-white !px-2 !py-1">{% trans 'Occupé' %}</span>
+                <span class="badge bg-blue-500 text-white !px-2 !py-1">{% trans 'Occupé' %}</span>
                 {% else %}
                 <span class="badge bg-graphite-900/70 text-white !px-2 !py-1">{% trans 'Fermé' %}</span>
                 {% endif %}

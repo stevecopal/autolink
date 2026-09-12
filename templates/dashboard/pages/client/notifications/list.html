@@ -9,7 +9,7 @@
 
 {% block dashboard_breadcrumb %}
     <nav class="flex items-center space-x-2 text-sm text-graphite-600">
-        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-orange-500 transition">{% trans "Tableau de bord" %}</a>
+        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-blue-500 transition">{% trans "Tableau de bord" %}</a>
         <span class="text-graphite-500">/</span>
         <span class="font-bold text-navy-900">{% trans "Notifications" %}</span>
     </nav>
@@ -19,7 +19,7 @@
 <div class="space-y-6">
     <div class="flex items-center justify-between flex-wrap gap-3">
         <div>
-            <h2 class="text-lg font-bold text-orange-600">{% trans "Centre de notifications" %}</h2>
+            <h2 class="text-lg font-bold text-blue-600">{% trans "Centre de notifications" %}</h2>
             <p class="text-sm text-graphite-600 mt-1">{% trans "Restez informe des activites de votre compte." %}</p>
         </div>
         <form method="post" action="{% url 'accounts:notification_mark_all_read' %}">
@@ -33,15 +33,15 @@
 
     <div class="space-y-3">
         {% for notif in notifications %}
-        <div class="card p-4 {% if not notif.is_read %}border-l-4 border-l-orange-500 bg-steel-50/50{% endif %} transition-all duration-200 hover:shadow-md">
+        <div class="card p-4 {% if not notif.is_read %}border-l-4 border-l-blue-500 bg-steel-50/50{% endif %} transition-all duration-200 hover:shadow-md">
             <div class="flex items-start gap-3">
                 <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0
                     {% if notif.notif_type == 'PAYMENT_SUCCESS' %}bg-emerald-50 text-emerald-600
-                    {% elif notif.notif_type == 'PAYMENT_FAILED' %}bg-orange-500/10 text-orange-600
+                    {% elif notif.notif_type == 'PAYMENT_FAILED' %}bg-blue-500/10 text-blue-600
                     {% elif notif.notif_type == 'GARAGE_APPROVED' %}bg-info-100 text-info-600
-                    {% elif notif.notif_type == 'GARAGE_REJECTED' %}bg-orange-500/10 text-orange-600
+                    {% elif notif.notif_type == 'GARAGE_REJECTED' %}bg-blue-500/10 text-blue-600
                     {% elif notif.notif_type == 'GARAGE_ACTIVATED' %}bg-emerald-50 text-emerald-600
-                    {% elif notif.notif_type == 'ADMIN_MESSAGE' %}bg-orange-500/10 text-orange-500
+                    {% elif notif.notif_type == 'ADMIN_MESSAGE' %}bg-blue-500/10 text-blue-500
                     {% else %}bg-line-200/30 text-graphite-600{% endif %}">
                     {% if notif.notif_type == 'PAYMENT_SUCCESS' %}
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
@@ -63,7 +63,7 @@
                     <p class="text-sm text-graphite-600 mt-1 leading-relaxed">{{ notif.message }}</p>
                     <div class="flex items-center gap-3 mt-2">
                         {% if notif.link %}
-                        <a href="{{ notif.link }}" class="text-xs font-bold text-orange-500 hover:underline">{% trans "Voir" %}</a>
+                        <a href="{{ notif.link }}" class="text-xs font-bold text-blue-500 hover:underline">{% trans "Voir" %}</a>
                         {% endif %}
                         {% if not notif.is_read %}
                         <a href="{% url 'accounts:notification_mark_read' notif.pk %}?next={% url 'accounts:notifications' %}" class="text-xs text-graphite-500 hover:text-navy-900 transition">{% trans "Marquer comme lu" %}</a>

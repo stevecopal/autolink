@@ -16,13 +16,13 @@
     <div class="card p-4 sm:p-6">
         <div class="space-y-3 max-h-[60vh] overflow-y-auto">
             {% for message in conversation_messages %}
-            <article class="p-3 sm:p-4 rounded-xl {% if message.sender_id == request.user.id %}bg-orange-500/10 ml-4 sm:ml-16{% else %}bg-steel-50 mr-4 sm:mr-16{% endif %}">
+            <article class="p-3 sm:p-4 rounded-xl {% if message.sender_id == request.user.id %}bg-blue-500/10 ml-4 sm:ml-16{% else %}bg-steel-50 mr-4 sm:mr-16{% endif %}">
                 <div class="flex items-center justify-between gap-2 mb-1">
                     <strong class="text-sm text-navy-900">{{ message.sender.display_name }}</strong>
                     <time class="text-xs text-graphite-500">{{ message.created_at|date:"d/m/Y H:i" }}</time>
                 </div>
                 {% if message.body %}<p class="text-sm text-graphite-600 whitespace-pre-wrap break-words">{{ message.body }}</p>{% endif %}
-                {% if message.attachment %}<a class="text-sm text-orange-500 underline break-all" href="{{ message.attachment.url }}" target="_blank" rel="noopener">{% trans "Voir la pièce jointe" %}</a>{% endif %}
+                {% if message.attachment %}<a class="text-sm text-blue-500 underline break-all" href="{{ message.attachment.url }}" target="_blank" rel="noopener">{% trans "Voir la pièce jointe" %}</a>{% endif %}
             </article>
             {% empty %}
             <p class="text-center text-graphite-500 py-8">{% trans "Aucun message pour le moment." %}</p>

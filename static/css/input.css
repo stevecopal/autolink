@@ -60,7 +60,7 @@ body {
 }
 
 .tech-panel[data-accent="orange"] {
-  --accent-color: #FF6A2B;
+  --accent-color: #1C6DD0;
 }
 
 .tech-panel[data-accent="blue"] {
@@ -145,7 +145,7 @@ input[type="file"] {
 }
 
 .form-error {
-  @apply text-orange-600 text-sm mt-1;
+  @apply text-blue-600 text-sm mt-1;
 }
 
 /* ============================================================
@@ -167,11 +167,11 @@ input[type="file"] {
 }
 
 .badge-warning {
-  @apply bg-orange-100 text-orange-500;
+  @apply bg-blue-100 text-blue-600;
 }
 
 .badge-error {
-  @apply bg-orange-100 text-orange-600;
+  @apply bg-blue-100 text-blue-700;
 }
 
 .badge-info {
@@ -246,11 +246,11 @@ input[type="file"] {
 }
 
 .status-busy {
-  @apply bg-orange-500;
+  @apply bg-blue-500;
 }
 
 .status-closed {
-  @apply bg-orange-600;
+  @apply bg-blue-700;
 }
 
 /* ============================================================
@@ -347,7 +347,7 @@ input[type="file"] {
   cursor: pointer;
   padding: 0.25rem;
   border-radius: 0.375rem;
-  color: #FF6A2B;
+  color: #1C6DD0;
   transition: background-color 150ms ease;
 }
 
@@ -371,7 +371,7 @@ input[type="file"] {
 }
 
 .al-modal-body .form-error {
-  color: #E8591C;
+  color: #1558B0;
   font-size: 0.875rem;
   margin-top: 0.25rem;
 }
@@ -413,8 +413,8 @@ input[type="file"] {
 /* Confirmation prompt styling consistency */
 .admin-confirm-banner {
   background-color: #F3F5F7;
-  border: 1px solid #FF6A2B;
-  color: #E8591C;
+  border: 1px solid #1C6DD0;
+  color: #1558B0;
   padding: 0.625rem 1rem;
   border-radius: 0.5rem;
   font-size: 0.875rem;

@@ -49,8 +49,8 @@
 
         <div class="stat-card">
             <div class="flex items-center gap-3">
-                <div class="w-11 h-11 bg-orange-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <svg class="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                <div class="w-11 h-11 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
                 </div>
                 <div class="min-w-0">
                     <div class="stat-value">{{ total_payments }}</div>
@@ -75,15 +75,15 @@
 
         <div class="stat-card">
             <div class="flex items-center gap-3">
-                <div class="w-11 h-11 bg-orange-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <div class="w-11 h-11 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 </div>
                 <div class="min-w-0">
-                    <div class="stat-value text-orange-600">{{ pending_payment_garages }}</div>
+                    <div class="stat-value text-blue-600">{{ pending_payment_garages }}</div>
                     <div class="stat-label">{% trans "À activer" %}</div>
                 </div>
             </div>
-            <div class="text-xs text-orange-600 mt-2 font-bold">{% trans "En attente de paiement" %}</div>
+            <div class="text-xs text-blue-600 mt-2 font-bold">{% trans "En attente de paiement" %}</div>
         </div>
     </div>
 
@@ -115,18 +115,18 @@
                         {% if garage.activation_status == 'ACTIVE' %}
                         <span class="bg-blue-100 text-blue-500 text-[11px] font-bold px-2 py-1 rounded-md">{% trans "Actif" %}</span>
                         {% elif garage.payment_status == 'UNPAID' and garage.approval_status == 'APPROVED' %}
-                        <span class="bg-orange-100 text-orange-600 text-[11px] font-bold px-2 py-1 rounded-md">{% trans "À payer" %}</span>
+                        <span class="bg-blue-100 text-blue-600 text-[11px] font-bold px-2 py-1 rounded-md">{% trans "À payer" %}</span>
                         {% elif garage.approval_status == 'PENDING' %}
                         <span class="bg-yellow-100 text-yellow-700 text-[11px] font-bold px-2 py-1 rounded-md">{% trans "En attente" %}</span>
                         {% elif garage.approval_status == 'REJECTED' %}
-                        <span class="bg-orange-500/10 text-orange-600 text-[11px] font-bold px-2 py-1 rounded-md">{% trans "Rejeté" %}</span>
+                        <span class="bg-blue-500/10 text-blue-600 text-[11px] font-bold px-2 py-1 rounded-md">{% trans "Rejeté" %}</span>
                         {% else %}
                         <span class="bg-steel-50 text-graphite-600 text-[11px] font-bold px-2 py-1 rounded-md">{{ garage.get_activation_status_display }}</span>
                         {% endif %}
                     </div>
                     <div class="flex items-center gap-2">
                         {% if garage.approval_status == 'APPROVED' and garage.payment_status == 'UNPAID' %}
-                        <a href="{% url 'garages:garage_dashboard' %}" class="btn bg-orange-500 hover:bg-orange-600 text-white text-xs px-3 py-2 !min-h-0 flex-1">{% trans "Payer" %}</a>
+                        <a href="{% url 'garages:garage_dashboard' %}" class="btn bg-blue-500 hover:bg-blue-600 text-white text-xs px-3 py-2 !min-h-0 flex-1">{% trans "Payer" %}</a>
                         {% endif %}
                         {% if garage.approval_status == 'APPROVED' %}
                         <a href="{% url 'garages:garage_detail' slug=garage.slug %}" class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 text-xs px-3 py-2 !min-h-0 flex-1">{% trans "Voir public" %}</a>
@@ -168,9 +168,9 @@
                         {% if payment.status == 'SUCCESS' %}
                         <span class="bg-blue-100 text-blue-500 text-[11px] font-bold px-2 py-1 rounded-md">{% trans "Payé" %}</span>
                         {% elif payment.status == 'PENDING' or payment.status == 'PROCESSING' %}
-                        <span class="bg-orange-100 text-orange-600 text-[11px] font-bold px-2 py-1 rounded-md">{% trans "En cours" %}</span>
+                        <span class="bg-blue-100 text-blue-600 text-[11px] font-bold px-2 py-1 rounded-md">{% trans "En cours" %}</span>
                         {% else %}
-                        <span class="bg-orange-500/10 text-orange-600 text-[11px] font-bold px-2 py-1 rounded-md">{{ payment.get_status_display }}</span>
+                        <span class="bg-blue-500/10 text-blue-600 text-[11px] font-bold px-2 py-1 rounded-md">{{ payment.get_status_display }}</span>
                         {% endif %}
                     </div>
                 </div>
@@ -191,7 +191,7 @@
                 {% for notif in notifications %}
                 <a href="{% url 'accounts:notification_mark_read' notification_id=notif.pk %}" class="block p-3 rounded-lg border border-line-200/60 hover:bg-steel-50 transition">
                     <div class="flex items-center gap-2">
-                        {% if not notif.is_read %}<span class="w-2 h-2 rounded-full bg-orange-500 flex-shrink-0"></span>{% endif %}
+                        {% if not notif.is_read %}<span class="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0"></span>{% endif %}
                         <div class="font-bold text-sm text-navy-900 truncate">{{ notif.title }}</div>
                     </div>
                     <p class="text-xs text-graphite-600 mt-1 line-clamp-2">{{ notif.message }}</p>

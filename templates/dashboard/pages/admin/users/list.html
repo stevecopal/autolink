@@ -9,7 +9,7 @@
 
 {% block admin_breadcrumb %}
     <nav class="flex items-center space-x-2 text-sm text-graphite-600">
-        <a href="{% url 'administration:dashboard' %}" class="hover:text-orange-500 transition">{% trans "Tableau de bord" %}</a>
+        <a href="{% url 'administration:dashboard' %}" class="hover:text-blue-500 transition">{% trans "Tableau de bord" %}</a>
         <span class="text-graphite-500">/</span>
         <span class="font-bold text-navy-900">{% trans "Utilisateurs" %}</span>
     </nav>
@@ -77,11 +77,11 @@
                                 {% if user.is_active %}
                                     <span class="bg-blue-100 text-blue-500">{% trans "Actif" %}</span>
                                 {% else %}
-                                    <span class="bg-orange-100 text-orange-600">{% trans "Inactif" %}</span>
+                                    <span class="bg-blue-100 text-blue-600">{% trans "Inactif" %}</span>
                                 {% endif %}
                             </td>
                             <td>
-                                <a href="{% url 'administration:user_detail' user.pk %}" class="text-orange-500 font-bold hover:text-orange-600 transition">{% trans "Voir" %}</a>
+                                <a href="{% url 'administration:user_detail' user.pk %}" class="text-blue-500 font-bold hover:text-blue-600 transition">{% trans "Voir" %}</a>
                             </td>
                         </tr>
                     {% empty %}

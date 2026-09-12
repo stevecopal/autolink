@@ -46,7 +46,7 @@
             {% for part in results.parts %}
             <a href="{% url 'catalog:part_detail' slug=part.slug %}" class="card p-4 group">
                 <h3 class="font-bold text-sm text-navy-900 group-hover:text-blue-500 transition-colors">{{ part.name }}</h3>
-                <p class="text-orange-600 font-bold mt-2 text-sm">{{ part.price }} FCFA</p>
+                <p class="text-blue-600 font-bold mt-2 text-sm">{{ part.price }} FCFA</p>
             </a>
             {% endfor %}
         </div>

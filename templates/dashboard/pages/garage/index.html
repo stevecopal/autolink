@@ -26,7 +26,7 @@
     </div>
 
     {% if garage.approval_status == 'APPROVED' and garage.payment_status != 'PAID' %}
-    <div class="bg-orange-500/10 border border-orange-500/30 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+    <div class="bg-blue-500/10 border border-blue-500/30 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
             <p class="font-bold text-navy-900">{% trans "Votre garage est approuvé" %}</p>
             <p class="text-sm text-graphite-600">{% blocktrans with amount=garage_activation_amount|floatformat:0 currency=garage_activation_currency %}Payer {{ amount }} {{ currency }} pour activer votre garage{% endblocktrans %}</p>
@@ -52,7 +52,7 @@
         <span class="text-xs text-graphite-600">{% trans "Modifié il y a" %} {{ garage.updated_at|timesince }}</span>
     </div>    <div class="grid grid-cols-1 gap-4 mb-6">
         <div class="stat-card text-center">
-            <div class="stat-value text-orange-500">{{ total_sales|intcomma }}</div>
+            <div class="stat-value text-blue-500">{{ total_sales|intcomma }}</div>
             <div class="stat-label">{% trans "Ventes (FCFA)" %}</div>
         </div>
     </div>
@@ -62,7 +62,7 @@
         <div class="card p-6">
             <div class="flex items-center justify-between mb-4">
                 <h2 class="font-bold text-lg">{% trans "Services" %}</h2>
-                <a href="{% url 'garages:service_list' %}" class="text-orange-500 font-bold text-sm hover:text-orange-600 transition">{% trans "Gérer" %} →</a>
+                <a href="{% url 'garages:service_list' %}" class="text-blue-500 font-bold text-sm hover:text-blue-600 transition">{% trans "Gérer" %} →</a>
             </div>
             {% if services %}
                 <div class="space-y-2">
@@ -79,7 +79,7 @@
                 <div class="text-center py-8 text-graphite-600">
                     <div class="text-3xl mb-2">🔧</div>
                     <p>{% trans "Aucun service ajouté." %}</p>
-                    <a href="{% url 'garages:service_create' %}" class="text-orange-500 font-bold text-sm hover:text-orange-600 transition mt-2 inline-block">
+                    <a href="{% url 'garages:service_create' %}" class="text-blue-500 font-bold text-sm hover:text-blue-600 transition mt-2 inline-block">
                         + {% trans "Ajouter un service" %}
                     </a>
                 </div>
@@ -90,7 +90,7 @@
         <div class="card p-6">
             <div class="flex items-center justify-between mb-4">
                 <h2 class="font-bold text-lg">{% trans "Produits" %}</h2>
-                <a href="{% url 'catalog:garage_products' %}" class="text-orange-500 font-bold text-sm hover:text-orange-600 transition">{% trans "Voir tout" %} →</a>
+                <a href="{% url 'catalog:garage_products' %}" class="text-blue-500 font-bold text-sm hover:text-blue-600 transition">{% trans "Voir tout" %} →</a>
             </div>
             {% if products %}
                 <div class="space-y-3">
@@ -154,7 +154,7 @@
             </div>
 
             <!-- Montant fixe -->
-            <div class="mx-6 mb-4 bg-orange-500/10 border border-orange-500/30 rounded-xl p-4 text-center">
+            <div class="mx-6 mb-4 bg-blue-500/10 border border-blue-500/30 rounded-xl p-4 text-center">
                 <p class="text-sm text-graphite-600 mb-1">{% trans "Montant à payer" %}</p>
                 <p class="text-3xl font-extrabold text-navy-900">{{ garage_activation_amount|floatformat:0 }} <span class="text-lg">{{ garage_activation_currency }}</span></p>
                 <p class="text-xs text-graphite-500 mt-1">{% trans "Montant fixe – non modifiable" %}</p>
@@ -180,7 +180,7 @@
                             maxlength="9"
                             minlength="9"
                             placeholder="6XX XXX XXX"
-                            class="w-full px-4 py-3 rounded-r-xl border border-line-200 bg-steel-50 text-navy-900 placeholder:text-graphite-500 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 outline-none transition text-base"
+                            class="w-full px-4 py-3 rounded-r-xl border border-line-200 bg-steel-50 text-navy-900 placeholder:text-graphite-500 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition text-base"
                         >
                     </div>
                     <p class="text-xs text-graphite-500 mt-1">{% trans "Le numéro doit commencer par 6 et contenir 9 chiffres" %}</p>
@@ -193,7 +193,7 @@
 
                 <!-- Bouton Payer -->
                 <button type="button" id="payment-submit-btn"
-                        class="w-full bg-orange-500 hover:bg-orange-500-dark text-white font-bold py-3.5 px-6 rounded-xl transition-colors flex items-center justify-center gap-2 text-base disabled:opacity-50 disabled:cursor-not-allowed">
+                        class="w-full bg-blue-500 hover:bg-blue-500-dark text-white font-bold py-3.5 px-6 rounded-xl transition-colors flex items-center justify-center gap-2 text-base disabled:opacity-50 disabled:cursor-not-allowed">
                     <span id="payment-btn-text">{% trans "Payer maintenant" %}</span>
                     <svg id="payment-btn-spinner" class="hidden animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -338,9 +338,9 @@
             if (status !== 'ACTIVE') return;
 
             var isOrange = shortcode === 'ORANGE_CM';
-            var borderColor = isOrange ? 'border-orange-500 bg-orange-50' : 'border-yellow-500 bg-yellow-50';
-            var logoColor = isOrange ? 'text-orange-600' : 'text-yellow-600';
-            var bgColor = isOrange ? 'bg-orange-100' : 'bg-yellow-100';
+            var borderColor = isOrange ? 'border-blue-500 bg-blue-50' : 'border-yellow-500 bg-yellow-50';
+            var logoColor = isOrange ? 'text-blue-600' : 'text-yellow-600';
+            var bgColor = isOrange ? 'bg-blue-100' : 'bg-yellow-100';
 
             html += `
                 <label class="cursor-pointer">

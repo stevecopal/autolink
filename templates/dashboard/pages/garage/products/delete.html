@@ -9,9 +9,9 @@
 
 {% block dashboard_breadcrumb %}
     <nav class="flex items-center space-x-2 text-sm text-graphite-600">
-        <a href="{% url 'garages:garage_dashboard' %}" class="hover:text-orange-500 transition">{% trans "Tableau de bord" %}</a>
+        <a href="{% url 'garages:garage_dashboard' %}" class="hover:text-blue-500 transition">{% trans "Tableau de bord" %}</a>
         <span class="text-graphite-500">/</span>
-        <a href="{% url 'catalog:garage_products' %}" class="hover:text-orange-500 transition">{% trans "Produits" %}</a>
+        <a href="{% url 'catalog:garage_products' %}" class="hover:text-blue-500 transition">{% trans "Produits" %}</a>
         <span class="text-graphite-500">/</span>
         <span class="font-bold text-navy-900">{% trans "Supprimer" %}</span>
     </nav>
@@ -30,12 +30,12 @@
                 {% if part.photo %}
                 <img src="{{ part.photo.url }}" class="w-16 h-16 rounded-xl object-cover" alt="{{ part.name }}">
                 {% else %}
-                <div class="w-16 h-16 rounded-xl bg-orange-500/10 flex items-center justify-center text-3xl">🔩</div>
+                <div class="w-16 h-16 rounded-xl bg-blue-500/10 flex items-center justify-center text-3xl">🔩</div>
                 {% endif %}
                 <div class="min-w-0">
                     <div class="font-bold text-lg text-navy-900 truncate">{{ part.name }}</div>
                     <div class="text-sm text-graphite-500">{{ part.category|default:"—" }}</div>
-                    <div class="text-sm font-bold text-orange-500 mt-1">{{ part.price|intcomma }} FCFA</div>
+                    <div class="text-sm font-bold text-blue-500 mt-1">{{ part.price|intcomma }} FCFA</div>
                     <div class="mt-1">
                         <span class="badge-{{ part.stock_color }} text-[10px]">{{ part.stock_label }}</span>
                     </div>
@@ -43,14 +43,14 @@
             </div>
         </div>
 
-        <div class="p-4 mb-6 rounded-xl border border-warning-100 bg-orange-500/10">
+        <div class="p-4 mb-6 rounded-xl border border-warning-100 bg-blue-500/10">
             <div class="flex items-center gap-2">
-                <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
-                <span class="text-sm font-bold text-orange-600">{% trans "Attention" %}</span>
+                <span class="text-sm font-bold text-blue-600">{% trans "Attention" %}</span>
             </div>
-            <p class="text-xs text-orange-600 mt-2">
+            <p class="text-xs text-blue-600 mt-2">
                 {% trans "Le produit ne sera plus visible dans le catalogue public. Les commandes en cours ne seront pas affectées." %}
             </p>
         </div>
@@ -60,7 +60,7 @@
                class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 text-sm w-full sm:w-auto text-center">{% trans "Annuler" %}</a>
             <form method="post" class="w-full sm:w-auto" id="delete-form">
                 {% csrf_token %}
-                <button type="submit" class="bg-orange-500/100 text-white px-6 py-3 rounded-lg font-bold text-sm hover:bg-error-600 transition w-full sm:w-auto">
+                <button type="submit" class="bg-blue-500/100 text-white px-6 py-3 rounded-lg font-bold text-sm hover:bg-error-600 transition w-full sm:w-auto">
                     {% trans "Désactiver le produit" %}
                 </button>
             </form>

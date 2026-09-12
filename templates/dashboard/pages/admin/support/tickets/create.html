@@ -9,9 +9,9 @@
 
 {% block dashboard_breadcrumb %}
     <nav class="flex items-center space-x-2 text-sm text-graphite-600">
-        <a href="{% url 'administration:dashboard' %}" class="hover:text-orange-500 transition">{% trans "Tableau de bord" %}</a>
+        <a href="{% url 'administration:dashboard' %}" class="hover:text-blue-500 transition">{% trans "Tableau de bord" %}</a>
         <span class="text-graphite-500">/</span>
-        <a href="{% url 'administration:support' %}" class="hover:text-orange-500 transition">{% trans "Support" %}</a>
+        <a href="{% url 'administration:support' %}" class="hover:text-blue-500 transition">{% trans "Support" %}</a>
         <span class="text-graphite-500">/</span>
         <span class="font-bold text-navy-900">{% trans "Créer" %}</span>
     </nav>
@@ -43,7 +43,7 @@
                 <label class="cursor-pointer">
                     <input type="radio" name="recipient_type" value="USER"
                            class="peer sr-only" {% if form.recipient_type.value != 'GARAGE' %}checked{% endif %}>
-                    <div class="border-2 border-line-200 peer-checked:border-orange-500 peer-checked:bg-orange-500/10 rounded-xl p-4 text-center transition-all">
+                    <div class="border-2 border-line-200 peer-checked:border-blue-500 peer-checked:bg-blue-500/10 rounded-xl p-4 text-center transition-all">
                         <div class="text-2xl mb-1">👤</div>
                         <div class="text-sm font-bold text-navy-900">{% trans "Utilisateur" %}</div>
                     </div>
@@ -51,7 +51,7 @@
                 <label class="cursor-pointer">
                     <input type="radio" name="recipient_type" value="GARAGE"
                            class="peer sr-only" {% if form.recipient_type.value == 'GARAGE' %}checked{% endif %}>
-                    <div class="border-2 border-line-200 peer-checked:border-orange-500 peer-checked:bg-orange-500/10 rounded-xl p-4 text-center transition-all">
+                    <div class="border-2 border-line-200 peer-checked:border-blue-500 peer-checked:bg-blue-500/10 rounded-xl p-4 text-center transition-all">
                         <div class="text-2xl mb-1">🏪</div>
                         <div class="text-sm font-bold text-navy-900">{% trans "Boutique (garage)" %}</div>
                     </div>

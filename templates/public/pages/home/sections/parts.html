@@ -25,7 +25,7 @@
                     </div>
                     {% endif %}
                     <div class="absolute top-2 right-2">
-                        <span class="{% if part.stock_status == 'IN_STOCK' %}bg-blue-500{% elif part.stock_status == 'LOW_STOCK' %}bg-orange-500{% else %}bg-graphite-500{% endif %} text-white text-[10px] font-bold px-2 py-0.5 rounded-md">
+                        <span class="{% if part.stock_status == 'IN_STOCK' %}bg-blue-500{% elif part.stock_status == 'LOW_STOCK' %}bg-blue-500{% else %}bg-graphite-500{% endif %} text-white text-[10px] font-bold px-2 py-0.5 rounded-md">
                             {{ part.stock_label }}
                         </span>
                     </div>
@@ -36,7 +36,7 @@
                     <p class="text-graphite-500 text-[10px] sm:text-xs mb-2">{{ part.brand.name }}</p>
                     {% endif %}
                     <div class="flex items-end justify-between">
-                        <span class="text-orange-500 font-bold text-sm sm:text-base">{{ part.price|intcomma }} <span class="text-[10px] font-medium text-graphite-500">FCFA</span></span>
+                        <span class="text-blue-500 font-bold text-sm sm:text-base">{{ part.price|intcomma }} <span class="text-[10px] font-medium text-graphite-500">FCFA</span></span>
                     </div>
                 </div>
             </a>

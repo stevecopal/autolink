@@ -44,7 +44,7 @@
                 <span class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center shadow-[0_4px_14px_rgba(28,109,208,0.4)]">
                     <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M18.92 6.01C18.72 5.42 18.16 5 17.5 5h-11c-.66 0-1.21.42-1.42 1.01L3 12v8c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-1h12v1c0 .55.45 1 1 1h1c.55 0 1-.45 1-1v-8l-2.08-5.99zM6.5 16c-.83 0-1.5-.67-1.5-1.5S5.67 13 6.5 13s1.5.67 1.5 1.5S7.33 16 6.5 16zm11 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zM5 11l1.5-4.5h11L19 11H5z"/></svg>
                 </span>
-                <span class="font-display font-bold text-white text-lg tracking-tight">Auto<span class="text-orange-500">Link</span></span>
+                <span class="font-display font-bold text-white text-lg tracking-tight">Auto<span class="text-blue-500">Link</span></span>
             </a>
             <button onclick="window.CloseAdminDrawer()" class="lg:hidden p-1.5 rounded-lg hover:bg-white/10 text-white/70 transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
@@ -94,7 +94,7 @@
 
                 <a href="{% url 'accounts:notifications' %}" class="relative p-2 rounded-lg text-graphite-600 hover:bg-steel-50 transition" aria-label="{% trans 'Notifications' %}">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-                    <span id="notif-badge" class="hidden absolute -top-0.5 -right-0.5 min-w-4 h-4 px-1 rounded-full bg-orange-500 text-white text-[10px] font-bold flex items-center justify-center"></span>
+                    <span id="notif-badge" class="hidden absolute -top-0.5 -right-0.5 min-w-4 h-4 px-1 rounded-full bg-blue-500 text-white text-[10px] font-bold flex items-center justify-center"></span>
                 </a>
 
                 {% if user.is_authenticated %}
@@ -112,7 +112,7 @@
                         <a href="{% url 'core:home' %}" class="flex items-center gap-2 px-4 py-2 text-sm text-graphite-600 hover:bg-steel-50 hover:text-navy-900">{% trans "Voir le site" %}</a>
                         <form method="post" action="{% url 'accounts:logout' %}" class="border-t border-line-200 mt-1">
                             {% csrf_token %}
-                            <button type="submit" class="w-full text-left flex items-center gap-2 px-4 py-2 text-sm font-bold text-orange-600 hover:bg-orange-500/10">{% trans "Déconnexion" %}</button>
+                            <button type="submit" class="w-full text-left flex items-center gap-2 px-4 py-2 text-sm font-bold text-blue-600 hover:bg-blue-500/10">{% trans "Déconnexion" %}</button>
                         </form>
                     </div>
                 </details>
@@ -142,8 +142,8 @@
                 </div>
                 <div class="al-modal-body">
                     <div class="flex items-start gap-3">
-                        <div class="flex-shrink-0 w-10 h-10 rounded-full bg-orange-500/10 flex items-center justify-center" id="delete-confirm-icon">
-                            <svg class="w-5 h-5 text-orange-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+                        <div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center" id="delete-confirm-icon">
+                            <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
                         </div>
                         <div>
                             <p class="text-sm text-navy-900" id="delete-confirm-message"></p>
@@ -152,7 +152,7 @@
                 </div>
                 <div class="al-modal-footer">
                     <button type="button" class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 text-sm" data-modal-close>{% trans "Annuler" %}</button>
-                    <button type="button" id="delete-confirm-btn" class="btn bg-orange-600 hover:bg-orange-700 text-white text-sm">{% trans "Supprimer" %}</button>
+                    <button type="button" id="delete-confirm-btn" class="btn bg-blue-600 hover:bg-blue-700 text-white text-sm">{% trans "Supprimer" %}</button>
                 </div>
             </div>
         </div>

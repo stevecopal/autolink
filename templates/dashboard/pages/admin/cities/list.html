@@ -9,9 +9,9 @@
 
 {% block dashboard_breadcrumb %}
     <nav class="flex items-center space-x-2 text-sm text-graphite-600">
-        <a href="{% url 'administration:dashboard' %}" class="hover:text-orange-500 transition">{% trans "Tableau de bord" %}</a>
+        <a href="{% url 'administration:dashboard' %}" class="hover:text-blue-500 transition">{% trans "Tableau de bord" %}</a>
         <span class="text-graphite-500">/</span>
-        <a href="{% url 'administration:geography' %}" class="hover:text-orange-500 transition">{% trans "Géographie" %}</a>
+        <a href="{% url 'administration:geography' %}" class="hover:text-blue-500 transition">{% trans "Géographie" %}</a>
         <span class="text-graphite-500">/</span>
         <span class="font-bold text-navy-900">{% trans "Villes" %}</span>
     </nav>
@@ -77,13 +77,13 @@
                             <td class="px-4 py-3">
                                 <button type="button"
                                         onclick="editCityModal('{{ city.id }}')"
-                                        class="text-orange-500 font-medium hover:underline text-sm mr-3">
+                                        class="text-blue-500 font-medium hover:underline text-sm mr-3">
                                     {% trans "Modifier" %}
                                 </button>
                                 <form method="post" action="{% url 'administration:city_delete' city.id %}" class="inline delete-city-form" data-city-name="{{ city.name }}">
                                     {% csrf_token %}
                                     <button type="submit"
-                                            class="text-orange-600 hover:text-orange-600 text-sm">
+                                            class="text-blue-600 hover:text-blue-600 text-sm">
                                         {% trans "Supprimer" %}
                                     </button>
                                 </form>
@@ -133,7 +133,7 @@
             </div>
             <div class="al-modal-body">
                 <div id="city-form-spinner" class="hidden text-center py-8">
-                    <div class="animate-spin w-8 h-8 border-4 border-orange-500 border-t-transparent rounded-full mx-auto"></div>
+                    <div class="animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto"></div>
                 </div>
                 <form id="city-form" method="post" action="" data-async="true">
                     {% csrf_token %}
@@ -145,7 +145,7 @@
                         </div>
                         <div class="flex items-center gap-3 mb-4">
                             <label class="inline-flex items-center gap-2 cursor-pointer">
-                                <input type="checkbox" name="is_active" class="rounded border-line-200 text-orange-500 focus:ring-orange-500" checked>
+                                <input type="checkbox" name="is_active" class="rounded border-line-200 text-blue-500 focus:ring-blue-500" checked>
                                 <span class="text-sm font-medium">{% trans "Actif" %}</span>
                             </label>
                         </div>
@@ -201,7 +201,7 @@ function editCityModal(id) {
                 '</div>' +
                 '<div class="flex items-center gap-3 mb-4">' +
                 '<label class="inline-flex items-center gap-2 cursor-pointer">' +
-                '<input type="checkbox" name="is_active" class="rounded border-line-200 text-orange-500 focus:ring-orange-500" ' + (f.is_active ? 'checked' : '') + '>' +
+                '<input type="checkbox" name="is_active" class="rounded border-line-200 text-blue-500 focus:ring-blue-500" ' + (f.is_active ? 'checked' : '') + '>' +
                 '<span class="text-sm font-medium">{% trans "Actif" %}</span>' +
                 '</label>' +
                 '</div>';
@@ -218,7 +218,7 @@ function editCityModal(id) {
 function clearCityErrors() {
     var formBody = document.getElementById('city-form-body');
     formBody.querySelectorAll('.form-error').forEach(function(el) { el.textContent = ''; });
-    formBody.querySelectorAll('.border-orange-500\\2f30').forEach(function(el) { el.classList.remove('border-orange-500/30'); });
+    formBody.querySelectorAll('.border-blue-500\\2f30').forEach(function(el) { el.classList.remove('border-blue-500/30'); });
 }
 
 window.openCityModal = openCityModal;

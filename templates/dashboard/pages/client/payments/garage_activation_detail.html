@@ -9,9 +9,9 @@
 
 {% block dashboard_breadcrumb %}
     <nav class="flex items-center space-x-2 text-sm text-graphite-600">
-        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-orange-500 transition">{% trans "Tableau de bord" %}</a>
+        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-blue-500 transition">{% trans "Tableau de bord" %}</a>
         <span class="text-graphite-500">/</span>
-        <a href="{% url 'payments:payment_list' %}" class="hover:text-orange-500 transition">{% trans "Paiements" %}</a>
+        <a href="{% url 'payments:payment_list' %}" class="hover:text-blue-500 transition">{% trans "Paiements" %}</a>
         <span class="text-graphite-500">/</span>
         <span class="font-bold text-navy-900">{% trans "Detail" %}</span>
     </nav>
@@ -27,12 +27,12 @@
                 <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
             </div>
             {% elif payment.status == 'FAILED' %}
-            <div class="w-12 h-12 bg-orange-500/10 rounded-xl flex items-center justify-center">
-                <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            <div class="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center">
+                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </div>
             {% else %}
-            <div class="w-12 h-12 bg-orange-500/10 rounded-xl flex items-center justify-center">
-                <svg class="w-6 h-6 text-orange-600 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
+            <div class="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center">
+                <svg class="w-6 h-6 text-blue-600 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
             </div>
             {% endif %}
             <div>
@@ -51,7 +51,7 @@
                 {% if payment.status == 'SUCCESS' %}
                 <span class="bg-blue-100 text-blue-500">{% trans "Paye" %}</span>
                 {% elif payment.status == 'PENDING' or payment.status == 'PROCESSING' %}
-                <span class="bg-orange-100 text-orange-600">{% trans "En cours" %}</span>
+                <span class="bg-blue-100 text-blue-600">{% trans "En cours" %}</span>
                 {% elif payment.status == 'FAILED' %}
                 <span class="badge-danger">{% trans "Echoue" %}</span>
                 {% else %}
@@ -75,10 +75,10 @@
         </div>
 
         {% if payment.status == 'PENDING' %}
-        <div class="mt-6 p-4 rounded-xl bg-orange-500/10 border border-orange-500/20">
+        <div class="mt-6 p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
             <div class="flex items-center gap-2">
-                <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                <p class="text-sm text-orange-600">{% trans "La confirmation sera effectuee par le prestataire de paiement. Vous recevrez une notification une fois confirme." %}</p>
+                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <p class="text-sm text-blue-600">{% trans "La confirmation sera effectuee par le prestataire de paiement. Vous recevrez une notification une fois confirme." %}</p>
             </div>
         </div>
         {% elif payment.status == 'SUCCESS' %}
@@ -89,8 +89,8 @@
             </div>
         </div>
         {% elif payment.status == 'FAILED' %}
-        <div class="mt-6 p-4 rounded-xl bg-orange-500/10 border border-orange-500/20">
-            <p class="text-sm text-orange-700">{% trans "Le paiement a echoue. Veuillez reessayer." %}</p>
+        <div class="mt-6 p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
+            <p class="text-sm text-blue-700">{% trans "Le paiement a echoue. Veuillez reessayer." %}</p>
         </div>
         {% endif %}
     </div>

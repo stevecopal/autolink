@@ -21,10 +21,10 @@
                 {% if garage.verification_status == 'APPROVED' %}
                 <span class="badge bg-blue-100 text-blue-500">{% trans "Vérifié" %}</span>
                 {% elif garage.verification_status == 'PENDING' %}
-                <span class="badge bg-orange-100 text-orange-600">{% trans "En attente" %}</span>
+                <span class="badge bg-blue-100 text-blue-600">{% trans "En attente" %}</span>
                 {% endif %}
                 {% if garage.is_featured %}
-                <span class="badge bg-orange-500 text-white">{% trans "Recommandé" %}</span>
+                <span class="badge bg-blue-500 text-white">{% trans "Recommandé" %}</span>
                 {% endif %}
             </div>
             <h1 class="font-display text-2xl sm:text-3xl font-bold text-navy-900 leading-tight mb-1">{{ garage.name }}</h1>
@@ -59,9 +59,9 @@
 
 <!-- Payment CTA for unactivated garages (owner view) -->
 {% if request.user.is_authenticated and garage.owner == request.user and garage.approval_status == 'APPROVED' and garage.payment_status == 'UNPAID' %}
-<div class="bg-orange-500/10 rounded-2xl p-5 sm:p-6 mb-6 border border-orange-500/20">
+<div class="bg-blue-500/10 rounded-2xl p-5 sm:p-6 mb-6 border border-blue-500/20">
     <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-        <div class="w-12 h-12 bg-orange-500 rounded-xl flex items-center justify-center flex-shrink-0">
+        <div class="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center flex-shrink-0">
             <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
         </div>
         <div class="flex-1">
@@ -69,7 +69,7 @@
             <p class="text-sm text-graphite-600 mt-1">{% trans "Votre garage est approuvé. Effectuez le paiement de 1000 FCFA pour l'activer et le rendre visible dans les recherches." %}</p>
         </div>
         <a href="{% url 'payments:garage_activation' garage.pk %}"
-           class="btn bg-orange-500 hover:bg-orange-600 text-white flex-shrink-0">
+           class="btn bg-blue-500 hover:bg-blue-600 text-white flex-shrink-0">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
             {% trans "Effectuer le paiement (1000 FCFA)" %}
         </a>
@@ -93,10 +93,10 @@
 
 <!-- Payment pending notice -->
 {% if request.user.is_authenticated and garage.owner == request.user and garage.payment_status == 'PENDING' %}
-<div class="bg-orange-500/10 rounded-2xl p-5 mb-6 border border-orange-500/20">
+<div class="bg-blue-500/10 rounded-2xl p-5 mb-6 border border-blue-500/20">
     <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center flex-shrink-0">
-            <svg class="w-5 h-5 text-orange-600 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
+        <div class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+            <svg class="w-5 h-5 text-blue-600 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
         </div>
         <div>
             <div class="font-bold text-sm text-navy-900">{% trans "Paiement en cours de traitement" %}</div>
@@ -135,7 +135,7 @@
     {% if request.user.is_authenticated and not garage.owner == request.user %}
     <a href="{% url 'support:ticket_create' %}?garage={{ garage.pk }}"
        class="inline-flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-steel-50 border border-line-200 rounded-xl text-sm font-bold text-navy-900 transition">
-        <svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+        <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
         {% trans "Signaler" %}
     </a>
     {% endif %}
@@ -159,7 +159,7 @@
                 <div class="font-bold text-sm text-navy-900">{{ service.name }}</div>
                 <div class="text-xs text-graphite-500 mt-0.5">{{ service.get_category_display }}</div>
                 {% if service.price_min or service.price_max %}
-                <div class="mt-1 text-sm font-bold text-orange-600">
+                <div class="mt-1 text-sm font-bold text-blue-600">
                     {% if service.price_min and service.price_max %}
                         {{ service.price_min|intcomma }} - {{ service.price_max|intcomma }} FCFA
                     {% elif service.price_min %}
@@ -203,7 +203,7 @@
         <div class="relative rounded-xl overflow-hidden aspect-square bg-steel-50">
             <img src="{{ photo.image.url }}" alt="{{ photo.caption|default:'' }}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
             {% if photo.is_primary %}
-            <div class="absolute top-2 left-2 bg-orange-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">{% trans "Par défaut" %}</div>
+            <div class="absolute top-2 left-2 bg-blue-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">{% trans "Par défaut" %}</div>
             {% endif %}
             {% if photo.caption %}
             <div class="absolute bottom-2 left-2 right-2 bg-navy-900/70 text-white text-xs px-2 py-1 rounded-lg truncate">{{ photo.caption }}</div>

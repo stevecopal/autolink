@@ -9,9 +9,9 @@
 
 {% block dashboard_breadcrumb %}
     <nav class="flex items-center space-x-2 text-sm text-graphite-600">
-        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-orange-500 transition">{% trans "Tableau de bord" %}</a>
+        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-blue-500 transition">{% trans "Tableau de bord" %}</a>
         <span class="text-graphite-500">/</span>
-        <a href="{% url 'support:ticket_list' %}" class="hover:text-orange-500 transition">{% trans "Mes tickets" %}</a>
+        <a href="{% url 'support:ticket_list' %}" class="hover:text-blue-500 transition">{% trans "Mes tickets" %}</a>
         <span class="text-graphite-500">/</span>
         <span class="font-bold text-navy-900">{{ ticket.ticket_number }}</span>
     </nav>
@@ -52,7 +52,7 @@
                 {% if ticket.part %}
                 <div class="mt-3 p-4 rounded-xl bg-steel-50 border border-line-200">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center flex-shrink-0">
+                        <div class="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center flex-shrink-0">
                             {% if ticket.part.photo %}
                             <img src="{{ ticket.part.photo.url }}" class="w-full h-full object-cover rounded-xl">
                             {% else %}
@@ -74,7 +74,7 @@
                 {% if ticket.garage %}
                 <div class="mt-3 p-4 rounded-xl bg-steel-50 border border-line-200">
                     <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center flex-shrink-0">
+                        <div class="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center flex-shrink-0">
                             {% if ticket.garage.photo %}
                             <img src="{{ ticket.garage.photo.url }}" class="w-full h-full object-cover rounded-xl">
                             {% else %}
@@ -100,12 +100,12 @@
                 {% if messages %}
                 <div class="space-y-4">
                     {% for message in messages %}
-                    <div class="p-4 rounded-xl {% if message.sender == ticket.user %}bg-steel-50 border-l-4 border-l-orange-500{% else %}bg-orange-500/10 border-l-4 border-l-orange-600{% endif %}">
+                    <div class="p-4 rounded-xl {% if message.sender == ticket.user %}bg-steel-50 border-l-4 border-l-blue-500{% else %}bg-blue-500/10 border-l-4 border-l-blue-600{% endif %}">
                         <div class="flex items-center gap-2 mb-2">
                             {% if message.sender.avatar %}
                             <img src="{{ message.sender.avatar.url }}" class="w-6 h-6 rounded-full object-cover">
                             {% else %}
-                            <div class="w-6 h-6 rounded-full bg-orange-500/10 flex items-center justify-center text-xs font-bold text-navy-900">
+                            <div class="w-6 h-6 rounded-full bg-blue-500/10 flex items-center justify-center text-xs font-bold text-navy-900">
                                 {{ message.sender.display_name|first|upper }}
                             </div>
                             {% endif %}
@@ -122,7 +122,7 @@
                         <div class="mt-3">
                             <a href="{{ message.attachment.url }}" target="_blank" rel="noopener noreferrer"
                                class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-white border border-line-200 hover:bg-steel-50 transition text-sm">
-                                <svg class="w-4 h-4 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586-6.586a2 2 0 112.828-2.828l6.414 6.414a4 4 0 00-5.656-5.656l-6.415-6.414a6 6 0 118.486 8.486L20.5 13"/></svg>
+                                <svg class="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586-6.586a2 2 0 112.828-2.828l6.414 6.414a4 4 0 00-5.656-5.656l-6.415-6.414a6 6 0 118.486 8.486L20.5 13"/></svg>
                                 <span class="text-navy-900 font-medium truncate max-w-[200px]">{{ message.attachment.name|cut:"tickets/attachments/" }}</span>
                             </a>
                         </div>
@@ -154,7 +154,7 @@
                             <input type="file" name="attachment" class="hidden" accept="image/*,application/pdf,.doc,.docx">
                         </label>
                         <button type="submit"
-                                class="bg-orange-500 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-orange-500-dark transition">
+                                class="bg-blue-500 text-white px-4 py-2 rounded-lg font-bold text-sm hover:bg-blue-500-dark transition">
                             {% trans "Envoyer" %}
                         </button>
                     </div>
@@ -193,23 +193,23 @@
                 <p class="text-xs text-emerald-600 mt-1">{% trans "Ce ticket a été clôturé." %}</p>
             </div>
 
-            <div class="card p-5 border border-warning-100 bg-orange-500/10">
-                <h4 class="font-bold text-sm text-orange-600 mb-2">{% trans "Besoin d'aide supplémentaire ?" %}</h4>
-                <p class="text-xs text-orange-600 mb-3">{% trans "Vous pouvez rouvrir ce ticket si votre problème n'est pas résolu." %}</p>
+            <div class="card p-5 border border-warning-100 bg-blue-500/10">
+                <h4 class="font-bold text-sm text-blue-600 mb-2">{% trans "Besoin d'aide supplémentaire ?" %}</h4>
+                <p class="text-xs text-blue-600 mb-3">{% trans "Vous pouvez rouvrir ce ticket si votre problème n'est pas résolu." %}</p>
                 <form method="post" action="{% url 'support:ticket_detail' ticket.ticket_number %}">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="reopen">
                     <button type="submit"
-                            class="bg-orange-500/100 text-white px-4 py-2 rounded-lg font-bold text-xs hover:bg-warning-600 transition w-full">
+                            class="bg-blue-500/100 text-white px-4 py-2 rounded-lg font-bold text-xs hover:bg-warning-600 transition w-full">
                         {% trans "Rouvrir le ticket" %}
                     </button>
                 </form>
             </div>
             {% endif %}
 
-            <div class="card p-5 border border-orange-500/20 bg-orange-500/10">
-                <h4 class="font-bold text-sm text-orange-600 mb-2">{% trans "Supprimer ce ticket" %}</h4>
-                <p class="text-xs text-orange-600 mb-3">{% trans "Cette action est irréversible." %}</p>
+            <div class="card p-5 border border-blue-500/20 bg-blue-500/10">
+                <h4 class="font-bold text-sm text-blue-600 mb-2">{% trans "Supprimer ce ticket" %}</h4>
+                <p class="text-xs text-blue-600 mb-3">{% trans "Cette action est irréversible." %}</p>
                 <form method="post" action="{% url 'support:ticket_detail' ticket.ticket_number %}"
                           data-confirm
                           data-confirm-title="{% trans "Supprimer le ticket" %}"
@@ -219,7 +219,7 @@
                     {% csrf_token %}
                     <input type="hidden" name="action" value="delete">
                     <button type="submit"
-                            class="bg-orange-500/100 text-white px-4 py-2 rounded-lg font-bold text-xs hover:bg-error-600 transition w-full">
+                            class="bg-blue-500/100 text-white px-4 py-2 rounded-lg font-bold text-xs hover:bg-error-600 transition w-full">
                         {% trans "Supprimer" %}
                     </button>
                 </form>
