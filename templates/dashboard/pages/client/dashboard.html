@@ -128,7 +128,9 @@
                         {% if garage.approval_status == 'APPROVED' and garage.payment_status == 'UNPAID' %}
                         <a href="{% url 'garages:garage_dashboard' %}" class="btn bg-orange-500 hover:bg-orange-600 text-white text-xs px-3 py-2 !min-h-0 flex-1">{% trans "Payer" %}</a>
                         {% endif %}
+                        {% if garage.approval_status == 'APPROVED' %}
                         <a href="{% url 'garages:garage_detail' slug=garage.slug %}" class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 text-xs px-3 py-2 !min-h-0 flex-1">{% trans "Voir public" %}</a>
+                        {% endif %}
                     </div>
                 </div>
             </div>

@@ -12,6 +12,7 @@ class PartForm(forms.ModelForm):
         label=_("Garage"),
         empty_label=_("Sélectionnez un garage"),
         required=True,
+        widget=forms.Select(attrs={"class": "form-input"}),
     )
 
     class Meta:

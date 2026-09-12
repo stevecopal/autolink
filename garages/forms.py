@@ -32,12 +32,14 @@ class GarageForm(forms.ModelForm):
         label=_("Ville"),
         empty_label=_("Sélectionnez une ville"),
         required=True,
+        widget=forms.Select(attrs={"class": "form-input"}),
     )
     neighborhood = forms.ModelChoiceField(
         queryset=Neighborhood.objects.filter(is_active=True),
         label=_("Quartier"),
         empty_label=_("Sélectionnez un quartier"),
         required=True,
+        widget=forms.Select(attrs={"class": "form-input"}),
     )
     latitude = forms.DecimalField(
         max_digits=9, decimal_places=6, widget=forms.HiddenInput(), required=True,
@@ -158,6 +160,7 @@ class GarageServiceForm(forms.ModelForm):
         label=_("Garage"),
         empty_label=_("Sélectionnez un garage"),
         required=True,
+        widget=forms.Select(attrs={"class": "form-input"}),
     )
 
     class Meta:
