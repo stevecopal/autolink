@@ -3,10 +3,10 @@
 <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-14 sm:pt-18 mb-8" aria-labelledby="garages-heading">
     <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-8 sm:mb-10">
         <div>
-            <span class="inline-block text-blue-500 text-xs font-mono font-medium tracking-widest uppercase mb-3">{% trans "Nos partenaires" %}</span>
+            <span class="inline-block text-navy-500 text-xs font-mono font-medium tracking-widest uppercase mb-3">{% trans "Nos partenaires" %}</span>
             <h2 id="garages-heading" class="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-graphite-900 tracking-tight">{% trans "Garages vérifiés" %}</h2>
         </div>
-        <a href="{% url 'garages:garage_list' %}" class="inline-flex items-center gap-1.5 text-blue-500 hover:text-blue-500/80 font-bold text-sm transition-colors group shrink-0">
+        <a href="{% url 'garages:garage_list' %}" class="inline-flex items-center gap-1.5 text-navy-500 hover:text-navy-500/80 font-bold text-sm transition-colors group shrink-0">
             {% trans "Voir tous les garages" %}
             <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
         </a>
@@ -14,23 +14,23 @@
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
         {% for garage in garages %}
-        <a href="{% url 'garages:garage_detail' slug=garage.slug %}" class="group bg-white rounded-xl border border-line-200 hover:border-blue-500/30 hover:shadow-card-hover transition-all duration-300 overflow-hidden">
+        <a href="{% url 'garages:garage_detail' slug=garage.slug %}" class="group bg-white rounded-xl border border-line-200 hover:border-navy-500/30 hover:shadow-card-hover transition-all duration-300 overflow-hidden">
             <div class="p-4 sm:p-5">
                 <div class="flex items-start gap-3">
                     <div class="shrink-0">
                         {% if garage.photo %}
                         <img src="{{ garage.photo.url }}" alt="{{ garage.name }}" class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl object-cover border border-line-200" loading="lazy">
                         {% else %}
-                        <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-blue-100 flex items-center justify-center">
-                            <svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                        <div class="w-12 h-12 sm:w-14 sm:h-14 rounded-xl bg-navy-100 flex items-center justify-center">
+                            <svg class="w-6 h-6 text-navy-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                         </div>
                         {% endif %}
                     </div>
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2 mb-1">
-                            <h3 class="font-bold text-graphite-900 truncate group-hover:text-blue-500 transition-colors text-sm sm:text-base">{{ garage.name }}</h3>
+                            <h3 class="font-bold text-graphite-900 truncate group-hover:text-navy-500 transition-colors text-sm sm:text-base">{{ garage.name }}</h3>
                             {% if garage.verification_status == 'APPROVED' %}
-                            <span class="shrink-0 inline-flex items-center gap-1 bg-blue-100 text-blue-500 text-[10px] font-bold px-1.5 py-0.5 rounded-md">
+                            <span class="shrink-0 inline-flex items-center gap-1 bg-navy-100 text-navy-500 text-[10px] font-bold px-1.5 py-0.5 rounded-md">
                                 <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>
                                 {% trans "Vérifié" %}
                             </span>
@@ -61,7 +61,7 @@
 
     {% if has_more_garages %}
     <div class="text-center mt-8">
-        <a href="{% url 'garages:garage_list' %}" class="btn bg-white border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white text-sm">
+        <a href="{% url 'garages:garage_list' %}" class="btn bg-white border-2 border-navy-500 text-navy-500 hover:bg-navy-500 hover:text-white text-sm">
             {% trans "Voir tous les garages" %}
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
         </a>

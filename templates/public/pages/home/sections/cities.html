@@ -1,11 +1,11 @@
 {% load i18n %}
 {% if cities %}
 <section class="bg-navy-900 relative overflow-hidden" aria-labelledby="cities-heading">
-    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(28,109,208,0.08),transparent_70%)]" aria-hidden="true"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(0,0,128,0.08),transparent_70%)]" aria-hidden="true"></div>
 
     <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-18">
         <div class="text-center mb-8 sm:mb-10">
-            <span class="inline-block text-blue-500 text-xs font-mono font-medium tracking-widest uppercase mb-3">{% trans "Présence" %}</span>
+            <span class="inline-block text-navy-500 text-xs font-mono font-medium tracking-widest uppercase mb-3">{% trans "Présence" %}</span>
             <h2 id="cities-heading" class="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-white tracking-tight">{% trans "Villes couvertes" %}</h2>
             <p class="text-white/40 text-sm mt-3 max-w-md mx-auto">{% trans "Retrouvez nos partenaires dans les principales villes du Cameroun." %}</p>
         </div>
@@ -13,8 +13,8 @@
         <div class="flex flex-wrap justify-center gap-2 sm:gap-3" role="list" aria-label="{% trans 'Villes disponibles' %}">
             {% for city in cities %}
             <a href="{% url 'garages:garage_list' %}?city={{ city }}" role="listitem"
-               class="group inline-flex items-center gap-2 bg-white/[0.05] hover:bg-blue-500 border border-white/[0.08] hover:border-blue-500 px-5 sm:px-6 py-2.5 sm:py-3 rounded-full transition-all duration-300">
-                <svg class="w-4 h-4 text-blue-500 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+               class="group inline-flex items-center gap-2 bg-white/[0.05] hover:bg-navy-500 border border-white/[0.08] hover:border-navy-500 px-5 sm:px-6 py-2.5 sm:py-3 rounded-full transition-all duration-300">
+                <svg class="w-4 h-4 text-navy-500 group-hover:text-white transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                 <span class="text-white/60 group-hover:text-white text-sm sm:text-base font-bold transition-colors">{{ city }}</span>
             </a>
             {% endfor %}

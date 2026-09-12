@@ -1,27 +1,30 @@
 {% load i18n static %}
 <header class="sticky top-0 z-50">
-<nav class="bg-navy-900 backdrop-blur " role="navigation" aria-label="{% trans 'Navigation principale' %}">
+<nav class="bg-navy-900 backdrop-blur" role="navigation" aria-label="{% trans 'Navigation principale' %}">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex items-center justify-between h-16 lg:h-[4.5rem]">
             <!-- Logo -->
             <a href="{% url 'core:home' %}" class="flex items-center gap-2.5 group shrink-0" aria-label="{% trans 'AutoLink - Accueil' %}">
                 
-                <span class="text-xl font-display font-bold text-white tracking-tight">Auto<span class="text-blue-500">Link</span></span>
+                <span class="text-xl font-display font-bold text-white tracking-tight">Auto<span class="text-navy-300">Link</span></span>
             </a>
 
             <!-- Desktop nav -->
             <div class="hidden lg:flex items-center gap-1">
-                <a href="{% url 'search:nearby_page' %}" class="px-3.5 py-2 text-sm font-medium text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors duration-200">{% trans "Mécaniciens" %}</a>
-                <a href="{% url 'garages:garage_list' %}" class="px-3.5 py-2 text-sm font-medium text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors duration-200">{% trans "Garages" %}</a>
-                <a href="{% url 'catalog:part_list' %}" class="px-3.5 py-2 text-sm font-medium text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors duration-200">{% trans "Pièces" %}</a>
+                <a href="{% url 'search:nearby_page' %}" class="nav-link px-3.5 py-2 text-sm font-medium text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors duration-200">{% trans "Mécaniciens" %}</a>
+                <a href="{% url 'garages:garage_list' %}" class="nav-link px-3.5 py-2 text-sm font-medium text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors duration-200">{% trans "Garages" %}</a>
+                <a href="{% url 'catalog:part_list' %}" class="nav-link px-3.5 py-2 text-sm font-medium text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors duration-200">{% trans "Pièces" %}</a>
+                <a href="{% url 'core:contact' %}" class="nav-link px-3.5 py-2 text-sm font-medium text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors duration-200">{% trans "Contact" %}</a>
+                <a href="{% url 'core:about' %}" class="nav-link px-3.5 py-2 text-sm font-medium text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors duration-200">{% trans "À propos" %}</a>
+                <a href="{% url 'core:policy' %}" class="nav-link px-3.5 py-2 text-sm font-medium text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors duration-200">{% trans "Politique" %}</a>
 
                 {% if user.is_authenticated %}
                     {% if user.role == 'ADMIN' or user.role == 'SUPERUSER' or user.is_superuser %}
-                        <a href="{% url 'administration:dashboard' %}" class="px-3.5 py-2 text-sm font-medium text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors duration-200">{% trans "Dashboard" %}</a>
+                        <a href="{% url 'administration:dashboard' %}" class="nav-link px-3.5 py-2 text-sm font-medium text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors duration-200">{% trans "Dashboard" %}</a>
                     {% elif user.role == 'CLIENT' %}
-                        <a href="{% url 'garages:garage_dashboard' %}" class="px-3.5 py-2 text-sm font-medium text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors duration-200">{% trans "Dashboard" %}</a>
+                        <a href="{% url 'garages:garage_dashboard' %}" class="nav-link px-3.5 py-2 text-sm font-medium text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors duration-200">{% trans "Dashboard" %}</a>
                     {% else %}
-                        <a href="{% url 'accounts:client_dashboard' %}" class="px-3.5 py-2 text-sm font-medium text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors duration-200">{% trans "Dashboard" %}</a>
+                        <a href="{% url 'accounts:client_dashboard' %}" class="nav-link px-3.5 py-2 text-sm font-medium text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors duration-200">{% trans "Dashboard" %}</a>
                     {% endif %}
                 {% endif %}
             </div>
@@ -30,7 +33,7 @@
             <div class="hidden lg:flex items-center gap-2">
                 {% if user.is_authenticated %}
                     <a href="{% url 'accounts:profile' %}" class="flex items-center gap-2 pl-2 pr-3.5 py-1.5 text-sm font-medium text-white/80 hover:bg-white/5 rounded-lg transition-colors duration-200">
-                        <span class="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center text-xs font-bold text-blue-400">{{ user.display_name|first|upper }}</span>
+                        <span class="w-8 h-8 bg-navy-500/20 rounded-full flex items-center justify-center text-xs font-bold text-navy-300">{{ user.display_name|first|upper }}</span>
                         <span class="hidden xl:inline max-w-[10rem] truncate">{{ user.display_name|truncatechars:18 }}</span>
                     </a>
                     <form method="post" action="{% url 'accounts:logout' %}">
@@ -41,7 +44,7 @@
                     </form>
                 {% else %}
                     <a href="{% url 'accounts:login' %}" class="px-4 py-2 text-sm font-bold text-white/80 hover:text-white transition-colors duration-200">{% trans "Connexion" %}</a>
-                    <a href="{% url 'accounts:register' %}" class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-blue-500 hover:bg-blue-500/90 rounded-lg shadow-[0_4px_14px_rgba(28,109,208,0.35)] transition-colors duration-200">
+                    <a href="{% url 'accounts:register' %}" class="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold text-white bg-navy-500 hover:bg-navy-500/90 rounded-lg shadow-[0_4px_14px_rgba(0,0,128,0.35)] transition-colors duration-200">
                         {% trans "S'inscrire" %}
                     </a>
                 {% endif %}
@@ -49,18 +52,28 @@
 
             <!-- Mobile toggle -->
             <button id="mobile-menu-btn" class="lg:hidden p-2 text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors duration-200" aria-label="{% trans 'Basculer le menu' %}" aria-controls="mobile-menu" aria-expanded="false">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                <svg class="w-6 h-6 hamburger-icon text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                <svg class="w-6 h-6 close-icon hidden text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
     </div>
 </nav>
 
 <!-- Mobile menu -->
-<div id="mobile-menu" class="hidden lg:hidden bg-navy-900 border-t border-white/10 shadow-nav" role="menu">
+<div id="mobile-menu" class="hidden lg:hidden bg-navy-900 shadow-nav" role="menu">
+    <div class="flex items-center justify-between pl-4 pr-1 pt-1">
+        <span class="font-display font-bold text-white text-lg tracking-tight">Auto<span class="text-navy-300">Link</span></span>
+        <button id="mobile-menu-close" class="lg:hidden p-2 text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors duration-200" aria-label="{% trans 'Fermer le menu' %}" aria-controls="mobile-menu" aria-expanded="false">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+    </div>
     <div class="max-w-7xl mx-auto px-4 sm:px-6 py-4 space-y-1">
         <a href="{% url 'search:nearby_page' %}" class="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors" role="menuitem">{% trans "Mécaniciens à proximité" %}</a>
         <a href="{% url 'garages:garage_list' %}" class="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors" role="menuitem">{% trans "Trouver un garage" %}</a>
         <a href="{% url 'catalog:part_list' %}" class="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors" role="menuitem">{% trans "Trouver une pièce" %}</a>
+        <a href="{% url 'core:contact' %}" class="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors" role="menuitem">{% trans "Contact" %}</a>
+        <a href="{% url 'core:about' %}" class="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors" role="menuitem">{% trans "À propos" %}</a>
+        <a href="{% url 'core:policy' %}" class="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors" role="menuitem">{% trans "Politique" %}</a>
 
         {% if user.is_authenticated %}
             <div class="pt-3 mt-2 border-t border-white/10">
@@ -75,13 +88,13 @@
                 <a href="{% url 'accounts:profile' %}" class="block px-4 py-3 text-sm font-medium text-white/80 hover:text-white hover:bg-white/5 rounded-lg transition-colors" role="menuitem">{% trans "Mon profil" %}</a>
                 <form method="post" action="{% url 'accounts:logout' %}">
                     {% csrf_token %}
-                    <button type="submit" class="w-full text-left px-4 py-3 text-sm font-bold text-blue-500 hover:bg-blue-500/10 rounded-lg transition-colors" role="menuitem">{% trans "Déconnexion" %}</button>
+                    <button type="submit" class="w-full text-left px-4 py-3 text-sm font-bold text-navy-300 hover:bg-white/5 rounded-lg transition-colors" role="menuitem">{% trans "Déconnexion" %}</button>
                 </form>
             </div>
         {% else %}
             <div class="pt-3 mt-2 border-t border-white/10 grid grid-cols-1 gap-2">
                 <a href="{% url 'accounts:login' %}" class="btn bg-white/10 hover:bg-white/20 text-white w-full" role="menuitem">{% trans "Connexion" %}</a>
-                <a href="{% url 'accounts:register' %}" class="btn bg-blue-500 hover:bg-blue-500/90 text-white w-full" role="menuitem">{% trans "S'inscrire" %}</a>
+                <a href="{% url 'accounts:register' %}" class="btn bg-navy-500 hover:bg-navy-500/90 text-white w-full" role="menuitem">{% trans "S'inscrire" %}</a>
             </div>
         {% endif %}
     </div>

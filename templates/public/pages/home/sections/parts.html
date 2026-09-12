@@ -4,10 +4,10 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-18">
         <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-8 sm:mb-10">
             <div>
-                <span class="inline-block text-blue-500 text-xs font-mono font-medium tracking-widest uppercase mb-3">{% trans "Marketplace" %}</span>
+                <span class="inline-block text-navy-500 text-xs font-mono font-medium tracking-widest uppercase mb-3">{% trans "Marketplace" %}</span>
                 <h2 id="parts-heading" class="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-graphite-900 tracking-tight">{% trans "Pièces disponibles" %}</h2>
             </div>
-            <a href="{% url 'catalog:part_list' %}" class="inline-flex items-center gap-1.5 text-blue-500 hover:text-blue-500/80 font-bold text-sm transition-colors group shrink-0">
+            <a href="{% url 'catalog:part_list' %}" class="inline-flex items-center gap-1.5 text-navy-500 hover:text-navy-500/80 font-bold text-sm transition-colors group shrink-0">
                 {% trans "Voir le catalogue" %}
                 <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
             </a>
@@ -15,7 +15,7 @@
 
         <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
             {% for part in parts %}
-            <a href="{% url 'catalog:part_detail' slug=part.slug %}" class="group bg-white rounded-xl border border-line-200 hover:border-blue-500/30 hover:shadow-card-hover transition-all duration-300 overflow-hidden">
+            <a href="{% url 'catalog:part_detail' slug=part.slug %}" class="group bg-white rounded-xl border border-line-200 hover:border-navy-500/30 hover:shadow-card-hover transition-all duration-300 overflow-hidden">
                 <div class="relative overflow-hidden">
                     {% if part.photo %}
                     <img src="{{ part.photo.url }}" alt="{{ part.name }}" class="w-full h-36 sm:h-44 object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
@@ -25,18 +25,18 @@
                     </div>
                     {% endif %}
                     <div class="absolute top-2 right-2">
-                        <span class="{% if part.stock_status == 'IN_STOCK' %}bg-blue-500{% elif part.stock_status == 'LOW_STOCK' %}bg-blue-500{% else %}bg-graphite-500{% endif %} text-white text-[10px] font-bold px-2 py-0.5 rounded-md">
+                        <span class="{% if part.stock_status == 'IN_STOCK' %}bg-navy-500{% elif part.stock_status == 'LOW_STOCK' %}bg-navy-500{% else %}bg-graphite-500{% endif %} text-white text-[10px] font-bold px-2 py-0.5 rounded-md">
                             {{ part.stock_label }}
                         </span>
                     </div>
                 </div>
                 <div class="p-3 sm:p-4">
-                    <h3 class="font-bold text-graphite-900 text-xs sm:text-sm line-clamp-2 group-hover:text-blue-500 transition-colors mb-1 min-h-[2.5rem]">{{ part.name }}</h3>
+                    <h3 class="font-bold text-graphite-900 text-xs sm:text-sm line-clamp-2 group-hover:text-navy-500 transition-colors mb-1 min-h-[2.5rem]">{{ part.name }}</h3>
                     {% if part.brand %}
                     <p class="text-graphite-500 text-[10px] sm:text-xs mb-2">{{ part.brand.name }}</p>
                     {% endif %}
                     <div class="flex items-end justify-between">
-                        <span class="text-blue-500 font-bold text-sm sm:text-base">{{ part.price|intcomma }} <span class="text-[10px] font-medium text-graphite-500">FCFA</span></span>
+                        <span class="text-navy-500 font-bold text-sm sm:text-base">{{ part.price|intcomma }} <span class="text-[10px] font-medium text-graphite-500">FCFA</span></span>
                     </div>
                 </div>
             </a>
@@ -45,7 +45,7 @@
 
         {% if has_more_parts %}
         <div class="text-center mt-8">
-            <a href="{% url 'catalog:part_list' %}" class="btn bg-white border-2 border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white text-sm">
+            <a href="{% url 'catalog:part_list' %}" class="btn bg-white border-2 border-navy-500 text-navy-500 hover:bg-navy-500 hover:text-white text-sm">
                 {% trans "Voir toutes les pièces" %}
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
             </a>

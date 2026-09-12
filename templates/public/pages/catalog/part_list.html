@@ -7,7 +7,7 @@
 {# ============ PAGE HEADER ============ #}
 <div class="relative bg-navy-900 overflow-hidden">
     <div class="absolute top-0 right-0 w-1/2 h-full opacity-[0.08]" aria-hidden="true">
-        <div class="absolute inset-0 bg-gradient-to-l from-blue-500/30 to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-l from-navy-500/30 to-transparent"></div>
     </div>
     <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         
@@ -26,7 +26,7 @@
                 </div>
                 <input type="text" name="q" value="{{ search_query }}"
                        placeholder="{% trans 'Rechercher une pièce, modèle, référence...' %}"
-                       class="w-full pl-11 pr-4 py-3 border border-line-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all duration-200 font-mono bg-steel-50/50 text-sm"
+                       class="w-full pl-11 pr-4 py-3 border border-line-200 rounded-xl focus:ring-2 focus:ring-navy-500 focus:border-navy-500 outline-none transition-all duration-200 font-mono bg-steel-50/50 text-sm"
                        aria-label="{% trans 'Rechercher une pièce' %}">
             </div>
 
@@ -49,7 +49,7 @@
                     <option value="-price" {% if sort == '-price' %}selected{% endif %}>{% trans "Prix décroissant" %}</option>
                     <option value="name" {% if sort == 'name' %}selected{% endif %}>{% trans "Nom" %}</option>
                 </select>
-                <button type="submit" class="btn bg-blue-500 hover:bg-blue-500/90 text-white !py-2.5 text-sm whitespace-nowrap shrink-0">
+                <button type="submit" class="btn bg-navy-500 hover:bg-navy-500/90 text-white !py-2.5 text-sm whitespace-nowrap shrink-0">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                     {% trans "Rechercher" %}
                 </button>
@@ -88,7 +88,7 @@
             </a>
             <div class="p-3 sm:p-4">
                 <a href="{% url 'catalog:part_detail' slug=part.slug %}" class="block">
-                    <h3 class="font-bold text-graphite-900 text-sm truncate group-hover:text-blue-500 transition-colors">{{ part.name }}</h3>
+                    <h3 class="font-bold text-graphite-900 text-sm truncate group-hover:text-navy-500 transition-colors">{{ part.name }}</h3>
                 </a>
                 {% if part.category %}
                 <p class="text-graphite-500 text-xs mt-0.5 truncate">{{ part.category.name }}</p>
@@ -100,7 +100,7 @@
                 <p class="text-graphite-500/70 text-xs mt-0.5 truncate">{{ part.garage.name }}</p>
                 {% endif %}
                 <div class="flex items-center justify-between mt-3 pt-2 border-t border-line-200">
-                    <span class="font-bold text-blue-600 text-base">{{ part.price|intcomma }} <span class="text-xs font-normal text-graphite-500">FCFA</span></span>
+                    <span class="font-bold text-navy-600 text-base">{{ part.price|intcomma }} <span class="text-xs font-normal text-graphite-500">FCFA</span></span>
                 </div>
             </div>
         </article>
@@ -148,7 +148,7 @@
         </div>
         <h2 class="font-display text-2xl font-bold text-navy-900 mb-2">{% trans "Aucune pièce trouvée" %}</h2>
         <p class="text-graphite-600 mb-6 text-sm">{% trans "Essayez de modifier vos filtres ou votre recherche" %}</p>
-        <a href="{% url 'catalog:part_list' %}" class="btn bg-blue-500 hover:bg-blue-500/90 text-white text-sm">{% trans "Réinitialiser les filtres" %}</a>
+        <a href="{% url 'catalog:part_list' %}" class="btn bg-navy-500 hover:bg-navy-500/90 text-white text-sm">{% trans "Réinitialiser les filtres" %}</a>
     </div>
     {% endif %}
 </div>

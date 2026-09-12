@@ -100,11 +100,11 @@
         btn: "bg-green-600 hover:bg-green-700",
       },
       default: {
-        wrapper: "bg-blue-100",
+        wrapper: "bg-navy-100",
         icon:
-          '<svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
+          '<svg class="w-5 h-5 text-navy-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">' +
           '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15m-4.5-4.5m-4.5 6m-6-4.5m-6 0m0 4.5m0-6m4.5 0"/></svg>',
-        btn: "bg-blue-500 hover:bg-blue-600",
+        btn: "bg-navy-500 hover:bg-navy-600",
       },
     };
     var variant = variants[opts.variant] || variants.default;

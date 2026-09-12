@@ -2,17 +2,17 @@
 {% if categories %}
 <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-18" aria-labelledby="categories-heading">
     <div class="text-center mb-8 sm:mb-10">
-        <span class="inline-block text-blue-500 text-xs font-mono font-medium tracking-widest uppercase mb-3">{% trans "Explorer" %}</span>
+        <span class="inline-block text-navy-500 text-xs font-mono font-medium tracking-widest uppercase mb-3">{% trans "Explorer" %}</span>
         <h2 id="categories-heading" class="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-graphite-900 tracking-tight">{% trans "Par catégorie" %}</h2>
     </div>
 
     <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
         {% for cat in categories %}
-        <a href="{% url 'catalog:part_list' %}?category={{ cat.slug }}" class="group bg-white rounded-xl p-4 sm:p-5 text-center border border-line-200 hover:border-blue-500/30 hover:shadow-card-hover transition-all duration-300">
-            <div class="w-14 h-14 sm:w-16 sm:h-16 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:bg-blue-500/10 transition-colors duration-300 text-2xl sm:text-3xl" aria-hidden="true">
+        <a href="{% url 'catalog:part_list' %}?category={{ cat.slug }}" class="group bg-white rounded-xl p-4 sm:p-5 text-center border border-line-200 hover:border-navy-500/30 hover:shadow-card-hover transition-all duration-300">
+            <div class="w-14 h-14 sm:w-16 sm:h-16 bg-navy-100 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:bg-navy-500/10 transition-colors duration-300 text-2xl sm:text-3xl" aria-hidden="true">
                 {{ cat.icon|default:"&#128230;" }}
             </div>
-            <h3 class="font-bold text-graphite-900 group-hover:text-blue-500 transition-colors text-xs sm:text-sm mb-1">{{ cat.name }}</h3>
+            <h3 class="font-bold text-graphite-900 group-hover:text-navy-500 transition-colors text-xs sm:text-sm mb-1">{{ cat.name }}</h3>
             <p class="text-graphite-500 text-[10px] sm:text-xs">{{ cat.part_count }} {% trans "pièces" %}</p>
         </a>
         {% endfor %}

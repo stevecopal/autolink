@@ -15,7 +15,7 @@
     .leaflet-popup-content { margin: 12px 16px; }
     .garage-result-card { transition: all 0.2s ease; }
     .garage-result-card:hover { transform: translateX(4px); }
-    .garage-result-card.active { border-color: #1C6DD0; background: #E7F0FB; }
+    .garage-result-card.active { border-color: #000080; background: #F5F5FC; }
     .search-pulse { animation: searchPulse 1.5s ease-in-out infinite; }
     @keyframes searchPulse {
         0%, 100% { transform: scale(1); opacity: 1; }
@@ -29,7 +29,7 @@
 {# ============ PAGE HEADER ============ #}
 <div class="relative bg-navy-900 overflow-hidden">
     <div class="absolute top-0 right-0 w-1/2 h-full opacity-[0.08]" aria-hidden="true">
-        <div class="absolute inset-0 bg-gradient-to-l from-blue-500/30 to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-l from-navy-500/30 to-transparent"></div>
     </div>
     <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         
@@ -46,7 +46,7 @@
             <button
                 type="button"
                 id="find-nearby-btn"
-                class="btn bg-blue-500 hover:bg-blue-500/90 text-white w-full lg:w-auto"
+                class="btn bg-navy-500 hover:bg-navy-500/90 text-white w-full lg:w-auto"
                 aria-label="{% trans 'Rechercher les mécaniciens près de ma position' %}"
             >
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -68,7 +68,7 @@
                     </select>
                 </div>
                 <label for="available-filter" class="flex items-center gap-2 text-sm text-navy-900 cursor-pointer whitespace-nowrap">
-                    <input type="checkbox" id="available-filter" class="w-4 h-4 rounded border-line-200 text-blue-500 focus:ring-blue-500 accent-blue-500">
+                    <input type="checkbox" id="available-filter" class="w-4 h-4 rounded border-line-200 text-navy-500 focus:ring-navy-500 accent-navy-500">
                     <span>{% trans "Disponibles" %}</span>
                 </label>
             </div>
@@ -84,7 +84,7 @@
         <div class="lg:col-span-2 order-2 lg:order-1">
             <div class="flex items-center justify-between mb-4">
                 <h2 class="font-display text-lg font-bold text-navy-900" id="results-count">{% trans "Résultats" %}</h2>
-                <span class="badge bg-blue-100 text-blue-500 text-sm" id="results-badge" style="display: none;"></span>
+                <span class="badge bg-navy-100 text-navy-500 text-sm" id="results-badge" style="display: none;"></span>
             </div>
 
             <div id="results-list" class="space-y-3 max-h-[600px] overflow-y-auto pr-2" role="list" aria-label="{% trans 'Liste des garages à proximité' %}">
@@ -110,12 +110,12 @@
 
     {# Error States #}
     <div id="error-state" class="hidden bg-white rounded-2xl border border-line-200 shadow-card p-8 text-center">
-        <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-blue-500/10 flex items-center justify-center">
-            <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+        <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-navy-500/10 flex items-center justify-center">
+            <svg class="w-8 h-8 text-navy-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
         </div>
         <h3 class="font-display text-xl font-bold text-navy-900 mb-2" id="error-title">{% trans "Erreur de localisation" %}</h3>
         <p class="text-graphite-600 mb-6 text-sm" id="error-message"></p>
-        <button type="button" id="retry-btn" class="btn bg-blue-500 hover:bg-blue-500/90 text-white" style="display: none;">
+        <button type="button" id="retry-btn" class="btn bg-navy-500 hover:bg-navy-500/90 text-white" style="display: none;">
             {% trans "Réessayer" %}
         </button>
     </div>

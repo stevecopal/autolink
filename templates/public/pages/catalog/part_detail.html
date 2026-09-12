@@ -40,7 +40,7 @@
             {# Title & Category #}
             <div>
                 {% if part.category %}
-                <div class="text-xs text-blue-500 uppercase tracking-wider font-mono font-medium mb-2">{{ part.category.name }}</div>
+                <div class="text-xs text-navy-500 uppercase tracking-wider font-mono font-medium mb-2">{{ part.category.name }}</div>
                 {% endif %}
                 <h1 class="font-display text-3xl sm:text-4xl font-bold text-navy-900 tracking-tight">{{ part.name }}</h1>
 
@@ -61,9 +61,9 @@
                         {{ part.price|intcomma }} <span class="text-base font-normal text-graphite-500">FCFA</span>
                     </div>
                     {% if part.stock_status == 'IN_STOCK' %}
-                    <span class="badge bg-blue-100 text-blue-500 text-sm">{% trans "Disponible" %}</span>
+                    <span class="badge bg-navy-100 text-navy-500 text-sm">{% trans "Disponible" %}</span>
                     {% elif part.stock_status == 'LOW_STOCK' %}
-                    <span class="badge bg-blue-100 text-blue-600 text-sm">{% trans "Stock faible" %}</span>
+                    <span class="badge bg-navy-100 text-navy-600 text-sm">{% trans "Stock faible" %}</span>
                     {% else %}
                     <span class="badge bg-graphite-500/10 text-graphite-600 text-sm">{% trans "Indisponible" %}</span>
                     {% endif %}
@@ -98,15 +98,15 @@
                     {% if part.garage.photo %}
                     <img src="{{ part.garage.photo.url }}" alt="" class="w-14 h-14 rounded-xl object-cover border border-line-200 flex-shrink-0">
                     {% else %}
-                    <div class="w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center flex-shrink-0">
-                        <svg class="w-7 h-7 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                    <div class="w-14 h-14 rounded-xl bg-navy-100 flex items-center justify-center flex-shrink-0">
+                        <svg class="w-7 h-7 text-navy-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                     </div>
                     {% endif %}
                     <div class="flex-1 min-w-0">
                         <h4 class="font-bold text-navy-900 truncate">{{ part.garage.name }}</h4>
                         <p class="text-graphite-500 text-xs mt-0.5">{{ part.garage.neighborhood.name|default:part.garage.city.name }}</p>
                     </div>
-                    <a href="{% url 'garages:garage_detail' slug=part.garage.slug %}" class="btn bg-white border border-line-200 text-blue-500 hover:bg-steel-50 text-xs px-4 py-2 flex-shrink-0 !min-h-0">
+                    <a href="{% url 'garages:garage_detail' slug=part.garage.slug %}" class="btn bg-white border border-line-200 text-navy-500 hover:bg-steel-50 text-xs px-4 py-2 flex-shrink-0 !min-h-0">
                         {% trans "Voir le garage" %}
                     </a>
                 </div>
@@ -117,7 +117,7 @@
             {% if part.garage and part.garage.phone and user.is_authenticated %}
 
             <div class="flex flex-col sm:flex-row items-center gap-3">
-                <a href="tel:{{ part.garage.phone }}" class="btn  bg-blue-500 hover:bg-blue-500/90 text-white flex-1 text-sm !min-h-0">
+                <a href="tel:{{ part.garage.phone }}" class="btn  bg-navy-500 hover:bg-navy-500/90 text-white flex-1 text-sm !min-h-0">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
                     {% trans "Contacter" %}
                 </a>
@@ -129,7 +129,7 @@
                 {% endif %}
             </div>
             {% else %}
-             <a href="{% url 'accounts:login' %}" class="btn  bg-blue-500 hover:bg-blue-500/90 text-white flex-1 text-sm !min-h-0">
+             <a href="{% url 'accounts:login' %}" class="btn  bg-navy-500 hover:bg-navy-500/90 text-white flex-1 text-sm !min-h-0">
                         {% trans "connecter vous pour contacter le vendeur" %}
                     </a>
             {% endif %}
@@ -149,7 +149,7 @@
                         </div>
                         {% endif %}
                         <div class="font-bold text-xs text-navy-900 truncate">{{ similar.name }}</div>
-                        <div class="text-blue-600 font-bold text-xs">{{ similar.price|intcomma }} FCFA</div>
+                        <div class="text-navy-600 font-bold text-xs">{{ similar.price|intcomma }} FCFA</div>
                     </a>
                     {% endfor %}
                 </div>

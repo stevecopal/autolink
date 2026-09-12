@@ -116,7 +116,7 @@
     function createUserIcon() {
         return L.divIcon({
             className: 'user-marker',
-            html: '<div style="width:24px;height:24px;background:#3B82F6;border:3px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(59,130,246,0.5);"></div>',
+            html: '<div style="width:24px;height:24px;background:#000080;border:3px solid white;border-radius:50%;box-shadow:0 2px 8px rgba(0,0,128,0.5);"></div>',
             iconSize: [24, 24],
             iconAnchor: [12, 12],
         });
@@ -200,7 +200,7 @@
 
         garages.forEach(function (garage, index) {
             var card = document.createElement('div');
-            card.className = 'garage-result-card bg-white rounded-xl p-4 border border-blue-100/50 shadow-card cursor-pointer hover:shadow-card-hover transition-all duration-200';
+            card.className = 'garage-result-card bg-white rounded-xl p-4 border border-navy-100/50 shadow-card cursor-pointer hover:shadow-card-hover transition-all duration-200';
             card.setAttribute('role', 'listitem');
             card.setAttribute('data-index', index);
             card.setAttribute('tabindex', '0');
@@ -216,7 +216,7 @@
 
             card.innerHTML =
                 '<div class="flex items-start gap-3">' +
-                    '<div class="w-14 h-14 rounded-xl bg-blue-100 flex items-center justify-center text-2xl flex-shrink-0 overflow-hidden">' +
+                    '<div class="w-14 h-14 rounded-xl bg-navy-100 flex items-center justify-center text-2xl flex-shrink-0 overflow-hidden">' +
                         (garage.photo_url
                             ? '<img src="' + garage.photo_url + '" alt="" class="w-full h-full object-cover">'
                             : '🔧') +
@@ -224,9 +224,9 @@
                     '<div class="flex-1 min-w-0">' +
                         '<div class="flex items-start justify-between gap-2">' +
                             '<h3 class="font-bold text-navy-900 text-sm truncate">' + escapeHtml(garage.name) + '</h3>' +
-                            '<span class="text-blue-500 font-bold text-sm whitespace-nowrap">' + escapeHtml(garage.distance_display) + '</span>' +
+                            '<span class="text-navy-500 font-bold text-sm whitespace-nowrap">' + escapeHtml(garage.distance_display) + '</span>' +
                         '</div>' +
-                        '<p class="text-blue-600 text-xs mt-1 truncate"> ' + escapeHtml(garage.neighborhood || garage.city || '') + '</p>' +
+                        '<p class="text-navy-600 text-xs mt-1 truncate"> ' + escapeHtml(garage.neighborhood || garage.city || '') + '</p>' +
                         
                         
                     '</div>' +
@@ -269,8 +269,8 @@
     function showLoading(message) {
         searchStatus.classList.remove('hidden');
         searchStatus.innerHTML =
-            '<div class="flex items-center gap-3 text-blue-600">' +
-                '<svg class="animate-spin w-5 h-5 text-blue-500 search-pulse" fill="none" viewBox="0 0 24 24">' +
+            '<div class="flex items-center gap-3 text-navy-600">' +
+                '<svg class="animate-spin w-5 h-5 text-navy-500 search-pulse" fill="none" viewBox="0 0 24 24">' +
                     '<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>' +
                     '<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 4.373 0 12h4z"></path>' +
                 '</svg>' +

@@ -61,7 +61,7 @@
         success: { bg: '#ECFDF5', border: '#6EE7B7', text: '#065F46', iconBg: '#D1FAE5' },
         error:   { bg: '#FEF2F2', border: '#FCA5A5', text: '#991B1B', iconBg: '#FEE2E2' },
         warning: { bg: '#FFFBEB', border: '#FCD34D', text: '#92400E', iconBg: '#FEF3C7' },
-        info:    { bg: '#EFF6FF', border: '#93C5FD', text: '#1E40AF', iconBg: '#DBEAFE' },
+        info:    { bg: '#F5F5FC', border: '#A0A0D8', text: '#000056', iconBg: '#E8E8F8' },
     };
 
     window.AutoLink.showToast = function(message, type) {

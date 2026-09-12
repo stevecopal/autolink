@@ -6,8 +6,8 @@
 {% block content %}
 <div class="max-w-2xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
     <div class="text-center mb-8">
-        <span class="inline-flex items-center gap-2 text-xs font-mono font-medium tracking-widest uppercase text-blue-500 mb-3">
-            <span class="w-8 h-px bg-blue-500" aria-hidden="true"></span>
+        <span class="inline-flex items-center gap-2 text-xs font-mono font-medium tracking-widest uppercase text-navy-500 mb-3">
+            <span class="w-8 h-px bg-navy-500" aria-hidden="true"></span>
             {% trans "Demande" %}
         </span>
         <h1 class="font-display text-3xl sm:text-4xl font-bold text-navy-900 tracking-tight mb-3">{% trans "Demande de pièce" %}</h1>
@@ -18,13 +18,13 @@
         <form method="post" class="space-y-5">
             {% csrf_token %}
             {% if form.non_field_errors %}
-            <div class="bg-blue-500/10 text-blue-600 p-3 rounded-lg text-sm border border-blue-500/20">
+            <div class="bg-navy-500/10 text-navy-600 p-3 rounded-lg text-sm border border-navy-500/20">
                 {{ form.non_field_errors.0 }}
             </div>
             {% endif %}
 
             <div>
-                <label class="form-label" for="{{ form.part_request.id_for_label }}">{% trans "Pièce recherchée" %} <span class="text-blue-500">*</span></label>
+                <label class="form-label" for="{{ form.part_request.id_for_label }}">{% trans "Pièce recherchée" %} <span class="text-navy-500">*</span></label>
                 {{ form.part_request }}
                 {% if form.part_request.errors %}
                 <p class="form-error">{{ form.part_request.errors.0 }}</p>
@@ -33,21 +33,21 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
                 <div>
-                    <label class="form-label" for="{{ form.brand.id_for_label }}">{% trans "Marque" %} <span class="text-blue-500">*</span></label>
+                    <label class="form-label" for="{{ form.brand.id_for_label }}">{% trans "Marque" %} <span class="text-navy-500">*</span></label>
                     {{ form.brand }}
                     {% if form.brand.errors %}
                     <p class="form-error">{{ form.brand.errors.0 }}</p>
                     {% endif %}
                 </div>
                 <div>
-                    <label class="form-label" for="{{ form.model.id_for_label }}">{% trans "Modèle" %} <span class="text-blue-500">*</span></label>
+                    <label class="form-label" for="{{ form.model.id_for_label }}">{% trans "Modèle" %} <span class="text-navy-500">*</span></label>
                     {{ form.model }}
                     {% if form.model.errors %}
                     <p class="form-error">{{ form.model.errors.0 }}</p>
                     {% endif %}
                 </div>
                 <div>
-                    <label class="form-label" for="{{ form.year.id_for_label }}">{% trans "Année" %} <span class="text-blue-500">*</span></label>
+                    <label class="form-label" for="{{ form.year.id_for_label }}">{% trans "Année" %} <span class="text-navy-500">*</span></label>
                     {{ form.year }}
                     {% if form.year.errors %}
                     <p class="form-error">{{ form.year.errors.0 }}</p>
@@ -61,7 +61,7 @@
             </div>
 
             <div>
-                <label class="form-label" for="{{ form.description.id_for_label }}">{% trans "Description" %} <span class="text-blue-500">*</span></label>
+                <label class="form-label" for="{{ form.description.id_for_label }}">{% trans "Description" %} <span class="text-navy-500">*</span></label>
                 {{ form.description }}
                 {% if form.description.errors %}
                 <p class="form-error">{{ form.description.errors.0 }}</p>
@@ -70,7 +70,7 @@
 
             <div class="flex flex-col-reverse sm:flex-row justify-between items-center gap-3 pt-6 border-t border-line-200">
                 <a href="{% url 'catalog:garage_products' %}" class="btn w-full sm:w-auto bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 text-sm">{% trans "Annuler" %}</a>
-                <button type="submit" class="btn w-full sm:w-auto bg-blue-500 hover:bg-blue-600 text-white">
+                <button type="submit" class="btn w-full sm:w-auto bg-navy-500 hover:bg-navy-600 text-white">
                     {% trans "Envoyer la demande" %}
                 </button>
             </div>
