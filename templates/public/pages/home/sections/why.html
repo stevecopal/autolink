@@ -1,34 +1,57 @@
 {% load i18n %}
-<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-18 lg:py-24" aria-labelledby="why-heading">
-    <div class="text-center mb-10 sm:mb-14">
-        <span class="inline-block text-navy-500 text-xs font-mono font-medium tracking-widest uppercase mb-3">{% trans "Notre promesse" %}</span>
-        <h2 id="why-heading" class="font-display text-2xl sm:text-3xl lg:text-4xl font-bold text-graphite-900 tracking-tight">{% trans "Pourquoi AutoLink ?" %}</h2>
-        <p class="text-graphite-500 text-sm sm:text-base mt-3 max-w-lg mx-auto">{% trans "Une plateforme conçue pour les Camerounais, par des Camerounais." %}</p>
+<section class="bg-graphite-900 relative overflow-hidden" aria-labelledby="why-heading">
+    <div class="absolute inset-0 opacity-[0.03]" aria-hidden="true">
+        <div class="absolute inset-0" style="background-image: linear-gradient(rgba(255,255,255,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.4) 1px, transparent 1px); background-size: 60px 60px;"></div>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 sm:gap-6">
-        <div class="group bg-white rounded-xl p-6 sm:p-7 border border-line-200 hover:shadow-card-hover transition-all duration-300">
-            <div class="w-12 h-12 bg-navy-100 rounded-xl flex items-center justify-center mb-5 group-hover:bg-navy-500/10 transition-colors duration-300">
-                <svg class="w-6 h-6 text-navy-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-            </div>
-            <h3 class="font-display font-bold text-graphite-900 text-base sm:text-lg mb-2">{% trans "Garages vérifiés" %}</h3>
-            <p class="text-graphite-500 text-sm leading-relaxed">{% trans "Chaque garage est vérifié par notre équipe avant d'apparaître sur la plateforme. Votre confiance est notre priorité." %}</p>
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24">
+        <div class="max-w-3xl mb-14 sm:mb-16">
+            <span class="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-navy-300 mb-4">
+                {% trans "Notre promesse" %}
+            </span>
+            <h2 id="why-heading" class="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight leading-[1.05] mb-5">
+                {% trans "Pourquoi AutoLink change la donne" %}
+            </h2>
+            <p class="text-white/55 text-sm sm:text-base leading-relaxed max-w-xl">
+                {% trans "Nous avons construit la plateforme que nous aurions voulu utiliser : vérifiée, transparente, pensée pour le terrain camerounais." %}
+            </p>
         </div>
 
-        <div class="group bg-white rounded-xl p-6 sm:p-7 border border-line-200 hover:shadow-card-hover transition-all duration-300">
-            <div class="w-12 h-12 bg-navy-100 rounded-xl flex items-center justify-center mb-5 group-hover:bg-navy-500/10 transition-colors duration-300">
-                <svg class="w-6 h-6 text-navy-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/></svg>
-            </div>
-            <h3 class="font-display font-bold text-graphite-900 text-base sm:text-lg mb-2">{% trans "Pièces compatibles" %}</h3>
-            <p class="text-graphite-500 text-sm leading-relaxed">{% trans "Vérifiez la compatibilité des pièces avec votre véhicule avant d'acheter. Zéro erreur garantie." %}</p>
-        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-px bg-white/[0.06] rounded-xl overflow-hidden">
 
-        <div class="group bg-white rounded-xl p-6 sm:p-7 border border-line-200 hover:shadow-card-hover transition-all duration-300">
-            <div class="w-12 h-12 bg-navy-100 rounded-xl flex items-center justify-center mb-5 group-hover:bg-navy-500/10 transition-colors duration-300">
-                <svg class="w-6 h-6 text-navy-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            {% comment %}Argument 1{% endcomment %}
+            <div class="bg-graphite-900 p-7 sm:p-8 reveal">
+                <div class="font-mono text-[10px] uppercase tracking-[0.14em] text-navy-300 mb-6">01 / {% trans "Vérification" %}</div>
+                <div class="font-display font-bold text-5xl sm:text-6xl text-white tabular-nums leading-none mb-2" data-counter="{{ why_verification_pct }}" data-suffix="%">0%</div>
+                <div class="font-mono text-[10px] uppercase tracking-wider text-white/40 mb-6">{% trans "garages contrôlés" %}</div>
+                <p class="text-white/65 text-sm leading-relaxed">
+                    {% trans "Chaque garage est visité et vérifié avant d'apparaître sur la plateforme. Photos réelles, services réels, prix réels." %}
+                </p>
             </div>
-            <h3 class="font-display font-bold text-graphite-900 text-base sm:text-lg mb-2">{% trans "Prix transparents" %}</h3>
-            <p class="text-graphite-500 text-sm leading-relaxed">{% trans "Comparez les prix entre garages et fournisseurs. Pas de surprises, pas de frais cachés." %}</p>
+
+            {% comment %}Argument 2{% endcomment %}
+            <div class="bg-graphite-900 p-7 sm:p-8 reveal" style="transition-delay: 100ms;">
+                <div class="font-mono text-[10px] uppercase tracking-[0.14em] text-navy-300 mb-6">02 / {% trans "Vitesse" %}</div>
+                <div class="font-display font-bold text-5xl sm:text-6xl text-white tabular-nums leading-none mb-2" data-counter="{{ why_avg_response_time|default:47 }}" data-suffix="min">0min</div>
+                <div class="font-mono text-[10px] uppercase tracking-wider text-white/40 mb-6">{% trans "réponse moyenne" %}</div>
+                <p class="text-white/65 text-sm leading-relaxed">
+                    {% trans "Les garages répondent en moins d'une heure en moyenne. Plus de téléphone dans le vide, plus d'attente interminable." %}
+                </p>
+            </div>
+
+            {% comment %}Argument 3{% endcomment %}
+            <div class="bg-graphite-900 p-7 sm:p-8 reveal" style="transition-delay: 200ms;">
+                <div class="font-mono text-[10px] uppercase tracking-[0.14em] text-navy-300 mb-6">03 / {% trans "Prix" %}</div>
+                <div class="font-display font-bold text-5xl sm:text-6xl text-white tabular-nums leading-none mb-2">
+                    {% if why_savings_pct %}{{ why_savings_pct }}{% else %}{{ why_searches_this_month|default:0 }}{% endif %}
+                    <span class="text-navy-300">{% if why_savings_pct %}%{% else %}+{% endif %}</span>
+                </div>
+                <div class="font-mono text-[10px] uppercase tracking-wider text-white/40 mb-6">{% trans "économisés en moyenne" %}</div>
+                <p class="text-white/65 text-sm leading-relaxed">
+                    {% trans "En comparant les prix affichés avant d'appeler, nos utilisateurs économisent en moyenne sur leurs réparations." %}
+                </p>
+            </div>
+
         </div>
     </div>
 </section>

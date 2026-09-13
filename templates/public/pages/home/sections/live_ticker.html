@@ -1,0 +1,70 @@
+{% load i18n %}
+<section class="bg-graphite-900 border-y border-white/[0.04] overflow-hidden" aria-label="{% trans 'Activité en direct' %}">
+    <div class="flex items-center h-11">
+        <div class="flex-shrink-0 px-4 sm:px-6 flex items-center gap-2 border-r border-white/[0.06] h-full bg-navy-500">
+            <span class="w-1.5 h-1.5 rounded-full bg-white animate-pulse-soft"></span>
+            <span class="font-mono text-[10px] uppercase tracking-[0.14em] text-white font-bold">Live</span>
+        </div>
+        <div class="relative flex-1 overflow-hidden h-full">
+            <div class="marquee-track flex items-center h-full whitespace-nowrap will-change-transform">
+                {% if live_activities %}
+                {% for activity in live_activities %}
+                <div class="flex items-center gap-3 px-6 text-white/60">
+                    {% if activity.icon == 'emerald' %}
+                    <span class="w-1 h-1 rounded-full bg-emerald-400"></span>
+                    {% elif activity.icon == 'navy' %}
+                    <span class="w-1 h-1 rounded-full bg-navy-300"></span>
+                    {% else %}
+                    <span class="w-1 h-1 rounded-full bg-emerald-400"></span>
+                    {% endif %}
+                    <span class="font-mono text-[11px] uppercase tracking-wider">{{ activity.label }}</span>
+                    <span class="text-white/90 font-medium text-xs">{{ activity.subject }}</span>
+                    <span class="text-white/30 text-[11px]">· {{ activity.location }} · {% trans "il y a" %} {{ activity.created_at|timesince }}</span>
+                </div>
+                {% endfor %}
+                {% for i in "12" %}
+                <div class="flex items-center gap-3 px-6 text-white/60">
+                    <span class="w-1 h-1 rounded-full bg-emerald-400"></span>
+                    <span class="font-mono text-[11px] uppercase tracking-wider">{% trans "Nouveau garage vérifié" %}</span>
+                    <span class="text-white/90 font-medium text-xs">Auto Service Bonabéri</span>
+                    <span class="text-white/30 text-[11px]">· Douala · {% trans "il y a" %} 2 min</span>
+                </div>
+                <div class="flex items-center gap-3 px-6 text-white/60">
+                    <span class="w-1 h-1 rounded-full bg-navy-300"></span>
+                    <span class="font-mono text-[11px] uppercase tracking-wider">{% trans "3 pièces ajoutées" %}</span>
+                    <span class="text-white/90 font-medium text-xs">Plaquettes Bosch · Filtres Mann</span>
+                    <span class="text-white/30 text-[11px]">· {% trans "il y a" %} 8 min</span>
+                </div>
+                <div class="flex items-center gap-3 px-6 text-white/60">
+                    <span class="w-1 h-1 rounded-full bg-emerald-400"></span>
+                    <span class="font-mono text-[11px] uppercase tracking-wider">{% trans "Nouvelle note 5★" %}</span>
+                    <span class="text-white/90 font-medium text-xs">Garage Central Yaoundé</span>
+                    <span class="text-white/30 text-[11px]">· {% trans "il y a" %} 12 min</span>
+                </div>
+                {% endfor %}
+                {% else %}
+                {% for i in "12" %}
+                <div class="flex items-center gap-3 px-6 text-white/60">
+                    <span class="w-1 h-1 rounded-full bg-emerald-400"></span>
+                    <span class="font-mono text-[11px] uppercase tracking-wider">{% trans "Nouveau garage vérifié" %}</span>
+                    <span class="text-white/90 font-medium text-xs">Auto Service Bonabéri</span>
+                    <span class="text-white/30 text-[11px]">· Douala · {% trans "il y a" %} 2 min</span>
+                </div>
+                <div class="flex items-center gap-3 px-6 text-white/60">
+                    <span class="w-1 h-1 rounded-full bg-navy-300"></span>
+                    <span class="font-mono text-[11px] uppercase tracking-wider">{% trans "3 pièces ajoutées" %}</span>
+                    <span class="text-white/90 font-medium text-xs">Plaquettes Bosch · Filtres Mann</span>
+                    <span class="text-white/30 text-[11px]">· {% trans "il y a" %} 8 min</span>
+                </div>
+                <div class="flex items-center gap-3 px-6 text-white/60">
+                    <span class="w-1 h-1 rounded-full bg-emerald-400"></span>
+                    <span class="font-mono text-[11px] uppercase tracking-wider">{% trans "Nouvelle note 5★" %}</span>
+                    <span class="text-white/90 font-medium text-xs">Garage Central Yaoundé</span>
+                    <span class="text-white/30 text-[11px]">· {% trans "il y a" %} 12 min</span>
+                </div>
+                {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>

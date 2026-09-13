@@ -1,24 +1,51 @@
 {% load i18n %}
-<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-14 sm:pb-18" aria-labelledby="cta-heading">
-    <div class="relative overflow-hidden rounded-2xl bg-navy-900">
-        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(0,0,128,0.15),transparent_60%)]" aria-hidden="true"></div>
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20" aria-labelledby="cta-heading">
+    <div class="relative overflow-hidden rounded-2xl bg-navy-900 tech-panel" style="--accent-color:#4F6EE0; border-color: transparent;">
+        <div class="absolute inset-0 opacity-[0.06]" aria-hidden="true">
+            <div class="absolute inset-0" style="background-image: linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px); background-size: 40px 40px;"></div>
+        </div>
+        <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(79,110,224,0.35),transparent_60%)]" aria-hidden="true"></div>
 
-        <div class="relative z-10 px-6 sm:px-10 md:px-14 py-12 sm:py-14 md:py-16 text-center">
-            <h2 id="cta-heading" class="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-3 sm:mb-4 leading-tight tracking-tight">
-                {% trans "Vous êtes un professionnel automobile ?" %}
-            </h2>
-            <p class="text-white/45 mb-8 sm:mb-10 max-w-xl mx-auto text-sm sm:text-base leading-relaxed">
-                {% trans "Rejoignez AutoLink et trouvez de nouveaux clients. Inscrivez votre garage gratuitement et développez votre activité." %}
-            </p>
+        <div class="relative z-10 px-6 sm:px-12 md:px-16 py-14 sm:py-16 md:py-20">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
 
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4">
-                <a href="{% url 'garages:garage_create' %}" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-navy-500 text-white font-bold px-8 py-3.5 rounded-xl hover:bg-navy-500/90 transition-colors duration-200 text-sm sm:text-base">
-                    {% trans "Inscrire mon garage" %}
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
-                </a>
-                <a href="{% url 'core:contact' %}" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white/[0.06] hover:bg-white/[0.1] text-white border border-white/[0.1] font-bold px-8 py-3.5 rounded-xl transition-colors duration-200 text-sm sm:text-base">
-                    {% trans "Nous contacter" %}
-                </a>
+                <div class="lg:col-span-8">
+                    <span class="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-navy-300 mb-4">
+                        {% trans "Professionnels" %}
+                    </span>
+                    <h2 id="cta-heading" class="font-display text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4 sm:mb-5 leading-[1.05] tracking-tight">
+                        {% trans "Inscrivez votre garage" %}<br>
+                        <span class="text-navy-300">{% trans "gratuitement." %}</span>
+                    </h2>
+                    <p class="text-white/55 mb-6 sm:mb-8 max-w-xl text-sm sm:text-base leading-relaxed">
+                        {% trans "" %} {{ garages_this_month }} {% trans "garages ont rejoint AutoLink ce mois-ci. Recevez des demandes qualifiées, gérez votre stock et développez votre activité." %}
+                    </p>
+
+                    <div class="flex flex-wrap items-center gap-6 mb-8">
+                        <div>
+                            <div class="font-display font-bold text-2xl text-white tabular-nums">{{ garages_this_month }}</div>
+                            <div class="font-mono text-[10px] uppercase tracking-wider text-white/40 mt-0.5">{% trans "inscrits ce mois" %}</div>
+                        </div>
+                        <div class="w-px h-10 bg-white/[0.08]"></div>
+                        <div>
+                            <div class="font-display font-bold text-2xl text-white tabular-nums">0 FCFA</div>
+                            <div class="font-mono text-[10px] uppercase tracking-wider text-white/40 mt-0.5">{% trans "frais d'inscription" %}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-4 flex flex-col gap-3">
+                    <a href="{% url 'garages:garage_create' %}"
+                       class="inline-flex items-center justify-center gap-2 bg-white text-navy-900 font-bold px-7 py-4 rounded-xl hover:bg-navy-50 transition-colors duration-200 text-sm sm:text-base">
+                        {% trans "Inscrire mon garage" %}
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                    </a>
+                    <a href="{% url 'core:contact' %}"
+                       class="inline-flex items-center justify-center gap-2 bg-white/[0.06] hover:bg-white/[0.12] text-white border border-white/[0.12] font-bold px-7 py-4 rounded-xl transition-colors duration-200 text-sm sm:text-base">
+                        {% trans "Parler à un conseiller" %}
+                    </a>
+                </div>
+
             </div>
         </div>
     </div>

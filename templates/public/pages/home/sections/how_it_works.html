@@ -1,0 +1,68 @@
+{% load i18n %}
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24" aria-labelledby="how-heading">
+    <div class="max-w-2xl mb-12 sm:mb-16">
+        <span class="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-navy-500 mb-4">
+            {% trans "Comment ça marche" %}
+        </span>
+        <h2 id="how-heading" class="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-graphite-900 tracking-tight leading-[1.05]">
+            {% trans "Trois étapes simples." %}<br>
+            <span class="text-navy-500">{% trans "Trouvez votre garage." %}</span>
+        </h2>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+
+        {% comment %}Étape 1 : Localisation{% endcomment %}
+        <div class="reveal relative">
+            <div class="flex items-baseline gap-3 mb-5">
+                <span class="font-mono text-5xl sm:text-6xl font-bold text-navy-500/20 tabular-nums leading-none">01</span>
+                <span class="font-mono text-[10px] uppercase tracking-[0.14em] text-navy-500 pb-1">{% trans "Localiser" %}</span>
+            </div>
+            <h3 class="font-display font-bold text-xl text-graphite-900 mb-3">{% trans "Entrez votre position" %}</h3>
+            <p class="text-graphite-500 text-sm leading-relaxed mb-6">
+                {% trans "Saisissez votre ville ou activez la géolocalisation. AutoLink vous affiche instantanément les garages vérifiés les plus proches de vous." %}
+            </p>
+            <div class="flex items-center gap-2 text-xs text-navy-500 font-semibold">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                {% trans "Géolocalisation précise" %}
+            </div>
+        </div>
+
+        {% comment %}Étape 2 : Comparaison{% endcomment %}
+        <div class="reveal relative" style="transition-delay: 100ms;">
+            <div class="flex items-baseline gap-3 mb-5">
+                <span class="font-mono text-5xl sm:text-6xl font-bold text-navy-500/20 tabular-nums leading-none">02</span>
+                <span class="font-mono text-[10px] uppercase tracking-[0.14em] text-navy-500 pb-1">{% trans "Choisir" %}</span>
+            </div>
+            <h3 class="font-display font-bold text-xl text-graphite-900 mb-3">{% trans "Comparez les garages" %}</h3>
+            <p class="text-graphite-500 text-sm leading-relaxed mb-6">
+                {% trans "Consultez les avis vérifiés, les services proposés, les prix et les distances. Trouvez le garage idéal en un coup d'œil." %}
+            </p>
+            <div class="flex items-center gap-2 text-xs text-navy-500 font-semibold">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                {% trans "Transparence totale" %}
+            </div>
+        </div>
+
+        {% comment %}Étape 3 : Contact{% endcomment %}
+        <div class="reveal relative" style="transition-delay: 200ms;">
+            <div class="flex items-baseline gap-3 mb-5">
+                <span class="font-mono text-5xl sm:text-6xl font-bold text-navy-500/20 tabular-nums leading-none">03</span>
+                <span class="font-mono text-[10px] uppercase tracking-[0.14em] text-navy-500 pb-1">{% trans "Contacter" %}</span>
+            </div>
+            <h3 class="font-display font-bold text-xl text-graphite-900 mb-3">{% trans "Contactez en 1 clic" %}</h3>
+            <p class="text-graphite-500 text-sm leading-relaxed mb-6">
+                {% trans "Envoyez un message direct ou appelez le garage. Réservez votre rendez-vous sans attendre." %}
+            </p>
+            <div class="flex items-center gap-2 text-xs text-navy-500 font-semibold">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                {% if why_avg_response_time %}
+                    {% trans "Réponse en" %} {{ why_avg_response_time }} {% trans "min" %}
+                {% else %}
+                    {% trans "Réponse rapide" %}
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</section>

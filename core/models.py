@@ -8,6 +8,13 @@ class City(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(_('Nom de la ville'), max_length=150, unique=True)
     slug = models.SlugField(unique=True)
+    region = models.CharField(_('Région'), max_length=100, blank=True)
+    latitude = models.DecimalField(
+        max_digits=9, decimal_places=6, null=True, blank=True, verbose_name=_('Latitude')
+    )
+    longitude = models.DecimalField(
+        max_digits=9, decimal_places=6, null=True, blank=True, verbose_name=_('Longitude')
+    )
     is_active = models.BooleanField(_('Active'), default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -82,3 +89,29 @@ class ContactMessage(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.subject}"
+
+
+class Testimonial(models.Model):
+    """Témoignage réel publié sur la landing page (rempli uniquement avec de vraies données)."""
+
+    class Role(models.TextChoices):
+        CLIENT = "CLIENT", _("Client")
+        GARAGE = "GARAGE", _("Gérant garage")
+        VENDEUR = "VENDEUR", _("Vendeur")
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(_('Nom'), max_length=150)
+    role = models.CharField(max_length=20, choices=Role.choices, default=Role.CLIENT)
+    city = models.CharField(_('Ville'), max_length=100)
+    quote = models.TextField(_('Témoignage'))
+    rating = models.PositiveSmallIntegerField(_('Note'), default=5, help_text=_('Note sur 5'))
+    is_published = models.BooleanField(_('Publié'), default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = _('Témoignage')
+        verbose_name_plural = _('Témoignages')
+
+    def __str__(self):
+        return f"{self.name} · {self.quote[:40]}"

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import ContactMessage, City, Neighborhood
+from .models import ContactMessage, City, Neighborhood,Testimonial
 
 
 @admin.register(ContactMessage)
@@ -19,3 +19,10 @@ class NeighborhoodAdmin(admin.ModelAdmin):
     list_display = ['name', 'city']
     search_fields = ['name']
     list_filter = ['city']
+
+@admin.register(Testimonial)
+class TestimonialAdmin(admin.ModelAdmin):
+    list_display = ['name' ,'role', 'city', 'rating', 'is_published', 'created_at']
+    list_filter = ['role', 'is_published', 'created_at']
+    search_fields = ['name', 'quote']
+    readonly_fields = ['created_at']
