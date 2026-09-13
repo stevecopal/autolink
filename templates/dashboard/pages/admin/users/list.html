@@ -1,5 +1,5 @@
 {% extends 'dashboard/base.html' %}
-{% load i18n %}
+{% load i18n humanize %}
 
 {% block title %}{% trans "Utilisateurs" %} - AutoLink{% endblock %}
 
@@ -7,29 +7,201 @@
     <h1 class="text-sm font-bold text-navy-900">{% trans "Utilisateurs" %}</h1>
 {% endblock %}
 
-{% block admin_breadcrumb %}
-    <nav class="flex items-center space-x-2 text-sm text-graphite-600">
-        <a href="{% url 'administration:dashboard' %}" class="hover:text-blue-500 transition">{% trans "Tableau de bord" %}</a>
-        <span class="text-graphite-500">/</span>
-        <span class="font-bold text-navy-900">{% trans "Utilisateurs" %}</span>
-    </nav>
-{% endblock %}
+
 
 {% block content %}
-<div class="space-y-6">
-    <div class="flex items-center justify-between mb-6">
-        <h1 class="text-2xl md:text-3xl font-bold text-navy-900">{% trans "Utilisateurs" %}</h1>
-        <a href="{% url 'administration:dashboard' %}" class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50">{% trans "Retour au tableau de bord" %}</a>
-    </div>    <!-- Filters -->
-    <div class="card p-4">
-        <form method="get" class="flex flex-col sm:flex-row flex-wrap gap-4 items-end">
-            <div>
-                <label class="form-label">{% trans "Recherche" %}</label>
-                <input type="text" name="q" value="{{ search_query }}" class="form-input" placeholder="{% trans 'Name or email...' %}">
+<div class="space-y-4 md:space-y-6">
+
+    {% comment %}En-tête de page{% endcomment %}
+    <header class="flex items-center justify-between gap-3">
+        <div class="min-w-0">
+            <h1 class="font-display font-bold text-xl md:text-3xl text-graphite-900 leading-tight truncate">
+                {% trans "Utilisateurs" %}
+            </h1>
+            <p class="text-xs md:text-sm text-graphite-500 mt-1">
+                {{ users.paginator.count }} {% trans "compte(s)" %}
+            </p>
+        </div>
+
+        
+
+        <a href="{% url 'administration:dashboard' %}" class="btn btn-outline hidden md:inline-flex">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            {% trans "Retour" %}
+        </a>
+    </header>
+
+    {% comment %}KPI utilisateurs (sans bordures){% endcomment %}
+    <div class="grid grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4">
+
+        <div class="bg-white rounded-xl p-3.5 md:p-5 shadow-card">
+            <div class="flex items-start justify-between gap-2">
+                <div class="w-9 h-9 md:w-11 md:h-11 rounded-lg bg-navy-50 text-navy-500 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                              d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                </div>
+                <span class="hidden md:inline font-mono text-[10px] uppercase tracking-wider text-graphite-500">Total</span>
             </div>
+            <div class="mt-2.5 md:mt-4">
+                <div class="font-display font-bold text-xl md:text-3xl text-graphite-900 tabular-nums leading-none truncate">
+                    {{ users.paginator.count|intcomma }}
+                </div>
+                <div class="text-[11px] md:text-sm text-graphite-500 mt-1.5 truncate">{% trans "Utilisateurs" %}</div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl p-3.5 md:p-5 shadow-card">
+            <div class="flex items-start justify-between gap-2">
+                <div class="w-9 h-9 md:w-11 md:h-11 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <span class="hidden md:inline font-mono text-[10px] uppercase tracking-wider text-graphite-500">Active</span>
+            </div>
+            <div class="mt-2.5 md:mt-4">
+                <div class="font-display font-bold text-xl md:text-3xl text-graphite-900 tabular-nums leading-none truncate">
+                    {{ active_count|default:"—" }}
+                </div>
+                <div class="text-[11px] md:text-sm text-graphite-500 mt-1.5 truncate">{% trans "Comptes actifs" %}</div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl p-3.5 md:p-5 shadow-card">
+            <div class="flex items-start justify-between gap-2">
+                <div class="w-9 h-9 md:w-11 md:h-11 rounded-lg bg-red-50 text-red-600 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                              d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+                    </svg>
+                </div>
+                <span class="hidden md:inline font-mono text-[10px] uppercase tracking-wider text-graphite-500">Suspendus</span>
+            </div>
+            <div class="mt-2.5 md:mt-4">
+                <div class="font-display font-bold text-xl md:text-3xl text-graphite-900 tabular-nums leading-none truncate">
+                    {{ inactive_count|default:"—" }}
+                </div>
+                <div class="text-[11px] md:text-sm text-graphite-500 mt-1.5 truncate">{% trans "Suspendus" %}</div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl p-3.5 md:p-5 shadow-card">
+            <div class="flex items-start justify-between gap-2">
+                <div class="w-9 h-9 md:w-11 md:h-11 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+                              d="M5 10l7-7m0 0l7 7m-7-7v18"/>
+                    </svg>
+                </div>
+                <span class="hidden md:inline font-mono text-[10px] uppercase tracking-wider text-graphite-500">30 j.</span>
+            </div>
+            <div class="mt-2.5 md:mt-4">
+                <div class="font-display font-bold text-xl md:text-3xl text-graphite-900 tabular-nums leading-none truncate">
+                    {{ new_this_month|default:"—" }}
+                </div>
+                <div class="text-[11px] md:text-sm text-graphite-500 mt-1.5 truncate">{% trans "Nouveaux" %}</div>
+            </div>
+        </div>
+
+    </div>
+
+    {% comment %}Barre de filtres desktop — une seule ligne{% endcomment %}
+    <form method="get"
+          class="hidden md:grid bg-white rounded-xl shadow-card p-3 md:p-4
+                 grid-cols-12 gap-3 items-stretch">
+
+        <div class="relative col-span-6 lg:col-span-5">
+            <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-graphite-500 pointer-events-none"
+                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            <input type="text" name="q" value="{{ search_query }}"
+                   class="form-input pl-9 !py-2.5"
+                   placeholder="{% trans 'Rechercher un nom, email, username…' %}">
+        </div>
+
+        <div class="col-span-3 lg:col-span-3">
+            <select name="role" class="form-input !py-2.5">
+                <option value="">{% trans "Tous les rôles" %}</option>
+                <option value="CLIENT" {% if selected_role == 'CLIENT' %}selected{% endif %}>{% trans "Client" %}</option>
+                <option value="GARAGE" {% if selected_role == 'GARAGE' %}selected{% endif %}>{% trans "Garage" %}</option>
+                <option value="VENDEUR" {% if selected_role == 'VENDEUR' %}selected{% endif %}>{% trans "Vendeur" %}</option>
+                <option value="ADMIN" {% if selected_role == 'ADMIN' %}selected{% endif %}>{% trans "Admin" %}</option>
+            </select>
+        </div>
+
+        <div class="col-span-3 lg:col-span-2">
+            <select name="status" class="form-input !py-2.5">
+                <option value="">{% trans "Tous les statuts" %}</option>
+                <option value="active" {% if selected_status == 'active' %}selected{% endif %}>{% trans "Actif" %}</option>
+                <option value="inactive" {% if selected_status == 'inactive' %}selected{% endif %}>{% trans "Inactif" %}</option>
+            </select>
+        </div>
+
+        <div class="col-span-12 lg:col-span-2 flex items-stretch gap-2">
+            <button type="submit" class="btn btn-primary flex-1 !py-2.5">
+                {% trans "Filtrer" %}
+            </button>
+            {% if search_query or selected_role or selected_status %}
+                <a href="{% url 'administration:users' %}"
+                   class="btn btn-outline !px-3 !py-2.5"
+                   title="{% trans 'Réinitialiser' %}"
+                   aria-label="{% trans 'Réinitialiser' %}">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </a>
+            {% endif %}
+        </div>
+    </form>
+
+    {% comment %}Barre de recherche + filtres mobile (compacte et dépliable){% endcomment %}
+    <div class="md:hidden space-y-2">
+        <form method="get" class="flex gap-2">
+            <div class="relative flex-1">
+                <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-graphite-500 pointer-events-none"
+                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                <input type="text" name="q" value="{{ search_query }}"
+                       class="form-input pl-9"
+                       placeholder="{% trans 'Rechercher…' %}">
+            </div>
+            <button type="button"
+                    id="mobile-filter-toggle"
+                    class="btn btn-outline !px-3 flex-shrink-0"
+                    aria-expanded="false"
+                    aria-controls="mobile-filter-panel"
+                    aria-label="{% trans 'Filtres' %}">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                </svg>
+                {% if selected_role or selected_status %}
+                    <span class="w-1.5 h-1.5 rounded-full bg-navy-500"></span>
+                {% endif %}
+            </button>
+            <button type="submit" class="btn btn-primary !px-3 flex-shrink-0" aria-label="{% trans 'Rechercher' %}">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+            </button>
+        </form>
+
+        <div id="mobile-filter-panel" class="hidden bg-white rounded-xl shadow-card p-3 space-y-2.5">
             <div>
-                <label class="form-label">{% trans "Role" %}</label>
-                <select name="role" class="form-input">
+                <label class="block text-[11px] font-mono uppercase tracking-wider text-graphite-500 mb-1.5">
+                    {% trans "Rôle" %}
+                </label>
+                <select name="role" form="mobile-filter-form" class="form-input" id="mobile-role-select">
                     <option value="">{% trans "Tous les rôles" %}</option>
                     <option value="CLIENT" {% if selected_role == 'CLIENT' %}selected{% endif %}>{% trans "Client" %}</option>
                     <option value="GARAGE" {% if selected_role == 'GARAGE' %}selected{% endif %}>{% trans "Garage" %}</option>
@@ -37,80 +209,261 @@
                     <option value="ADMIN" {% if selected_role == 'ADMIN' %}selected{% endif %}>{% trans "Admin" %}</option>
                 </select>
             </div>
+
             <div>
-                <label class="form-label">{% trans "Statut" %}</label>
-                <select name="status" class="form-input">
-                    <option value="">{% trans "Tous" %}</option>
+                <label class="block text-[11px] font-mono uppercase tracking-wider text-graphite-500 mb-1.5">
+                    {% trans "Statut" %}
+                </label>
+                <select name="status" form="mobile-filter-form" class="form-input" id="mobile-status-select">
+                    <option value="">{% trans "Tous les statuts" %}</option>
                     <option value="active" {% if selected_status == 'active' %}selected{% endif %}>{% trans "Actif" %}</option>
                     <option value="inactive" {% if selected_status == 'inactive' %}selected{% endif %}>{% trans "Inactif" %}</option>
                 </select>
             </div>
-            <button type="submit" class="btn bg-blue-500 hover:bg-blue-500/90 text-white">{% trans "Filtrer" %}</button>
+
+            <div class="flex gap-2 pt-1">
+                <button type="submit" form="mobile-filter-form" class="btn btn-primary flex-1">
+                    {% trans "Appliquer" %}
+                </button>
+                <a href="{% url 'administration:users' %}" class="btn btn-outline flex-1">
+                    {% trans "Réinitialiser" %}
+                </a>
+            </div>
+        </div>
+
+        <form id="mobile-filter-form" method="get" class="hidden">
+            <input type="hidden" name="q" value="{{ search_query }}">
         </form>
-    </div>    <!-- Users Table -->
-    <div class="card overflow-hidden">
-        <div class="table-container">
-            <table class="table">
+    </div>
+
+    {% comment %}Liste des utilisateurs{% endcomment %}
+    <section class="bg-white rounded-xl shadow-card overflow-hidden">
+
+        <header class="flex items-center justify-between px-4 md:px-5 py-3.5 md:py-4">
+            <div class="min-w-0">
+                <h2 class="font-display font-bold text-sm md:text-base text-graphite-900 leading-tight">
+                    {% trans "Liste des utilisateurs" %}
+                </h2>
+                <p class="text-[11px] md:text-xs text-graphite-500 mt-0.5">
+                    {{ users.paginator.count }} {% trans "résultat(s)" %}
+                </p>
+            </div>
+        </header>
+
+        {% comment %}Vue tableau (md et plus){% endcomment %}
+        <div class="hidden md:block overflow-x-auto">
+            <table class="w-full text-sm">
                 <thead>
-                    <tr>
-                        <th>{% trans "Utilisateur" %}</th>
-                        <th>{% trans "Role" %}</th>
-                        <th>{% trans "Ville" %}</th>
-                        <th>{% trans "Inscrit le" %}</th>
-                        <th>{% trans "Statut" %}</th>
-                        <th>{% trans "Actions" %}</th>
+                    <tr class="bg-steel-50/60">
+                        <th class="text-left font-mono text-[10px] uppercase tracking-wider text-graphite-500 px-5 py-3">{% trans "Utilisateur" %}</th>
+                        <th class="text-left font-mono text-[10px] uppercase tracking-wider text-graphite-500 px-5 py-3">{% trans "Rôle" %}</th>
+                        <th class="text-left font-mono text-[10px] uppercase tracking-wider text-graphite-500 px-5 py-3">{% trans "Ville" %}</th>
+                        <th class="text-left font-mono text-[10px] uppercase tracking-wider text-graphite-500 px-5 py-3">{% trans "Inscrit le" %}</th>
+                        <th class="text-left font-mono text-[10px] uppercase tracking-wider text-graphite-500 px-5 py-3">{% trans "Statut" %}</th>
+                        <th class="text-right font-mono text-[10px] uppercase tracking-wider text-graphite-500 px-5 py-3">{% trans "Action" %}</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="divide-y divide-line-200">
                     {% for user in users %}
-                        <tr>
-                            <td>
-                                <div class="font-bold">{{ user.display_name }}</div>
-                                <div class="text-xs text-graphite-600">{{ user.email }}</div>
+                        <tr class="hover:bg-steel-50/60 transition-colors">
+                            <td class="px-5 py-3">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <span class="w-9 h-9 rounded-full bg-navy-100 text-navy-600 flex items-center justify-center text-xs font-bold flex-shrink-0">
+                                        {{ user.display_name|first|upper }}
+                                    </span>
+                                    <div class="min-w-0">
+                                        <div class="font-semibold text-graphite-900 truncate">{{ user.display_name }}</div>
+                                        <div class="text-xs text-graphite-500 truncate">{{ user.email }}</div>
+                                    </div>
+                                </div>
                             </td>
-                            <td>
-                                <span class="badge-{{ user.role|lower }}">{{ user.role }}</span>
-                            </td>
-                            <td>{{ user.city|default:"-" }}</td>
-                            <td>{{ user.date_joined|date:"d/m/Y" }}</td>
-                            <td>
-                                {% if user.is_active %}
-                                    <span class="bg-blue-100 text-blue-500">{% trans "Actif" %}</span>
+                            <td class="px-5 py-3">
+                                {% if user.role == 'ADMIN' %}
+                                    <span class="badge bg-navy-100 text-navy-700">{{ user.role }}</span>
+                                {% elif user.role == 'GARAGE' %}
+                                    <span class="badge bg-blue-100 text-blue-700">{{ user.role }}</span>
+                                {% elif user.role == 'VENDEUR' %}
+                                    <span class="badge bg-purple-50 text-purple-700">{{ user.role }}</span>
                                 {% else %}
-                                    <span class="bg-blue-100 text-blue-600">{% trans "Inactif" %}</span>
+                                    <span class="badge bg-steel-50 text-graphite-600">{{ user.role }}</span>
                                 {% endif %}
                             </td>
-                            <td>
-                                <a href="{% url 'administration:user_detail' user.pk %}" class="text-blue-500 font-bold hover:text-blue-600 transition">{% trans "Voir" %}</a>
+                            <td class="px-5 py-3 text-graphite-600">{{ user.city|default:"—" }}</td>
+                            <td class="px-5 py-3 text-graphite-600 tabular-nums">{{ user.date_joined|date:"d/m/Y" }}</td>
+                            <td class="px-5 py-3">
+                                {% if user.is_active %}
+                                    <span class="badge bg-emerald-50 text-emerald-700">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>
+                                        {% trans "Actif" %}
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-red-50 text-red-700">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5"></span>
+                                        {% trans "Inactif" %}
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td class="px-5 py-3 text-right">
+                                <a href="{% url 'administration:user_detail' user.pk %}"
+                                   class="inline-flex items-center gap-1 text-navy-500 font-semibold hover:text-navy-600 text-sm">
+                                    {% trans "Voir" %}
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                    </svg>
+                                </a>
                             </td>
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="6" class="px-4 py-8 text-center text-graphite-600">{% trans "Aucun utilisateur trouvé." %}</td>
+                            <td colspan="6" class="px-5 py-12 text-center">
+                                <div class="w-12 h-12 mx-auto mb-3 rounded-lg bg-steel-50 flex items-center justify-center text-graphite-500">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                              d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                                    </svg>
+                                </div>
+                                <p class="text-sm text-graphite-500">{% trans "Aucun utilisateur trouvé." %}</p>
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
 
-    <!-- Pagination -->
-    {% if users.has_other_pages %}
-            <div class="px-4 py-3 border-t border-line-200 flex justify-between items-center flex-wrap gap-2">
-                <span class="text-sm text-graphite-600">
-                    {% trans "Page" %} {{ users.number }} {% trans "sur" %} {{ users.paginator.num_pages }}
+        {% comment %}Vue cartes (mobile){% endcomment %}
+        <ul class="md:hidden divide-y divide-line-200">
+            {% for user in users %}
+                <li>
+                    <a href="{% url 'administration:user_detail' user.pk %}" class="block px-4 py-3.5 active:bg-steel-50 transition-colors">
+                        <div class="flex items-start gap-3">
+
+                            <span class="w-11 h-11 rounded-full bg-navy-100 text-navy-600 flex items-center justify-center text-sm font-bold flex-shrink-0">
+                                {{ user.display_name|first|upper }}
+                            </span>
+
+                            <div class="min-w-0 flex-1">
+
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="min-w-0 flex-1">
+                                        <div class="font-semibold text-sm text-graphite-900 truncate leading-tight">
+                                            {{ user.display_name }}
+                                        </div>
+                                        <div class="text-xs text-graphite-500 truncate mt-0.5">
+                                            {{ user.email }}
+                                        </div>
+                                    </div>
+                                    <svg class="w-4 h-4 text-graphite-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                    </svg>
+                                </div>
+
+                                <div class="mt-2 flex flex-wrap items-center gap-1.5">
+                                    {% if user.role == 'ADMIN' %}
+                                        <span class="badge bg-navy-100 text-navy-700">{{ user.role }}</span>
+                                    {% elif user.role == 'GARAGE' %}
+                                        <span class="badge bg-blue-100 text-blue-700">{{ user.role }}</span>
+                                    {% elif user.role == 'VENDEUR' %}
+                                        <span class="badge bg-purple-50 text-purple-700">{{ user.role }}</span>
+                                    {% else %}
+                                        <span class="badge bg-steel-50 text-graphite-600">{{ user.role }}</span>
+                                    {% endif %}
+
+                                    {% if user.is_active %}
+                                        <span class="badge bg-emerald-50 text-emerald-700">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>
+                                            {% trans "Actif" %}
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-red-50 text-red-700">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5"></span>
+                                            {% trans "Inactif" %}
+                                        </span>
+                                    {% endif %}
+                                </div>
+
+                                <div class="mt-2 flex items-center gap-3 text-[11px] text-graphite-500">
+                                    <span class="inline-flex items-center gap-1 min-w-0">
+                                        <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                        </svg>
+                                        <span class="truncate">{{ user.city|default:"—" }}</span>
+                                    </span>
+                                    <span class="inline-flex items-center gap-1 flex-shrink-0">
+                                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                        </svg>
+                                        <span class="tabular-nums">{{ user.date_joined|date:"d/m/Y" }}</span>
+                                    </span>
+                                </div>
+
+                            </div>
+                        </div>
+                    </a>
+                </li>
+            {% empty %}
+                <li class="p-8 text-center">
+                    <div class="w-12 h-12 mx-auto mb-3 rounded-lg bg-steel-50 flex items-center justify-center text-graphite-500">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+                        </svg>
+                    </div>
+                    <p class="text-sm text-graphite-500">{% trans "Aucun utilisateur trouvé." %}</p>
+                </li>
+            {% endfor %}
+        </ul>
+
+        {% comment %}Pagination{% endcomment %}
+        {% if users.has_other_pages %}
+            <div class="px-4 md:px-5 py-3 md:py-3.5 flex items-center justify-between gap-2">
+                <span class="text-xs md:text-sm text-graphite-500">
+                    <span class="font-semibold text-graphite-900">{{ users.number }}</span> / {{ users.paginator.num_pages }}
                 </span>
-                <div class="flex space-x-2">
+
+                <div class="flex gap-2">
                     {% if users.has_previous %}
                         <a href="?page={{ users.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_role %}&role={{ selected_role }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}"
-                           class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 text-sm py-1 px-3">{% trans "Précédent" %}</a>
+                           class="btn btn-outline btn-sm"
+                           aria-label="{% trans 'Précédent' %}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                            </svg>
+                            <span class="hidden sm:inline">{% trans "Précédent" %}</span>
+                        </a>
                     {% endif %}
                     {% if users.has_next %}
                         <a href="?page={{ users.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_role %}&role={{ selected_role }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}"
-                           class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 text-sm py-1 px-3">{% trans "Suivant" %}</a>
+                           class="btn btn-outline btn-sm"
+                           aria-label="{% trans 'Suivant' %}">
+                            <span class="hidden sm:inline">{% trans "Suivant" %}</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </a>
                     {% endif %}
                 </div>
             </div>
         {% endif %}
-    </div>
+
+    </section>
+
 </div>
+
+<script>
+(function () {
+    var toggle = document.getElementById('mobile-filter-toggle');
+    var panel = document.getElementById('mobile-filter-panel');
+    if (!toggle || !panel) return;
+    toggle.addEventListener('click', function () {
+        var isHidden = panel.classList.contains('hidden');
+        panel.classList.toggle('hidden', !isHidden);
+        toggle.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+    });
+})();
+</script>
+
 {% endblock %}

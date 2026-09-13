@@ -9,42 +9,31 @@
     <meta name="description" content="{% block description %}{% trans "Plateforme AutoLink - Réparation automobile" %}{% endblock %}">
     <link rel="stylesheet" href="{% static 'css/output.css' %}">
     <meta name="csrf-token" content="{{ csrf_token }}">
-    <style>
-        select.form-input, select {
-            appearance: none;
-            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><path fill='%234B545D' d='M8 3l1.5 1.5-1.5 1.5-1.5 1.5 1.5 1.5-1.5 3' transform='translate(8,6)'/></svg>");
-            background-repeat: no-repeat;
-            background-position: right 0.8rem center;
-            background-size: 1em;
-            padding-right: 2.25rem;
-        }
-        input[type="checkbox"], input[type="radio"] { accent-color: #000080; }
-        input[type="date"] { min-height: 2.75rem; }
-    </style>
+    
     {% block extra_css %}{% endblock %}
 </head>
-<body class="bg-steel-50 text-graphite-900 font-body antialiased min-h-screen overflow-x-hidden">
+<body class="bg-gray-50 text-gray-900 font-body antialiased min-h-screen overflow-x-hidden">
 
     <!-- ===== OVERLAY MOBILE ===== -->
     <div id="admin-drawer-overlay"
-         class="fixed inset-0 bg-navy-900/50 backdrop-blur-sm z-40 hidden lg:hidden transition-opacity duration-300"
+         class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 hidden lg:hidden transition-opacity duration-300"
          onclick="window.CloseAdminDrawer()"></div>
 
     <!-- ===== SIDEBAR ===== -->
     <aside id="admin-sidebar"
-           class="fixed inset-y-0 left-0 z-50 w-64 bg-navy-900
+           class="fixed inset-y-0 left-0 z-50 w-[280px] bg-white
                   flex flex-col
                   transition-transform duration-300 ease-in-out
                   -translate-x-full lg:translate-x-0
-                  shadow-elevated">
+                  border-r border-gray-200 shadow-xl lg:shadow-none">
 
         <!-- Header logo -->
-        <div class="flex items-center justify-between h-16 px-4 border-b border-white/10 flex-shrink-0">
-            <a href="{% url 'core:home' %}" class="flex items-center gap-2" aria-label="AutoLink">
+        <div class="flex items-center justify-between h-16 px-5 border-b border-gray-100 flex-shrink-0">
+            <a href="{% url 'core:home' %}" class="flex items-center gap-2.5" aria-label="AutoLink">
                 
-                <span class="font-display font-bold text-white text-lg tracking-tight">Auto<span class="text-navy-300">Link</span></span>
+                <span class="font-display font-bold text-gray-900 text-lg tracking-tight">Auto<span class="text-navy-500">Link</span></span>
             </a>
-            <button onclick="window.CloseAdminDrawer()" class="lg:hidden p-1.5 rounded-lg hover:bg-white/10 text-white/70 transition">
+            <button onclick="window.CloseAdminDrawer()" class="lg:hidden p-2 rounded-lg hover:bg-gray-100 text-gray-500 transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
         </div>
@@ -55,13 +44,12 @@
         </div>
 
         <!-- Footer sidebar -->
-        <div class="flex-shrink-0 p-3 border-t border-white/10">
+        <div class="flex-shrink-0 p-3 border-t border-gray-100">
             {% if user.is_authenticated %}
-            <div class="flex items-center gap-3 rounded-xl bg-white/5 p-3">
-                <span class="w-9 h-9 shrink-0 rounded-full bg-navy-500/20 flex items-center justify-center text-sm font-bold text-navy-300">{{ user.display_name|first|upper }}</span>
+            <div class="flex items-center gap-3 rounded-xl bg-gray-50 p-3">
+                <span class="w-10 h-10 shrink-0 rounded-full bg-navy-500 flex items-center justify-center text-sm font-bold text-white">{{ user.display_name|first|upper }}</span>
                 <div class="min-w-0 flex-1">
-                    <div class="text-sm font-bold text-white truncate">{{ user.display_name }}</div>
-                    <div class="text-[11px] text-white/50 font-mono uppercase tracking-wide truncate">{{ user.role|default:"compte" }}</div>
+                    <div class="text-sm font-semibold text-gray-900 truncate">{{ user.display_name }}</div>
                 </div>
             </div>
             {% endif %}
@@ -69,49 +57,54 @@
     </aside>
 
     <!-- ===== CONTENU PRINCIPAL ===== -->
-    <div class="lg:pl-64 min-w-0 flex flex-col min-h-screen">
+    <div class="lg:pl-[280px] min-w-0 flex flex-col min-h-screen">
 
         <!-- ===== TOPBAR ===== -->
-        <header class="sticky top-0 z-30 bg-white/85 backdrop-blur border-b border-line-200 flex-shrink-0">
-            <div class="flex items-center gap-1.5 md:gap-3 px-3 sm:px-4 md:px-6 lg:px-8 h-16">
+        <header class="sticky top-0 z-30 bg-white border-b border-gray-200 flex-shrink-0">
+            <div class="flex items-center gap-2 sm:gap-4 px-4 sm:px-6 lg:px-8 h-16">
                 <button id="sidebar-toggle-btn" onclick="window.OpenAdminDrawer()"
-                        class="lg:hidden p-2 -ml-1 rounded-lg text-navy-900 hover:bg-steel-50 transition" aria-label="{% trans 'Ouvrir le menu' %}">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                        class="lg:hidden p-2 -ml-2 rounded-lg text-gray-600 hover:bg-gray-100 transition" aria-label="{% trans 'Ouvrir le menu' %}">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
                 </button>
 
-                <button onclick="window.history.length > 1 ? window.history.back() : location.href='{% url 'core:home' %}'"
-                        class="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-bold text-graphite-600 hover:bg-steel-50 hover:text-navy-900 transition"
-                        aria-label="{% trans 'Retour' %}">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-                    <span class="hidden md:inline">{% trans "Retour" %}</span>
-                </button>
 
                 <div class="min-w-0 flex-1">
-                    <h1 class="font-display font-bold text-navy-900 text-sm sm:text-base lg:text-lg truncate">{% block dashboard_header %}{% trans "Tableau de bord" %}{% endblock %}</h1>
+                    <h1 class="font-display font-bold text-gray-900 text-base sm:text-lg truncate"></h1>
                 </div>
 
-                <a href="{% url 'accounts:notifications' %}" class="relative p-2 rounded-lg text-graphite-600 hover:bg-steel-50 transition" aria-label="{% trans 'Notifications' %}">
+                <a href="{% url 'accounts:notifications' %}" class="relative p-2.5 rounded-lg text-gray-500 hover:bg-gray-100 hover:text-gray-700 transition" aria-label="{% trans 'Notifications' %}">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-                    <span id="notif-badge" class="hidden absolute -top-0.5 -right-0.5 min-w-4 h-4 px-1 rounded-full bg-navy-500 text-white text-[10px] font-bold flex items-center justify-center"></span>
+                    <span id="notif-badge" class="hidden absolute -top-0.5 -right-0.5 min-w-5 h-5 px-1.5 rounded-full bg-navy-500 text-white text-[10px] font-bold flex items-center justify-center"></span>
                 </a>
 
                 {% if user.is_authenticated %}
                 <details class="relative" id="profile-menu">
-                    <summary class="list-none flex items-center gap-2 pl-2 pr-1 py-1.5 rounded-lg hover:bg-steel-50 transition cursor-pointer" aria-label="{% trans 'Menu du compte' %}">
-                        <span class="w-8 h-8 rounded-full bg-navy-500 flex items-center justify-center text-sm font-bold text-white">{{ user.display_name|first|upper }}</span>
-                        <svg class="hidden sm:block w-4 h-4 text-graphite-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    <summary class="list-none flex items-center gap-2.5 pl-2 pr-1 py-1.5 rounded-lg hover:bg-gray-100 transition cursor-pointer" aria-label="{% trans 'Menu du compte' %}">
+                        <span class="w-9 h-9 rounded-full bg-navy-500 flex items-center justify-center text-sm font-bold text-white">{{ user.display_name|first|upper }}</span>
+                        <svg class="hidden sm:block w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
                     </summary>
-                    <div class="absolute right-0 mt-2 w-56 bg-white rounded-xl border border-line-200 shadow-elevated py-1.5 z-50">
-                        <div class="px-4 py-2 border-b border-line-200 mb-1">
-                            <div class="text-sm font-bold text-navy-900 truncate">{{ user.display_name }}</div>
-                            <div class="text-xs text-graphite-500 truncate">{{ user.email|default:'' }}</div>
+                    <div class="absolute right-0 mt-2 w-60 bg-white rounded-xl border border-gray-200 shadow-lg py-1.5 z-50">
+                        <div class="px-4 py-3 border-b border-gray-100 mb-1">
+                            <div class="text-sm font-semibold text-gray-900 truncate">{{ user.display_name }}</div>
+                            <div class="text-xs text-gray-500 truncate">{{ user.email|default:'' }}</div>
                         </div>
-                        <a href="{% url 'accounts:profile' %}" class="flex items-center gap-2 px-4 py-2 text-sm text-graphite-600 hover:bg-steel-50 hover:text-navy-900">{% trans "Mon profil" %}</a>
-                        <a href="{% url 'core:home' %}" class="flex items-center gap-2 px-4 py-2 text-sm text-graphite-600 hover:bg-steel-50 hover:text-navy-900">{% trans "Voir le site" %}</a>
-                        <form method="post" action="{% url 'accounts:logout' %}" class="border-t border-line-200 mt-1">
-                            {% csrf_token %}
-                            <button type="submit" class="w-full text-left flex items-center gap-2 px-4 py-2 text-sm font-bold text-navy-600 hover:bg-navy-500/10">{% trans "Déconnexion" %}</button>
-                        </form>
+                        <a href="{% url 'accounts:profile' %}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+                            {% trans "Mon profil" %}
+                        </a>
+                        <a href="{% url 'core:home' %}" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                            {% trans "Voir le site" %}
+                        </a>
+                        <div class="border-t border-gray-100 mt-1 pt-1">
+                            <form method="post" action="{% url 'accounts:logout' %}">
+                                {% csrf_token %}
+                                <button type="submit" class="w-full text-left flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 transition">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                                    {% trans "Déconnexion" %}
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </details>
                 {% endif %}
@@ -119,7 +112,7 @@
         </header>
 
         <!-- ===== MAIN CONTENT ===== -->
-        <main class="flex-1 p-4 sm:p-5 md:p-6 lg:p-8">
+        <main class="flex-1 p-4 sm:p-6 lg:p-8">
             <div class="max-w-7xl mx-auto w-full">
                 {% block content %}{% endblock %}
             </div>
@@ -140,17 +133,17 @@
                 </div>
                 <div class="al-modal-body">
                     <div class="flex items-start gap-3">
-                        <div class="flex-shrink-0 w-10 h-10 rounded-full bg-navy-500/10 flex items-center justify-center" id="delete-confirm-icon">
-                            <svg class="w-5 h-5 text-navy-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+                        <div class="flex-shrink-0 w-10 h-10 rounded-full bg-red-100 flex items-center justify-center" id="delete-confirm-icon">
+                            <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
                         </div>
                         <div>
-                            <p class="text-sm text-navy-900" id="delete-confirm-message"></p>
+                            <p class="text-sm text-gray-900" id="delete-confirm-message"></p>
                         </div>
                     </div>
                 </div>
                 <div class="al-modal-footer">
-                    <button type="button" class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 text-sm" data-modal-close>{% trans "Annuler" %}</button>
-                    <button type="button" id="delete-confirm-btn" class="btn bg-navy-500 hover:bg-navy-600 text-white text-sm">{% trans "Supprimer" %}</button>
+                    <button type="button" class="btn btn-outline" data-modal-close>{% trans "Annuler" %}</button>
+                    <button type="button" id="delete-confirm-btn" class="btn btn-danger">{% trans "Supprimer" %}</button>
                 </div>
             </div>
         </div>

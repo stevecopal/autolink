@@ -2,60 +2,54 @@
 
 {# ===== SECTION ADMIN / SUPERUSER ===== #}
 {% if user.is_superadmin or user.role == 'ADMIN' or user.role == 'SUPERUSER' %}
-    <p class="px-3 pt-1 text-[10px] font-mono uppercase tracking-widest text-white/40">{% trans "Administration" %}</p>
 
     <a href="{% url 'administration:dashboard' %}"
-       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition
-              {% if request.resolver_match.url_name == 'dashboard' %}bg-blue-500/15 text-white font-bold{% else %}text-white/70 hover:bg-white/10 hover:text-white{% endif %}">
+       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200
+              {% if request.resolver_match.url_name == 'dashboard' %}bg-navy-500 text-white shadow-md{% else %}text-gray-600 hover:bg-gray-100 hover:text-gray-900{% endif %}">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3"/></svg>
         {% trans "Tableau de bord" %}
     </a>
 
-    <a href="{% url 'administration:geography' %}"
-       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition
-              {% if request.resolver_match.url_name == 'geography' %}bg-blue-500/15 text-white font-bold{% else %}text-white/70 hover:bg-white/10 hover:text-white{% endif %}">
-        <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-        {% trans "Géographie" %}
-    </a>
+   
 
     <a href="{% url 'administration:users' %}"
-       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition
-              {% if request.resolver_match.url_name == 'users' or request.resolver_match.url_name == 'user_detail' %}bg-blue-500/15 text-white font-bold{% else %}text-white/70 hover:bg-white/10 hover:text-white{% endif %}">
+       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200
+              {% if request.resolver_match.url_name == 'users' or request.resolver_match.url_name == 'user_detail' %}bg-navy-500 text-white shadow-md{% else %}text-gray-600 hover:bg-gray-100 hover:text-gray-900{% endif %}">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a4 4 0 00-5-3.87M9 20H4v-2a4 4 0 015-3.87M12 12a4 4 0 100-8 4 4 0 000 8z"/></svg>
         {% trans "Utilisateurs" %}
     </a>
 
     <a href="{% url 'administration:garages' %}"
-       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition
-              {% if request.resolver_match.url_name == 'garages' or request.resolver_match.url_name == 'garage_verify' %}bg-blue-500/15 text-white font-bold{% else %}text-white/70 hover:bg-white/10 hover:text-white{% endif %}">
+       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200
+              {% if request.resolver_match.url_name == 'garages' or request.resolver_match.url_name == 'garage_verify' %}bg-navy-500 text-white shadow-md{% else %}text-gray-600 hover:bg-gray-100 hover:text-gray-900{% endif %}">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
         {% trans "Garages" %}
     </a>
 
     <a href="{% url 'administration:cities' %}"
-       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition
-              {% if request.resolver_match.url_name == 'cities' or request.resolver_match.url_name == 'city_detail' %}bg-blue-500/15 text-white font-bold{% else %}text-white/70 hover:bg-white/10 hover:text-white{% endif %}">
+       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200
+              {% if request.resolver_match.url_name == 'cities' or request.resolver_match.url_name == 'city_detail' %}bg-navy-500 text-white shadow-md{% else %}text-gray-600 hover:bg-gray-100 hover:text-gray-900{% endif %}">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 11-2 0v3a1 1 0 112 0z"/></svg>
         {% trans "Villes" %}
     </a>
 
     <a href="{% url 'administration:neighborhoods' %}"
-       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition
-              {% if request.resolver_match.url_name == 'neighborhoods' or request.resolver_match.url_name == 'neighborhood_detail' %}bg-blue-500/15 text-white font-bold{% else %}text-white/70 hover:bg-white/10 hover:text-white{% endif %}">
+       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200
+              {% if request.resolver_match.url_name == 'neighborhoods' or request.resolver_match.url_name == 'neighborhood_detail' %}bg-navy-500 text-white shadow-md{% else %}text-gray-600 hover:bg-gray-100 hover:text-gray-900{% endif %}">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
         {% trans "Quartiers" %}
     </a>
 
     <a href="{% url 'administration:payments' %}"
-       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition
-              {% if request.resolver_match.url_name == 'payments' %}bg-blue-500/15 text-white font-bold{% else %}text-white/70 hover:bg-white/10 hover:text-white{% endif %}">
+       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200
+              {% if request.resolver_match.url_name == 'payments' %}bg-navy-500 text-white shadow-md{% else %}text-gray-600 hover:bg-gray-100 hover:text-gray-900{% endif %}">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
         {% trans "Paiements" %}
     </a>
 
     <a href="{% url 'administration:support' %}"
-       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition
-              {% if request.resolver_match.url_name == 'support' or request.resolver_match.url_name == 'ticket_detail' %}bg-blue-500/15 text-white font-bold{% else %}text-white/70 hover:bg-white/10 hover:text-white{% endif %}">
+       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200
+              {% if request.resolver_match.url_name == 'support' or request.resolver_match.url_name == 'ticket_detail' %}bg-navy-500 text-white shadow-md{% else %}text-gray-600 hover:bg-gray-100 hover:text-gray-900{% endif %}">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
         {% trans "Support" %}
     </a>
@@ -63,46 +57,46 @@
 
 {# ===== SECTION CLIENT / GARAGE ===== #}
 {% if user.role == 'CLIENT' %}
-    <p class="px-3 pt-1 text-[10px] font-mono uppercase tracking-widest text-white/40">{% trans "Mon espace" %}</p>
+    <p class="px-3 pt-2 pb-1 text-[11px] font-semibold uppercase tracking-wider text-gray-400">{% trans "Mon espace" %}</p>
 
     <a href="{% url 'accounts:client_dashboard' %}"
-       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition
-              {% if request.resolver_match.url_name == 'client_dashboard' %}bg-blue-500/15 text-white font-bold{% else %}text-white/70 hover:bg-white/10 hover:text-white{% endif %}">
+       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200
+              {% if request.resolver_match.url_name == 'client_dashboard' %}bg-navy-500 text-white shadow-md{% else %}text-gray-600 hover:bg-gray-100 hover:text-gray-900{% endif %}">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3"/></svg>
         {% trans "Tableau de bord" %}
     </a>
 
     <a href="{% url 'garages:garage_my_list' %}"
-       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition
-              {% if request.resolver_match.url_name == 'garage_my_list' or request.resolver_match.url_name == 'garage_dashboard' %}bg-blue-500/15 text-white font-bold{% else %}text-white/70 hover:bg-white/10 hover:text-white{% endif %}">
+       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200
+              {% if request.resolver_match.url_name == 'garage_my_list' or request.resolver_match.url_name == 'garage_dashboard' %}bg-navy-500 text-white shadow-md{% else %}text-gray-600 hover:bg-gray-100 hover:text-gray-900{% endif %}">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
         {% trans "Gérer mes garages" %}
     </a>
 
     <a href="{% url 'garages:garage_create' %}"
-       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition
-              {% if request.resolver_match.url_name == 'garage_create' %}bg-blue-500/15 text-white font-bold{% else %}text-white/70 hover:bg-white/10 hover:text-white{% endif %}">
+       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200
+              {% if request.resolver_match.url_name == 'garage_create' %}bg-navy-500 text-white shadow-md{% else %}text-gray-600 hover:bg-gray-100 hover:text-gray-900{% endif %}">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
         {% trans "Ajouter un garage" %}
     </a>
 
     <a href="{% url 'payments:payment_list' %}"
-       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition
-              {% if request.resolver_match.url_name == 'payment_list' %}bg-blue-500/15 text-white font-bold{% else %}text-white/70 hover:bg-white/10 hover:text-white{% endif %}">
+       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200
+              {% if request.resolver_match.url_name == 'payment_list' %}bg-navy-500 text-white shadow-md{% else %}text-gray-600 hover:bg-gray-100 hover:text-gray-900{% endif %}">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
         {% trans "Mes paiements" %}
     </a>
 
     <a href="{% url 'support:conversation_list' %}"
-       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition
-              {% if request.resolver_match.url_name == 'conversation_list' or request.resolver_match.url_name == 'conversation_detail' %}bg-blue-500/15 text-white font-bold{% else %}text-white/70 hover:bg-white/10 hover:text-white{% endif %}">
+       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200
+              {% if request.resolver_match.url_name == 'conversation_list' or request.resolver_match.url_name == 'conversation_detail' %}bg-navy-500 text-white shadow-md{% else %}text-gray-600 hover:bg-gray-100 hover:text-gray-900{% endif %}">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
         {% trans "Messages" %}
     </a>
 
     <a href="{% url 'accounts:notifications' %}"
-       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition
-              {% if request.resolver_match.url_name == 'notifications' or request.resolver_match.url_name == 'notification_mark_read' %}bg-blue-500/15 text-white font-bold{% else %}text-white/70 hover:bg-white/10 hover:text-white{% endif %}">
+       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200
+              {% if request.resolver_match.url_name == 'notifications' or request.resolver_match.url_name == 'notification_mark_read' %}bg-navy-500 text-white shadow-md{% else %}text-gray-600 hover:bg-gray-100 hover:text-gray-900{% endif %}">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
         {% trans "Notifications" %}
     </a>
@@ -110,41 +104,40 @@
 
 {# ===== SECTION USER (défaut) ===== #}
 {% if user.role == 'USER' %}
-    <p class="px-3 pt-1 text-[10px] font-mono uppercase tracking-widest text-white/40">{% trans "Mon espace" %}</p>
+    <p class="px-3 pt-2 pb-1 text-[11px] font-semibold uppercase tracking-wider text-gray-400">{% trans "Mon espace" %}</p>
 
     <a href="{% url 'accounts:client_dashboard' %}"
-       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition
-              {% if request.resolver_match.url_name == 'client_dashboard' %}bg-blue-500/15 text-white font-bold{% else %}text-white/70 hover:bg-white/10 hover:text-white{% endif %}">
+       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200
+              {% if request.resolver_match.url_name == 'client_dashboard' %}bg-navy-500 text-white shadow-md{% else %}text-gray-600 hover:bg-gray-100 hover:text-gray-900{% endif %}">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3"/></svg>
         {% trans "Tableau de bord" %}
     </a>
 
     <a href="{% url 'payments:payment_list' %}"
-       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition
-              {% if request.resolver_match.url_name == 'payment_list' %}bg-blue-500/15 text-white font-bold{% else %}text-white/70 hover:bg-white/10 hover:text-white{% endif %}">
+       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200
+              {% if request.resolver_match.url_name == 'payment_list' %}bg-navy-500 text-white shadow-md{% else %}text-gray-600 hover:bg-gray-100 hover:text-gray-900{% endif %}">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
         {% trans "Mes paiements" %}
     </a>
 
     <a href="{% url 'garages:garage_create' %}"
-       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition
-              {% if request.resolver_match.url_name == 'garage_create' %}bg-blue-500/15 text-white font-bold{% else %}text-white/70 hover:bg-white/10 hover:text-white{% endif %}">
+       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200
+              {% if request.resolver_match.url_name == 'garage_create' %}bg-navy-500 text-white shadow-md{% else %}text-gray-600 hover:bg-gray-100 hover:text-gray-900{% endif %}">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
         {% trans "Ajouter un garage" %}
     </a>
 
     <a href="{% url 'garages:garage_list' %}"
-       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition
-              {% if request.resolver_match.url_name == 'garage_list' %}bg-blue-500/15 text-white font-bold{% else %}text-white/70 hover:bg-white/10 hover:text-white{% endif %}">
+       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200
+              {% if request.resolver_match.url_name == 'garage_list' %}bg-navy-500 text-white shadow-md{% else %}text-gray-600 hover:bg-gray-100 hover:text-gray-900{% endif %}">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
         {% trans "Trouver un mécanicien" %}
     </a>
 
     <a href="{% url 'support:ticket_create' %}"
-       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition
-              {% if request.resolver_match.url_name == 'ticket_create' %}bg-blue-500/15 text-white font-bold{% else %}text-white/70 hover:bg-white/10 hover:text-white{% endif %}">
+       class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200
+              {% if request.resolver_match.url_name == 'ticket_create' %}bg-navy-500 text-white shadow-md{% else %}text-gray-600 hover:bg-gray-100 hover:text-gray-900{% endif %}">
         <svg class="w-5 h-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
         {% trans "Signaler un problème" %}
     </a>
 {% endif %}
-

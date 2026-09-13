@@ -105,6 +105,7 @@ def admin_dashboard_view(request):
         .select_related("garage", "user")
         .order_by("-created_at")[:8]
     )
+    garage_cities_list = list(garage_cities)
 
     context = {
         "total_users": total_users,
@@ -123,24 +124,12 @@ def admin_dashboard_view(request):
         "recent_payments": recent_payments,
         "latest_payments": latest_payments,
         "alerts": alerts,
+        "max_city_count": max((c.garage_count for c in garage_cities_list), default=1),
     }
     return render(request, "dashboard/pages/admin/dashboard.html", context)
 
 
 
-@user_passes_test(is_admin)
-def admin_geography_view(request):
-    cities = City.objects.annotate(
-        garage_count=Count(
-            "garages", filter=Q(garages__approval_status=Garage.ApprovalStatus.APPROVED)
-        ),
-        neighborhood_count=Count("neighborhoods"),
-    ).order_by("-garage_count", "name")
-
-    context = {
-        "cities": cities,
-    }
-    return render(request, "dashboard/pages/admin/geography/geography.html", context)
 
 
 @user_passes_test(is_admin)

@@ -1,25 +1,137 @@
 {% extends 'dashboard/base.html' %}
-{% load i18n %}
+{% load i18n humanize %}
 
-{% block title %}{% trans "Gestion des garages" %}{% endblock %}
+{% block title %}{% trans "Gestion des garages" %} - AutoLink{% endblock %}
+{% block admin_header %}<h1 class="text-sm font-bold text-navy-900">{% trans "Garages" %}</h1>{% endblock %}
+
+{% block admin_breadcrumb %}
+    <nav class="hidden sm:flex items-center space-x-2 text-sm text-graphite-600">
+        <a href="{% url 'administration:dashboard' %}" class="hover:text-navy-500 transition">{% trans "Tableau de bord" %}</a>
+        <span class="text-graphite-500">/</span>
+        <span class="font-bold text-navy-900">{% trans "Garages" %}</span>
+    </nav>
+{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 py-8">
-    <div class="flex items-center justify-between mb-6">
-        <h1 class="text-2xl font-bold text-navy-900">{% trans "Garages" %}</h1>
-        <a href="{% url 'administration:dashboard' %}" class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50">{% trans "Retour au tableau de bord" %}</a>
-    </div>
+<div class="space-y-4 md:space-y-6">
 
-    <!-- Filters -->
-    <div class="card p-4 mb-6">
-        <form method="get" class="flex flex-wrap gap-4 items-end">
+    {% comment %}En-tête{% endcomment %}
+    <header class="flex items-center justify-between gap-3">
+        <div class="min-w-0">
+            <h1 class="font-display font-bold text-xl md:text-3xl text-graphite-900 leading-tight truncate">
+                {% trans "Garages" %}
+            </h1>
+            <p class="text-xs md:text-sm text-graphite-500 mt-1">
+                {{ garages.paginator.count }} {% trans "garage(s)" %}
+            </p>
+        </div>
+
+        
+        <a href="{% url 'administration:dashboard' %}" class="btn btn-outline hidden md:inline-flex">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            {% trans "Retour" %}
+        </a>
+    </header>
+
+    {% comment %}Barre de filtres desktop — une seule ligne{% endcomment %}
+    <form method="get"
+          class="hidden md:grid bg-white rounded-xl shadow-card p-3 md:p-4 grid-cols-12 gap-3 items-stretch">
+
+        <div class="relative col-span-4">
+          
+            <input type="text" name="q" value="{{ search_query }}"
+                   class="form-input pl-9 !py-2.5"
+                   placeholder="{% trans 'Nom, propriétaire, ville…' %}">
+        </div>
+
+        <div class="col-span-2">
+            <select name="payment_status" class="form-input !py-2.5">
+                <option value="">{% trans "Paiement" %}</option>
+                <option value="UNPAID" {% if selected_payment_status == 'UNPAID' %}selected{% endif %}>{% trans "Non payé" %}</option>
+                <option value="PENDING" {% if selected_payment_status == 'PENDING' %}selected{% endif %}>{% trans "En attente" %}</option>
+                <option value="PAID" {% if selected_payment_status == 'PAID' %}selected{% endif %}>{% trans "Payé" %}</option>
+                <option value="FAILED" {% if selected_payment_status == 'FAILED' %}selected{% endif %}>{% trans "Échec" %}</option>
+            </select>
+        </div>
+
+        <div class="col-span-2">
+            <select name="activation_status" class="form-input !py-2.5">
+                <option value="">{% trans "Activation" %}</option>
+                <option value="INACTIVE" {% if selected_activation_status == 'INACTIVE' %}selected{% endif %}>{% trans "Inactif" %}</option>
+                <option value="ACTIVE" {% if selected_activation_status == 'ACTIVE' %}selected{% endif %}>{% trans "Actif" %}</option>
+                <option value="SUSPENDED" {% if selected_activation_status == 'SUSPENDED' %}selected{% endif %}>{% trans "Suspendu" %}</option>
+            </select>
+        </div>
+
+        <div class="col-span-2">
+            <select name="status" class="form-input !py-2.5">
+                <option value="">{% trans "Approbation" %}</option>
+                <option value="PENDING" {% if selected_status == 'PENDING' %}selected{% endif %}>{% trans "En attente" %}</option>
+                <option value="APPROVED" {% if selected_status == 'APPROVED' %}selected{% endif %}>{% trans "Approuvé" %}</option>
+                <option value="REJECTED" {% if selected_status == 'REJECTED' %}selected{% endif %}>{% trans "Rejeté" %}</option>
+                <option value="SUSPENDED" {% if selected_status == 'SUSPENDED' %}selected{% endif %}>{% trans "Suspendu" %}</option>
+            </select>
+        </div>
+
+        <div class="col-span-12 lg:col-span-2 flex items-stretch gap-2">
+            <button type="submit" class="btn btn-primary flex-1 !py-2.5">{% trans "Filtrer" %}</button>
+            {% if search_query or selected_payment_status or selected_activation_status or selected_status %}
+                <a href="{% url 'administration:garages' %}"
+                   class="btn btn-outline !px-3 !py-2.5"
+                   title="{% trans 'Réinitialiser' %}" aria-label="{% trans 'Réinitialiser' %}">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </a>
+            {% endif %}
+        </div>
+    </form>
+
+    {% comment %}Filtres mobile — recherche + panneau dépliable{% endcomment %}
+    <div class="md:hidden space-y-2">
+        <form method="get" class="flex gap-2">
+            <div class="relative flex-1">
+                
+                <input type="text" name="q" value="{{ search_query }}"
+                       class="form-input pl-9"
+                       placeholder="{% trans 'Rechercher…' %}">
+            </div>
+            <button type="button" id="mobile-filter-toggle"
+                    class="btn btn-outline !px-3 flex-shrink-0"
+                    aria-expanded="false" aria-controls="mobile-filter-panel"
+                    aria-label="{% trans 'Filtres' %}">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
+                </svg>
+                {% if selected_payment_status or selected_activation_status or selected_status %}
+                    <span class="w-1.5 h-1.5 rounded-full bg-navy-500"></span>
+                {% endif %}
+            </button>
+            <button type="submit" class="btn btn-primary !px-3 flex-shrink-0" aria-label="{% trans 'Rechercher' %}">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+            </button>
+        </form>
+
+        <div id="mobile-filter-panel" class="hidden bg-white rounded-xl shadow-card p-3 space-y-2.5">
             <div>
-                <label class="block text-sm font-medium text-navy-800 mb-1">{% trans "Recherche" %}</label>
-                <input type="text" name="q" value="{{ search_query }}" class="form-input" placeholder="{% trans 'Name or city...' %}">
+                <label class="block text-[11px] font-mono uppercase tracking-wider text-graphite-500 mb-1.5">{% trans "Approbation" %}</label>
+                <select name="status" form="mobile-garages-form" class="form-input">
+                    <option value="">{% trans "Toutes" %}</option>
+                    <option value="PENDING" {% if selected_status == 'PENDING' %}selected{% endif %}>{% trans "En attente" %}</option>
+                    <option value="APPROVED" {% if selected_status == 'APPROVED' %}selected{% endif %}>{% trans "Approuvé" %}</option>
+                    <option value="REJECTED" {% if selected_status == 'REJECTED' %}selected{% endif %}>{% trans "Rejeté" %}</option>
+                    <option value="SUSPENDED" {% if selected_status == 'SUSPENDED' %}selected{% endif %}>{% trans "Suspendu" %}</option>
+                </select>
             </div>
             <div>
-                <label class="block text-sm font-medium text-navy-800 mb-1">{% trans "Paiement" %}</label>
-                <select name="payment_status" class="form-input">
+                <label class="block text-[11px] font-mono uppercase tracking-wider text-graphite-500 mb-1.5">{% trans "Paiement" %}</label>
+                <select name="payment_status" form="mobile-garages-form" class="form-input">
                     <option value="">{% trans "Tous" %}</option>
                     <option value="UNPAID" {% if selected_payment_status == 'UNPAID' %}selected{% endif %}>{% trans "Non payé" %}</option>
                     <option value="PENDING" {% if selected_payment_status == 'PENDING' %}selected{% endif %}>{% trans "En attente" %}</option>
@@ -28,92 +140,225 @@
                 </select>
             </div>
             <div>
-                <label class="block text-sm font-medium text-navy-800 mb-1">{% trans "Activation" %}</label>
-                <select name="activation_status" class="form-input">
-                    <option value="">{% trans "Tous" %}</option>
+                <label class="block text-[11px] font-mono uppercase tracking-wider text-graphite-500 mb-1.5">{% trans "Activation" %}</label>
+                <select name="activation_status" form="mobile-garages-form" class="form-input">
+                    <option value="">{% trans "Toutes" %}</option>
                     <option value="INACTIVE" {% if selected_activation_status == 'INACTIVE' %}selected{% endif %}>{% trans "Inactif" %}</option>
                     <option value="ACTIVE" {% if selected_activation_status == 'ACTIVE' %}selected{% endif %}>{% trans "Actif" %}</option>
                     <option value="SUSPENDED" {% if selected_activation_status == 'SUSPENDED' %}selected{% endif %}>{% trans "Suspendu" %}</option>
                 </select>
             </div>
-            <div>
-                <label class="block text-sm font-medium text-navy-800 mb-1">{% trans "Statut" %}</label>
-                <select name="status" class="form-input">
-                    <option value="">{% trans "Tous" %}</option>
-                    <option value="PENDING" {% if selected_status == 'PENDING' %}selected{% endif %}>{% trans "En attente" %}</option>
-                    <option value="APPROVED" {% if selected_status == 'APPROVED' %}selected{% endif %}>{% trans "Approuvé" %}</option>
-                    <option value="REJECTED" {% if selected_status == 'REJECTED' %}selected{% endif %}>{% trans "Rejeté" %}</option>
-                    <option value="SUSPENDED" {% if selected_status == 'SUSPENDED' %}selected{% endif %}>{% trans "Suspendu" %}</option>
-                </select>
+            <div class="flex gap-2 pt-1">
+                <button type="submit" form="mobile-garages-form" class="btn btn-primary flex-1">{% trans "Appliquer" %}</button>
+                <a href="{% url 'administration:garages' %}" class="btn btn-outline flex-1">{% trans "Réinitialiser" %}</a>
             </div>
-            <button type="submit" class="btn bg-blue-500 hover:bg-blue-500/90 text-white">{% trans "Filtrer" %}</button>
+        </div>
+
+        <form id="mobile-garages-form" method="get" class="hidden">
+            <input type="hidden" name="q" value="{{ search_query }}">
         </form>
     </div>
 
-    <!-- Garages Table -->
-    <div class="card overflow-hidden">
-        <div class="overflow-x-auto">
+    {% comment %}Liste{% endcomment %}
+    <section class="bg-white rounded-xl shadow-card overflow-hidden">
+
+        <header class="flex items-center justify-between px-4 md:px-5 py-3.5 md:py-4">
+            <div class="min-w-0">
+                <h2 class="font-display font-bold text-sm md:text-base text-graphite-900 leading-tight">
+                    {% trans "Liste des garages" %}
+                </h2>
+                <p class="text-[11px] md:text-xs text-graphite-500 mt-0.5">
+                    {{ garages.paginator.count }} {% trans "résultat(s)" %}
+                </p>
+            </div>
+        </header>
+
+        {% comment %}Tableau desktop{% endcomment %}
+        <div class="hidden md:block overflow-x-auto">
             <table class="w-full text-sm">
-                <thead class="bg-steel-50">
-                    <tr class="text-left text-graphite-600">
-                        <th class="px-4 py-3">{% trans "Garage" %}</th>
-                        <th class="px-4 py-3">{% trans "Propriétaire" %}</th>
-                        <th class="px-4 py-3">{% trans "Ville" %}</th>
-                        <th class="px-4 py-3">{% trans "Approbation" %}</th>
-                        <th class="px-4 py-3">{% trans "Paiement" %}</th>
-                        <th class="px-4 py-3">{% trans "Activation" %}</th>
-                        <th class="px-4 py-3">{% trans "Actions" %}</th>
+                <thead>
+                    <tr class="bg-steel-50/60">
+                        <th class="text-left font-mono text-[10px] uppercase tracking-wider text-graphite-500 px-5 py-3">{% trans "Garage" %}</th>
+                        <th class="text-left font-mono text-[10px] uppercase tracking-wider text-graphite-500 px-5 py-3">{% trans "Propriétaire" %}</th>
+                        <th class="text-left font-mono text-[10px] uppercase tracking-wider text-graphite-500 px-5 py-3">{% trans "Ville" %}</th>
+                        <th class="text-left font-mono text-[10px] uppercase tracking-wider text-graphite-500 px-5 py-3">{% trans "Approbation" %}</th>
+                        <th class="text-left font-mono text-[10px] uppercase tracking-wider text-graphite-500 px-5 py-3">{% trans "Paiement" %}</th>
+                        <th class="text-left font-mono text-[10px] uppercase tracking-wider text-graphite-500 px-5 py-3">{% trans "Activation" %}</th>
+                        <th class="text-right font-mono text-[10px] uppercase tracking-wider text-graphite-500 px-5 py-3">{% trans "Action" %}</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y">
+                <tbody class="divide-y divide-line-200">
                     {% for garage in garages %}
-                        <tr class="hover:bg-steel-50">
-                            <td class="px-4 py-3">
-                                <div class="font-medium">{{ garage.name }}</div>
-                                <div class="text-xs text-graphite-600">{{ garage.city.name }}</div>
+                        <tr class="hover:bg-steel-50/60 transition-colors">
+                            <td class="px-5 py-3">
+                                <div class="flex items-center gap-3 min-w-0">
+                                    <span class="w-9 h-9 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold flex-shrink-0">
+                                        {{ garage.name|first|upper }}
+                                    </span>
+                                    <div class="min-w-0">
+                                        <div class="font-semibold text-graphite-900 truncate">{{ garage.name }}</div>
+                                        <div class="text-xs text-graphite-500 truncate">{{ garage.city.name|default:"—" }}</div>
+                                    </div>
+                                </div>
                             </td>
-                            <td class="px-4 py-3">{{ garage.owner.username }}</td>
-                            <td class="px-4 py-3">{{ garage.city.name }}</td>
-                            <td class="px-4 py-3">
+                            <td class="px-5 py-3 text-graphite-600">{{ garage.owner.username }}</td>
+                            <td class="px-5 py-3 text-graphite-600">{{ garage.city.name|default:"—" }}</td>
+                            <td class="px-5 py-3">
                                 {% if garage.approval_status == 'APPROVED' %}
-                                    <span class="bg-blue-100 text-blue-500">{% trans "Approuvé" %}</span>
+                                    <span class="badge bg-emerald-50 text-emerald-700">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>{% trans "Approuvé" %}
+                                    </span>
                                 {% elif garage.approval_status == 'PENDING' %}
-                                    <span class="bg-blue-100 text-blue-600">{% trans "En attente" %}</span>
+                                    <span class="badge bg-navy-100 text-navy-700">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-navy-500 mr-1.5"></span>{% trans "En attente" %}
+                                    </span>
                                 {% elif garage.approval_status == 'REJECTED' %}
-                                    <span class="bg-blue-100 text-blue-600">{% trans "Rejeté" %}</span>
+                                    <span class="badge bg-red-50 text-red-700">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5"></span>{% trans "Rejeté" %}
+                                    </span>
+                                {% elif garage.approval_status == 'SUSPENDED' %}
+                                    <span class="badge bg-steel-50 text-graphite-600">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-graphite-500 mr-1.5"></span>{% trans "Suspendu" %}
+                                    </span>
                                 {% endif %}
                             </td>
-                            <td class="px-4 py-3">{{ garage.get_payment_status_display }}</td>
-                            <td class="px-4 py-3">{{ garage.get_activation_status_display }}</td>
-                            <td class="px-4 py-3">
-                                <a href="{% url 'administration:garage_verify' garage.pk %}" class="text-blue-500 hover:underline">{% trans "Examiner" %}</a>
+                            <td class="px-5 py-3 text-graphite-600 text-xs">{{ garage.get_payment_status_display }}</td>
+                            <td class="px-5 py-3 text-graphite-600 text-xs">{{ garage.get_activation_status_display }}</td>
+                            <td class="px-5 py-3 text-right">
+                                <a href="{% url 'administration:garage_verify' garage.pk %}"
+                                   class="inline-flex items-center gap-1 text-navy-500 font-semibold hover:text-navy-600 text-sm">
+                                    {% trans "Examiner" %}
+                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                    </svg>
+                                </a>
                             </td>
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="7" class="px-4 py-8 text-center text-graphite-600">{% trans "Aucun garage trouvé." %}</td>
+                            <td colspan="7" class="px-5 py-12 text-center">
+                                <div class="w-12 h-12 mx-auto mb-3 rounded-lg bg-steel-50 flex items-center justify-center text-graphite-500">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/>
+                                    </svg>
+                                </div>
+                                <p class="text-sm text-graphite-500">{% trans "Aucun garage trouvé." %}</p>
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
 
-        <!-- Pagination -->
+        {% comment %}Cartes mobile{% endcomment %}
+        <ul class="md:hidden divide-y divide-line-200">
+            {% for garage in garages %}
+                <li>
+                    <a href="{% url 'administration:garage_verify' garage.pk %}" class="block px-4 py-3.5 active:bg-steel-50 transition-colors">
+                        <div class="flex items-start gap-3">
+                            <span class="w-11 h-11 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold flex-shrink-0">
+                                {{ garage.name|first|upper }}
+                            </span>
+                            <div class="min-w-0 flex-1">
+                                <div class="flex items-start justify-between gap-2">
+                                    <div class="min-w-0 flex-1">
+                                        <div class="font-semibold text-sm text-graphite-900 truncate leading-tight">{{ garage.name }}</div>
+                                        <div class="text-xs text-graphite-500 truncate mt-0.5">{{ garage.owner.username }}</div>
+                                    </div>
+                                    <svg class="w-4 h-4 text-graphite-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                    </svg>
+                                </div>
+
+                                <div class="mt-2 flex flex-wrap items-center gap-1.5">
+                                    {% if garage.approval_status == 'APPROVED' %}
+                                        <span class="badge bg-emerald-50 text-emerald-700">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>{% trans "Approuvé" %}
+                                        </span>
+                                    {% elif garage.approval_status == 'PENDING' %}
+                                        <span class="badge bg-navy-100 text-navy-700">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-navy-500 mr-1.5"></span>{% trans "En attente" %}
+                                        </span>
+                                    {% elif garage.approval_status == 'REJECTED' %}
+                                        <span class="badge bg-red-50 text-red-700">
+                                            <span class="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5"></span>{% trans "Rejeté" %}
+                                        </span>
+                                    {% elif garage.approval_status == 'SUSPENDED' %}
+                                        <span class="badge bg-steel-50 text-graphite-600">{% trans "Suspendu" %}</span>
+                                    {% endif %}
+                                    <span class="badge bg-steel-50 text-graphite-600">{{ garage.get_payment_status_display }}</span>
+                                    <span class="badge bg-steel-50 text-graphite-600">{{ garage.get_activation_status_display }}</span>
+                                </div>
+
+                                <div class="mt-2 flex items-center gap-3 text-[11px] text-graphite-500">
+                                    <span class="inline-flex items-center gap-1 min-w-0">
+                                        <svg class="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                        </svg>
+                                        <span class="truncate">{{ garage.city.name|default:"—" }}</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+            {% empty %}
+                <li class="p-8 text-center">
+                    <div class="w-12 h-12 mx-auto mb-3 rounded-lg bg-steel-50 flex items-center justify-center text-graphite-500">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                  d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16"/>
+                        </svg>
+                    </div>
+                    <p class="text-sm text-graphite-500">{% trans "Aucun garage trouvé." %}</p>
+                </li>
+            {% endfor %}
+        </ul>
+
+        {% comment %}Pagination{% endcomment %}
         {% if garages.has_other_pages %}
-            <div class="px-4 py-3 border-t flex justify-between items-center">
-                <span class="text-sm text-graphite-600">
-                    {% trans "Page" %} {{ garages.number }} {% trans "sur" %} {{ garages.paginator.num_pages }}
+            <div class="px-4 md:px-5 py-3 md:py-3.5 flex items-center justify-between gap-2">
+                <span class="text-xs md:text-sm text-graphite-500">
+                    <span class="font-semibold text-graphite-900">{{ garages.number }}</span> / {{ garages.paginator.num_pages }}
                 </span>
-                <div class="flex space-x-2">
+                <div class="flex gap-2">
                     {% if garages.has_previous %}
-                        <a href="?page={{ garages.previous_page_number }}" class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 text-sm py-1 px-3">{% trans "Précédent" %}</a>
+                        <a href="?page={{ garages.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_payment_status %}&payment_status={{ selected_payment_status }}{% endif %}{% if selected_activation_status %}&activation_status={{ selected_activation_status }}{% endif %}"
+                           class="btn btn-outline btn-sm" aria-label="{% trans 'Précédent' %}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                            </svg>
+                            <span class="hidden sm:inline">{% trans "Précédent" %}</span>
+                        </a>
                     {% endif %}
                     {% if garages.has_next %}
-                        <a href="?page={{ garages.next_page_number }}" class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 text-sm py-1 px-3">{% trans "Suivant" %}</a>
+                        <a href="?page={{ garages.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_payment_status %}&payment_status={{ selected_payment_status }}{% endif %}{% if selected_activation_status %}&activation_status={{ selected_activation_status }}{% endif %}"
+                           class="btn btn-outline btn-sm" aria-label="{% trans 'Suivant' %}">
+                            <span class="hidden sm:inline">{% trans "Suivant" %}</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </a>
                     {% endif %}
                 </div>
             </div>
         {% endif %}
-    </div>
+
+    </section>
 </div>
+
+<script>
+(function () {
+    var toggle = document.getElementById('mobile-filter-toggle');
+    var panel = document.getElementById('mobile-filter-panel');
+    if (!toggle || !panel) return;
+    toggle.addEventListener('click', function () {
+        var hidden = panel.classList.contains('hidden');
+        panel.classList.toggle('hidden', !hidden);
+        toggle.setAttribute('aria-expanded', hidden ? 'true' : 'false');
+    });
+})();
+</script>
 {% endblock %}

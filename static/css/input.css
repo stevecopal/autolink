@@ -17,7 +17,7 @@ section[id] {
 
 body {
   font-feature-settings: "ss01";
-  @apply bg-white text-graphite-900 font-body antialiased;
+  @apply bg-gray-50 text-gray-900 font-body antialiased;
 }
 
 :focus-visible {
@@ -29,10 +29,10 @@ body {
    Components
    ============================================================ */
 
-/* Technical corner-bracket panel, used for cards throughout the page */
+/* Technical corner-bracket panel */
 .tech-panel {
   position: relative;
-  border: 1px solid #D7DCE1;
+  border: 1px solid #E5E7EB;
   --accent-color: #000080;
 }
 
@@ -57,14 +57,6 @@ body {
   right: -1px;
   border-bottom: 2px solid var(--accent-color);
   border-right: 2px solid var(--accent-color);
-}
-
-.tech-panel[data-accent="orange"] {
-  --accent-color: #000080;
-}
-
-.tech-panel[data-accent="blue"] {
-  --accent-color: #000080;
 }
 
 .blueprint-grid {
@@ -107,15 +99,32 @@ body {
    Buttons
    ============================================================ */
 .btn {
-  @apply font-bold px-6 py-3 rounded-lg transition-all duration-200 active:scale-[0.98] inline-flex items-center justify-center gap-2;
-  min-height: 2.75rem;
+  @apply font-semibold px-5 py-2.5 rounded-lg transition-all duration-200 active:scale-[0.98] inline-flex items-center justify-center gap-2;
+  min-height: 2.5rem;
+}
+
+.btn-sm {
+  @apply px-3 py-1.5 text-sm;
+  min-height: 2rem;
+}
+
+.btn-primary {
+  @apply bg-navy-500 hover:bg-navy-600 text-white shadow-sm;
+}
+
+.btn-outline {
+  @apply bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300;
+}
+
+.btn-danger {
+  @apply bg-red-500 hover:bg-red-600 text-white;
 }
 
 /* ============================================================
    Form Inputs
    ============================================================ */
 .form-input {
-  @apply w-full px-4 py-3 border border-line-200 rounded-lg focus:ring-2 focus:ring-navy-500 focus:border-navy-500 outline-none transition-all duration-200 font-mono bg-white;
+  @apply w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-navy-500 focus:border-navy-500 outline-none transition-all duration-200 font-body bg-white text-gray-900;
 }
 
 select.form-input {
@@ -141,59 +150,59 @@ input[type="file"] {
 }
 
 .form-label {
-  @apply block text-sm font-bold text-graphite-900 mb-2;
+  @apply block text-sm font-semibold text-gray-900 mb-2;
 }
 
 .form-error {
-  @apply text-navy-600 text-sm mt-1;
+  @apply text-red-600 text-sm mt-1.5;
 }
 
 /* ============================================================
    Cards
    ============================================================ */
 .card {
-  @apply bg-white rounded-xl shadow-card border border-line-200/50 overflow-hidden hover:shadow-card-hover transition-all duration-200;
+  @apply bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all duration-200;
 }
 
 /* ============================================================
    Badges
    ============================================================ */
 .badge {
-  @apply text-xs font-bold px-2.5 py-0.5 rounded-full inline-flex items-center;
+  @apply text-xs font-semibold px-2.5 py-0.5 rounded-lg inline-flex items-center;
 }
 
 .badge-success {
-  @apply bg-navy-100 text-navy-500;
+  @apply bg-emerald-50 text-emerald-700;
 }
 
 .badge-warning {
-  @apply bg-navy-100 text-navy-600;
+  @apply bg-amber-50 text-amber-700;
 }
 
 .badge-error {
-  @apply bg-navy-100 text-navy-700;
+  @apply bg-red-50 text-red-700;
 }
 
 .badge-info {
-  @apply bg-navy-100 text-navy-500;
+  @apply bg-blue-50 text-blue-700;
 }
 
 /* ============================================================
    Navigation
    ============================================================ */
 .nav-link {
-  @apply hover:text-navy-800 transition-all duration-200;
+  @apply hover:text-gray-900 transition-all duration-200;
 }
 
 .nav-link-active {
-  @apply text-navy-800;
+  @apply text-gray-900;
 }
 
 /* ============================================================
    Tables
    ============================================================ */
 .table-container {
-  @apply overflow-x-auto rounded-xl border border-line-200/50;
+  @apply overflow-x-auto rounded-xl border border-gray-200;
 }
 
 .table {
@@ -201,37 +210,37 @@ input[type="file"] {
 }
 
 .table th {
-  @apply px-4 py-3 text-left font-bold text-white bg-navy-800 border-b border-line-200;
+  @apply px-4 py-3 text-left font-semibold text-gray-600 bg-gray-50 border-b border-gray-200;
 }
 
 .table td {
-  @apply px-4 py-3 border-b border-line-200;
+  @apply px-4 py-3 border-b border-gray-100;
 }
 
 .table tr:hover td {
-  @apply bg-steel-50;
+  @apply bg-gray-50;
 }
 
 /* ============================================================
    Stats Cards
    ============================================================ */
 .stat-card {
-  @apply bg-white rounded-xl p-5 border border-line-200/50 shadow-card;
+  @apply bg-white rounded-xl p-5 border border-gray-200 shadow-sm;
 }
 
 .stat-value {
-  @apply text-2xl md:text-3xl font-bold text-navy-800;
+  @apply text-2xl md:text-3xl font-bold text-gray-900;
 }
 
 .stat-label {
-  @apply text-sm text-graphite-600 mt-1;
+  @apply text-sm text-gray-500 mt-1;
 }
 
 /* ============================================================
    Section Headers
    ============================================================ */
 .section-header {
-  @apply bg-navy-800 text-white py-6 md:py-8;
+  @apply bg-gray-900 text-white py-6 md:py-8;
 }
 
 /* ============================================================
@@ -242,15 +251,15 @@ input[type="file"] {
 }
 
 .status-available {
-  @apply bg-navy-500;
+  @apply bg-emerald-500;
 }
 
 .status-busy {
-  @apply bg-navy-500;
+  @apply bg-amber-500;
 }
 
 .status-closed {
-  @apply bg-navy-700;
+  @apply bg-gray-400;
 }
 
 /* ============================================================
@@ -316,7 +325,7 @@ input[type="file"] {
   max-width: 24rem;
   background: #ffffff;
   border-radius: 0.75rem;
-  border: 1px solid #D7DCE1;
+  border: 1px solid #E5E7EB;
   box-shadow: 0 20px 60px -12px rgba(0, 0, 0, 0.25);
   display: flex;
   flex-direction: column;
@@ -330,14 +339,14 @@ input[type="file"] {
   align-items: center;
   justify-content: space-between;
   padding: 1rem 1.25rem;
-  border-bottom: 1px solid #D7DCE1;
+  border-bottom: 1px solid #E5E7EB;
   flex-shrink: 0;
 }
 
 .al-modal-title {
   font-size: 1.125rem;
   font-weight: 700;
-  color: #000080;
+  color: #111827;
   margin: 0;
 }
 
@@ -347,12 +356,12 @@ input[type="file"] {
   cursor: pointer;
   padding: 0.25rem;
   border-radius: 0.375rem;
-  color: #000080;
+  color: #6B7280;
   transition: background-color 150ms ease;
 }
 
 .al-modal-close:hover {
-  background-color: #F5F5FC;
+  background-color: #F3F4F6;
 }
 
 .al-modal-body {
@@ -362,7 +371,7 @@ input[type="file"] {
 }
 
 .al-modal-body .form-input {
-  border-color: #D7DCE1;
+  border-color: #E5E7EB;
 }
 
 .al-modal-body .form-input:focus {
@@ -371,7 +380,7 @@ input[type="file"] {
 }
 
 .al-modal-body .form-error {
-  color: #00006B;
+  color: #DC2626;
   font-size: 0.875rem;
   margin-top: 0.25rem;
 }
@@ -382,7 +391,7 @@ input[type="file"] {
   justify-content: flex-end;
   gap: 0.75rem;
   padding: 1rem 1.25rem;
-  border-top: 1px solid #D7DCE1;
+  border-top: 1px solid #E5E7EB;
   flex-shrink: 0;
 }
 
@@ -412,9 +421,9 @@ input[type="file"] {
 
 /* Confirmation prompt styling consistency */
 .admin-confirm-banner {
-  background-color: #F5F5FC;
-  border: 1px solid #000080;
-  color: #00006B;
+  background-color: #F3F4F6;
+  border: 1px solid #E5E7EB;
+  color: #374151;
   padding: 0.625rem 1rem;
   border-radius: 0.5rem;
   font-size: 0.875rem;
@@ -489,3 +498,5 @@ input[type="file"] {
     white-space: normal;
   }
 }
+
+
