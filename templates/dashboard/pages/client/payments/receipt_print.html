@@ -9,7 +9,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f5f5; padding: 20px; }
         .receipt { max-width: 600px; margin: 0 auto; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .header { background: linear-gradient(135deg, #762011, #C47A24); color: white; padding: 30px; text-align: center; }
+        .header { background: linear-gradient(135deg, #000080, #1e40af); color: white; padding: 30px; text-align: center; }
         .header h1 { font-size: 24px; margin-bottom: 5px; }
         .header p { opacity: 0.9; font-size: 14px; }
         .body { padding: 30px; }
@@ -18,7 +18,7 @@
         .label { color: #666; font-size: 14px; }
         .value { font-weight: bold; color: #1c1c1c; font-size: 14px; text-align: right; }
         .total { background: #f8f8f8; margin: 20px -30px -30px; padding: 20px 30px; text-align: center; }
-        .total .amount { font-size: 32px; font-weight: bold; color: #762011; }
+        .total .amount { font-size: 32px; font-weight: bold; color: #000080; }
         .total .currency { font-size: 16px; color: #666; }
         .footer { text-align: center; padding: 20px; color: #999; font-size: 12px; border-top: 1px solid #f0f0f0; }
         .badge { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; }
@@ -79,7 +79,7 @@
             Imprimer / Telecharger en PDF
         </button>
         <br><br>
-        <a href="{% url 'payments:payment_detail' receipt.payment.pk %}" style="color: #762011; text-decoration: none; font-size: 14px;">
+        <a href="{% url 'payments:payment_detail' receipt.payment.pk %}" style="color: #000080; text-decoration: none; font-size: 14px;">
             ← Retour au detail du paiement
         </a>
     </div>

@@ -4,224 +4,255 @@
 {% block title %}{% trans "Mon Dashboard" %} - AutoLink{% endblock %}
 
 {% block dashboard_header %}
-    {% trans "Tableau de bord" %}
+    <h1 class="text-sm font-bold text-navy-900">{% trans "Tableau de bord" %}</h1>
+{% endblock %}
+
+{% block dashboard_breadcrumb %}
+    <nav class="hidden sm:flex items-center space-x-2 text-sm text-graphite-600">
+        <span class="font-bold text-navy-900">{% trans "Tableau de bord" %}</span>
+    </nav>
 {% endblock %}
 
 {% block content %}
-<div class="space-y-6">
+<div class="space-y-4 md:space-y-6">
 
-    <!-- Header avec bienvenue -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-            <h2 class="font-display text-2xl font-bold text-gray-900">{% trans "Bienvenue" %}, {{ user.display_name }}</h2>
-            <p class="text-gray-500 text-sm mt-1">{% trans "Gérez vos garages, suivez vos paiements et restez informé." %}</p>
+    {% comment %}En-tête de page{% endcomment %}
+    <header class="flex items-center justify-between gap-3 flex-wrap">
+        <div class="min-w-0">
+            <h1 class="font-display font-bold text-xl md:text-3xl text-graphite-900 leading-tight truncate">
+                {% trans "Bienvenue" %}, {{ user.display_name }}
+            </h1>
+            <p class="text-xs md:text-sm text-graphite-500 mt-1">
+                {% trans "Gérez vos garages, suivez vos paiements et restez informé." %}
+            </p>
         </div>
-        <div class="flex flex-wrap gap-2">
-            <a href="{% url 'garages:garage_create' %}" class="btn btn-primary">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
-                {% trans "Ajouter un garage" %}
+
+        <div class="flex items-center gap-2 flex-shrink-0">
+            <a href="{% url 'garages:garage_my_list' %}" class="btn btn-outline btn-sm md:inline-flex">{% trans "Mes garages" %}</a>
+            <a href="{% url 'garages:garage_create' %}" class="btn btn-primary btn-sm md:px-5" aria-label="{% trans 'Ajouter un garage' %}">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                </svg>
+                <span class="hidden sm:inline">{% trans "Ajouter un garage" %}</span>
             </a>
-            <a href="{% url 'garages:garage_my_list' %}" class="btn btn-outline">{% trans "Mes garages" %}</a>
+        </div>
+    </header>
+
+    {% comment %}KPIs — sans bordures{% endcomment %}
+    <div class="grid grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4">
+        {% comment %}Total payé{% endcomment %}
+        <div class="bg-white rounded-xl p-3.5 md:p-5 shadow-card">
+            <div class="flex items-start justify-between gap-2">
+                <div class="w-9 h-9 md:w-11 md:h-11 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <span class="hidden md:inline font-mono text-[10px] uppercase tracking-wider text-graphite-500">Total</span>
+            </div>
+            <div class="mt-2.5 md:mt-4">
+                <div class="font-display font-bold text-xl md:text-3xl text-graphite-900 tabular-nums leading-none truncate">{{ total_paid|intcomma }}</div>
+                <div class="text-[11px] md:text-sm text-graphite-500 mt-1.5 truncate">{% trans "Total payé (FCFA)" %}</div>
+            </div>
+        </div>
+
+        {% comment %}Paiements{% endcomment %}
+        <div class="bg-white rounded-xl p-3.5 md:p-5 shadow-card">
+            <div class="flex items-start justify-between gap-2">
+                <div class="w-9 h-9 md:w-11 md:h-11 rounded-lg bg-navy-50 text-navy-500 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                    </svg>
+                </div>
+                <span class="hidden md:inline font-mono text-[10px] uppercase tracking-wider text-graphite-500">Compteur</span>
+            </div>
+            <div class="mt-2.5 md:mt-4">
+                <div class="font-display font-bold text-xl md:text-3xl text-graphite-900 tabular-nums leading-none truncate">{{ total_payments|intcomma }}</div>
+                <div class="text-[11px] md:text-sm text-graphite-500 mt-1.5 truncate">{% trans "Paiements" %}</div>
+            </div>
+        </div>
+
+        {% comment %}Garages{% endcomment %}
+        <div class="bg-white rounded-xl p-3.5 md:p-5 shadow-card">
+            <div class="flex items-start justify-between gap-2">
+                <div class="w-9 h-9 md:w-11 md:h-11 rounded-lg bg-navy-50 text-navy-500 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                    </svg>
+                </div>
+                <span class="hidden md:inline font-mono text-[10px] uppercase tracking-wider text-graphite-500">{{ active_garages }} {% trans "actifs" %}</span>
+            </div>
+            <div class="mt-2.5 md:mt-4">
+                <div class="font-display font-bold text-xl md:text-3xl text-graphite-900 tabular-nums leading-none truncate">{{ user_garages.count }}</div>
+                <div class="text-[11px] md:text-sm text-graphite-500 mt-1.5 truncate">{% trans "Garages" %}</div>
+            </div>
+        </div>
+
+        {% comment %}À activer{% endcomment %}
+        <div class="bg-white rounded-xl p-3.5 md:p-5 shadow-card">
+            <div class="flex items-start justify-between gap-2">
+                <div class="w-9 h-9 md:w-11 md:h-11 rounded-lg bg-navy-100 text-navy-700 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <span class="hidden md:inline font-mono text-[10px] uppercase tracking-wider text-graphite-500">{% trans "À payer" %}</span>
+            </div>
+            <div class="mt-2.5 md:mt-4">
+                <div class="font-display font-bold text-xl md:text-3xl text-graphite-900 tabular-nums leading-none truncate">{{ pending_payment_garages|intcomma }}</div>
+                <div class="text-[11px] md:text-sm text-graphite-500 mt-1.5 truncate">{% trans "À activer" %}</div>
+            </div>
         </div>
     </div>
 
-    <!-- KPI Cards -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <!-- Total payé -->
-        <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                </div>
-                <div class="min-w-0">
-                    <div class="text-2xl font-bold text-gray-900">{{ total_paid|intcomma }}</div>
-                    <div class="text-sm text-gray-500">{% trans "Total payé (FCFA)" %}</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Paiements -->
-        <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-                </div>
-                <div class="min-w-0">
-                    <div class="text-2xl font-bold text-gray-900">{{ total_payments }}</div>
-                    <div class="text-sm text-gray-500">{% trans "Paiements" %}</div>
-                </div>
-            </div>
-            <div class="mt-3 pt-3 border-t border-gray-100">
-                <a href="{% url 'payments:payment_list' %}" class="text-sm font-semibold text-navy-500 hover:text-navy-600">{% trans "Voir tout" %}</a>
-            </div>
-        </div>
-
-        <!-- Garages -->
-        <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                </div>
-                <div class="min-w-0">
-                    <div class="text-2xl font-bold text-gray-900">{{ user_garages.count }}</div>
-                    <div class="text-sm text-gray-500">{% trans "Garages" %}</div>
-                </div>
-            </div>
-            <div class="mt-3 pt-3 border-t border-gray-100">
-                <div class="flex items-center gap-1.5 text-sm">
-                    <span class="inline-flex items-center gap-1 text-emerald-600 font-semibold">{{ active_garages }}</span>
-                    <span class="text-gray-400">{% trans "actifs" %}</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- À activer -->
-        <div class="bg-white rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                </div>
-                <div class="min-w-0">
-                    <div class="text-2xl font-bold text-gray-900">{{ pending_payment_garages }}</div>
-                    <div class="text-sm text-gray-500">{% trans "À activer" %}</div>
-                </div>
-            </div>
-            <div class="mt-3 pt-3 border-t border-gray-100">
-                <span class="text-sm text-amber-600 font-medium">{% trans "En attente de paiement" %}</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Mes garages -->
+    {% comment %}Mes garages{% endcomment %}
     {% if user_garages %}
-    <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
-        <div class="flex items-center justify-between p-5 border-b border-gray-100">
-            <h2 class="font-display font-bold text-gray-900">{% trans "Mes garages" %}</h2>
-            <a href="{% url 'garages:garage_my_list' %}" class="text-sm font-semibold text-navy-500 hover:text-navy-600">{% trans "Gérer" %}</a>
-        </div>
-        <div class="p-5">
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {% for garage in user_garages %}
-                <div class="border border-gray-200 rounded-xl overflow-hidden bg-white hover:border-gray-300 hover:shadow-md transition-all">
-                    <div class="flex items-center gap-4 p-4">
-                        {% if garage.photo %}
-                        <img src="{{ garage.photo.url }}" alt="{{ garage.name }}" class="w-12 h-12 rounded-xl object-cover border border-gray-200 flex-shrink-0">
-                        {% else %}
-                        <span class="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0">
-                            <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                        </span>
-                        {% endif %}
-                        <div class="min-w-0 flex-1">
-                            <div class="font-semibold text-gray-900 truncate">{{ garage.name }}</div>
-                            <div class="text-xs text-gray-500 truncate">{{ garage.neighborhood.name|default:garage.city.name }}</div>
+        <section class="bg-white rounded-xl shadow-card overflow-hidden">
+            <header class="flex items-center justify-between px-4 md:px-5 py-3.5 md:py-4 border-b border-line-200">
+                <h2 class="font-display font-bold text-graphite-900 text-sm md:text-base">{% trans "Mes garages" %}</h2>
+                <a href="{% url 'garages:garage_my_list' %}" class="text-xs md:text-sm font-semibold text-navy-600 hover:text-navy-700">{% trans "Gérer" %}</a>
+            </header>
+            <div class="p-4 md:p-5">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+                    {% for garage in user_garages %}
+                        <div class="bg-white rounded-xl shadow-card p-4 hover:shadow-card-hover transition-shadow">
+                            <div class="flex items-center gap-3">
+                                {% if garage.photo %}
+                                    <img src="{{ garage.photo.url }}" alt="{{ garage.name }}" class="w-11 h-11 md:w-12 md:h-12 rounded-lg object-cover flex-shrink-0">
+                                {% else %}
+                                    <span class="w-11 h-11 md:w-12 md:h-12 rounded-lg bg-navy-100 text-navy-600 flex items-center justify-center flex-shrink-0">
+                                        <svg class="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                                        </svg>
+                                    </span>
+                                {% endif %}
+                                <div class="min-w-0 flex-1">
+                                    <div class="font-semibold text-sm text-graphite-900 truncate">{{ garage.name }}</div>
+                                    <div class="text-xs text-graphite-500 truncate">{{ garage.neighborhood.name|default:garage.city.name }}</div>
+                                </div>
+                            </div>
+                            <div class="mt-3 mb-3">
+                                {% if garage.activation_status == 'ACTIVE' %}
+                                    <span class="badge bg-emerald-50 text-emerald-700"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>{% trans "Actif" %}</span>
+                                {% elif garage.payment_status == 'UNPAID' and garage.approval_status == 'APPROVED' %}
+                                    <span class="badge bg-navy-100 text-navy-700"><span class="w-1.5 h-1.5 rounded-full bg-navy-500 mr-1.5"></span>{% trans "À payer" %}</span>
+                                {% elif garage.approval_status == 'PENDING' %}
+                                    <span class="badge bg-navy-100 text-navy-700"><span class="w-1.5 h-1.5 rounded-full bg-navy-500 mr-1.5"></span>{% trans "En attente" %}</span>
+                                {% elif garage.approval_status == 'REJECTED' %}
+                                    <span class="badge bg-red-50 text-red-700"><span class="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5"></span>{% trans "Rejeté" %}</span>
+                                {% else %}
+                                    <span class="badge bg-steel-50 text-graphite-600"><span class="w-1.5 h-1.5 rounded-full bg-graphite-500 mr-1.5"></span>{{ garage.get_activation_status_display }}</span>
+                                {% endif %}
+                            </div>
+                            <div class="flex items-center gap-2">
+                                {% if garage.approval_status == 'APPROVED' and garage.payment_status == 'UNPAID' %}
+                                    <a href="{% url 'garages:garage_dashboard' %}" class="btn btn-primary btn-sm flex-1">{% trans "Payer" %}</a>
+                                {% endif %}
+                                {% if garage.approval_status == 'APPROVED' %}
+                                    <a href="{% url 'garages:garage_detail' slug=garage.slug %}" class="btn btn-outline btn-sm flex-1">{% trans "Voir public" %}</a>
+                                {% endif %}
+                            </div>
                         </div>
-                    </div>
-                    <div class="px-4 pb-4">
-                        <div class="mb-3">
-                            {% if garage.activation_status == 'ACTIVE' %}
-                            <span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 text-xs font-semibold px-2.5 py-1 rounded-lg">{% trans "Actif" %}</span>
-                            {% elif garage.payment_status == 'UNPAID' and garage.approval_status == 'APPROVED' %}
-                            <span class="inline-flex items-center gap-1 bg-amber-50 text-amber-700 text-xs font-semibold px-2.5 py-1 rounded-lg">{% trans "À payer" %}</span>
-                            {% elif garage.approval_status == 'PENDING' %}
-                            <span class="inline-flex items-center gap-1 bg-blue-50 text-blue-700 text-xs font-semibold px-2.5 py-1 rounded-lg">{% trans "En attente" %}</span>
-                            {% elif garage.approval_status == 'REJECTED' %}
-                            <span class="inline-flex items-center gap-1 bg-red-50 text-red-700 text-xs font-semibold px-2.5 py-1 rounded-lg">{% trans "Rejeté" %}</span>
-                            {% else %}
-                            <span class="inline-flex items-center gap-1 bg-gray-100 text-gray-700 text-xs font-semibold px-2.5 py-1 rounded-lg">{{ garage.get_activation_status_display }}</span>
-                            {% endif %}
-                        </div>
-                        <div class="flex items-center gap-2">
-                            {% if garage.approval_status == 'APPROVED' and garage.payment_status == 'UNPAID' %}
-                            <a href="{% url 'garages:garage_dashboard' %}" class="btn btn-primary btn-sm flex-1">{% trans "Payer" %}</a>
-                            {% endif %}
-                            {% if garage.approval_status == 'APPROVED' %}
-                            <a href="{% url 'garages:garage_detail' slug=garage.slug %}" class="btn btn-outline btn-sm flex-1">{% trans "Voir public" %}</a>
-                            {% endif %}
-                        </div>
-                    </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
             </div>
-        </div>
-    </div>
+        </section>
     {% else %}
-    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-8 text-center">
-        <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gray-100 flex items-center justify-center">
-            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-        </div>
-        <h3 class="font-display text-lg font-bold text-gray-900 mb-2">{% trans "Aucun garage" %}</h3>
-        <p class="text-gray-500 text-sm mb-6">{% trans "Créez votre premier garage pour démarrer." %}</p>
-        <a href="{% url 'garages:garage_create' %}" class="btn btn-primary">{% trans "Ajouter un garage" %}</a>
-    </div>
+        <section class="bg-white rounded-xl shadow-card p-8 text-center">
+            <div class="w-12 h-12 mx-auto mb-3 rounded-lg bg-navy-50 flex items-center justify-center text-navy-500">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                </svg>
+            </div>
+            <h3 class="font-display font-bold text-graphite-900 mb-2">{% trans "Aucun garage" %}</h3>
+            <p class="text-sm text-graphite-500 mb-4">{% trans "Ajoutez votre premier garage pour commencer." %}</p>
+            <a href="{% url 'garages:garage_create' %}" class="btn btn-primary">{% trans "Ajouter un garage" %}</a>
+        </section>
     {% endif %}
 
-    <!-- Paiements + Notifications -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-        <!-- Derniers paiements -->
-        <div class="lg:col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm">
-            <div class="flex items-center justify-between p-5 border-b border-gray-100">
-                <h2 class="font-display font-bold text-gray-900">{% trans "Derniers paiements" %}</h2>
-                <a href="{% url 'payments:payment_list' %}" class="text-sm font-semibold text-navy-500 hover:text-navy-600">{% trans "Voir tout" %}</a>
-            </div>
-            <div class="p-5">
-                {% if recent_payments %}
-                <div class="space-y-3">
-                    {% for payment in recent_payments %}
-                    <div class="flex items-center justify-between gap-4 p-4 rounded-xl border border-gray-200 hover:bg-gray-50 hover:border-gray-300 transition-all">
-                        <div class="min-w-0">
-                            <div class="font-semibold text-sm text-gray-900 truncate">{{ payment.garage.name|default:"-" }}</div>
-                            <div class="text-xs text-gray-500">{{ payment.created_at|date:"d/m/Y H:i" }}</div>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <span class="font-semibold text-sm text-gray-900">{{ payment.amount|intcomma }} {{ payment.currency }}</span>
-                            {% if payment.status == 'SUCCESS' %}
-                            <span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-700 text-xs font-semibold px-2.5 py-1 rounded-lg">{% trans "Payé" %}</span>
-                            {% elif payment.status == 'PENDING' or payment.status == 'PROCESSING' %}
-                            <span class="inline-flex items-center gap-1 bg-amber-50 text-amber-700 text-xs font-semibold px-2.5 py-1 rounded-lg">{% trans "En cours" %}</span>
-                            {% else %}
-                            <span class="inline-flex items-center gap-1 bg-gray-100 text-gray-700 text-xs font-semibold px-2.5 py-1 rounded-lg">{{ payment.get_status_display }}</span>
-                            {% endif %}
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-                {% else %}
-                <div class="text-center py-8 text-gray-500">
-                    <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-                    <p class="text-sm">{% trans "Aucun paiement pour le moment." %}</p>
-                </div>
-                {% endif %}
-            </div>
-        </div>
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
 
-        <!-- Notifications -->
-        <div class="bg-white rounded-xl border border-gray-200 shadow-sm">
-            <div class="flex items-center justify-between p-5 border-b border-gray-100">
-                <h2 class="font-display font-bold text-gray-900">{% trans "Notifications" %}</h2>
-                <a href="{% url 'accounts:notifications' %}" class="text-sm font-semibold text-navy-500 hover:text-navy-600">{% trans "Voir tout" %}</a>
-            </div>
-            <div class="p-5">
-                {% if notifications %}
-                <div class="space-y-3">
-                    {% for notif in notifications %}
-                    <a href="{% url 'accounts:notification_mark_read' notification_id=notif.pk %}" class="block p-3 rounded-lg border border-gray-200 hover:bg-gray-50 hover:border-gray-300 transition-all">
-                        <div class="flex items-center gap-2">
-                            {% if not notif.is_read %}<span class="w-2 h-2 rounded-full bg-navy-500 flex-shrink-0"></span>{% endif %}
-                            <div class="font-semibold text-sm text-gray-900 truncate">{{ notif.title }}</div>
-                        </div>
-                        <p class="text-xs text-gray-500 mt-1.5 line-clamp-2">{{ notif.message }}</p>
-                        <div class="text-[11px] text-gray-400 mt-1.5">{{ notif.created_at|timesince }}</div>
-                    </a>
-                    {% endfor %}
-                </div>
+        {% comment %}Paiements récents{% endcomment %}
+        <section class="bg-white rounded-xl shadow-card overflow-hidden">
+            <header class="flex items-center justify-between px-4 md:px-5 py-3.5 md:py-4 border-b border-line-200">
+                <h2 class="font-display font-bold text-graphite-900 text-sm md:text-base">{% trans "Paiements récents" %}</h2>
+                <a href="{% url 'payments:payment_list' %}" class="text-xs md:text-sm font-semibold text-navy-600 hover:text-navy-700">{% trans "Voir tout" %}</a>
+            </header>
+            <div class="p-4 md:p-5">
+                {% if recent_payments %}
+                    <ul class="space-y-2.5">
+                        {% for payment in recent_payments %}
+                            <li>
+                                <a href="{% url 'payments:payment_detail' payment.pk %}" class="flex items-center justify-between gap-3 p-3 rounded-lg bg-steel-50 hover:bg-navy-50 transition-colors">
+                                    <div class="min-w-0 flex-1">
+                                        <div class="font-medium text-sm text-graphite-900 truncate">{{ payment.garage.name|default:"—" }}</div>
+                                        <div class="text-xs text-graphite-500 truncate">{{ payment.created_at|date:"d/m/Y H:i" }}</div>
+                                    </div>
+                                    <div class="text-right flex-shrink-0">
+                                        <div class="font-display font-bold text-sm text-graphite-900 tabular-nums">{{ payment.amount|intcomma }} {{ payment.currency }}</div>
+                                        <div class="mt-1">
+                                            {% if payment.status == 'SUCCESS' %}
+                                                <span class="badge bg-emerald-50 text-emerald-700"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>{% trans "Payé" %}</span>
+                                            {% elif payment.status == 'PENDING' or payment.status == 'PROCESSING' %}
+                                                <span class="badge bg-navy-100 text-navy-700"><span class="w-1.5 h-1.5 rounded-full bg-navy-500 mr-1.5"></span>{% trans "En cours" %}</span>
+                                            {% elif payment.status == 'FAILED' %}
+                                                <span class="badge bg-red-50 text-red-700"><span class="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5"></span>{% trans "Échoué" %}</span>
+                                            {% else %}
+                                                <span class="badge bg-steel-50 text-graphite-600">{{ payment.get_status_display }}</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
                 {% else %}
-                <div class="text-center py-8 text-gray-500">
-                    <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/></svg>
-                    <p class="text-sm">{% trans "Aucune notification." %}</p>
-                </div>
+                    <div class="text-center py-8">
+                        <div class="w-12 h-12 mx-auto mb-3 rounded-lg bg-steel-50 flex items-center justify-center text-graphite-500">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                            </svg>
+                        </div>
+                        <p class="text-sm text-graphite-500">{% trans "Aucun paiement pour le moment." %}</p>
+                    </div>
                 {% endif %}
             </div>
-        </div>
+        </section>
+
+        {% comment %}Notifications{% endcomment %}
+        <section class="bg-white rounded-xl shadow-card overflow-hidden">
+            <header class="flex items-center justify-between px-4 md:px-5 py-3.5 md:py-4 border-b border-line-200">
+                <h2 class="font-display font-bold text-graphite-900 text-sm md:text-base">{% trans "Notifications" %}</h2>
+                <a href="{% url 'accounts:notifications' %}" class="text-xs md:text-sm font-semibold text-navy-600 hover:text-navy-700">{% trans "Voir tout" %}</a>
+            </header>
+            <div class="p-4 md:p-5">
+                {% if notifications %}
+                    <ul class="space-y-2.5">
+                        {% for notif in notifications %}
+                            <li>
+                                <a href="{% url 'accounts:notification_mark_read' notification_id=notif.pk %}" class="flex items-start gap-3 p-3 rounded-lg bg-steel-50 hover:bg-navy-50 transition-colors">
+                                    {% if not notif.is_read %}<span class="w-2 h-2 rounded-full bg-navy-500 flex-shrink-0 mt-1.5"></span>{% endif %}
+                                    <div class="min-w-0 flex-1">
+                                        <div class="font-semibold text-sm text-graphite-900 truncate">{{ notif.title }}</div>
+                                        <p class="text-xs text-graphite-500 mt-1 line-clamp-2">{{ notif.message }}</p>
+                                        <div class="text-[11px] text-graphite-500 mt-1.5">{{ notif.created_at|timesince }}</div>
+                                    </div>
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <div class="text-center py-8">
+                        <div class="w-12 h-12 mx-auto mb-3 rounded-lg bg-steel-50 flex items-center justify-center text-graphite-500">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"/>
+                            </svg>
+                        </div>
+                        <p class="text-sm text-graphite-500">{% trans "Aucune notification." %}</p>
+                    </div>
+                {% endif %}
+            </div>
+        </section>
     </div>
 </div>
 {% endblock %}

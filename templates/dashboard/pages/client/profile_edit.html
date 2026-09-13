@@ -8,73 +8,63 @@
 {% endblock %}
 
 {% block dashboard_breadcrumb %}
-    <nav class="flex items-center space-x-2 text-sm text-graphite-600">
-        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-blue-500 transition">{% trans "Tableau de bord" %}</a>
+    <nav class="hidden sm:flex items-center space-x-2 text-sm text-graphite-600">
+        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-navy-500 transition">{% trans "Tableau de bord" %}</a>
         <span class="text-graphite-500">/</span>
-        <a href="{% url 'accounts:profile' %}" class="hover:text-blue-500 transition">{% trans "Mon profil" %}</a>
+        <a href="{% url 'accounts:profile' %}" class="hover:text-navy-500 transition">{% trans "Mon profil" %}</a>
         <span class="text-graphite-500">/</span>
         <span class="font-bold text-navy-900">{% trans "Modifier" %}</span>
     </nav>
 {% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto px-4 sm:px-0 py-6 space-y-6">
-    <!-- Header -->
-    <div class="flex items-center gap-3">
-        <a href="{% url 'accounts:profile' %}" class="p-2 rounded-lg hover:bg-line-200/30 transition">
-            <svg class="w-5 h-5 text-graphite-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        </a>
-        <div>
-            <h2 class="text-lg font-bold text-navy-900">{% trans "Modifier mon profil" %}</h2>
-            <p class="text-sm text-graphite-500">{% trans "Mettez à jour vos informations." %}</p>
-        </div>
-    </div>
+<div class="max-w-2xl mx-auto px-0 space-y-4 md:space-y-6">
 
-    <form method="post" class="space-y-5">
+    {% comment %}En-tête de page{% endcomment %}
+    <header class="flex items-center justify-between gap-3">
+        <div class="min-w-0">
+            <h1 class="font-display font-bold text-xl md:text-3xl text-graphite-900 leading-tight truncate">{% trans "Modifier mon profil" %}</h1>
+            <p class="text-xs md:text-sm text-graphite-500 mt-1">{% trans "Mettez à jour vos informations." %}</p>
+        </div>
+        <a href="{% url 'accounts:profile' %}" class="btn btn-outline btn-sm md:inline-flex flex-shrink-0" aria-label="{% trans 'Retour' %}">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            <span class="hidden md:inline">{% trans "Retour" %}</span>
+        </a>
+    </header>
+
+    <form method="post" enctype="multipart/form-data" class="space-y-4">
         {% csrf_token %}
 
-        <!-- Phone -->
-        <div class="card p-5">
-            <label class="form-label text-sm font-bold text-graphite-600 mb-2 block">
-                {% trans "Numéro de téléphone" %}
-            </label>
+        {% comment %}Téléphone{% endcomment %}
+        <div class="bg-white rounded-xl shadow-card p-4 md:p-5">
+            <label class="form-label">{% trans "Numéro de téléphone" %}</label>
             {{ form.phone }}
-            {% if form.phone.errors %}
-            <p class="text-red-500 text-xs mt-1">{{ form.phone.errors.0 }}</p>
-            {% endif %}
+            {% if form.phone.errors %}<p class="form-error">{{ form.phone.errors.0 }}</p>{% endif %}
         </div>
 
-        <!-- City -->
-        <div class="card p-5">
-            <label class="form-label text-sm font-bold text-graphite-600 mb-2 block">
-                {% trans "Ville" %}
-            </label>
+        {% comment %}Ville{% endcomment %}
+        <div class="bg-white rounded-xl shadow-card p-4 md:p-5">
+            <label class="form-label">{% trans "Ville" %}</label>
             {{ form.city }}
-            {% if form.city.errors %}
-            <p class="text-red-500 text-xs mt-1">{{ form.city.errors.0 }}</p>
-            {% endif %}
+            {% if form.city.errors %}<p class="form-error">{{ form.city.errors.0 }}</p>{% endif %}
         </div>
 
-        <!-- Neighborhood -->
-        <div class="card p-5">
-            <label class="form-label text-sm font-bold text-graphite-600 mb-2 block">
-                {% trans "Quartier" %}
-            </label>
+        {% comment %}Quartier{% endcomment %}
+        <div class="bg-white rounded-xl shadow-card p-4 md:p-5">
+            <label class="form-label">{% trans "Quartier" %}</label>
             {{ form.neighborhood }}
-            {% if form.neighborhood.errors %}
-            <p class="text-red-500 text-xs mt-1">{{ form.neighborhood.errors.0 }}</p>
-            {% endif %}
+            {% if form.neighborhood.errors %}<p class="form-error">{{ form.neighborhood.errors.0 }}</p>{% endif %}
         </div>
 
-        <!-- Actions -->
-        <div class="flex flex-col sm:flex-row gap-3 pt-2">
-            <a href="{% url 'accounts:profile' %}"
-               class="flex-1 sm:flex-none px-5 py-2.5 rounded-xl border border-line-200 text-graphite-600 font-bold text-sm text-center hover:bg-steel-50 transition">
-                {% trans "Annuler" %}
-            </a>
-            <button type="submit"
-                    class="flex-1 sm:flex-none bg-blue-500 text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:bg-blue-500-dark transition inline-flex items-center justify-center gap-2">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+        {% comment %}Actions{% endcomment %}
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-2">
+            <a href="{% url 'accounts:profile' %}" class="btn btn-outline sm:flex-none">{% trans "Annuler" %}</a>
+            <button type="submit" class="btn btn-primary sm:flex-none">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5 13l4 4L19 7"/>
+                </svg>
                 {% trans "Enregistrer" %}
             </button>
         </div>

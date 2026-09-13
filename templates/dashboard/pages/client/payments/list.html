@@ -8,62 +8,63 @@
 {% endblock %}
 
 {% block dashboard_breadcrumb %}
-    <nav class="flex items-center space-x-2 text-sm text-graphite-600">
-        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-blue-500 transition">{% trans "Tableau de bord" %}</a>
+    <nav class="hidden sm:flex items-center space-x-2 text-sm text-graphite-600">
+        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-navy-500 transition">{% trans "Tableau de bord" %}</a>
         <span class="text-graphite-500">/</span>
         <span class="font-bold text-navy-900">{% trans "Mes paiements" %}</span>
     </nav>
 {% endblock %}
 
 {% block content %}
-<div class="space-y-6">
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <h2 class="text-lg font-bold text-navy-900">{% trans "Liste des paiements" %}</h2>
-    </div>
+<div class="space-y-4 md:space-y-6">
 
+    {% comment %}En-tête de page{% endcomment %}
+    <header class="flex items-center justify-between gap-3">
+        <div class="min-w-0">
+            <h1 class="font-display font-bold text-xl md:text-3xl text-graphite-900 leading-tight truncate">{% trans "Mes paiements" %}</h1>
+            <p class="text-xs md:text-sm text-graphite-500 mt-1">{% trans "Liste de vos paiements." %}</p>
+        </div>
+    </header>
+
+    {% comment %}Liste{% endcomment %}
     {% if payments %}
-        <div class="card overflow-hidden">
-            <div class="overflow-x-auto -mx-6 px-6">
+        <section class="bg-white rounded-xl shadow-card overflow-hidden">
+            <div class="hidden md:block overflow-x-auto">
                 <table class="w-full text-sm">
-                    <thead>
-                        <tr class="border-b border-line-200">
-                            <th class="text-left py-3 font-bold text-graphite-600">{% trans "Reference" %}</th>
-                            <th class="text-left py-3 font-bold text-graphite-600">{% trans "Garage" %}</th>
-                            <th class="text-left py-3 font-bold text-graphite-600">{% trans "Montant" %}</th>
-                            <th class="text-left py-3 font-bold text-graphite-600 hidden sm:table-cell">{% trans "Methode" %}</th>
-                            <th class="text-left py-3 font-bold text-graphite-600">{% trans "Statut" %}</th>
-                            <th class="text-left py-3 font-bold text-graphite-600 hidden md:table-cell">{% trans "Date" %}</th>
-                            <th class="text-right py-3 font-bold text-graphite-600"></th>
+                    <thead class="bg-steel-50/60">
+                        <tr class="font-mono text-[10px] uppercase tracking-wider text-graphite-500">
+                            <th class="px-4 py-3 text-left font-medium">{% trans "Référence" %}</th>
+                            <th class="px-4 py-3 text-left font-medium">{% trans "Garage" %}</th>
+                            <th class="px-4 py-3 text-left font-medium">{% trans "Montant" %}</th>
+                            <th class="px-4 py-3 text-left font-medium">{% trans "Méthode" %}</th>
+                            <th class="px-4 py-3 text-left font-medium">{% trans "Statut" %}</th>
+                            <th class="px-4 py-3 text-left font-medium">{% trans "Date" %}</th>
+                            <th class="px-4 py-3 text-right font-medium"></th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="divide-y divide-line-200">
                         {% for payment in payments %}
-                            <tr class="border-b border-steel-50 hover:bg-steel-50 transition">
-                                <td class="py-3 font-mono text-xs text-graphite-600">{{ payment.idempotency_key|truncatechars:12 }}</td>
-                                <td class="py-3 font-bold text-navy-900">{{ payment.garage.name|default:"-" }}</td>
-                                <td class="py-3 font-bold">{{ payment.amount|intcomma }} {{ payment.currency }}</td>
-                                <td class="py-3 hidden sm:table-cell">
-                                    <span class="bg-steel-50 text-graphite-600 text-[10px]">{{ payment.get_provider_display }}</span>
-                                </td>
-                                <td class="py-3">
+                            <tr class="hover:bg-steel-50/60 transition-colors">
+                                <td class="px-4 py-3 font-mono text-[11px] text-graphite-500">{{ payment.idempotency_key|truncatechars:12 }}</td>
+                                <td class="px-4 py-3 font-medium text-graphite-900 truncate max-w-[12rem]">{{ payment.garage.name|default:"—" }}</td>
+                                <td class="px-4 py-3 font-display font-bold text-graphite-900 tabular-nums whitespace-nowrap">{{ payment.amount|intcomma }} {{ payment.currency }}</td>
+                                <td class="px-4 py-3"><span class="font-mono text-[11px] uppercase tracking-wider text-graphite-500">{{ payment.get_provider_display }}</span></td>
+                                <td class="px-4 py-3">
                                     {% if payment.status == 'SUCCESS' %}
-                                    <span class="bg-blue-100 text-blue-500 text-[10px]">{% trans "Paye" %}</span>
+                                        <span class="badge bg-emerald-50 text-emerald-700"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>{% trans "Payé" %}</span>
                                     {% elif payment.status == 'PENDING' or payment.status == 'PROCESSING' %}
-                                    <span class="bg-blue-100 text-blue-600 text-[10px]">{% trans "En cours" %}</span>
+                                        <span class="badge bg-navy-100 text-navy-700"><span class="w-1.5 h-1.5 rounded-full bg-navy-500 mr-1.5"></span>{% trans "En cours" %}</span>
                                     {% elif payment.status == 'FAILED' %}
-                                    <span class="badge-danger text-[10px]">{% trans "Echoue" %}</span>
+                                        <span class="badge bg-red-50 text-red-700"><span class="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5"></span>{% trans "Échoué" %}</span>
                                     {% elif payment.status == 'CANCELLED' %}
-                                    <span class="bg-steel-50 text-graphite-600 text-[10px]">{% trans "Annule" %}</span>
+                                        <span class="badge bg-steel-50 text-graphite-600"><span class="w-1.5 h-1.5 rounded-full bg-graphite-500 mr-1.5"></span>{% trans "Annulé" %}</span>
                                     {% else %}
-                                    <span class="bg-steel-50 text-graphite-600 text-[10px]">{{ payment.get_status_display }}</span>
+                                        <span class="badge bg-steel-50 text-graphite-600">{{ payment.get_status_display }}</span>
                                     {% endif %}
                                 </td>
-                                <td class="py-3 text-graphite-600 text-sm hidden md:table-cell">{{ payment.created_at|date:"d/m/Y H:i" }}</td>
-                                <td class="py-3 text-right">
-                                    <a href="{% url 'payments:payment_detail' payment.pk %}"
-                                       class="text-blue-500 font-bold text-sm hover:underline">
-                                        {% trans "Voir" %}
-                                    </a>
+                                <td class="px-4 py-3 text-xs text-graphite-500 whitespace-nowrap">{{ payment.created_at|date:"d/m/Y H:i" }}</td>
+                                <td class="px-4 py-3 text-right">
+                                    <a href="{% url 'payments:payment_detail' payment.pk %}" class="font-medium text-navy-700 hover:text-navy-800">{% trans "Voir" %}</a>
                                 </td>
                             </tr>
                         {% endfor %}
@@ -71,31 +72,75 @@
                 </table>
             </div>
 
+            <ul class="md:hidden divide-y divide-line-200">
+                {% for payment in payments %}
+                    <li>
+                        <a href="{% url 'payments:payment_detail' payment.pk %}" class="block px-4 py-3.5 hover:bg-steel-50/60 transition-colors">
+                            <div class="flex items-center justify-between gap-3">
+                                <div class="min-w-0 flex-1">
+                                    <div class="font-semibold text-sm text-graphite-900 truncate">{{ payment.garage.name|default:'—' }}</div>
+                                    <div class="font-mono text-[11px] text-graphite-500 truncate mt-0.5">{{ payment.idempotency_key|truncatechars:14 }}</div>
+                                </div>
+                                <div class="text-right flex-shrink-0">
+                                    <div class="font-display font-bold text-sm text-graphite-900 tabular-nums">{{ payment.amount|intcomma }} {{ payment.currency }}</div>
+                                    <div class="mt-1">
+                                        {% if payment.status == 'SUCCESS' %}
+                                            <span class="badge bg-emerald-50 text-emerald-700"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>{% trans "Payé" %}</span>
+                                        {% elif payment.status == 'PENDING' or payment.status == 'PROCESSING' %}
+                                            <span class="badge bg-navy-100 text-navy-700"><span class="w-1.5 h-1.5 rounded-full bg-navy-500 mr-1.5"></span>{% trans "En cours" %}</span>
+                                        {% elif payment.status == 'FAILED' %}
+                                            <span class="badge bg-red-50 text-red-700"><span class="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5"></span>{% trans "Échoué" %}</span>
+                                        {% elif payment.status == 'CANCELLED' %}
+                                            <span class="badge bg-steel-50 text-graphite-600"><span class="w-1.5 h-1.5 rounded-full bg-graphite-500 mr-1.5"></span>{% trans "Annulé" %}</span>
+                                        {% else %}
+                                            <span class="badge bg-steel-50 text-graphite-600">{{ payment.get_status_display }}</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+
+            {% comment %}Pagination compacte{% endcomment %}
             {% if payments.has_other_pages %}
-            <div class="px-6 py-3 border-t border-line-200 flex justify-between items-center">
-                <span class="text-sm text-graphite-600">
-                    {% trans "Page" %} {{ payments.number }} {% trans "sur" %} {{ payments.paginator.num_pages }}
-                </span>
-                <div class="flex gap-2">
-                    {% if payments.has_previous %}
-                        <a href="?page={{ payments.previous_page_number }}" class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 text-sm py-1 px-3">{% trans "Precedent" %}</a>
-                    {% endif %}
-                    {% if payments.has_next %}
-                        <a href="?page={{ payments.next_page_number }}" class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 text-sm py-1 px-3">{% trans "Suivant" %}</a>
-                    {% endif %}
+                <div class="px-4 md:px-5 py-3 md:py-3.5 flex items-center justify-between gap-2 border-t border-line-200">
+                    <span class="text-xs md:text-sm text-graphite-500">
+                        <span class="font-semibold text-graphite-900">{{ payments.number }}</span> / {{ payments.paginator.num_pages }}
+                    </span>
+                    <div class="flex gap-2">
+                        {% if payments.has_previous %}
+                            <a href="?page={{ payments.previous_page_number }}" class="btn btn-outline btn-sm" aria-label="{% trans 'Précédent' %}">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                                </svg>
+                                <span class="hidden sm:inline">{% trans "Précédent" %}</span>
+                            </a>
+                        {% endif %}
+                        {% if payments.has_next %}
+                            <a href="?page={{ payments.next_page_number }}" class="btn btn-outline btn-sm" aria-label="{% trans 'Suivant' %}">
+                                <span class="hidden sm:inline">{% trans "Suivant" %}</span>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                </svg>
+                            </a>
+                        {% endif %}
+                    </div>
                 </div>
-            </div>
             {% endif %}
-        </div>
+        </section>
     {% else %}
-        <div class="card p-12 text-center">
-            <svg class="w-16 h-16 text-graphite-500/50 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-            <h3 class="font-bold text-navy-900 mb-2">{% trans "Aucun paiement" %}</h3>
-            <p class="text-graphite-600 text-sm">{% trans "Vous n'avez pas encore effectue de paiement." %}</p>
-            <a href="{% url 'garages:garage_create' %}" class="btn bg-blue-500 hover:bg-blue-500/90 text-white text-sm mt-4 inline-block">
-                {% trans "Ajouter un garage" %}
-            </a>
-        </div>
+        <section class="bg-white rounded-xl shadow-card p-12 text-center">
+            <div class="w-12 h-12 mx-auto mb-3 rounded-lg bg-steel-50 flex items-center justify-center text-graphite-500">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                </svg>
+            </div>
+            <h3 class="font-display font-bold text-graphite-900 mb-2">{% trans "Aucun paiement" %}</h3>
+            <p class="text-sm text-graphite-500">{% trans "Vous n'avez pas encore effectué de paiement." %}</p>
+            <a href="{% url 'garages:garage_create' %}" class="btn btn-primary text-sm mt-4">{% trans "Ajouter un garage" %}</a>
+        </section>
     {% endif %}
 </div>
 {% endblock %}

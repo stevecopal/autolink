@@ -8,135 +8,139 @@
 {% endblock %}
 
 {% block dashboard_breadcrumb %}
-    <nav class="flex items-center space-x-2 text-sm text-graphite-600">
-        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-blue-500 transition">{% trans "Tableau de bord" %}</a>
+    <nav class="hidden sm:flex items-center space-x-2 text-sm text-graphite-600">
+        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-navy-500 transition">{% trans "Tableau de bord" %}</a>
         <span class="text-graphite-500">/</span>
-        <a href="{% url 'payments:payment_list' %}" class="hover:text-blue-500 transition">{% trans "Paiements" %}</a>
+        <a href="{% url 'payments:payment_list' %}" class="hover:text-navy-500 transition">{% trans "Paiements" %}</a>
         <span class="text-graphite-500">/</span>
-        <span class="font-bold text-navy-900">{% trans "Detail" %}</span>
+        <span class="font-bold text-navy-900">{% trans "Détail" %}</span>
     </nav>
 {% endblock %}
 
 {% block content %}
-<div class="max-w-xl mx-auto space-y-6">
-    <!-- Payment Status Card -->
-    <div class="card p-6">
+<div class="max-w-xl mx-auto space-y-4 md:space-y-6">
+
+    {% comment %}En-tête de page{% endcomment %}
+    <header class="flex items-center justify-between gap-3">
+        <div class="min-w-0">
+            <h1 class="font-display font-bold text-xl md:text-3xl text-graphite-900 leading-tight truncate">{% trans "Paiement d'activation" %}</h1>
+        </div>
+        <a href="{% url 'payments:payment_list' %}" class="btn btn-outline btn-sm md:inline-flex flex-shrink-0" aria-label="{% trans 'Retour' %}">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            <span class="hidden md:inline">{% trans "Retour" %}</span>
+        </a>
+    </header>
+
+    {% comment %}Carte de statut{% endcomment %}
+    <section class="bg-white rounded-xl shadow-card p-4 md:p-6">
         <div class="flex items-center gap-3 mb-6">
             {% if payment.status == 'SUCCESS' %}
-            <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center">
-                <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg class="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M5 13l4 4L19 7"/></svg>
             </div>
             {% elif payment.status == 'FAILED' %}
-            <div class="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center">
-                <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M6 18L18 6M6 6l12 12"/></svg>
             </div>
             {% else %}
-            <div class="w-12 h-12 bg-blue-500/10 rounded-xl flex items-center justify-center">
-                <svg class="w-6 h-6 text-blue-600 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
+            <div class="w-12 h-12 bg-navy-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                <svg class="w-6 h-6 text-navy-700 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
             </div>
             {% endif %}
-            <div>
-                <h1 class="text-xl font-bold text-navy-900">{% trans "Activation du garage" %}</h1>
-                <p class="text-sm text-graphite-600">{{ payment.garage.name }}</p>
+            <div class="min-w-0">
+                <h1 class="font-display font-bold text-xl text-graphite-900 truncate">{% trans "Activation du garage" %}</h1>
+                <p class="text-sm text-graphite-500 truncate">{{ payment.garage.name }}</p>
             </div>
         </div>
 
-        <div class="space-y-3">
-            <div class="flex items-center justify-between p-3 rounded-lg bg-steel-50">
+        <div class="divide-y divide-line-200">
+            <div class="flex items-center justify-between py-2.5">
                 <span class="text-sm text-graphite-600">{% trans "Montant" %}</span>
-                <span class="font-bold text-lg text-navy-900">{{ payment.amount|intcomma }} {{ payment.currency }}</span>
+                <span class="font-display font-bold text-lg text-graphite-900 tabular-nums">{{ payment.amount|intcomma }} {{ payment.currency }}</span>
             </div>
-            <div class="flex items-center justify-between p-3 rounded-lg bg-steel-50">
+            <div class="flex items-center justify-between py-2.5">
                 <span class="text-sm text-graphite-600">{% trans "Statut" %}</span>
                 {% if payment.status == 'SUCCESS' %}
-                <span class="bg-blue-100 text-blue-500">{% trans "Paye" %}</span>
+                <span class="badge bg-emerald-50 text-emerald-700"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>{% trans "Payé" %}</span>
                 {% elif payment.status == 'PENDING' or payment.status == 'PROCESSING' %}
-                <span class="bg-blue-100 text-blue-600">{% trans "En cours" %}</span>
+                <span class="badge bg-navy-100 text-navy-700"><span class="w-1.5 h-1.5 rounded-full bg-navy-500 mr-1.5"></span>{% trans "En cours" %}</span>
                 {% elif payment.status == 'FAILED' %}
-                <span class="badge-danger">{% trans "Echoue" %}</span>
+                <span class="badge bg-red-50 text-red-700"><span class="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5"></span>{% trans "Échoué" %}</span>
                 {% else %}
-                <span class="bg-steel-50 text-graphite-600">{{ payment.get_status_display }}</span>
+                <span class="badge bg-steel-50 text-graphite-600">{{ payment.get_status_display }}</span>
                 {% endif %}
             </div>
-            <div class="flex items-center justify-between p-3 rounded-lg bg-steel-50">
+            <div class="flex items-center justify-between py-2.5">
                 <span class="text-sm text-graphite-600">{% trans "Provider" %}</span>
-                <span class="font-bold text-sm">{{ payment.get_provider_display }}</span>
+                <span class="font-semibold text-sm text-graphite-900">{{ payment.get_provider_display }}</span>
             </div>
-            <div class="flex items-center justify-between p-3 rounded-lg bg-steel-50">
-                <span class="text-sm text-graphite-600">{% trans "Reference" %}</span>
+            <div class="flex items-center justify-between py-2.5">
+                <span class="text-sm text-graphite-600">{% trans "Référence" %}</span>
                 <span class="font-mono text-xs text-graphite-600">{{ payment.idempotency_key|truncatechars:24 }}</span>
             </div>
             {% if payment.paid_at %}
-            <div class="flex items-center justify-between p-3 rounded-lg bg-steel-50">
-                <span class="text-sm text-graphite-600">{% trans "Paye le" %}</span>
-                <span class="text-sm font-bold">{{ payment.paid_at|date:"d/m/Y H:i" }}</span>
+            <div class="flex items-center justify-between py-2.5">
+                <span class="text-sm text-graphite-600">{% trans "Payé le" %}</span>
+                <span class="text-sm font-semibold text-graphite-900">{{ payment.paid_at|date:"d/m/Y H:i" }}</span>
             </div>
             {% endif %}
         </div>
 
         {% if payment.status == 'PENDING' %}
-        <div class="mt-6 p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
-            <div class="flex items-center gap-2">
-                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                <p class="text-sm text-blue-600">{% trans "La confirmation sera effectuee par le prestataire de paiement. Vous recevrez une notification une fois confirme." %}</p>
-            </div>
+        <div class="mt-5 p-3.5 rounded-xl bg-navy-50">
+            <p class="text-sm text-navy-700">{% trans "La confirmation sera effectuée par le prestataire de paiement. Vous recevrez une notification une fois confirmé." %}</p>
         </div>
         {% elif payment.status == 'SUCCESS' %}
-        <div class="mt-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200">
-            <div class="flex items-center gap-2">
-                <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-                <p class="text-sm text-emerald-700">{% trans "Votre garage est maintenant actif et visible dans les recherches." %}</p>
-            </div>
+        <div class="mt-5 p-3.5 rounded-xl bg-emerald-50">
+            <p class="text-sm text-emerald-700">{% trans "Votre garage est maintenant actif et visible dans les recherches." %}</p>
         </div>
         {% elif payment.status == 'FAILED' %}
-        <div class="mt-6 p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
-            <p class="text-sm text-blue-700">{% trans "Le paiement a echoue. Veuillez reessayer." %}</p>
+        <div class="mt-5 p-3.5 rounded-xl bg-red-50">
+            <p class="text-sm text-red-700">{% trans "Le paiement a échoué. Veuillez réessayer." %}</p>
         </div>
         {% endif %}
-    </div>
+    </section>
 
-    <!-- Receipt (if payment successful) -->
+    {% comment %}Reçu (si paiement réussi){% endcomment %}
     {% if payment.status == 'SUCCESS' and receipt %}
-    <div class="card p-6 border border-emerald-200">
-        <div class="flex items-center justify-between mb-4">
-            <h2 class="font-bold text-navy-900">{% trans "Recu de paiement" %}</h2>
-            <span class="bg-blue-100 text-blue-500 text-[10px]">{% trans "Valide" %}</span>
-        </div>
-        <div class="space-y-2 text-sm">
-            <div class="flex justify-between">
-                <span class="text-graphite-600">{% trans "Reference" %}</span>
-                <span class="font-mono font-bold">{{ receipt.reference }}</span>
+    <section class="bg-white rounded-xl shadow-card overflow-hidden">
+        <header class="flex items-center justify-between px-4 md:px-5 py-3.5 md:py-4 border-b border-line-200">
+            <h2 class="font-display font-bold text-graphite-900 text-sm md:text-base">{% trans "Reçu de paiement" %}</h2>
+            <span class="badge bg-emerald-50 text-emerald-700"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>{% trans "Valide" %}</span>
+        </header>
+        <div class="p-4 md:p-5 divide-y divide-line-200 text-sm">
+            <div class="flex items-center justify-between py-2.5">
+                <span class="text-graphite-600">{% trans "Référence" %}</span>
+                <span class="font-mono font-semibold text-graphite-900">{{ receipt.reference }}</span>
             </div>
-            <div class="flex justify-between">
+            <div class="flex items-center justify-between py-2.5">
                 <span class="text-graphite-600">{% trans "Montant" %}</span>
-                <span class="font-bold">{{ receipt.amount|intcomma }} {{ receipt.currency }}</span>
+                <span class="font-display font-bold text-graphite-900 tabular-nums">{{ receipt.amount|intcomma }} {{ receipt.currency }}</span>
             </div>
-            <div class="flex justify-between">
+            <div class="flex items-center justify-between py-2.5">
                 <span class="text-graphite-600">{% trans "Garage" %}</span>
-                <span class="font-bold">{{ receipt.garage.name }}</span>
+                <span class="font-semibold text-graphite-900">{{ receipt.garage.name }}</span>
             </div>
-            <div class="flex justify-between">
+            <div class="flex items-center justify-between py-2.5">
                 <span class="text-graphite-600">{% trans "Date" %}</span>
-                <span>{{ receipt.created_at|date:"d/m/Y H:i" }}</span>
+                <span class="text-graphite-900">{{ receipt.created_at|date:"d/m/Y H:i" }}</span>
             </div>
         </div>
-        <div class="mt-4 pt-4 border-t border-line-200 flex flex-col sm:flex-row gap-3">
-            <a href="{% url 'payments:receipt_download' receipt.pk %}" class="btn bg-blue-500 hover:bg-blue-500/90 text-white text-center text-sm flex-1">
-                <svg class="w-4 h-4 inline mr-1 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                {% trans "Telecharger le recu" %}
+        <div class="px-4 md:px-5 py-3.5 border-t border-line-200">
+            <a href="{% url 'payments:receipt_download' receipt.pk %}" class="btn btn-primary w-full text-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                {% trans "Télécharger le reçu" %}
             </a>
         </div>
-    </div>
+    </section>
     {% endif %}
 
-    <!-- Actions -->
+    {% comment %}Actions{% endcomment %}
     <div class="flex flex-col sm:flex-row gap-3">
-        <a href="{% url 'garages:garage_dashboard' %}" class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 text-center text-sm flex-1">
-            {% trans "Retour au garage" %}
-        </a>
-        <a href="{% url 'payments:payment_list' %}" class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 text-center text-sm flex-1">
-            {% trans "Mes paiements" %}
-        </a>
+        <a href="{% url 'garages:garage_dashboard' %}" class="btn btn-outline text-center text-sm flex-1">{% trans "Retour au garage" %}</a>
+        <a href="{% url 'payments:payment_list' %}" class="btn btn-outline text-center text-sm flex-1">{% trans "Mes paiements" %}</a>
     </div>
 </div>
 {% endblock %}

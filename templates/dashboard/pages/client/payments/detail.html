@@ -8,207 +8,199 @@
 {% endblock %}
 
 {% block dashboard_breadcrumb %}
-    <nav class="flex items-center space-x-2 text-sm text-graphite-600">
-        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-blue-500 transition">{% trans "Tableau de bord" %}</a>
+    <nav class="hidden sm:flex items-center space-x-2 text-sm text-graphite-600">
+        <a href="{% url 'accounts:client_dashboard' %}" class="hover:text-navy-500 transition">{% trans "Tableau de bord" %}</a>
         <span class="text-graphite-500">/</span>
-        <a href="{% url 'payments:payment_list' %}" class="hover:text-blue-500 transition">{% trans "Mes paiements" %}</a>
+        <a href="{% url 'payments:payment_list' %}" class="hover:text-navy-500 transition">{% trans "Mes paiements" %}</a>
         <span class="text-graphite-500">/</span>
         <span class="font-bold text-navy-900">#{{ payment.id }}</span>
     </nav>
 {% endblock %}
 
 {% block content %}
-<div class="space-y-6">
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-            <h2 class="text-xl font-bold text-navy-900 mb-1">{% trans "Paiement" %} #{{ payment.id }}</h2>
-            <p class="text-sm text-graphite-500">{{ payment.created_at|date:"d/m/Y H:i" }}</p>
-        </div>
-        <div class="flex gap-2">
-            <a href="{% url 'payments:payment_list' %}"
-               class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 text-sm">{% trans "Retour à la liste" %}</a>
-        </div>
-    </div>
+<div class="space-y-4 md:space-y-6">
 
-    <!-- Status Badge -->
-    <div class="card p-4 bg-steel-50 border border-line-200 flex items-center justify-between">
-        <div>
-            <span class="font-bold text-sm">{% trans "Statut" %}</span>
-            <div class="flex items-center gap-2 mt-1">
-                <span class="badge-{{ payment.status_color }} text-[10px]">{{ payment.status_label }}</span>
+    {% comment %}En-tête de page{% endcomment %}
+    <header class="flex items-start sm:items-center justify-between gap-3">
+        <div class="min-w-0">
+            <h1 class="font-display font-bold text-xl md:text-3xl text-graphite-900 leading-tight truncate">
+                {% trans "Paiement" %} #{{ payment.id }}
+            </h1>
+            <p class="text-xs md:text-sm text-graphite-500 mt-1">{{ payment.created_at|date:"d/m/Y H:i" }}</p>
+        </div>
+        <a href="{% url 'payments:payment_list' %}" class="btn btn-outline btn-sm md:inline-flex flex-shrink-0" aria-label="{% trans 'Retour' %}">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            <span class="hidden md:inline">{% trans "Retour" %}</span>
+        </a>
+    </header>
+
+    {% comment %}Statut{% endcomment %}
+    <section class="bg-white rounded-xl shadow-card p-4 md:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="min-w-0">
+            <span class="block font-mono text-[10px] uppercase tracking-wider text-graphite-500 mb-1.5">{% trans "Statut" %}</span>
+            <div class="flex items-center gap-2 flex-wrap">
+                {% if payment.status == 'SUCCESS' %}
+                    <span class="badge bg-emerald-50 text-emerald-700"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>{% trans "Réussi" %}</span>
+                {% elif payment.status == 'FAILED' or payment.status == 'CANCELLED' %}
+                    <span class="badge bg-red-50 text-red-700"><span class="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5"></span>{{ payment.status_label }}</span>
+                {% else %}
+                    <span class="badge bg-navy-100 text-navy-700"><span class="w-1.5 h-1.5 rounded-full bg-navy-500 mr-1.5"></span>{{ payment.status_label }}</span>
+                {% endif %}
                 {% if payment.status == 'PENDING' %}
-                    <span class="text-xs text-blue-600">{% trans "En attente de confirmation." %}</span>
+                    <span class="text-xs text-navy-700">{% trans "En attente de confirmation." %}</span>
                 {% elif payment.status == 'SUCCESS' %}
-                    <span class="text-xs text-emerald-600">{% trans "Paiement réussi." %}</span>
+                    <span class="text-xs text-emerald-700">{% trans "Paiement réussi." %}</span>
                 {% elif payment.status == 'FAILED' %}
-                    <span class="text-xs text-blue-600">{% trans "Paiement échoué." %}</span>
+                    <span class="text-xs text-red-700">{% trans "Paiement échoué." %}</span>
                 {% elif payment.status == 'REFUNDED' %}
-                    <span class="text-xs text-blue-500">{% trans "Remboursé." %}</span>
+                    <span class="text-xs text-navy-700">{% trans "Remboursé." %}</span>
                 {% endif %}
             </div>
         </div>
-        <div class="text-right text-sm text-graphite-500">
+        <div class="text-sm text-graphite-500 text-left sm:text-right flex-shrink-0">
             <div>{% trans "CR" %} {{ payment.cr_number }}</div>
             <div>{% trans "Référence" %} : {{ payment.reference }}</div>
         </div>
-    </div>
+    </section>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Informations du paiement -->
-        <div class="card p-6 md:col-span-2">
-            <h3 class="text-lg font-bold text-navy-900 mb-4">{% trans "Informations" %}</h3>
-            <div class="space-y-4">
-                <div class="flex justify-between items-center py-2 border-b border-line-200">
-                    <span class="text-graphite-600">{% trans "Montant" %}</span>
-                    <span class="font-bold text-lg text-blue-600">{{ payment.amount|intcomma }} FCFA</span>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+        {% comment %}Informations du paiement{% endcomment %}
+        <section class="bg-white rounded-xl shadow-card overflow-hidden md:col-span-2">
+            <header class="px-4 md:px-5 py-3.5 md:py-4 border-b border-line-200">
+                <h3 class="font-display font-bold text-graphite-900 text-sm md:text-base">{% trans "Informations" %}</h3>
+            </header>
+            <div class="p-4 md:p-5 divide-y divide-line-200">
+                <div class="flex items-center justify-between gap-3 py-2.5">
+                    <span class="text-graphite-600 text-sm">{% trans "Montant" %}</span>
+                    <span class="font-display font-bold text-lg text-graphite-900 tabular-nums">{{ payment.amount|intcomma }} FCFA</span>
                 </div>
-                <div class="flex justify-between items-center py-2 border-b border-line-200">
-                    <span class="text-graphite-600">{% trans "Méthode" %}</span>
-                    <span class="font-bold">{{ payment.get_payment_method_display }}</span>
+                <div class="flex items-center justify-between gap-3 py-2.5">
+                    <span class="text-graphite-600 text-sm">{% trans "Méthode" %}</span>
+                    <span class="font-semibold text-graphite-900">{{ payment.get_payment_method_display }}</span>
                 </div>
-                <div class="flex justify-between items-center py-2 border-b border-line-200">
-                    <span class="text-graphite-600">{% trans "Transaction" %}</span>
-                    <span class="font-bold text-blue-500 text-sm">{{ payment.transaction_id }}</span>
+                <div class="flex items-center justify-between gap-3 py-2.5">
+                    <span class="text-graphite-600 text-sm">{% trans "Transaction" %}</span>
+                    <span class="font-mono text-[11px] text-navy-700 break-all">{{ payment.transaction_id }}</span>
                 </div>
-                <div class="flex justify-between items-center py-2 border-b border-line-200">
-                    <span class="text-graphite-600">{% trans "Paiement" %}</span>
-                    <span class="font-bold">{{ payment.created_at|date:"d/m/Y H:i" }}</span>
+                <div class="flex items-center justify-between gap-3 py-2.5">
+                    <span class="text-graphite-600 text-sm">{% trans "Paiement" %}</span>
+                    <span class="font-semibold text-graphite-900">{{ payment.created_at|date:"d/m/Y H:i" }}</span>
                 </div>
                 {% if payment.refunds.first %}
-                <div class="flex justify-between items-center py-2 border-b border-line-200">
-                    <span class="text-graphite-600">{% trans "Remboursement" %}</span>
-                    <a href="{% url 'payments:refund_detail' payment.refunds.first.id %}"
-                       class="font-bold text-blue-600 hover:underline text-sm">
+                <div class="flex items-center justify-between gap-3 py-2.5">
+                    <span class="text-graphite-600 text-sm">{% trans "Remboursement" %}</span>
+                    <a href="{% url 'payments:refund_detail' payment.refunds.first.id %}" class="font-semibold text-navy-700 hover:text-navy-800 text-sm">
                         {{ payment.refunds.first.amount|intcomma }} FCFA
                     </a>
                 </div>
                 {% endif %}
-                <div class="flex justify-between items-center">
-                    <span class="text-graphite-600">{% trans "Statut" %}</span>
-                    <span class="badge-{{ payment.status_color }} text-[10px]">{{ payment.status_label }}</span>
+                <div class="flex items-center justify-between gap-3 py-2.5">
+                    <span class="text-graphite-600 text-sm">{% trans "Statut" %}</span>
+                    <span class="font-semibold text-graphite-900">{{ payment.status_label }}</span>
                 </div>
             </div>
-        </div>
+        </section>
 
-    <!-- Informations de la commande -->
-    <div class="card p-6">
-        <h3 class="text-lg font-bold text-navy-900 mb-4">{% trans "Détails" %}</h3>
-        <div class="flex justify-between items-center pt-3 border-t border-line-200">
-            <span class="text-sm text-graphite-600">{% trans "Montant" %}</span>
-            <span class="font-bold text-lg text-blue-600">{{ payment.amount|intcomma }} FCFA</span>
-        </div>
-    </div>
-
-        <!-- Informations -->
-        <div class="space-y-6">
-            <!-- Client -->
-            <div class="card p-6">
-                <h3 class="text-lg font-bold text-navy-900 mb-4">{% trans "Client" %}</h3>
-                <div class="flex items-center gap-3 mb-4">
-                    {% if payment.user.avatar %}
-                        <img src="{{ payment.user.avatar.url }}"
-                             class="w-12 h-12 rounded-full object-cover border-2 border-blue-500">
-                    {% else %}
-                        <div class="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center text-xl font-bold text-navy-900 border-2 border-line-200">
-                            {{ payment.user.display_name|first|upper }}
+        {% comment %}Colonne latérale{% endcomment %}
+        <div class="space-y-4 md:space-y-6">
+            {% comment %}Client{% endcomment %}
+            <section class="bg-white rounded-xl shadow-card overflow-hidden">
+                <header class="px-4 md:px-5 py-3.5 md:py-4 border-b border-line-200">
+                    <h3 class="font-display font-bold text-graphite-900 text-sm md:text-base">{% trans "Client" %}</h3>
+                </header>
+                <div class="p-4 md:p-5">
+                    <div class="flex items-center gap-3 mb-4">
+                        {% if payment.user.avatar %}
+                            <img src="{{ payment.user.avatar.url }}" alt="{{ payment.user.display_name }}" class="w-12 h-12 rounded-full object-cover shadow-card">
+                        {% else %}
+                            <div class="w-12 h-12 rounded-full bg-navy-100 flex items-center justify-center text-lg font-bold text-navy-700">
+                                {{ payment.user.display_name|first|upper }}
+                            </div>
+                        {% endif %}
+                        <div class="min-w-0">
+                            <div class="font-bold text-graphite-900 truncate">{{ payment.user.display_name }}</div>
+                            <a href="mailto:{{ payment.user.email }}" class="text-sm text-navy-700 hover:text-navy-800 break-all">{{ payment.user.email }}</a>
                         </div>
-                    {% endif %}
-                    <div>
-                        <div class="font-bold">{{ payment.user.display_name }}</div>
-                        <a href="mailto:{{ payment.user.email }}"
-                           class="text-sm text-blue-500 hover:underline">{{ payment.user.email }}</a>
+                    </div>
+                    <div class="space-y-2.5 text-sm">
+                        <div>
+                            <p class="font-mono text-[10px] uppercase tracking-wider text-graphite-500 mb-0.5">{% trans "Téléphone" %}</p>
+                            <a href="tel:{{ payment.user.phone }}" class="font-semibold text-graphite-900">{{ payment.user.phone|default:"—" }}</a>
+                        </div>
+                        <div>
+                            <p class="font-mono text-[10px] uppercase tracking-wider text-graphite-500 mb-0.5">{% trans "Ville" %}</p>
+                            <p class="font-semibold text-graphite-900">{{ payment.user.city|default:"—" }}</p>
+                        </div>
+                        <div>
+                            <p class="font-mono text-[10px] uppercase tracking-wider text-graphite-500 mb-0.5">{% trans "Quartier" %}</p>
+                            <p class="font-semibold text-graphite-900">{{ payment.user.neighborhood|default:"—" }}</p>
+                        </div>
                     </div>
                 </div>
-                <div class="space-y-2 text-sm">
-                    <div>
-                        <p class="text-xs text-graphite-500 uppercase tracking-wider mb-1">{% trans "Téléphone" %}</p>
-                        <a href="tel:{{ payment.user.phone }}"
-                           class="font-bold">{{ payment.user.phone|default:"—" }}</a>
-                    </div>
-                    <div>
-                        <p class="text-xs text-graphite-500 uppercase tracking-wider mb-1">{% trans "Ville" %}</p>
-                        <p class="font-bold">{{ payment.user.city|default:"—" }}</p>
-                    </div>
-                    <div>
-                        <p class="text-xs text-graphite-500 uppercase tracking-wider mb-1">{% trans "Quartier" %}</p>
-                        <p class="font-bold">{{ payment.user.neighborhood|default:"—" }}</p>
-                    </div>
-                </div>
-            </div>
+            </section>
 
-            <!-- Assistance -->
-            <div class="card p-6 border border-line-200 bg-steel-50">
-                <h3 class="text-lg font-bold text-navy-900 mb-4">{% trans "Besoin d'aide" %}</h3>
+            {% comment %}Besoin d'aide{% endcomment %}
+            <section class="bg-white rounded-xl shadow-card p-4 md:p-5">
+                <h3 class="font-display font-bold text-graphite-900 text-sm md:text-base mb-4">{% trans "Besoin d'aide" %}</h3>
                 <div class="space-y-3">
-                    <a href="{% url 'support:ticket_list' %}"
-                       class="block w-full p-3 bg-white rounded-lg border border-line-200 hover:bg-steel-50 transition text-center text-sm font-bold text-navy-900">
+                    <a href="{% url 'support:ticket_list' %}" class="block w-full p-3 bg-steel-50 hover:bg-navy-50 transition rounded-lg text-center text-sm font-semibold text-graphite-900">
                         {% trans "Contactez le support" %}
                     </a>
-                    <a href="{% url 'support:assistance' %}"
-                       class="block w-full p-3 bg-white rounded-lg border border-line-200 hover:bg-steel-50 transition text-center text-sm font-bold text-navy-900">
+                    <a href="{% url 'support:assistance' %}" class="block w-full p-3 bg-steel-50 hover:bg-navy-50 transition rounded-lg text-center text-sm font-semibold text-graphite-900">
                         {% trans "Assistance" %}
                     </a>
                 </div>
-            </div>
+            </section>
         </div>
     </div>
 
-    <!-- Remboursement -->
+    {% comment %}Remboursement{% endcomment %}
     {% if payment.refunds.first %}
-    <div class="card p-6 border border-blue-500/30 bg-blue-500/10">
-        <h3 class="text-lg font-bold text-blue-600 mb-4">{% trans "Remboursement" %}</h3>
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div>
-                <div class="text-sm text-blue-600 mb-1">{% trans "Montant remboursé" %}</div>
-                <div class="text-2xl font-bold text-blue-600">{{ payment.refunds.first.amount|intcomma }} FCFA</div>
-                <div class="text-xs text-blue-600 mt-1">{% trans "le" %} {{ payment.refunds.first.created_at|date:"d/m/Y H:i" }}</div>
+        <section class="bg-navy-50 rounded-xl shadow-card p-4 md:p-6">
+            <h3 class="font-display font-bold text-navy-700 text-sm md:text-base mb-4">{% trans "Remboursement" %}</h3>
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                    <div class="text-sm text-navy-700 mb-1">{% trans "Montant remboursé" %}</div>
+                    <div class="font-display font-bold text-2xl text-navy-700 tabular-nums">{{ payment.refunds.first.amount|intcomma }} FCFA</div>
+                    <div class="text-xs text-navy-700 mt-1">{% trans "le" %} {{ payment.refunds.first.created_at|date:"d/m/Y H:i" }}</div>
+                </div>
+                <a href="{% url 'payments:refund_detail' payment.refunds.first.id %}" class="btn btn-outline text-sm">{% trans "Voir les détails" %}</a>
             </div>
-            <a href="{% url 'payments:refund_detail' payment.refunds.first.id %}"
-               class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 text-sm">{% trans "Voir les détails" %}</a>
-        </div>
-    </div>
+        </section>
     {% elif payment.status == 'SUCCESS' and not payment.refunds.first %}
-    <div class="card p-6 border border-blue-500/30 bg-blue-500/10">
-        <h3 class="text-lg font-bold text-blue-600 mb-4">{% trans "Demander un remboursement" %}</h3>
-        <p class="text-sm text-blue-600 mb-4">{% trans "Vous pouvez demander un remboursement pour ce paiement." %}</p>
-        {% if request.user.role != 'ADMIN' and request.user.role != 'SUPERUSER' and not request.user.is_superuser %}
-        <form method="post" action="{% url 'payments:refund_request' %}" class="max-w-md">
-            {% csrf_token %}
-            <input type="hidden" name="payment_id" value="{{ payment.id }}">
-            <div class="flex items-center gap-2 mb-3">
+        <section class="bg-navy-50 rounded-xl shadow-card p-4 md:p-6">
+            <h3 class="font-display font-bold text-navy-700 text-sm md:text-base mb-3">{% trans "Demander un remboursement" %}</h3>
+            <p class="text-sm text-navy-700 mb-4">{% trans "Vous pouvez demander un remboursement pour ce paiement." %}</p>
+            {% if request.user.role != 'ADMIN' and request.user.role != 'SUPERUSER' and not request.user.is_superuser %}
+            <form method="post" action="{% url 'payments:refund_request' %}" class="max-w-md">
+                {% csrf_token %}
+                <input type="hidden" name="payment_id" value="{{ payment.id }}">
                 <label class="form-label">{% trans "Montant du remboursement" %}</label>
-                <input type="number" name="amount" min="0" max="{{ payment.amount }}" step="1"
-                       class="form-input flex-1"
-                       placeholder="{{ payment.amount|intcomma }} FCFA" required>
-            </div>
-            <div class="flex justify-between items-center pt-4 border-t border-blue-500/30">
-                <a href="{% url 'payments:payment_list' %}"
-                   class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 text-sm">{% trans "Annuler" %}</a>
-                <button type="submit" class="bg-blue-500/100 text-white px-6 py-2 rounded-lg font-bold text-sm hover:bg-error-600 transition">
-                    {% trans "Demander le remboursement" %}
-                </button>
-            </div>
-        </form>
-        {% endif %}
-    </div>
+                <div class="flex items-center gap-2 mb-4">
+                    <input type="number" name="amount" min="0" max="{{ payment.amount }}" step="1"
+                           class="form-input flex-1" placeholder="{{ payment.amount|intcomma }} FCFA" required>
+                </div>
+                <div class="flex justify-end gap-3 pt-4 border-t border-navy-100">
+                    <a href="{% url 'payments:payment_list' %}" class="btn btn-outline text-sm">{% trans "Annuler" %}</a>
+                    <button type="submit" class="btn btn-primary text-sm">{% trans "Demander le remboursement" %}</button>
+                </div>
+            </form>
+            {% endif %}
+        </section>
     {% endif %}
 
-    <!-- Avertissement paiement échoué -->
+    {% comment %}Paiement échoué{% endcomment %}
     {% if payment.status == 'FAILED' %}
-    <div class="card p-6 border border-blue-500/30 bg-blue-500/10">
-        <h3 class="text-lg font-bold text-blue-600 mb-4">{% trans "Paiement échoué" %}</h3>
-        <p class="text-sm text-blue-600 mb-4">{% trans "Ce paiement a échoué. Veuillez réessayer ou contacter le support." %}</p>
-        <div class="flex gap-2">
-            <a href="{% url 'payments:payment_list' %}"
-               class="bg-blue-500 text-white px-6 py-3 rounded-lg font-bold text-sm hover:bg-blue-500-dark transition">
-                {% trans "Retour aux paiements" %}
-            </a>
-            <a href="{% url 'support:ticket_list' %}"
-               class="bg-white text-navy-900 px-6 py-3 rounded-lg font-bold text-sm hover:bg-steel-50 transition border border-line-200">
-                {% trans "Contacter le support" %}
-            </a>
-        </div>
-    </div>
+        <section class="bg-red-50 rounded-xl shadow-card p-4 md:p-6">
+            <h3 class="font-display font-bold text-red-700 text-sm md:text-base mb-3">{% trans "Paiement échoué" %}</h3>
+            <p class="text-sm text-red-700 mb-4">{% trans "Ce paiement a échoué. Veuillez réessayer ou contacter le support." %}</p>
+            <div class="flex flex-wrap gap-2">
+                <a href="{% url 'payments:payment_list' %}" class="btn btn-danger text-sm">{% trans "Retour aux paiements" %}</a>
+                <a href="{% url 'support:ticket_list' %}" class="btn btn-outline text-sm">{% trans "Contacter le support" %}</a>
+            </div>
+        </section>
     {% endif %}
 </div>
 {% endblock %}
