@@ -3,33 +3,69 @@
 
 {% block title %}{% trans "Ville" %} - AutoLink{% endblock %}
 
-{% block content %}
-<div class="max-w-xl mx-auto px-4 py-8">
-    <div class="flex items-center justify-between mb-6">
-        <h1 class="text-xl font-bold text-navy-900">
-            {% if is_new %}{% trans "Ajouter une ville" %}{% else %}{% trans "Modifier la ville" %}{% endif %}
-        </h1>
-        <a href="{% url 'administration:cities' %}" class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50">{% trans "Retour" %}</a>
-    </div>
+{% block admin_header %}
+    <h1 class="text-sm font-bold text-navy-900">{% trans "Géographie" %}</h1>
+{% endblock %}
 
-    <div class="card p-6">
-        <form method="post">
+{% block admin_breadcrumb %}
+    <nav class="hidden sm:flex items-center space-x-2 text-sm text-graphite-600">
+        <a href="{% url 'administration:dashboard' %}" class="hover:text-navy-500 transition">{% trans "Tableau de bord" %}</a>
+        <span class="text-graphite-500">/</span>
+        <a href="{% url 'administration:cities' %}" class="hover:text-navy-500 transition">{% trans "Villes" %}</a>
+        <span class="text-graphite-500">/</span>
+        <span class="font-bold text-navy-900">{% if is_new %}{% trans "Ajouter" %}{% else %}{% trans "Modifier" %}{% endif %}</span>
+    </nav>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-6">
+
+    {% comment %}En-tête de page{% endcomment %}
+    <header class="flex items-center justify-between gap-3 mb-4 md:mb-6">
+        <div class="min-w-0">
+            <h1 class="font-display font-bold text-xl md:text-3xl text-graphite-900 leading-tight truncate">
+                {% if is_new %}{% trans "Ajouter une ville" %}{% else %}{% trans "Modifier la ville" %}{% endif %}
+            </h1>
+            <p class="text-xs md:text-sm text-graphite-500 mt-1">{% trans "Gestion des villes de couverture." %}</p>
+        </div>
+
+        <a href="{% url 'administration:cities' %}" class="btn btn-outline btn-sm md:inline-flex flex-shrink-0" aria-label="{% trans 'Retour' %}">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            <span class="hidden md:inline">{% trans "Retour" %}</span>
+        </a>
+    </header>
+
+    <section class="bg-white rounded-xl shadow-card p-4 md:p-6">
+        <form method="post" novalidate>
             {% csrf_token %}
-            <div class="mb-4">
-                <label class="form-label">Nom</label>
-                <input type="text" name="name" class="form-input" value="{{ city.name|default:'' }}" required>
+
+            {% comment %}Nom de la ville{% endcomment %}
+            <div class="mb-5">
+                <label for="id_name" class="form-label">{% trans "Nom" %}</label>
+                <input type="text" name="name" id="id_name" class="form-input" value="{{ form.name.value|default:'' }}" required>
+                {% if form.name.errors %}<p class="form-error">{{ form.name.errors }}</p>{% endif %}
             </div>
-            <div class="flex items-center gap-3 mb-6">
+
+            {% comment %}Activation{% endcomment %}
+            <div class="mb-6">
                 <label class="inline-flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" name="is_active" class="rounded border-line-200 text-blue-500 focus:ring-blue-500" {% if city.is_active %}checked{% endif %}>
-                    <span class="text-sm font-medium">{% trans "Actif" %}</span>
+                    <input type="checkbox" name="is_active" class="w-4 h-4 rounded accent-navy-500" {% if form.is_active.value %}checked{% endif %}>
+                    <span class="text-sm font-medium text-graphite-700">{% trans "Actif" %}</span>
                 </label>
             </div>
-            <div class="flex justify-end gap-3">
-                <a href="{% url 'administration:cities' %}" class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50">{% trans "Annuler" %}</a>
-                <button type="submit" class="btn bg-blue-500 hover:bg-blue-500/90 text-white">{% trans "Enregistrer" %}</button>
+
+            <div class="flex items-center justify-end gap-3 pt-2 border-t border-line-200">
+                <a href="{% url 'administration:cities' %}" class="btn btn-outline">{% trans "Annuler" %}</a>
+                <button type="submit" class="btn btn-primary">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    {% trans "Enregistrer" %}
+                </button>
             </div>
         </form>
-    </div>
+    </section>
 </div>
 {% endblock %}

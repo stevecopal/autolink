@@ -1,55 +1,128 @@
 {% extends 'dashboard/base.html' %}
 {% load i18n humanize %}
 
-{% block title %}{% trans "Détail de l'utilisateur" %}{% endblock %}
+{% block title %}{% trans "Détail utilisateur" %} - AutoLink{% endblock %}
+
+{% block admin_header %}
+    <h1 class="text-sm font-bold text-navy-900">{% trans "Utilisateurs" %}</h1>
+{% endblock %}
+
+{% block admin_breadcrumb %}
+    <nav class="hidden sm:flex items-center space-x-2 text-sm text-graphite-600">
+        <a href="{% url 'administration:dashboard' %}" class="hover:text-navy-500 transition">{% trans "Tableau de bord" %}</a>
+        <span class="text-graphite-500">/</span>
+        <a href="{% url 'administration:users' %}" class="hover:text-navy-500 transition">{% trans "Utilisateurs" %}</a>
+        <span class="text-graphite-500">/</span>
+        <span class="font-bold text-navy-900">{{ user_obj.display_name }}</span>
+    </nav>
+{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto px-4 py-8">
-    <div class="flex items-center justify-between mb-6">
-        <h1 class="text-2xl font-bold text-navy-900">{{ user_obj.display_name }}</h1>
-        <a href="{% url 'administration:users' %}" class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50">{% trans "Retour aux utilisateurs" %}</a>
-    </div>
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-6 space-y-4 md:space-y-6">
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- User Info -->
-        <div class="card p-6">
-            <h2 class="font-bold text-lg mb-4">{% trans "Informations de l'utilisateur" %}</h2>
-            <div class="space-y-3">
-                <div>
-                    <label class="text-sm text-graphite-600">{% trans "Nom d'utilisateur" %}</label>
-                    <div class="font-medium">{{ user_obj.username }}</div>
-                </div>
-                <div>
-                    <label class="text-sm text-graphite-600">{% trans "Email" %}</label>
-                    <div class="font-medium">{{ user_obj.email|default:"-" }}</div>
-                </div>
-                <div>
-                    <label class="text-sm text-graphite-600">{% trans "Téléphone" %}</label>
-                    <div class="font-medium">{{ user_obj.phone|default:"-" }}</div>
-                </div>
-                <div>
-                    <label class="text-sm text-graphite-600">{% trans "Ville" %}</label>
-                    <div class="font-medium">{{ user_obj.city|default:"-" }}</div>
-                </div>
-                <div>
-                    <label class="text-sm text-graphite-600">{% trans "Quartier" %}</label>
-                    <div class="font-medium">{{ user_obj.neighborhood|default:"-" }}</div>
-                </div>
-                <div>
-                    <label class="text-sm text-graphite-600">{% trans "Rôle" %}</label>
-                    <div><span class="badge-{{ user_obj.role|lower }}">{{ user_obj.role }}</span></div>
-                </div>
-                <div>
-                    <label class="text-sm text-graphite-600">{% trans "Inscrit le" %}</label>
-                    <div class="font-medium">{{ user_obj.date_joined|date:"d/m/Y H:i" }}</div>
-                </div>
+    {% comment %}En-tête de page{% endcomment %}
+    <header class="flex items-start sm:items-center justify-between gap-3">
+        <div class="flex items-center gap-3 min-w-0">
+            <span class="w-11 h-11 md:w-14 md:h-14 rounded-full bg-navy-100 text-navy-600 flex items-center justify-center text-base md:text-lg font-bold flex-shrink-0">
+                {{ user_obj.display_name|first|upper }}
+            </span>
+            <div class="min-w-0">
+                <h1 class="font-display font-bold text-xl md:text-3xl text-graphite-900 leading-tight truncate">
+                    {{ user_obj.display_name }}
+                </h1>
+                <p class="text-xs md:text-sm text-graphite-500 mt-1 flex items-center gap-2 flex-wrap">
+                    <span class="font-mono text-[10px] uppercase tracking-wider">{{ user_obj.role }}</span>
+                    <span>·</span>
+                    <span class="truncate min-w-0">{{ user_obj.email|default:"-" }}</span>
+                </p>
             </div>
         </div>
 
-        <!-- Actions -->
-        <div class="card p-6">
-            <h2 class="font-bold text-lg mb-4">{% trans "Actions" %}</h2>
-            <div class="space-y-3">
+        <a href="{% url 'administration:users' %}" class="btn btn-outline btn-sm md:inline-flex flex-shrink-0" aria-label="{% trans 'Retour' %}">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            <span class="hidden md:inline">{% trans "Retour" %}</span>
+        </a>
+    </header>
+
+    {% if user_obj.account_status == 'SUSPENDED' %}
+        <div class="flex items-start gap-3 bg-red-50 rounded-xl shadow-card p-3.5 md:p-4">
+            <div class="w-9 h-9 md:w-10 md:h-10 rounded-lg bg-red-100 text-red-600 flex items-center justify-center flex-shrink-0">
+                <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+                </svg>
+            </div>
+            <div class="min-w-0">
+                <span class="font-semibold text-red-700 text-sm md:text-base block">{% trans "Compte suspendu" %}</span>
+                <p class="text-xs md:text-sm text-red-700 mt-0.5">{% trans "Cet utilisateur ne peut plus se connecter ni utiliser la plateforme." %}</p>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+
+        {% comment %}Informations de l'utilisateur{% endcomment %}
+        <section class="bg-white rounded-xl shadow-card overflow-hidden">
+            <header class="px-4 md:px-5 py-3.5 md:py-4 border-b border-line-200">
+                <h2 class="font-display font-bold text-graphite-900 text-sm md:text-base">{% trans "Informations" %}</h2>
+            </header>
+            <div class="p-4 md:p-5 space-y-3.5">
+                <div>
+                    <span class="block font-mono text-[10px] uppercase tracking-wider text-graphite-500 mb-1">{% trans "Nom d'utilisateur" %}</span>
+                    <span class="font-medium text-sm text-graphite-900">{{ user_obj.username }}</span>
+                </div>
+                <div>
+                    <span class="block font-mono text-[10px] uppercase tracking-wider text-graphite-500 mb-1">{% trans "Email" %}</span>
+                    <span class="font-medium text-sm text-graphite-900 break-all">{{ user_obj.email|default:"-" }}</span>
+                </div>
+                <div>
+                    <span class="block font-mono text-[10px] uppercase tracking-wider text-graphite-500 mb-1">{% trans "Téléphone" %}</span>
+                    <span class="font-medium text-sm text-graphite-900">{{ user_obj.phone|default:"-" }}</span>
+                </div>
+                <div>
+                    <span class="block font-mono text-[10px] uppercase tracking-wider text-graphite-500 mb-1">{% trans "Ville" %}</span>
+                    <span class="font-medium text-sm text-graphite-900">{{ user_obj.city|default:"-" }}</span>
+                </div>
+                <div>
+                    <span class="block font-mono text-[10px] uppercase tracking-wider text-graphite-500 mb-1">{% trans "Quartier" %}</span>
+                    <span class="font-medium text-sm text-graphite-900">{{ user_obj.neighborhood|default:"-" }}</span>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <span class="block font-mono text-[10px] uppercase tracking-wider text-graphite-500 mb-1">{% trans "Rôle" %}</span>
+                        {% if user_obj.role == 'VENDEUR' %}
+                            <span class="badge bg-purple-50 text-purple-600">{{ user_obj.role }}</span>
+                        {% elif user_obj.role == 'ADMIN' or user_obj.role == 'SUPERADMIN' %}
+                            <span class="badge bg-emerald-50 text-emerald-700">{{ user_obj.role }}</span>
+                        {% elif user_obj.role == 'GARAGE' %}
+                            <span class="badge bg-navy-100 text-navy-700">{{ user_obj.role }}</span>
+                        {% else %}
+                            <span class="badge bg-steel-50 text-graphite-600">{{ user_obj.role }}</span>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <span class="block font-mono text-[10px] uppercase tracking-wider text-graphite-500 mb-1">{% trans "Statut" %}</span>
+                        {% if user_obj.account_status == 'SUSPENDED' %}
+                            <span class="badge bg-red-50 text-red-700"><span class="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5"></span>{% trans "Suspendu" %}</span>
+                        {% else %}
+                            <span class="badge bg-emerald-50 text-emerald-700"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>{% trans "Actif" %}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div>
+                    <span class="block font-mono text-[10px] uppercase tracking-wider text-graphite-500 mb-1">{% trans "Inscrit le" %}</span>
+                    <span class="font-medium text-sm text-graphite-900">{{ user_obj.date_joined|date:"d/m/Y H:i" }}</span>
+                </div>
+            </div>
+        </section>
+
+        {% comment %}Actions{% endcomment %}
+        <section class="bg-white rounded-xl shadow-card overflow-hidden">
+            <header class="px-4 md:px-5 py-3.5 md:py-4 border-b border-line-200">
+                <h2 class="font-display font-bold text-graphite-900 text-sm md:text-base">{% trans "Actions" %}</h2>
+            </header>
+            <div class="p-4 md:p-5 space-y-4">
                 <form method="post"
                       {% if user_obj.is_active %}
                       data-confirm
@@ -64,44 +137,63 @@
                       data-confirm-label="{% trans "Activer" %}"
                       data-confirm-variant="success"
                       {% endif %}
-                >
+                      class="space-y-3">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="toggle_active">
+                    <span class="block text-sm text-graphite-600">{% trans "Suspendre ou réactiver l'accès de ce compte." %}</span>
                     {% if user_obj.is_active %}
-                        <button type="submit" class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 w-full text-sm">
-                            {% trans "Désactiver l'utilisateur" %}
-                        </button>
+                        <button type="submit" class="btn btn-outline btn-sm w-full text-red-600">{% trans "Désactiver l'utilisateur" %}</button>
                     {% else %}
-                        <button type="submit" class="btn bg-blue-500 hover:bg-blue-500/90 text-white w-full text-sm">
-                            {% trans "Activer l'utilisateur" %}
-                        </button>
+                        <button type="submit" class="btn btn-primary btn-sm w-full">{% trans "Activer l'utilisateur" %}</button>
                     {% endif %}
                 </form>
 
-                <form method="post">
+                <form method="post" class="space-y-3">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="change_role">
-                    <select name="role" class="form-input mb-2">
+                    <label for="role-select" class="block font-mono text-[10px] uppercase tracking-wider text-graphite-500">{% trans "Changer le rôle" %}</label>
+                    <select name="role" id="role-select" class="form-input">
                         <option value="CLIENT" {% if user_obj.role == 'CLIENT' %}selected{% endif %}>{% trans "Client" %}</option>
                         <option value="GARAGE" {% if user_obj.role == 'GARAGE' %}selected{% endif %}>{% trans "Garage" %}</option>
                         <option value="VENDEUR" {% if user_obj.role == 'VENDEUR' %}selected{% endif %}>{% trans "Vendeur" %}</option>
                         <option value="ADMIN" {% if user_obj.role == 'ADMIN' %}selected{% endif %}>{% trans "Admin" %}</option>
                     </select>
-                    <button type="submit" class="btn bg-blue-500 hover:bg-blue-500/90 text-white w-full text-sm">{% trans "Changer le rôle" %}</button>
+                    <button type="submit" class="btn btn-outline btn-sm w-full">{% trans "Changer le rôle" %}</button>
                 </form>
             </div>
-        </div>
+        </section>
 
-        <!-- Stats -->
-        <div class="card p-6">
-            <h2 class="font-bold text-lg mb-4">{% trans "Activité" %}</h2>
-            <div class="space-y-3">
-                <div class="flex justify-between">
-                    <span>{% trans "Paiements" %}</span>
-                    <span class="font-bold">{{ user_payments.count }}</span>
+        {% comment %}Activité{% endcomment %}
+        <section class="bg-white rounded-xl shadow-card overflow-hidden">
+            <header class="px-4 md:px-5 py-3.5 md:py-4 border-b border-line-200">
+                <h2 class="font-display font-bold text-graphite-900 text-sm md:text-base">{% trans "Activité" %}</h2>
+            </header>
+            <div class="p-4 md:p-5 space-y-3">
+                <div class="flex items-center justify-between gap-2 p-3 rounded-lg bg-steel-50">
+                    <span class="text-sm text-graphite-600">{% trans "Paiements" %}</span>
+                    <span class="font-display font-bold text-graphite-900 tabular-nums">{{ user_payments.count }}</span>
+                </div>
+
+                {% comment %}Derniers paiements{% endcomment %}
+                <div class="pt-1">
+                    <span class="block font-mono text-[10px] uppercase tracking-wider text-graphite-500 mb-2">{% trans "Derniers paiements" %}</span>
+                    {% if user_payments %}
+                        <ul class="space-y-2">
+                            {% for p in user_payments %}
+                                <li>
+                                    <a href="{% url 'administration:payment_detail' p.pk %}" class="flex items-center justify-between gap-2 p-2.5 rounded-lg bg-steel-50 hover:bg-navy-50 transition-colors">
+                                        <span class="text-sm text-graphite-700 truncate min-w-0">{{ p.garage.name|default:"-" }}</span>
+                                        <span class="font-display font-bold text-sm text-emerald-700 tabular-nums flex-shrink-0">{{ p.amount|intcomma }} {{ p.currency }}</span>
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        <p class="text-sm text-graphite-500">{% trans "Aucun paiement." %}</p>
+                    {% endif %}
                 </div>
             </div>
-        </div>
+        </section>
     </div>
 </div>
 {% endblock %}

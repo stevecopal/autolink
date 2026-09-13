@@ -701,6 +701,14 @@ video {
   top: 50%;
 }
 
+.-right-1 {
+  right: -0.25rem;
+}
+
+.-top-1 {
+  top: -0.25rem;
+}
+
 .z-10 {
   z-index: 10;
 }
@@ -1051,6 +1059,10 @@ video {
   height: 1px;
 }
 
+.h-2\.5 {
+  height: 0.625rem;
+}
+
 .max-h-96 {
   max-height: 24rem;
 }
@@ -1173,6 +1185,10 @@ video {
 
 .w-full {
   width: 100%;
+}
+
+.w-2\.5 {
+  width: 0.625rem;
 }
 
 .min-w-0 {
@@ -1446,6 +1462,12 @@ video {
   --tw-space-y-reverse: 0;
   margin-top: calc(0.625rem * calc(1 - var(--tw-space-y-reverse)));
   margin-bottom: calc(0.625rem * var(--tw-space-y-reverse));
+}
+
+.space-y-3\.5 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(0.875rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(0.875rem * var(--tw-space-y-reverse));
 }
 
 .divide-y > :not([hidden]) ~ :not([hidden]) {
@@ -3872,6 +3894,11 @@ input[type="file"] {
   background-color: rgb(254 226 226 / var(--tw-bg-opacity, 1));
 }
 
+.hover\:bg-navy-50:hover {
+  --tw-bg-opacity: 1;
+  background-color: rgb(245 245 252 / var(--tw-bg-opacity, 1));
+}
+
 .hover\:text-blue-500:hover {
   --tw-text-opacity: 1;
   color: rgb(0 0 128 / var(--tw-text-opacity, 1));
@@ -3934,6 +3961,11 @@ input[type="file"] {
 .hover\:text-white:hover {
   --tw-text-opacity: 1;
   color: rgb(255 255 255 / var(--tw-text-opacity, 1));
+}
+
+.hover\:text-navy-800:hover {
+  --tw-text-opacity: 1;
+  color: rgb(0 0 64 / var(--tw-text-opacity, 1));
 }
 
 .hover\:underline:hover {
@@ -4454,6 +4486,10 @@ input[type="file"] {
     margin-top: 1rem;
   }
 
+  .md\:mb-6 {
+    margin-bottom: 1.5rem;
+  }
+
   .md\:block {
     display: block;
   }
@@ -4486,6 +4522,14 @@ input[type="file"] {
     height: 1.25rem;
   }
 
+  .md\:h-10 {
+    height: 2.5rem;
+  }
+
+  .md\:h-14 {
+    height: 3.5rem;
+  }
+
   .md\:w-11 {
     width: 2.75rem;
   }
@@ -4496,6 +4540,14 @@ input[type="file"] {
 
   .md\:w-auto {
     width: auto;
+  }
+
+  .md\:w-10 {
+    width: 2.5rem;
+  }
+
+  .md\:w-14 {
+    width: 3.5rem;
   }
 
   .md\:flex-initial {
@@ -4540,6 +4592,10 @@ input[type="file"] {
 
   .md\:gap-4 {
     gap: 1rem;
+  }
+
+  .md\:gap-6 {
+    gap: 1.5rem;
   }
 
   .md\:space-y-6 > :not([hidden]) ~ :not([hidden]) {
@@ -4590,6 +4646,11 @@ input[type="file"] {
     padding-bottom: 1rem;
   }
 
+  .md\:py-6 {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+  }
+
   .md\:pb-32 {
     padding-bottom: 8rem;
   }
@@ -4631,6 +4692,16 @@ input[type="file"] {
   .md\:text-xs {
     font-size: 0.75rem;
     line-height: 1rem;
+  }
+
+  .md\:text-2xl {
+    font-size: 1.5rem;
+    line-height: 2rem;
+  }
+
+  .md\:text-lg {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
   }
 }
 
@@ -4789,6 +4860,10 @@ input[type="file"] {
 }
 
 @media (min-width: 1280px) {
+  .xl\:col-span-2 {
+    grid-column: span 2 / span 2;
+  }
+
   .xl\:inline {
     display: inline;
   }

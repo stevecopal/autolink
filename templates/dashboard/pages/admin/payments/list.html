@@ -1,27 +1,190 @@
 {% extends 'dashboard/base.html' %}
 {% load i18n humanize %}
 
-{% block title %}{% trans "Gestion des paiements" %}{% endblock %}
+{% block title %}{% trans "Paiements" %} - AutoLink{% endblock %}
+
+{% block admin_header %}
+    <h1 class="text-sm font-bold text-navy-900">{% trans "Paiements" %}</h1>
+{% endblock %}
+
+{% block admin_breadcrumb %}
+    <nav class="hidden sm:flex items-center space-x-2 text-sm text-graphite-600">
+        <a href="{% url 'administration:dashboard' %}" class="hover:text-navy-500 transition">{% trans "Tableau de bord" %}</a>
+        <span class="text-graphite-500">/</span>
+        <span class="font-bold text-navy-900">{% trans "Paiements" %}</span>
+    </nav>
+{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 py-8">
-    <div class="flex items-center justify-between mb-6">
-        <h1 class="text-2xl font-bold text-navy-900">{% trans "Paiements" %}</h1>
-        <a href="{% url 'administration:dashboard' %}" class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50">{% trans "Retour au tableau de bord" %}</a>
+<div class="space-y-4 md:space-y-6">
+
+    {% comment %}En-tête de page{% endcomment %}
+    <header class="flex items-center justify-between gap-3">
+        <div class="min-w-0">
+            <h1 class="font-display font-bold text-xl md:text-3xl text-graphite-900 leading-tight truncate">
+                {% trans "Paiements" %}
+            </h1>
+            <p class="text-xs md:text-sm text-graphite-500 mt-1">
+                {{ payments.paginator.count }} {% trans "paiement(s)" %}
+            </p>
+        </div>
+
+        <a href="{% url 'administration:dashboard' %}" class="btn btn-outline hidden md:inline-flex flex-shrink-0">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            {% trans "Retour" %}
+        </a>
+    </header>
+
+    {% comment %}KPIs — sans bordures{% endcomment %}
+    <div class="grid grid-cols-2 xl:grid-cols-4 gap-3 md:gap-4">
+        <div class="bg-white rounded-xl p-3.5 md:p-5 shadow-card">
+            <div class="flex items-start justify-between gap-2">
+                <div class="w-9 h-9 md:w-11 md:h-11 rounded-lg bg-navy-50 text-navy-500 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <span class="hidden md:inline font-mono text-[10px] uppercase tracking-wider text-graphite-500">En attente</span>
+            </div>
+            <div class="mt-2.5 md:mt-4">
+                <div class="font-display font-bold text-xl md:text-3xl text-graphite-900 tabular-nums leading-none truncate">{{ approved_unpaid_count|intcomma }}</div>
+                <div class="text-[11px] md:text-sm text-graphite-500 mt-1.5 truncate">{% trans "Approuvés non payés" %}</div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl p-3.5 md:p-5 shadow-card">
+            <div class="flex items-start justify-between gap-2">
+                <div class="w-9 h-9 md:w-11 md:h-11 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                </div>
+                <span class="hidden md:inline font-mono text-[10px] uppercase tracking-wider text-graphite-500">Payés</span>
+            </div>
+            <div class="mt-2.5 md:mt-4">
+                <div class="font-display font-bold text-xl md:text-3xl text-graphite-900 tabular-nums leading-none truncate">{{ paid_garage_count|intcomma }}</div>
+                <div class="text-[11px] md:text-sm text-graphite-500 mt-1.5 truncate">{% trans "Garages payés" %}</div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl p-3.5 md:p-5 shadow-card">
+            <div class="flex items-start justify-between gap-2">
+                <div class="w-9 h-9 md:w-11 md:h-11 rounded-lg bg-navy-50 text-navy-500 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                    </svg>
+                </div>
+                <span class="hidden md:inline font-mono text-[10px] uppercase tracking-wider text-graphite-500">Actifs</span>
+            </div>
+            <div class="mt-2.5 md:mt-4">
+                <div class="font-display font-bold text-xl md:text-3xl text-graphite-900 tabular-nums leading-none truncate">{{ active_garage_count|intcomma }}</div>
+                <div class="text-[11px] md:text-sm text-graphite-500 mt-1.5 truncate">{% trans "Garages actifs" %}</div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl p-3.5 md:p-5 shadow-card">
+            <div class="flex items-start justify-between gap-2">
+                <div class="w-9 h-9 md:w-11 md:h-11 rounded-lg bg-red-50 text-red-600 flex items-center justify-center flex-shrink-0">
+                    <svg class="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+                    </svg>
+                </div>
+                <span class="hidden md:inline font-mono text-[10px] uppercase tracking-wider text-graphite-500">Suspendus</span>
+            </div>
+            <div class="mt-2.5 md:mt-4">
+                <div class="font-display font-bold text-xl md:text-3xl text-graphite-900 tabular-nums leading-none truncate">{{ suspended_garage_count|intcomma }}</div>
+                <div class="text-[11px] md:text-sm text-graphite-500 mt-1.5 truncate">{% trans "Garages suspendus" %}</div>
+            </div>
+        </div>
     </div>
 
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
-        <div class="stat-card"><div class="stat-value">{{ approved_unpaid_count }}</div><div class="stat-label">{% trans "Approuvés non payés" %}</div></div>
-        <div class="stat-card"><div class="stat-value">{{ paid_garage_count }}</div><div class="stat-label">{% trans "Garages payés" %}</div></div>
-        <div class="stat-card"><div class="stat-value">{{ active_garage_count }}</div><div class="stat-label">{% trans "Garages actifs" %}</div></div>
-        <div class="stat-card"><div class="stat-value">{{ suspended_garage_count }}</div><div class="stat-label">{% trans "Garages suspendus" %}</div></div>
-    </div>
+    {% comment %}Barre de filtres desktop{% endcomment %}
+    <form method="get" class="hidden md:block bg-white rounded-xl shadow-card p-3 md:p-4">
+        <div class="grid grid-cols-12 gap-3 items-stretch">
+            <div class="col-span-6 xl:col-span-2">
+                <label class="block font-mono text-[10px] uppercase tracking-wider text-graphite-500 mb-1.5">{% trans "Statut" %}</label>
+                <select name="status" class="form-input !py-2.5">
+                    <option value="">{% trans "Tous" %}</option>
+                    <option value="INITIATED" {% if selected_status == 'INITIATED' %}selected{% endif %}>{% trans "Initié" %}</option>
+                    <option value="PENDING" {% if selected_status == 'PENDING' %}selected{% endif %}>{% trans "En attente" %}</option>
+                    <option value="SUCCESS" {% if selected_status == 'SUCCESS' %}selected{% endif %}>{% trans "Succès" %}</option>
+                    <option value="FAILED" {% if selected_status == 'FAILED' %}selected{% endif %}>{% trans "Échoué" %}</option>
+                </select>
+            </div>
+            <div class="col-span-6 xl:col-span-2">
+                <label class="block font-mono text-[10px] uppercase tracking-wider text-graphite-500 mb-1.5">{% trans "Fournisseur" %}</label>
+                <select name="provider" class="form-input !py-2.5">
+                    <option value="">{% trans "Tous" %}</option>
+                    {% for value, label in provider_choices %}<option value="{{ value }}" {% if selected_provider == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+                </select>
+            </div>
+            <div class="col-span-6 xl:col-span-2">
+                <label class="block font-mono text-[10px] uppercase tracking-wider text-graphite-500 mb-1.5">{% trans "Garage" %}</label>
+                <select name="garage" class="form-input !py-2.5">
+                    <option value="">{% trans "Tous" %}</option>
+                    {% for garage in garages %}<option value="{{ garage.id }}" {% if selected_garage == garage.id|stringformat:'s' %}selected{% endif %}>{{ garage.name }}</option>{% endfor %}
+                </select>
+            </div>
+            <div class="relative col-span-6 xl:col-span-2">
+                <label class="block font-mono text-[10px] uppercase tracking-wider text-graphite-500 mb-1.5">{% trans "Client / propriétaire" %}</label>
+                <input type="text" name="client" value="{{ selected_client }}" placeholder="{% trans 'Rechercher...' %}" class="form-input !py-2.5">
+            </div>
+            <div class="col-span-6 xl:col-span-2">
+                <label class="block font-mono text-[10px] uppercase tracking-wider text-graphite-500 mb-1.5">{% trans "Du" %}</label>
+                <input type="date" name="date_from" value="{{ date_from }}" class="form-input !py-2.5">
+            </div>
+            <div class="col-span-6 xl:col-span-2">
+                <label class="block font-mono text-[10px] uppercase tracking-wider text-graphite-500 mb-1.5">{% trans "Au" %}</label>
+                <input type="date" name="date_to" value="{{ date_to }}" class="form-input !py-2.5">
+            </div>
+        </div>
+        <div class="flex items-center justify-end gap-2 mt-3 pt-3 border-t border-line-200">
+            {% if selected_status or selected_provider or selected_garage or selected_client or date_from or date_to %}
+                <a href="{% url 'administration:payments' %}" class="btn btn-outline !py-2.5" aria-label="{% trans 'Réinitialiser' %}">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8 8 0 00-15.357-2m15.357 2H15"/>
+                    </svg>
+                </a>
+            {% endif %}
+            <button type="submit" class="btn btn-primary !py-2.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 6h16M6 12h12m-8 6h4"/>
+                </svg>
+                {% trans "Filtrer" %}
+            </button>
+        </div>
+    </form>
 
-    <!-- Filters -->
-    <div class="card p-4 mb-6">
-        <form method="get" class="flex flex-wrap gap-4 items-end">
+    {% comment %}Filtres mobile — panneau dépliable{% endcomment %}
+    <form method="get" class="md:hidden space-y-2">
+        <div class="flex items-center gap-2">
+            <div class="relative flex-1">
+                <svg class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-graphite-500 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+                <input type="text" name="client" value="{{ selected_client }}" placeholder="{% trans 'Rechercher...' %}" class="form-input pl-9 !py-2.5">
+            </div>
+            <button type="button" id="mobile-filter-toggle" aria-expanded="false" aria-controls="mobile-filter-panel"
+                    class="btn btn-outline btn-sm relative flex-shrink-0 !px-3" aria-label="{% trans 'Filtres' %}">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m6-4v2m0-2a2 2 0 110-4m0 4a2 2 0 100-4m6 0a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2"/>
+                </svg>
+                {% if selected_status or selected_provider or selected_garage or selected_client or date_from or date_to %}
+                    <span class="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-navy-500"></span>
+                {% endif %}
+            </button>
+            <button type="submit" class="btn btn-primary btn-sm flex-shrink-0 !px-3" aria-label="{% trans 'Filtrer' %}">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+            </button>
+        </div>
+
+        <div id="mobile-filter-panel" class="hidden bg-white rounded-xl shadow-card p-3 space-y-2.5">
             <div>
-                <label class="block text-sm font-medium text-navy-800 mb-1">{% trans "Statut" %}</label>
+                <label class="block text-[11px] font-mono uppercase tracking-wider text-graphite-500 mb-1.5">{% trans "Statut" %}</label>
                 <select name="status" class="form-input">
                     <option value="">{% trans "Tous" %}</option>
                     <option value="INITIATED" {% if selected_status == 'INITIATED' %}selected{% endif %}>{% trans "Initié" %}</option>
@@ -31,90 +194,163 @@
                 </select>
             </div>
             <div>
-                <label class="block text-sm font-medium text-navy-800 mb-1">{% trans "Garage" %}</label>
-                <select name="garage" class="form-input">
-                    <option value="">{% trans "Tous" %}</option>
-                    {% for garage in garages %}<option value="{{ garage.id }}" {% if selected_garage == garage.id|stringformat:'s' %}selected{% endif %}>{{ garage.name }}</option>{% endfor %}
-                </select>
-            </div>
-            <div><label class="block text-sm font-medium text-navy-800 mb-1">{% trans "Client / propriétaire" %}</label><input type="text" name="client" value="{{ selected_client }}" class="form-input"></div>
-            <div><label class="block text-sm font-medium text-navy-800 mb-1">{% trans "Du" %}</label><input type="date" name="date_from" value="{{ date_from }}" class="form-input"></div>
-            <div><label class="block text-sm font-medium text-navy-800 mb-1">{% trans "Au" %}</label><input type="date" name="date_to" value="{{ date_to }}" class="form-input"></div>
-            <div>
-                <label class="block text-sm font-medium text-navy-800 mb-1">{% trans "Fournisseur" %}</label>
+                <label class="block text-[11px] font-mono uppercase tracking-wider text-graphite-500 mb-1.5">{% trans "Fournisseur" %}</label>
                 <select name="provider" class="form-input">
                     <option value="">{% trans "Tous" %}</option>
                     {% for value, label in provider_choices %}<option value="{{ value }}" {% if selected_provider == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
                 </select>
             </div>
-            <button type="submit" class="btn bg-blue-500 hover:bg-blue-500/90 text-white">{% trans "Filtrer" %}</button>
-        </form>
-    </div>
+            <div>
+                <label class="block text-[11px] font-mono uppercase tracking-wider text-graphite-500 mb-1.5">{% trans "Garage" %}</label>
+                <select name="garage" class="form-input">
+                    <option value="">{% trans "Tous" %}</option>
+                    {% for garage in garages %}<option value="{{ garage.id }}" {% if selected_garage == garage.id|stringformat:'s' %}selected{% endif %}>{{ garage.name }}</option>{% endfor %}
+                </select>
+            </div>
+            <div class="grid grid-cols-2 gap-2.5">
+                <div>
+                    <label class="block text-[11px] font-mono uppercase tracking-wider text-graphite-500 mb-1.5">{% trans "Du" %}</label>
+                    <input type="date" name="date_from" value="{{ date_from }}" class="form-input">
+                </div>
+                <div>
+                    <label class="block text-[11px] font-mono uppercase tracking-wider text-graphite-500 mb-1.5">{% trans "Au" %}</label>
+                    <input type="date" name="date_to" value="{{ date_to }}" class="form-input">
+                </div>
+            </div>
+        </div>
+    </form>
 
-    <!-- Payments Table -->
-    <div class="card overflow-hidden">
-        <div class="overflow-x-auto">
+    {% comment %}Liste{% endcomment %}
+    <section class="bg-white rounded-xl shadow-card overflow-hidden">
+        <div class="hidden md:block overflow-x-auto">
             <table class="w-full text-sm">
-                <thead class="bg-steel-50">
-                    <tr class="text-left text-graphite-600">
-                        <th class="px-4 py-3">#</th>
-                        <th class="px-4 py-3">{% trans "Garage" %}</th>
-                        <th class="px-4 py-3">{% trans "Propriétaire" %}</th>
-                        <th class="px-4 py-3">{% trans "Client" %}</th>
-                        <th class="px-4 py-3">{% trans "Montant" %}</th>
-                        <th class="px-4 py-3">{% trans "Fournisseur" %}</th>
-                        <th class="px-4 py-3">{% trans "Transaction" %}</th>
-                        <th class="px-4 py-3">{% trans "Statut" %}</th>
-                        <th class="px-4 py-3">{% trans "Confirmation" %}</th>
-                        <th class="px-4 py-3">{% trans "Date" %}</th>
+                <thead class="bg-steel-50/60">
+                    <tr class="font-mono text-[10px] uppercase tracking-wider text-graphite-500">
+                        <th class="px-4 py-3 text-left font-medium">#</th>
+                        <th class="px-4 py-3 text-left font-medium">{% trans "Garage" %}</th>
+                        <th class="px-4 py-3 text-left font-medium">{% trans "Propriétaire" %}</th>
+                        <th class="px-4 py-3 text-left font-medium">{% trans "Montant" %}</th>
+                        <th class="px-4 py-3 text-left font-medium">{% trans "Fournisseur" %}</th>
+                        <th class="px-4 py-3 text-left font-medium">{% trans "Statut" %}</th>
+                        <th class="px-4 py-3 text-left font-medium">{% trans "Date" %}</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y">
+                <tbody class="divide-y divide-line-200">
                     {% for payment in payments %}
-                        <tr class="hover:bg-steel-50">
-                            <td class="px-4 py-3 font-mono text-xs">{{ payment.idempotency_key|truncatechars:12 }}</td>
-                            <td class="px-4 py-3"><a href="{% url 'administration:payment_detail' payment.id %}" class="text-blue-500 hover:underline">{{ payment.garage.name|default:'—' }}</a></td>
-                            <td class="px-4 py-3">{{ payment.garage.owner.username|default:'—' }}</td>
-                            <td class="px-4 py-3">{{ payment.user.username }}</td>
-                            <td class="px-4 py-3 font-bold">{{ payment.amount|intcomma }} {{ payment.currency }}</td>
-                            <td class="px-4 py-3">{{ payment.get_provider_display }}</td>
-                            <td class="px-4 py-3 font-mono text-xs">{{ payment.provider_transaction_id|default:'—' }}</td>
+                        <tr class="hover:bg-steel-50/60 transition-colors">
+                            <td class="px-4 py-3 font-mono text-[11px] text-graphite-500">{{ payment.idempotency_key|truncatechars:12 }}</td>
+                            <td class="px-4 py-3">
+                                <a href="{% url 'administration:payment_detail' payment.id %}" class="font-medium text-navy-700 hover:text-navy-800">{{ payment.garage.name|default:'—' }}</a>
+                            </td>
+                            <td class="px-4 py-3 text-graphite-600 truncate max-w-[10rem]">{{ payment.garage.owner.username|default:'—' }}</td>
+                            <td class="px-4 py-3 font-display font-bold text-graphite-900 tabular-nums whitespace-nowrap">{{ payment.amount|intcomma }} {{ payment.currency }}</td>
+                            <td class="px-4 py-3 font-mono text-[11px] text-graphite-500 uppercase tracking-wider">{{ payment.get_provider_display }}</td>
                             <td class="px-4 py-3">
                                 {% if payment.status == 'SUCCESS' %}
-                                    <span class="bg-blue-100 text-blue-500">{% trans "Succès" %}</span>
+                                    <span class="badge bg-emerald-50 text-emerald-700"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>{% trans "Succès" %}</span>
                                 {% elif payment.status == 'FAILED' %}
-                                    <span class="bg-blue-100 text-blue-600">{% trans "Échoué" %}</span>
+                                    <span class="badge bg-red-50 text-red-700"><span class="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5"></span>{% trans "Échoué" %}</span>
                                 {% else %}
-                                    <span class="bg-blue-100 text-blue-600">{{ payment.get_status_display }}</span>
+                                    <span class="badge bg-navy-100 text-navy-700"><span class="w-1.5 h-1.5 rounded-full bg-navy-500 mr-1.5"></span>{{ payment.get_status_display }}</span>
                                 {% endif %}
                             </td>
-                            <td class="px-4 py-3">{{ payment.paid_at|date:"d/m/Y H:i"|default:'—' }}</td>
-                            <td class="px-4 py-3">{{ payment.created_at|date:"d/m/Y H:i" }}</td>
+                            <td class="px-4 py-3 text-xs text-graphite-500 whitespace-nowrap">{{ payment.created_at|date:"d/m/Y H:i" }}</td>
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="11" class="px-4 py-8 text-center text-graphite-600">{% trans "Aucun paiement trouvé." %}</td>
+                            <td colspan="7" class="px-4 py-12 text-center">
+                                <div class="w-12 h-12 mx-auto mb-3 rounded-lg bg-steel-50 flex items-center justify-center text-graphite-500">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                                    </svg>
+                                </div>
+                                <p class="text-sm text-graphite-500">{% trans "Aucun paiement trouvé." %}</p>
+                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
 
+        <ul class="md:hidden divide-y divide-line-200">
+            {% for payment in payments %}
+                <li>
+                    <a href="{% url 'administration:payment_detail' payment.id %}" class="block px-4 py-3.5 hover:bg-steel-50/60 transition-colors">
+                        <div class="flex items-center justify-between gap-3">
+                            <div class="min-w-0 flex-1">
+                                <div class="font-semibold text-sm text-graphite-900 truncate">{{ payment.garage.name|default:'—' }}</div>
+                                <div class="text-xs text-graphite-500 truncate mt-0.5">{{ payment.garage.owner.username|default:'—' }} · {{ payment.created_at|date:"d/m/Y H:i" }}</div>
+                            </div>
+                            <div class="text-right flex-shrink-0">
+                                <div class="font-display font-bold text-sm text-graphite-900 tabular-nums">{{ payment.amount|intcomma }} {{ payment.currency }}</div>
+                                <div class="mt-1">
+                                    {% if payment.status == 'SUCCESS' %}
+                                        <span class="badge bg-emerald-50 text-emerald-700"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>{% trans "Succès" %}</span>
+                                    {% elif payment.status == 'FAILED' %}
+                                        <span class="badge bg-red-50 text-red-700"><span class="w-1.5 h-1.5 rounded-full bg-red-500 mr-1.5"></span>{% trans "Échoué" %}</span>
+                                    {% else %}
+                                        <span class="badge bg-navy-100 text-navy-700"><span class="w-1.5 h-1.5 rounded-full bg-navy-500 mr-1.5"></span>{{ payment.get_status_display }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </li>
+            {% empty %}
+                <li class="p-8 text-center">
+                    <div class="w-12 h-12 mx-auto mb-3 rounded-lg bg-steel-50 flex items-center justify-center text-graphite-500">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                        </svg>
+                    </div>
+                    <p class="text-sm text-graphite-500">{% trans "Aucun paiement trouvé." %}</p>
+                </li>
+            {% endfor %}
+        </ul>
+
+        {% comment %}Pagination compacte{% endcomment %}
         {% if payments.has_other_pages %}
-            <div class="px-4 py-3 border-t flex justify-between items-center">
-                <span class="text-sm text-graphite-600">
-                    {% trans "Page" %} {{ payments.number }} {% trans "sur" %} {{ payments.paginator.num_pages }}
+            <div class="px-4 md:px-5 py-3 md:py-3.5 flex items-center justify-between gap-2 border-t border-line-200">
+                <span class="text-xs md:text-sm text-graphite-500">
+                    <span class="font-semibold text-graphite-900">{{ payments.number }}</span> / {{ payments.paginator.num_pages }}
                 </span>
-                <div class="flex space-x-2">
+
+                <div class="flex gap-2">
                     {% if payments.has_previous %}
-                        <a href="?page={{ payments.previous_page_number }}" class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 text-sm py-1 px-3">{% trans "Précédent" %}</a>
+                        <a href="?page={{ payments.previous_page_number }}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_provider %}&provider={{ selected_provider }}{% endif %}{% if selected_garage %}&garage={{ selected_garage }}{% endif %}{% if selected_client %}&client={{ selected_client }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}"
+                           class="btn btn-outline btn-sm" aria-label="{% trans 'Précédent' %}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                            </svg>
+                            <span class="hidden sm:inline">{% trans "Précédent" %}</span>
+                        </a>
                     {% endif %}
                     {% if payments.has_next %}
-                        <a href="?page={{ payments.next_page_number }}" class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 text-sm py-1 px-3">{% trans "Suivant" %}</a>
+                        <a href="?page={{ payments.next_page_number }}{% if selected_status %}&status={{ selected_status }}{% endif %}{% if selected_provider %}&provider={{ selected_provider }}{% endif %}{% if selected_garage %}&garage={{ selected_garage }}{% endif %}{% if selected_client %}&client={{ selected_client }}{% endif %}{% if date_from %}&date_from={{ date_from }}{% endif %}{% if date_to %}&date_to={{ date_to }}{% endif %}"
+                           class="btn btn-outline btn-sm" aria-label="{% trans 'Suivant' %}">
+                            <span class="hidden sm:inline">{% trans "Suivant" %}</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </a>
                     {% endif %}
                 </div>
             </div>
         {% endif %}
-    </div>
+    </section>
 </div>
+
+<script>
+(function () {
+    var toggle = document.getElementById('mobile-filter-toggle');
+    var panel = document.getElementById('mobile-filter-panel');
+    if (!toggle || !panel) return;
+    toggle.addEventListener('click', function () {
+        var isHidden = panel.classList.contains('hidden');
+        panel.classList.toggle('hidden', !isHidden);
+        toggle.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+    });
+})();
+</script>
+
 {% endblock %}
