@@ -1103,6 +1103,10 @@ video {
   height: 1px;
 }
 
+.h-24 {
+  height: 6rem;
+}
+
 .max-h-\[420px\] {
   max-height: 420px;
 }
@@ -1225,6 +1229,10 @@ video {
 
 .w-full {
   width: 100%;
+}
+
+.w-24 {
+  width: 6rem;
 }
 
 .min-w-0 {
@@ -2930,6 +2938,10 @@ video {
   color: rgb(161 98 7 / var(--tw-text-opacity, 1));
 }
 
+.text-graphite-500\/20 {
+  color: rgb(107 116 128 / 0.2);
+}
+
 .underline {
   text-decoration-line: underline;
 }
@@ -4449,6 +4461,10 @@ input[type="file"] {
 
   .sm\:rounded-2xl {
     border-radius: 1rem;
+  }
+
+  .sm\:border-l {
+    border-left-width: 1px;
   }
 
   .sm\:p-10 {
