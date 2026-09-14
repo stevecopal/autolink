@@ -1,0 +1,35 @@
+{
+  "short_name": "AutoLink",
+  "name": "AutoLink — Garages & Pièces au Cameroun",
+  "icons": [
+    {
+      "src": "/static/logo.jpg",
+      "type": "image/svg+xml",
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/logo.jpg",
+      "type": "image/svg+xml",
+      "sizes": "512x512",
+      "purpose": "any"
+    },
+    {
+      "src": "/static/logo.jpg",
+      "type": "image/svg+xml",
+      "sizes": "512x512",
+      "purpose": "maskable"
+    }
+  ],
+  "start_url": "/",
+  "scope": "/",
+  "background_color": "#0A1830",
+  "theme_color": "#000080",
+  "display": "standalone",
+  "orientation": "portrait",
+  "description": "Trouvez des garages vérifiés et des pièces automobiles près de chez vous au Cameroun.",
+  "lang": "fr",
+  "categories": ["automotive", "business"],
+  "screenshots": [],
+  "prefer_related_applications": false
+}

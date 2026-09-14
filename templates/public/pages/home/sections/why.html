@@ -8,9 +8,7 @@
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- En-tête -->
         <div class="max-w-3xl mx-auto text-center mb-12 sm:mb-16">
-            <span class="inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.2em] text-navy-300 mb-4">
-                {% trans "Notre promesse" %}
-            </span>
+           
             <h2 id="why-heading" class="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight leading-[1.05] mb-5">
                 {% trans "Pourquoi AutoLink change la donne" %}
             </h2>
@@ -53,7 +51,7 @@
                     </div>
                     <div>
                         <div class="text-4xl sm:text-5xl font-bold text-gray-900 tabular-nums">
-                            {{ why_avg_response_time|default:47 }} {% trans "min" %}
+                            {{ why_avg_response_time|default:5 }} {% trans "mins" %}
                         </div>
                         <div class="text-sm text-gray-500 uppercase tracking-wider mt-1">
                             {% trans "Temps de réponse" %}
