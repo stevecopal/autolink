@@ -11,8 +11,19 @@ class ContactMessageAdmin(admin.ModelAdmin):
 
 @admin.register(City)
 class CityAdmin(admin.ModelAdmin):
-    list_display = ['name']
-    search_fields = ['name']
+    list_display = ['name', 'region', 'latitude', 'longitude', 'is_active', 'created_at']
+    list_filter = ['is_active', 'region']
+    search_fields = ['name', 'region']
+    list_editable = ['latitude', 'longitude', 'is_active']
+    fieldsets = (
+        (None, {
+            'fields': ('name', 'slug', 'region', 'is_active')
+        }),
+        ('Géolocalisation', {
+            'fields': ('latitude', 'longitude'),
+            'classes': ('wide',),
+        }),
+    )
 
 @admin.register(Neighborhood)
 class NeighborhoodAdmin(admin.ModelAdmin):

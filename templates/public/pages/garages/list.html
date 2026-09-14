@@ -10,152 +10,267 @@
         <div class="absolute inset-0 bg-gradient-to-l from-navy-500/30 to-transparent"></div>
     </div>
     <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-       
-        <h1 class="font-display text-4xl sm:text-5xl font-bold text-white tracking-tight mb-3">{% trans "Trouver un garage" %}</h1>
-        <p class="text-white/60 text-sm sm:text-base max-w-2xl">{% trans "Parcourez les garages automobiles disponibles sur AutoLink" %}</p>
+        <h1 class="font-display text-4xl sm:text-5xl font-bold text-white tracking-tight mb-3">
+            {% trans "Trouver un garage" %}
+        </h1>
+        <p class="text-white/80 text-sm sm:text-base max-w-2xl">
+            {% trans "Parcourez les garages automobiles disponibles sur AutoLink" %}
+        </p>
     </div>
 </div>
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-12">
-    <!-- Filter card -->
-    <div class="bg-white rounded-2xl border border-line-200 shadow-card p-4 sm:p-6 mb-8">
-        <form method="get" class="space-y-4" role="search" aria-label="{% trans 'Recherche de garages' %}">
-            <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none" aria-hidden="true">
-                    <svg class="w-5 h-5 text-graphite-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+    <!-- Barre de recherche + Filtres (TOUT SUR UNE SEULE LIGNE) -->
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4 sm:p-5 mb-8">
+        <form method="get" class="space-y-4" id="search-form" role="search" aria-label="{% trans 'Recherche de garages' %}">
+            <!-- Barre de recherche principale (avec bouton ✕) -->
+            <div class="relative flex items-center gap-2">
+                <div class="absolute left-4 flex items-center pointer-events-none">
+                    <svg class="w-5 h-5 text-graphite-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
                 </div>
-                <input type="text" name="q" value="{{ search_query }}"
-                       placeholder="{% trans 'Rechercher un garage, service, quartier...' %}"
-                       class="w-full pl-11 pr-4 py-3 border border-line-200 rounded-xl focus:ring-2 focus:ring-navy-500 focus:border-navy-500 outline-none transition-all duration-200 font-mono bg-steel-50/50 text-sm"
-                       aria-label="{% trans 'Rechercher un garage' %}">
+                <input
+                    type="text"
+                    name="q"
+                    value="{{ search_query }}"
+                    placeholder="{% trans 'Rechercher un garage, service, quartier...' %}"
+                    class="flex-1 pl-12 pr-10 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-navy-500 focus:border-navy-500 outline-none transition-all bg-gray-50/50 text-sm"
+                    aria-label="{% trans 'Rechercher un garage' %}"
+                    id="search-input">
+                <!-- Bouton ✕ pour vider la recherche -->
+                <button
+                    type="button"
+                    onclick="document.getElementById('search-input').value = ''; document.getElementById('search-form').submit();"
+                    class="absolute right-4 text-graphite-500 hover:text-graphite-700 transition-colors p-1"
+                    aria-label="{% trans 'Effacer la recherche' %}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:items-center gap-3">
-                <select name="city" class="form-input !py-2.5 text-sm min-w-0" aria-label="{% trans 'Ville' %}">
+            <!-- Boutons Filtres et Réinitialiser (TOUT SUR UNE LIGNE) -->
+            <div class="flex items-center gap-2">
+                <!-- Bouton pour afficher/masquer les filtres -->
+                <button
+                    type="button"
+                    onclick="toggleFilters()"
+                    class="inline-flex items-center gap-2 px-4 py-2.5 bg-gray-50 border border-gray-200 text-graphite-700 rounded-lg text-sm font-semibold hover:bg-gray-100 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
+                    </svg>
+                    {% trans "Filtres" %}
+                </button>
+
+                <!-- Bouton Réinitialiser -->
+                <a
+                    href="{% url 'garages:garage_list' %}"
+                    class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-graphite-700 rounded-lg text-sm font-semibold hover:bg-gray-50 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                    </svg>
+                    {% trans "Réinitialiser" %}
+                </a>
+            </div>
+
+            <!-- Filtres (masqués par défaut) -->
+            <div id="filters-container" class="hidden grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 gap-2">
+                <select name="city" class="form-input !py-2.5 text-sm" aria-label="{% trans 'Ville' %}">
                     <option value="">{% trans "Toutes les villes" %}</option>
                     {% for city in cities %}
                     <option value="{{ city }}" {% if selected_city == city %}selected{% endif %}>{{ city }}</option>
                     {% endfor %}
                 </select>
-                <select name="neighborhood" class="form-input !py-2.5 text-sm min-w-0" aria-label="{% trans 'Quartier' %}">
+                <select name="neighborhood" class="form-input !py-2.5 text-sm" aria-label="{% trans 'Quartier' %}">
                     <option value="">{% trans "Tous les quartiers" %}</option>
                     {% for hood in neighborhoods %}
                     <option value="{{ hood }}" {% if selected_neighborhood == hood %}selected{% endif %}>{{ hood }}</option>
                     {% endfor %}
                 </select>
-                <select name="service" class="form-input !py-2.5 text-sm min-w-0" aria-label="{% trans 'Service' %}">
+                <select name="service" class="form-input !py-2.5 text-sm" aria-label="{% trans 'Service' %}">
                     <option value="">{% trans "Tous les services" %}</option>
                     {% for cat_key, cat_label in service_categories %}
                     <option value="{{ cat_key }}" {% if selected_service == cat_key %}selected{% endif %}>{{ cat_label }}</option>
                     {% endfor %}
                 </select>
-                <select name="sort" class="form-input !py-2.5 text-sm min-w-0" aria-label="{% trans 'Trier par' %}">
+                <select name="sort" class="form-input !py-2.5 text-sm" aria-label="{% trans 'Trier par' %}">
                     <option value="-created_at" {% if sort == '-created_at' %}selected{% endif %}>{% trans "Plus récent" %}</option>
                     <option value="name" {% if sort == 'name' %}selected{% endif %}>{% trans "Nom" %}</option>
                     <option value="-rating" {% if sort == '-rating' %}selected{% endif %}>{% trans "Mieux notés" %}</option>
                 </select>
-                <button type="submit" class="btn bg-navy-500 hover:bg-navy-500/90 text-white !py-2.5 text-sm whitespace-nowrap">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                    {% trans "Rechercher" %}
+                <button type="submit" class="btn bg-navy-500 hover:bg-navy-600 text-white !py-2.5 text-sm whitespace-nowrap">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    {% trans "Appliquer" %}
                 </button>
             </div>
         </form>
     </div>
 
+    <!-- Résultat de la recherche -->
     <div class="flex items-center justify-between mb-5">
-        <h2 class="font-display text-lg font-bold text-navy-900">{{ garages.paginator.count }} {% trans "garage(s) trouvé(s)" %}</h2>
+        <h2 class="font-display text-lg font-bold text-graphite-900">
+            {{ garages.paginator.count }} {% trans "garage(s) trouvé(s)" %}
+        </h2>
     </div>
 
     {% if garages %}
+    <!-- Liste des garages (4 colonnes sur desktop, 2 sur mobile) -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" role="list">
         {% for garage in garages %}
-        <article class="card group" role="listitem">
+        <article class="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all group" role="listitem">
             <a href="{% url 'garages:garage_detail' slug=garage.slug %}" class="block">
-                <div class="relative aspect-video overflow-hidden rounded-t-xl bg-steel-50">
+                <!-- Image du garage -->
+                <div class="relative aspect-video overflow-hidden rounded-t-xl bg-gray-50">
                     {% if garage.photo %}
-                    <img src="{{ garage.photo.url }}" alt="{{ garage.name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy">
+                    <img
+                        src="{{ garage.photo.url }}"
+                        alt="{{ garage.name }}"
+                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        loading="lazy">
                     {% else %}
-                    <div class="w-full h-full flex items-center justify-center">
-                        <svg class="w-10 h-10 text-graphite-500/30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                    <div class="w-full h-full flex items-center justify-center bg-gray-100">
+                        <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                        </svg>
                     </div>
                     {% endif %}
+
+                    <!-- Badges en haut à gauche -->
                     <div class="absolute top-2 left-2 flex gap-1">
                         {% if garage.verification_status == 'APPROVED' %}
-                        <span class="badge bg-navy-100 text-navy-500 !px-2 !py-1">{% trans "Vérifié" %}</span>
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-white/90 text-navy-700 text-xs font-semibold rounded-md backdrop-blur-sm">
+                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                            </svg>
+                            {% trans "Vérifié" %}
+                        </span>
                         {% endif %}
                         {% if garage.is_featured %}
-                        <span class="badge bg-navy-500 text-white !px-2 !py-1">{% trans "Recommandé" %}</span>
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-navy-500 text-white text-xs font-semibold rounded-md">
+                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5 2a1 1 0 011 1v1h8V3a1 1 0 112 0v1h1a2 2 0 012 2v11a2 2 0 01-2 2H4a2 2 0 01-2-2V5a1 1 0 011-1h1zm0 4h12v1H5V6z" clip-rule="evenodd"/>
+                            </svg>
+                            {% trans "Recommandé" %}
+                        </span>
                         {% endif %}
                     </div>
+
+                    <!-- Badge disponibilité en bas à gauche -->
                     <div class="absolute bottom-2 left-2">
                         {% if garage.availability_status == 'AVAILABLE' %}
-                        <span class="badge bg-emerald-600 text-white !px-2 !py-1">{% trans "Disponible" %}</span>
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-500/10 text-emerald-700 text-xs font-semibold rounded-md backdrop-blur-sm">
+                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                            </svg>
+                            {% trans "Disponible" %}
+                        </span>
                         {% else %}
-                        <span class="badge bg-graphite-900/70 text-white !px-2 !py-1">{% trans "Fermé" %}</span>
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-gray-900/10 text-gray-700 text-xs font-semibold rounded-md backdrop-blur-sm">
+                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.414 1.414a1 1 0 101.414 1.414L10 11.414l1.414 1.414a1 1 0 001.414-1.414L11.414 10l1.414-1.414a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                            </svg>
+                            {% trans "Fermé" %}
+                        </span>
                         {% endif %}
                     </div>
+
+                    <!-- Badge "Ouvert maintenant" en bas à droite -->
                     {% if garage.is_open_now %}
                     <div class="absolute bottom-2 right-2">
-                        <span class="badge bg-white text-emerald-700 border border-line-200 !px-2 !py-1">{% trans "Ouvert" %}</span>
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-white text-emerald-700 text-xs font-semibold rounded-md">
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            {% trans "Ouvert" %}
+                        </span>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Contenu textuel -->
+                <div class="p-4">
+                    <h3 class="font-bold text-graphite-900 text-sm truncate group-hover:text-navy-600 transition-colors">
+                        {{ garage.name }}
+                    </h3>
+                    <p class="text-graphite-500 text-xs mt-1 flex items-center gap-1 truncate">
+                        <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        {% if garage.neighborhood %}
+                            {{ garage.neighborhood.name }}
+                        {% elif garage.city %}
+                            {{ garage.city.name }}
+                        {% endif %}
+                    </p>
+
+                    <!-- Services -->
+                    {% if garage.services %}
+                    <div class="flex flex-wrap gap-1 mt-2">
+                        {% for service in garage.services.all|slice:":3" %}
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-graphite-600">
+                            {{ service.name }}
+                        </span>
+                        {% endfor %}
+                        {% if garage.active_services_count > 3 %}
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-navy-100 text-navy-600">
+                            +{{ garage.active_services_count|add:"-3" }} {% trans "autres" %}
+                        </span>
+                        {% endif %}
                     </div>
                     {% endif %}
                 </div>
             </a>
-            <div class="p-3 sm:p-4">
-                <a href="{% url 'garages:garage_detail' slug=garage.slug %}" class="block">
-                    <h3 class="font-bold text-graphite-900 text-sm truncate group-hover:text-navy-500 transition-colors">{{ garage.name }}</h3>
-                </a>
-                <p class="text-graphite-500 text-xs mt-0.5 truncate flex items-center gap-1">
-                    <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                    <span>{% if garage.neighborhood %}{{ garage.neighborhood.name }}{% elif garage.city %}{{ garage.city.name }}{% endif %}</span>
-                    {% if garage.city and garage.neighborhood %}
-                    <span class="text-graphite-500/60">·</span>
-                    <span>{% if garage.city %}{{ garage.city.name }}{% endif %}</span>
-                    {% endif %}
-                </p>
-                {% if garage.services %}
-                <div class="flex flex-wrap gap-1 mt-2">
-                    {% for service in garage.services.all|slice:":3" %}
-                    <span class="badge bg-steel-50 text-graphite-600 !px-2 !py-0.5 font-medium">{{ service.name }}</span>
-                    {% endfor %}
-                    {% if garage.active_services_count > 3 %}
-                    <span class="badge bg-navy-100 text-navy-500 !px-2 !py-0.5">+{{ garage.active_services_count|add:"-3" }}</span>
-                    {% endif %}
-                </div>
-                {% endif %}
-            </div>
         </article>
         {% endfor %}
     </div>
 
     {% if garages.has_other_pages %}
+    <!-- Pagination -->
     <nav class="mt-10 flex justify-center" aria-label="{% trans 'Pagination' %}">
         <div class="flex items-center gap-2">
             {% if garages.has_previous %}
-            <a href="?page={{ garages.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_city %}&city={{ selected_city }}{% endif %}{% if selected_neighborhood %}&neighborhood={{ selected_neighborhood }}{% endif %}{% if selected_service %}&service={{ selected_service }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}"
-               class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 text-sm px-4 py-2" aria-label="{% trans 'Page précédente' %}">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            <a
+                href="?page={{ garages.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_city %}&city={{ selected_city }}{% endif %}{% if selected_neighborhood %}&neighborhood={{ selected_neighborhood }}{% endif %}{% if selected_service %}&service={{ selected_service }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}"
+                class="inline-flex items-center gap-1 px-4 py-2 bg-white border border-gray-200 text-graphite-700 rounded-lg text-sm font-semibold hover:bg-gray-50 transition-colors"
+                aria-label="{% trans 'Page précédente' %}">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
                 <span class="hidden sm:inline">{% trans "Précédent" %}</span>
             </a>
             {% else %}
-            <span class="btn bg-white border border-line-200 text-graphite-900 text-sm px-4 py-2 opacity-50 cursor-not-allowed" aria-disabled="true">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            <span class="inline-flex items-center gap-1 px-4 py-2 bg-white border border-gray-200 text-graphite-400 rounded-lg text-sm font-semibold cursor-not-allowed">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
                 <span class="hidden sm:inline">{% trans "Précédent" %}</span>
             </span>
             {% endif %}
 
-            <span class="px-4 py-2 text-sm font-medium text-graphite-600 font-mono">{% trans "Page" %} {{ garages.number }} / {{ garages.paginator.num_pages }}</span>
+            <span class="px-4 py-2 text-sm font-medium text-graphite-600">
+                {% trans "Page" %} {{ garages.number }} / {{ garages.paginator.num_pages }}
+            </span>
 
             {% if garages.has_next %}
-            <a href="?page={{ garages.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_city %}&city={{ selected_city }}{% endif %}{% if selected_neighborhood %}&neighborhood={{ selected_neighborhood }}{% endif %}{% if selected_service %}&service={{ selected_service }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}"
-               class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 text-sm px-4 py-2" aria-label="{% trans 'Page suivante' %}">
+            <a
+                href="?page={{ garages.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_city %}&city={{ selected_city }}{% endif %}{% if selected_neighborhood %}&neighborhood={{ selected_neighborhood }}{% endif %}{% if selected_service %}&service={{ selected_service }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}"
+                class="inline-flex items-center gap-1 px-4 py-2 bg-white border border-gray-200 text-graphite-700 rounded-lg text-sm font-semibold hover:bg-gray-50 transition-colors"
+                aria-label="{% trans 'Page suivante' %}">
                 <span class="hidden sm:inline">{% trans "Suivant" %}</span>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
             </a>
             {% else %}
-            <span class="btn bg-white border border-line-200 text-graphite-900 text-sm px-4 py-2 opacity-50 cursor-not-allowed" aria-disabled="true">
+            <span class="inline-flex items-center gap-1 px-4 py-2 bg-white border border-gray-200 text-graphite-400 rounded-lg text-sm font-semibold cursor-not-allowed">
                 <span class="hidden sm:inline">{% trans "Suivant" %}</span>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
             </span>
             {% endif %}
         </div>
@@ -163,14 +278,34 @@
     {% endif %}
 
     {% else %}
+    <!-- Aucun résultat -->
     <div class="text-center py-16">
-        <div class="w-16 h-16 mx-auto mb-5 rounded-2xl bg-steel-50 flex items-center justify-center">
-            <svg class="w-8 h-8 text-graphite-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+        <div class="w-16 h-16 mx-auto mb-5 rounded-xl bg-gray-50 flex items-center justify-center">
+            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+            </svg>
         </div>
-        <h2 class="font-display text-2xl font-bold text-navy-900 mb-2">{% trans "Aucun garage trouvé" %}</h2>
-        <p class="text-graphite-600 mb-6 text-sm">{% trans "Essayez de modifier vos filtres ou votre recherche" %}</p>
-        <a href="{% url 'garages:garage_list' %}" class="btn bg-navy-500 hover:bg-navy-500/90 text-white text-sm">{% trans "Réinitialiser les filtres" %}</a>
+        <h2 class="font-display text-2xl font-bold text-graphite-900 mb-2">
+            {% trans "Aucun garage trouvé" %}
+        </h2>
+        <p class="text-graphite-600 mb-6 text-sm">
+            {% trans "Essayez de modifier vos filtres ou votre recherche." %}
+        </p>
+        <a href="{% url 'garages:garage_list' %}" class="inline-flex items-center gap-2 bg-navy-500 hover:bg-navy-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+            {% trans "Réinitialiser les filtres" %}
+        </a>
     </div>
     {% endif %}
 </div>
+
+<!-- JavaScript pour les filtres -->
+<script>
+// Toggle les filtres
+function toggleFilters() {
+    const filtersContainer = document.getElementById('filters-container');
+    filtersContainer.classList.toggle('hidden');
+}
+
+// Réinitialiser les filtres (déjà géré par le lien "Réinitialiser")
+</script>
 {% endblock %}

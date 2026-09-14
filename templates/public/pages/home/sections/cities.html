@@ -1,5 +1,5 @@
 {% load i18n %}
-{% if cities %}
+{% if cities_map or cities %}
 <section class="bg-navy-900 relative overflow-hidden" aria-labelledby="cities-heading">
 
     {% comment %}Grille blueprint{% endcomment %}
@@ -27,161 +27,31 @@
                 <p class="text-white/55 text-sm sm:text-base leading-relaxed mb-8 max-w-md">
                     {% trans "De Douala à Maroua, en passant par Yaoundé, Bafoussam et Garoua : AutoLink vous connecte aux garages vérifiés de votre ville. Cliquez sur une ville pour voir les garages disponibles." %}
                 </p>
+                 <div class="mb-5 flex flex-wrap gap-2">
+                    {% for city in cities %}
+                        <a href="{% url 'garages:garage_list' %}?city={{ city.name }}"
+                            class="group inline-flex items-center gap-2 bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.08] hover:border-navy-300/40 rounded-full pl-2.5 pr-3 py-1.5 transition-colors duration-200">
+                            <span class="w-1.5 h-1.5 rounded-full bg-navy-300 group-hover:bg-emerald-400 transition-colors"></span>
+                            <span class="text-white/85 group-hover:text-white text-xs font-medium">{{ city.name }}</span>
+                        </a>
+                    {% endfor %}
+                </div>
 
                 <a href="{% url 'garages:garage_list' %}"
                    class="inline-flex items-center gap-2 bg-white text-navy-900 hover:bg-navy-50 font-bold px-6 py-3.5 rounded-xl transition-colors duration-200 text-sm sm:text-base">
-                    {% trans "Explorer toutes les villes" %}
+                    {% trans "Explorer toutes les garages" %}
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
                     </svg>
                 </a>
             </div>
+           
 
-            {% comment %}═════════ Colonne droite : carte interactive ═════════{% endcomment %}
-            <div class="lg:col-span-7">
-                <div class="relative">
 
-                    {% comment %}Étiquette du panneau{% endcomment %}
-                    <div class="flex items-center justify-between mb-4 px-1">
-                        <div class="flex items-center gap-2">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse-soft"></span>
-                            <span class="font-mono text-[10px] uppercase tracking-[0.14em] text-white/70">
-                                {% trans "Réseau actif" %} · CM
-                            </span>
-                        </div>
-                        <span class="font-mono text-[10px] uppercase tracking-[0.14em] text-white/40">
-                            {{ cities_count_display }} {% trans "villes" %}
-                        </span>
-                    </div>
-
-                    {% comment %}Panneau carte{% endcomment %}
-                    <div class="relative bg-white/[0.02] backdrop-blur-sm border border-white/[0.08] rounded-2xl overflow-hidden shadow-[0_30px_60px_-20px_rgba(0,0,0,0.7)]">
-
-                        {% comment %}Grille interne blueprint{% endcomment %}
-                        <div class="absolute inset-0 opacity-[0.06]" aria-hidden="true">
-                            <div class="absolute inset-0" style="background-image: linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px); background-size: 28px 28px;"></div>
-                        </div>
-
-                        {% comment %}Carte SVG du Cameroun + marqueurs{% endcomment %}
-                        <div class="relative aspect-[4/5] sm:aspect-[5/5] max-h-[520px]">
-                            <svg class="absolute inset-0 w-full h-full" viewBox="0 0 400 500" preserveAspectRatio="xMidYMid meet" aria-label="{% trans 'Carte des villes couvertes au Cameroun' %}">
-
-                                {% comment %}Silhouette du Cameroun{% endcomment %}
-                                <path d="M 295,30 L 315,50 L 335,85 L 350,120 L 360,160 L 362,200 L 355,240 L 348,280 L 340,310 L 315,355 L 280,385 L 240,400 L 200,410 L 160,415 L 130,405 L 105,380 L 90,350 L 80,315 L 78,280 L 82,245 L 90,210 L 105,180 L 125,160 L 145,145 L 165,135 L 185,120 L 205,105 L 225,90 L 240,75 L 255,60 L 275,42 Z"
-                                      fill="rgba(79,110,224,0.08)"
-                                      stroke="rgba(79,110,224,0.5)"
-                                      stroke-width="1.5"
-                                      stroke-linejoin="round"/>
-
-                                {% comment %}Lignes de connexion entre villes{% endcomment %}
-                                <g stroke="rgba(79,110,224,0.35)" stroke-width="0.8" stroke-dasharray="3 4" fill="none">
-                                    <line x1="150" y1="380" x2="195" y2="320"/>
-                                    <line x1="195" y1="320" x2="140" y2="240"/>
-                                    <line x1="140" y1="240" x2="135" y2="200"/>
-                                    <line x1="140" y1="240" x2="240" y2="200"/>
-                                    <line x1="240" y1="200" x2="260" y2="130"/>
-                                    <line x1="260" y1="130" x2="300" y2="75"/>
-                                    <line x1="195" y1="320" x2="270" y2="290"/>
-                                    <line x1="150" y1="380" x2="180" y2="380"/>
-                                </g>
-
-                                {% comment %}Marqueurs villes{% endcomment %}
-                                {% for city in cities_map %}
-                                    <g class="city-marker" transform="translate({{ city.x }}, {{ city.y }})">
-                                        <circle cx="0" cy="0" r="10" fill="rgba(79,110,224,0.15)" class="marker-pulse"/>
-                                        <circle cx="0" cy="0" r="5" fill="rgba(79,110,224,0.25)"/>
-                                        <circle cx="0" cy="0" r="3" fill="#4F6EE0"/>
-                                        <circle cx="0" cy="0" r="1.5" fill="#ffffff"/>
-                                    </g>
-                                {% endfor %}
-                            </svg>
-
-                            {% comment %}Labels HTML superposés (plus faciles à styler que du SVG text){% endcomment %}
-                            <div class="absolute inset-0 pointer-events-none">
-                                {% for city in cities_map %}
-                                    <a href="{% url 'garages:garage_list' %}?city={{ city.name }}"
-                                       class="city-label absolute pointer-events-auto inline-flex items-center gap-1 bg-navy-900/85 hover:bg-navy-500 backdrop-blur-sm border border-white/[0.12] hover:border-navy-500 text-white text-[10px] font-semibold px-2 py-1 rounded-md transition-all duration-200 whitespace-nowrap"
-                                       style="left: {{ city.label_x }}%; top: {{ city.label_y }}%; transform: translate(-50%, -130%);"
-                                       title="{{ city.name }} — {{ city.garages_count }} {% trans 'garages' %}">
-                                        {{ city.name }}
-                                        <span class="font-mono text-[8px] text-white/50">{{ city.garages_count }}</span>
-                                    </a>
-                                {% endfor %}
-                            </div>
-
-                            {% comment %}Ligne de scan subtile{% endcomment %}
-                            <div class="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-navy-300/40 to-transparent animate-scan pointer-events-none"></div>
-                        </div>
-
-                        {% comment %}Footer du panneau{% endcomment %}
-                        <div class="flex items-center justify-between px-4 py-3 border-t border-white/[0.06]">
-                            <span class="font-mono text-[10px] uppercase tracking-[0.14em] text-white/40">
-                                {% trans "Réseau AutoLink" %}
-                            </span>
-                            <span class="inline-flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.14em] text-emerald-400">
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse-soft"></span>
-                                {{ garages_total_display }} {% trans "garages actifs" %}
-                            </span>
-                        </div>
-                    </div>
-
-                    {% comment %}Liste compacte des villes sous la carte{% endcomment %}
-                    <div class="mt-5 flex flex-wrap gap-2">
-                        {% for city in cities %}
-                            <a href="{% url 'garages:garage_list' %}?city={{ city }}"
-                               class="group inline-flex items-center gap-2 bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.08] hover:border-navy-300/40 rounded-full pl-2.5 pr-3 py-1.5 transition-colors duration-200">
-                                <span class="w-1.5 h-1.5 rounded-full bg-navy-300 group-hover:bg-emerald-400 transition-colors"></span>
-                                <span class="text-white/85 group-hover:text-white text-xs font-medium">{{ city }}</span>
-                            </a>
-                        {% endfor %}
-                    </div>
-
-                </div>
-            </div>
+           
         </div>
     </div>
 </section>
 
-{% comment %}Styles pour l'animation des marqueurs{% endcomment %}
-<style>
-    @keyframes cityMarkerPulse {
-        0%   { transform: scale(0.6); opacity: 0.9; }
-        100% { transform: scale(2.2); opacity: 0; }
-    }
-    .marker-pulse {
-        transform-origin: center;
-        transform-box: fill-box;
-        animation: cityMarkerPulse 2.4s ease-out infinite;
-    }
-    .city-marker:nth-child(2) .marker-pulse { animation-delay: 0.3s; }
-    .city-marker:nth-child(3) .marker-pulse { animation-delay: 0.6s; }
-    .city-marker:nth-child(4) .marker-pulse { animation-delay: 0.9s; }
-    .city-marker:nth-child(5) .marker-pulse { animation-delay: 1.2s; }
-    .city-marker:nth-child(6) .marker-pulse { animation-delay: 1.5s; }
-    .city-marker:nth-child(7) .marker-pulse { animation-delay: 1.8s; }
-    .city-marker:nth-child(8) .marker-pulse { animation-delay: 0.5s; }
 
-    .city-label {
-        opacity: 0;
-        animation: cityLabelFadeIn 0.5s ease-out forwards;
-    }
-    .city-label:nth-child(1) { animation-delay: 0.2s; }
-    .city-label:nth-child(2) { animation-delay: 0.4s; }
-    .city-label:nth-child(3) { animation-delay: 0.6s; }
-    .city-label:nth-child(4) { animation-delay: 0.8s; }
-    .city-label:nth-child(5) { animation-delay: 1.0s; }
-    .city-label:nth-child(6) { animation-delay: 1.2s; }
-    .city-label:nth-child(7) { animation-delay: 1.4s; }
-    .city-label:nth-child(8) { animation-delay: 1.6s; }
-
-    @keyframes cityLabelFadeIn {
-        from { opacity: 0; transform: translate(-50%, -110%); }
-        to   { opacity: 1; transform: translate(-50%, -130%); }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-        .marker-pulse { animation: none; opacity: 0.5; transform: scale(1.4); }
-        .city-label { animation: none; opacity: 1; }
-    }
-</style>
 {% endif %}

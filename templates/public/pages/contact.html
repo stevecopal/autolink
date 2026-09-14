@@ -6,14 +6,19 @@
 {% block content %}
 {# ============ PAGE HEADER ============ #}
 <div class="relative bg-navy-900 overflow-hidden">
-    <div class="absolute top-0 right-0 w-1/2 h-full opacity-[0.08]" aria-hidden="true">
-        <div class="absolute inset-0 bg-gradient-to-l from-navy-500/30 to-transparent"></div>
+    <!-- Fond subtil avec grille légère -->
+    <div class="absolute inset-0 opacity-[0.05]" aria-hidden="true">
+        <div class="absolute inset-0" style="background-image: linear-gradient(rgba(255,255,255,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.3) 1px, transparent 1px); background-size: 40px 40px;"></div>
     </div>
+    <!-- Overlay dégradé -->
+    <div class="absolute inset-0 bg-gradient-to-b from-navy-900/80 to-navy-900/60" aria-hidden="true"></div>
+
     <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-20">
-       
-        <h1 class="font-display text-4xl sm:text-5xl font-bold text-white tracking-tight mb-4">{% trans "Nous contacter" %}</h1>
-        <p class="text-white/60 text-sm sm:text-base max-w-2xl leading-relaxed">
-            {% trans "Une question, un problème ou une suggestion ? Notre équipe est à votre disposition pour vous accompagner." %}
+        <h1 class="font-display text-4xl sm:text-5xl font-bold text-white tracking-tight mb-4">
+            {% trans "Nous contacter" %}
+        </h1>
+        <p class="text-white/80 text-sm sm:text-base max-w-2xl leading-relaxed">
+            {% trans "Une question, un besoin ou une suggestion ? Notre équipe est à votre disposition pour vous accompagner." %}
         </p>
     </div>
 </div>
@@ -22,66 +27,92 @@
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
     <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12">
         <!-- Coordonnées -->
-        <div class="lg:col-span-2">
-            <h2 class="font-display text-2xl font-bold text-navy-900 mb-6">{% trans "Nos coordonnées" %}</h2>
-            <div class="space-y-4">
-                <!-- Adresse -->
-                <div class="flex items-start gap-4 bg-white border border-line-200 rounded-xl p-4 hover:shadow-card-hover transition-shadow">
-                    <div class="w-11 h-11 rounded-xl bg-navy-100 flex items-center justify-center flex-shrink-0">
-                        <svg class="w-5 h-5 text-navy-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+        <div class="lg:col-span-2 space-y-6">
+            <h2 class="font-display text-2xl font-bold text-graphite-900 mb-6">
+                {% trans "Nos coordonnées" %}
+            </h2>
+
+            <!-- Adresse -->
+            <div class="reveal bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow">
+                <div class="flex items-start gap-4">
+                    <div class="w-11 h-11 rounded-xl bg-gray-50 flex items-center justify-center flex-shrink-0">
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
                     </div>
                     <div>
-                        <h4 class="font-bold text-sm text-navy-900">{% trans "Adresse" %}</h4>
-                        <p class="text-graphite-600 text-sm">Boulevard de la République<br>Douala, Cameroun</p>
+                        <h4 class="font-bold text-sm text-graphite-900">{% trans "Adresse" %}</h4>
+                        <p class="text-graphite-600 text-sm">
+                            Boulevard de la République<br>
+                            Douala, Cameroun
+                        </p>
                     </div>
                 </div>
-                <!-- Téléphone -->
-                <div class="flex items-start gap-4 bg-white border border-line-200 rounded-xl p-4 hover:shadow-card-hover transition-shadow">
-                    <div class="w-11 h-11 rounded-xl bg-navy-100 flex items-center justify-center flex-shrink-0">
-                        <svg class="w-5 h-5 text-navy-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/></svg>
+            </div>
+
+            <!-- Téléphone -->
+            <div class="reveal bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow" style="transition-delay: 100ms;">
+                <div class="flex items-start gap-4">
+                    <div class="w-11 h-11 rounded-xl bg-gray-50 flex items-center justify-center flex-shrink-0">
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+                        </svg>
                     </div>
                     <div>
-                        <h4 class="font-bold text-sm text-navy-900">{% trans "Téléphone" %}</h4>
-                        <a href="tel:+237600000000" class="text-graphite-600 text-sm hover:text-navy-500 transition font-mono">+237 600 000 000</a>
+                        <h4 class="font-bold text-sm text-graphite-900">{% trans "Téléphone" %}</h4>
+                        <a href="tel:+237600000000" class="text-graphite-600 text-sm hover:text-navy-600 transition font-mono">+237 600 000 000</a>
                     </div>
                 </div>
-                <!-- Email -->
-                <div class="flex items-start gap-4 bg-white border border-line-200 rounded-xl p-4 hover:shadow-card-hover transition-shadow">
-                    <div class="w-11 h-11 rounded-xl bg-navy-100 flex items-center justify-center flex-shrink-0">
-                        <svg class="w-5 h-5 text-navy-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            </div>
+
+            <!-- Email -->
+            <div class="reveal bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow" style="transition-delay: 200ms;">
+                <div class="flex items-start gap-4">
+                    <div class="w-11 h-11 rounded-xl bg-gray-50 flex items-center justify-center flex-shrink-0">
+                        <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
                     </div>
                     <div>
-                        <h4 class="font-bold text-sm text-navy-900">{% trans "Email" %}</h4>
-                        <a href="mailto:contact@autolink.cm" class="text-graphite-600 text-sm hover:text-navy-500 transition font-mono">contact@autolink.cm</a>
+                        <h4 class="font-bold text-sm text-graphite-900">{% trans "Email" %}</h4>
+                        <a href="mailto:contact@autolink.cm" class="text-graphite-600 text-sm hover:text-navy-600 transition font-mono">contact@autolink.cm</a>
                     </div>
                 </div>
-                <!-- WhatsApp -->
-                <div class="flex items-start gap-4 bg-white border border-line-200 rounded-xl p-4 hover:shadow-card-hover transition-shadow">
-                    <div class="w-11 h-11 rounded-xl bg-emerald-50 flex items-center justify-center flex-shrink-0">
-                        <svg class="w-5 h-5 text-emerald-600" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.454.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.472.099-.174.05-.372-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.372-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.67-.297-.472-.61-1.47-.94-2.205-.297-.67-.396-.766-.47-.866-.05-.075-.124-.173-.223-.199-.099-.024-.174 0-.372.074z"/></svg>
+            </div>
+
+            <!-- WhatsApp -->
+            <div class="reveal bg-white rounded-xl border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow" style="transition-delay: 300ms;">
+                <div class="flex items-start gap-4">
+                    <div class="w-11 h-11 rounded-xl bg-gray-50 flex items-center justify-center flex-shrink-0">
+                        <svg class="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.454.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.472.099-.174.05-.372-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.372-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.67-.297-.472-.61-1.47-.94-2.205-.297-.67-.396-.766-.47-.866-.05-.075-.124-.173-.223-.199-.099-.024-.174 0-.372.074z"/>
+                        </svg>
                     </div>
                     <div>
-                        <h4 class="font-bold text-sm text-navy-900">WhatsApp</h4>
-                        <a href="https://wa.me/237600000000" target="_blank" rel="noopener noreferrer" class="text-graphite-600 text-sm hover:text-navy-500 transition font-mono">+237 600 000 000</a>
+                        <h4 class="font-bold text-sm text-graphite-900">WhatsApp</h4>
+                        <a href="https://wa.me/237600000000" target="_blank" rel="noopener noreferrer" class="text-graphite-600 text-sm hover:text-navy-600 transition font-mono">+237 600 000 000</a>
                     </div>
                 </div>
             </div>
 
             <!-- Horaires -->
-            <div class="mt-6 tech-panel bg-white rounded-xl p-5" data-accent="blue">
-                <h4 class="font-display font-bold text-sm text-navy-900 mb-3">{% trans "Horaires d'ouverture" %}</h4>
+            <div class="reveal bg-white rounded-xl border border-gray-200 p-5 shadow-sm hover:shadow-md transition-shadow" style="transition-delay: 400ms;">
+                <h4 class="font-display font-bold text-sm text-graphite-900 mb-3">
+                    {% trans "Horaires d'ouverture" %}
+                </h4>
                 <div class="space-y-1.5 text-sm">
                     <div class="flex justify-between">
                         <span class="text-graphite-600">{% trans "Lundi - Vendredi" %}</span>
-                        <span class="font-bold text-navy-900">8h00 - 18h00</span>
+                        <span class="font-bold text-graphite-900">8h00 - 18h00</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-graphite-600">{% trans "Samedi" %}</span>
-                        <span class="font-bold text-navy-900">9h00 - 14h00</span>
+                        <span class="font-bold text-graphite-900">9h00 - 14h00</span>
                     </div>
                     <div class="flex justify-between">
                         <span class="text-graphite-600">{% trans "Dimanche" %}</span>
-                        <span class="font-bold text-navy-600">{% trans "Fermé" %}</span>
+                        <span class="font-bold text-graphite-600">{% trans "Fermé" %}</span>
                     </div>
                 </div>
             </div>
@@ -90,62 +121,96 @@
         <!-- Formulaire -->
         <div class="lg:col-span-3">
             {% if sent %}
-            <div class="tech-panel bg-white rounded-xl p-8 sm:p-12 text-center" data-accent="blue">
+            <div class="reveal bg-white rounded-xl border border-gray-200 p-8 sm:p-12 text-center shadow-sm">
                 <div class="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-5">
-                    <svg class="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <svg class="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
                 </div>
-                <h2 class="font-display text-2xl font-bold text-navy-900 mb-2">{% trans "Message envoyé !" %}</h2>
-                <p class="text-graphite-600 mb-8">{% trans "Merci de nous avoir contactés. Nous vous répondrons dans les plus brefs délais." %}</p>
-                <a href="{% url 'core:home' %}" class="btn bg-navy-500 hover:bg-navy-500/90 text-white">{% trans "Retour à l'accueil" %}</a>
+                <h2 class="font-display text-2xl font-bold text-graphite-900 mb-2">
+                    {% trans "Message envoyé !" %}
+                </h2>
+                <p class="text-graphite-600 mb-8">
+                    {% trans "Merci de nous avoir contactés. Nous vous répondrons dans les plus brefs délais." %}
+                </p>
+                <a href="{% url 'core:home' %}" class="inline-flex items-center gap-2 bg-navy-500 hover:bg-navy-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                    {% trans "Retour à l'accueil" %}
+                </a>
             </div>
             {% else %}
-            <div class="tech-panel bg-white rounded-xl p-6 sm:p-8" data-accent="blue">
-                <h2 class="font-display text-2xl font-bold text-navy-900 mb-1">{% trans "Envoyez-nous un message" %}</h2>
-                <p class="text-graphite-500 text-sm mb-8">{% trans "Remplissez le formulaire ci-dessous et nous vous répondrons rapidement." %}</p>
+            <div class="reveal bg-white rounded-xl border border-gray-200 p-6 sm:p-8 shadow-sm">
+                <h2 class="font-display text-2xl font-bold text-graphite-900 mb-1">
+                    {% trans "Envoyez-nous un message" %}
+                </h2>
+                <p class="text-graphite-500 text-sm mb-8">
+                    {% trans "Remplissez le formulaire ci-dessous et nous vous répondrons rapidement." %}
+                </p>
 
                 <form method="post" class="space-y-5">
                     {% csrf_token %}
+
+                    <!-- Erreurs globales -->
                     {% if form.non_field_errors %}
-                    <div class="bg-navy-500/10 text-navy-600 p-3 rounded-lg text-sm border border-navy-500/20">
+                    <div class="bg-red-50 text-red-600 p-3 rounded-lg text-sm border border-red-200">
                         {{ form.non_field_errors.0 }}
                     </div>
                     {% endif %}
+
+                    <!-- Nom et Email -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                         <div>
-                            <label class="form-label" for="{{ form.name.id_for_label }}">{% trans "Nom complet" %} <span class="text-navy-500">*</span></label>
+                            <label for="{{ form.name.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                {% trans "Nom complet" %} <span class="text-red-500">*</span>
+                            </label>
                             {{ form.name }}
                             {% if form.name.errors %}
-                            <p class="form-error">{{ form.name.errors.0 }}</p>
+                            <p class="text-red-600 text-sm mt-1">{{ form.name.errors.0 }}</p>
                             {% endif %}
                         </div>
                         <div>
-                            <label class="form-label" for="{{ form.email.id_for_label }}">{% trans "Email" %} <span class="text-navy-500">*</span></label>
+                            <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                {% trans "Email" %} <span class="text-red-500">*</span>
+                            </label>
                             {{ form.email }}
                             {% if form.email.errors %}
-                            <p class="form-error">{{ form.email.errors.0 }}</p>
+                            <p class="text-red-600 text-sm mt-1">{{ form.email.errors.0 }}</p>
                             {% endif %}
                         </div>
                     </div>
+
+                    <!-- Téléphone et Sujet -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
                         <div>
-                            <label class="form-label" for="{{ form.phone.id_for_label }}">{% trans "Téléphone" %}</label>
+                            <label for="{{ form.phone.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                {% trans "Téléphone" %}
+                            </label>
                             {{ form.phone }}
                         </div>
                         <div>
-                            <label class="form-label" for="{{ form.subject.id_for_label }}">{% trans "Sujet" %}</label>
+                            <label for="{{ form.subject.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                                {% trans "Sujet" %}
+                            </label>
                             {{ form.subject }}
                         </div>
                     </div>
+
+                    <!-- Message -->
                     <div>
-                        <label class="form-label" for="{{ form.message.id_for_label }}">{% trans "Message" %} <span class="text-navy-500">*</span></label>
+                        <label for="{{ form.message.id_for_label }}" class="block text-sm font-medium text-gray-700 mb-1">
+                            {% trans "Message" %} <span class="text-red-500">*</span>
+                        </label>
                         {{ form.message }}
                         {% if form.message.errors %}
-                        <p class="form-error">{{ form.message.errors.0 }}</p>
+                        <p class="text-red-600 text-sm mt-1">{{ form.message.errors.0 }}</p>
                         {% endif %}
                     </div>
+
+                    <!-- Bouton Envoyer -->
                     <div class="flex justify-end pt-2">
-                        <button type="submit" class="btn bg-navy-500 hover:bg-navy-500/90 text-white px-8">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+                        <button type="submit" class="inline-flex items-center gap-2 bg-navy-500 hover:bg-navy-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                            </svg>
                             {% trans "Envoyer" %}
                         </button>
                     </div>
@@ -155,4 +220,32 @@
         </div>
     </div>
 </div>
+
+<!-- Animation JS (à placer dans ton main.js) -->
+<script>
+// Animation des éléments au scroll (comme "How it works")
+document.addEventListener('DOMContentLoaded', function() {
+    const reveals = document.querySelectorAll('.reveal');
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+                observer.unobserve(entry.target);
+            }
+        });
+    }, {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    });
+
+    reveals.forEach((el, index) => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(20px)';
+        el.style.transition = `all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) ${index * 100}ms`;
+        observer.observe(el);
+    });
+});
+</script>
 {% endblock %}

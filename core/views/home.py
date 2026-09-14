@@ -9,6 +9,7 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.utils import timezone
 from django.utils.translation import gettext as _
+from context.helpers import build_cities_map
 
 from catalog.models import Category, Part
 from core.constants import (
@@ -241,6 +242,13 @@ def home_view(request: HttpRequest) -> HttpResponse:
     if not map_markers:
         map_markers = DEFAULT_MAP_MARKERS
 
+    # ── Carte SVG du Cameroun (villes géolocalisées) ───────────────────
+    cities_for_map = list(
+        cities_qs.filter(latitude__isnull=False, longitude__isnull=False)
+        .order_by("-garages_count")[:12]
+    )
+    cities_map = build_cities_map(cities_for_map)
+
     # ── Stats générales ────────────────────────────────────────────────
     avg_rating = Testimonial.objects.filter(is_published=True).aggregate(
         avg=Avg("rating")
@@ -286,6 +294,7 @@ def home_view(request: HttpRequest) -> HttpResponse:
         # Cities
         "cities": cities,
         "cities_count_display": cities_count,
+        "cities_map": cities_map,
         # Testimonials
         "testimonials": testimonials,
         # Why

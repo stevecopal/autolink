@@ -9,7 +9,7 @@ from django.db.models.signals import post_delete, post_save
 from django.dispatch import receiver
 
 from catalog.models import Category, Part
-from core.models import Testimonial
+from core.models import Testimonial, City
 from garages.models import Garage
 
 CACHE_KEY_HOME = "home_page_data"
@@ -67,4 +67,16 @@ def testimonial_saved(sender, instance, **kwargs):
 @receiver(post_delete, sender=Testimonial)
 def testimonial_deleted(sender, instance, **kwargs):
     """Un témoignage est supprimé : invalider le cache."""
+    _invalidate_home_cache(sender)
+
+
+@receiver(post_save, sender=City)
+def city_saved(sender, instance, **kwargs):
+    """Une ville est créée/modifiée : invalider le cache (coords GPS)."""
+    _invalidate_home_cache(sender)
+
+
+@receiver(post_delete, sender=City)
+def city_deleted(sender, instance, **kwargs):
+    """Une ville est supprimée : invalider le cache."""
     _invalidate_home_cache(sender)

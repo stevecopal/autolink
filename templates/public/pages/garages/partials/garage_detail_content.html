@@ -1,276 +1,344 @@
+{% extends 'public/base.html' %}
 {% load humanize i18n %}
 
-{% if garage.photo %}
-<div class="rounded-2xl overflow-hidden mb-6 shadow-card bg-steel-50 border border-line-200">
-    <img src="{{ garage.photo.url }}" alt="{{ garage.name }}" class="w-full h-auto max-h-96 object-cover">
-</div>
-{% endif %}
+{% block title %}{{ garage.name }} - AutoLink{% endblock %}
+{% block description %}{{ garage.name }} — {{ garage.neighborhood.name|default:garage.city.name }}{% endblock %}
 
-<div class="flex flex-col md:flex-row md:items-start md:justify-between gap-5 mb-6">
-    <div class="flex items-start gap-4 min-w-0">
-        
-        <div class="min-w-0">
-            <div class="flex items-center gap-2 mb-1 flex-wrap">
-                <h1 class="font-display text-2xl sm:text-3xl font-bold text-navy-900 leading-tight mb-1">{{ garage.name }}</h1>
-                {% if garage.verification_status == 'APPROVED' %}
-                <span class="badge bg-navy-100 text-navy-500">{% trans "Vérifié" %}</span>
-                {% elif garage.verification_status == 'PENDING' %}
-                <span class="badge bg-navy-100 text-navy-600">{% trans "En attente" %}</span>
-                {% endif %}
-                {% if garage.is_featured %}
-                <span class="badge bg-navy-500 text-white">{% trans "Recommandé" %}</span>
-                {% endif %}
-            </div>
-            <div class="flex flex-wrap items-center gap-2 text-sm text-graphite-600">
-                <svg class="w-4 h-4 text-graphite-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                <span>{{ garage.neighborhood.name|default:garage.city.name }}{% if garage.city and garage.neighborhood %}, {{ garage.city.name }}{% endif %}</span>
-                {% if garage.address %}
-                <span class="text-graphite-500/60" aria-hidden="true">·</span>
-                <span>{{ garage.address }}</span>
-                {% endif %}
-            </div>
-        </div>
-    </div>
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
 
-    <div class="tech-panel bg-white rounded-xl px-5 py-3.5 border border-line-200 shadow-card flex-shrink-0 self-start" data-accent="blue">
-        <div class="flex items-center gap-3">
-            <span class="w-3 h-3 rounded-full {% if garage.availability_status == 'AVAILABLE' %}status-available{% else %}status-closed{% endif %}"></span>
-            <div>
-                <div class="font-bold text-sm text-navy-900">
-                    {% if garage.availability_status == 'AVAILABLE' %}{% trans "Disponible" %}
-                    {% else %}{% trans "Fermé" %}{% endif %}
+    {% comment %}═════════ Bandeau propriétaire : activation paiement ═════════{% endcomment %}
+    {% if request.user.is_authenticated and garage.owner == request.user %}
+        {% if garage.approval_status == 'APPROVED' and garage.payment_status == 'UNPAID' %}
+            <div class="bg-navy-500 rounded-2xl p-5 sm:p-6 mb-6 text-white">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                    <div class="w-12 h-12 bg-white/10 rounded-xl flex items-center justify-center flex-shrink-0">
+                        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                        </svg>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <h3 class="font-display font-bold text-lg">{% trans "Activez votre garage" %}</h3>
+                        <p class="text-white/70 text-sm mt-1">{% trans "Effectuez le paiement de 1 000 FCFA pour rendre votre garage visible dans les recherches." %}</p>
+                    </div>
+                    <a href="{% url 'payments:garage_activation' garage.pk %}"
+                       class="inline-flex items-center gap-2 bg-white text-navy-900 hover:bg-navy-50 font-bold px-5 py-3 rounded-xl text-sm transition-colors flex-shrink-0 w-full sm:w-auto justify-center">
+                        {% trans "Payer 1 000 FCFA" %}
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                        </svg>
+                    </a>
                 </div>
-                {% if garage.is_open_now %}
-                <div class="text-xs text-emerald-600">{% trans "Ouvert maintenant" %}</div>
-                {% else %}
-                <div class="text-xs text-graphite-500">{% trans "Fermé pour le moment" %}</div>
-                {% endif %}
             </div>
-        </div>
-    </div>
-</div>
-
-<!-- Payment CTA for unactivated garages (owner view) -->
-{% if request.user.is_authenticated and garage.owner == request.user and garage.approval_status == 'APPROVED' and garage.payment_status == 'UNPAID' %}
-<div class="bg-navy-500/10 rounded-2xl p-5 sm:p-6 mb-6 border border-navy-500/20">
-    <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-        <div class="w-12 h-12 bg-navy-500 rounded-xl flex items-center justify-center flex-shrink-0">
-            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-        </div>
-        <div class="flex-1">
-            <h3 class="font-display font-bold text-navy-900 text-lg">{% trans "Activez votre garage" %}</h3>
-            <p class="text-sm text-graphite-600 mt-1">{% trans "Votre garage est approuvé. Effectuez le paiement de 1000 FCFA pour l'activer et le rendre visible dans les recherches." %}</p>
-        </div>
-        <a href="{% url 'payments:garage_activation' garage.pk %}"
-           class="btn bg-navy-500 hover:bg-navy-600 text-white flex-shrink-0">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
-            {% trans "Effectuer le paiement (1000 FCFA)" %}
-        </a>
-    </div>
-    <div class="flex flex-wrap items-center gap-4 mt-4 text-xs text-graphite-600">
-        <span class="flex items-center gap-1">
-            <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-            {% trans "Orange Money" %}
-        </span>
-        <span class="flex items-center gap-1">
-            <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-            {% trans "MTN Mobile Money" %}
-        </span>
-        <span class="flex items-center gap-1">
-            <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-            {% trans "Paiement sécurisé" %}
-        </span>
-    </div>
-</div>
-{% endif %}
-
-<!-- Payment pending notice -->
-{% if request.user.is_authenticated and garage.owner == request.user and garage.payment_status == 'PENDING' %}
-<div class="bg-navy-500/10 rounded-2xl p-5 mb-6 border border-navy-500/20">
-    <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-navy-100 rounded-xl flex items-center justify-center flex-shrink-0">
-            <svg class="w-5 h-5 text-navy-600 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/></svg>
-        </div>
-        <div>
-            <div class="font-bold text-sm text-navy-900">{% trans "Paiement en cours de traitement" %}</div>
-            <div class="text-xs text-graphite-600 mt-0.5">{% trans "Votre paiement est en cours de vérification. Vous recevrez une notification une fois confirmé." %}</div>
-        </div>
-    </div>
-</div>
-{% endif %}
-
-<div class="flex flex-wrap gap-3 mb-8">
-
-
-    {% if request.user.is_authenticated and not garage.owner == request.user %}
-    <a href="{% url 'support:ticket_create' %}?garage={{ garage.pk }}"
-       class="inline-flex items-center gap-2 px-4 py-2.5 bg-white hover:bg-steel-50 border border-line-200 rounded-xl text-sm font-bold text-navy-900 transition">
-        <svg class="w-4 h-4 text-navy-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
-        {% trans "Signaler" %}
-    </a>
+        {% elif garage.payment_status == 'PENDING' %}
+            <div class="bg-navy-50 rounded-2xl p-4 mb-6 flex items-center gap-3">
+                <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center flex-shrink-0">
+                    <svg class="w-5 h-5 text-navy-500 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"/>
+                    </svg>
+                </div>
+                <div class="min-w-0">
+                    <div class="font-bold text-sm text-navy-900">{% trans "Paiement en cours de traitement" %}</div>
+                    <div class="text-xs text-graphite-600 mt-0.5">{% trans "Vous recevrez une notification une fois confirmé." %}</div>
+                </div>
+            </div>
+        {% endif %}
     {% endif %}
-</div>
 
-{% if garage.description %}
-<div class="card p-6 mb-6">
-    <h2 class="font-display font-bold text-navy-900 mb-3">{% trans "À propos" %}</h2>
-    <p class="text-graphite-600 leading-relaxed whitespace-pre-wrap text-sm">{{ garage.description }}</p>
-</div>
-{% endif %}
+    {% comment %}═════════ En-tête garage ═════════{% endcomment %}
+    <header class="mb-6">
+        <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
 
-{% if services %}
-<div class="card p-6 mb-6">
-    <h2 class="font-display font-bold text-navy-900 mb-4">{% trans "Services" %}</h2>
-    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {% for service in services %}
-        <div class="flex items-start gap-3 p-3 rounded-xl bg-steel-50 border border-line-200/50 hover:bg-line-200/30 transition">
-            <svg class="w-5 h-5 text-navy-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-            <div class="min-w-0">
-                <div class="font-bold text-sm text-navy-900">{{ service.name }}</div>
-                <div class="text-xs text-graphite-500 mt-0.5">{{ service.get_category_display }}</div>
-                {% if service.price_min or service.price_max %}
-                <div class="mt-1 text-sm font-bold text-navy-600">
-                    {% if service.price_min and service.price_max %}
-                        {{ service.price_min|intcomma }} - {{ service.price_max|intcomma }} FCFA
-                    {% elif service.price_min %}
-                        {% trans "À partir de" %} {{ service.price_min|intcomma }} FCFA
-                    {% elif service.price_max %}
-                        {% trans "Jusqu'à" %} {{ service.price_max|intcomma }} FCFA
+            <div class="min-w-0 flex-1">
+                {% comment %}Badges{% endcomment %}
+                <div class="flex flex-wrap items-center gap-1.5 mb-3">
+                    {% if garage.verification_status == 'APPROVED' %}
+                        <span class="badge bg-emerald-50 text-emerald-700">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5"></span>
+                            {% trans "Vérifié" %}
+                        </span>
+                    {% elif garage.verification_status == 'PENDING' %}
+                        <span class="badge bg-navy-100 text-navy-700">
+                            <span class="w-1.5 h-1.5 rounded-full bg-navy-500 mr-1.5"></span>
+                            {% trans "En attente" %}
+                        </span>
+                    {% endif %}
+                    {% if garage.is_featured %}
+                        <span class="badge bg-navy-500 text-white">{% trans "Recommandé" %}</span>
                     {% endif %}
                 </div>
-                {% endif %}
-                {% if service.duration_minutes %}
-                <div class="text-xs text-graphite-500 mt-0.5">{{ service.duration_minutes }} min</div>
-                {% endif %}
+
+                <h1 class="font-display font-bold text-2xl sm:text-3xl lg:text-4xl text-graphite-900 leading-tight mb-2">
+                    {{ garage.name }}
+                </h1>
+
+                <div class="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm text-graphite-600">
+                    <span class="inline-flex items-center gap-1.5">
+                        <svg class="w-4 h-4 text-graphite-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        <span>{{ garage.neighborhood.name|default:garage.city.name }}{% if garage.city and garage.neighborhood %}, {{ garage.city.name }}{% endif %}</span>
+                    </span>
+                    {% if garage.address %}
+                        <span class="text-graphite-400" aria-hidden="true">·</span>
+                        <span>{{ garage.address }}</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            {% comment %}Bloc disponibilité{% endcomment %}
+            <div class="bg-white rounded-2xl shadow-card px-5 py-4 flex-shrink-0 self-start">
+                <div class="flex items-center gap-3">
+                    <span class="w-2.5 h-2.5 rounded-full
+                        {% if garage.availability_status == 'AVAILABLE' %}bg-emerald-500 animate-pulse-soft{% else %}bg-graphite-400{% endif %}"></span>
+                    <div>
+                        <div class="font-bold text-sm text-graphite-900">
+                            {% if garage.availability_status == 'AVAILABLE' %}{% trans "Disponible" %}{% else %}{% trans "Fermé" %}{% endif %}
+                        </div>
+                        <div class="font-mono text-[10px] uppercase tracking-wider mt-0.5
+                            {% if garage.is_open_now %}text-emerald-600{% else %}text-graphite-500{% endif %}">
+                            {% if garage.is_open_now %}{% trans "Ouvert maintenant" %}{% else %}{% trans "Fermé pour le moment" %}{% endif %}
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-        {% endfor %}
-    </div>
-</div>
-{% endif %}
+    </header>
 
-{% if brands %}
-<div class="card p-6 mb-6">
-    <h2 class="font-display font-bold text-navy-900 mb-4">{% trans "Marques" %}</h2>
-    <div class="flex flex-wrap gap-3">
-        {% for brand in brands %}
-        <div class="flex items-center gap-2 px-3 py-1.5 bg-steel-50 rounded-lg border border-line-200">
-            {% if brand.brand.logo %}
-            <img src="{{ brand.brand.logo.url }}" alt="{{ brand.brand.name }}" class="w-6 h-6 rounded object-cover">
-            {% endif %}
-            <span class="font-bold text-sm text-navy-900">{{ brand.brand.name }}</span>
+    {% comment %}═════════ Photo principale ═════════{% endcomment %}
+    {% if garage.photo %}
+        <div class="rounded-2xl overflow-hidden mb-6 bg-steel-50 shadow-card">
+            <img src="{{ garage.photo.url }}" alt="{{ garage.name }}"
+                 class="w-full h-auto max-h-[420px] object-cover">
         </div>
-        {% endfor %}
-    </div>
-</div>
-{% endif %}
-
-{% if photos %}
-<div class="card p-6 mb-6">
-    <h2 class="font-display font-bold text-navy-900 mb-4">{% trans "Photos" %} ({{ photos.count }})</h2>
-    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-        {% for photo in photos|slice:":6" %}
-        <div class="relative rounded-xl overflow-hidden aspect-square bg-steel-50">
-            <img src="{{ photo.image.url }}" alt="{{ photo.caption|default:'' }}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300">
-            {% if photo.is_primary %}
-            <div class="absolute top-2 left-2 bg-navy-500 text-white text-[10px] px-1.5 py-0.5 rounded-full font-bold">{% trans "Par défaut" %}</div>
-            {% endif %}
-            {% if photo.caption %}
-            <div class="absolute bottom-2 left-2 right-2 bg-navy-900/70 text-white text-xs px-2 py-1 rounded-lg truncate">{{ photo.caption }}</div>
-            {% endif %}
-        </div>
-        {% endfor %}
-    </div>
-    {% if photos.count > 6 %}
-    <div class="mt-4 text-center">
-        <span class="text-sm text-graphite-600">+{{ photos.count|add:"-6" }} {% trans "autres photos" %}</span>
-    </div>
     {% endif %}
-</div>
-{% endif %}
 
-<div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-    <div class="card p-5">
-        <h3 class="font-bold text-sm uppercase tracking-wider text-graphite-600 mb-3">{% trans "Horaires" %}</h3>
-        <div class="space-y-2 text-sm">
-            <div class="flex justify-between">
-                <span class="text-graphite-600">{% trans "Lun - Ven" %}</span>
-                <span class="font-medium text-navy-900">{% if garage.opening_time %}{{ garage.opening_time|time:"H:i" }}{% else %}—{% endif %} - {% if garage.closing_time %}{{ garage.closing_time|time:"H:i" }}{% else %}—{% endif %}</span>
+    {% comment %}═════════ Actions rapides ═════════{% endcomment %}
+    {% if request.user.is_authenticated %}
+        {% if garage.owner != request.user %}
+            <div class="flex flex-wrap gap-2 mb-6">
+                <a href="{% url 'support:ticket_create' %}?garage={{ garage.pk }}"
+                   class="inline-flex items-center gap-2 bg-white hover:bg-steel-50 rounded-xl px-4 py-2.5 text-sm font-semibold text-graphite-700 transition-colors shadow-card">
+                    <svg class="w-4 h-4 text-navy-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/>
+                    </svg>
+                    {% trans "Signaler" %}
+                </a>
             </div>
-            <div class="flex justify-between">
-                <span class="text-graphite-600">{% trans "Sam" %}</span>
-                <span class="font-medium text-navy-900">{% if garage.open_weekends and garage.opening_time %}{{ garage.opening_time|time:"H:i" }}{% else %}—{% endif %} - {% if garage.open_weekends and garage.closing_time %}{{ garage.closing_time|time:"H:i" }}{% else %}—{% endif %}</span>
-            </div>
-            <div class="flex justify-between">
-                <span class="text-graphite-600">{% trans "Dim" %}</span>
-                <span class="font-medium text-graphite-500">—</span>
-            </div>
-        </div>
-    </div>
+        {% endif %}
+    {% endif %}
 
-    {% if garage.owner %}
-    <div class="card p-5">
-        <h3 class="font-bold text-sm uppercase tracking-wider text-graphite-600 mb-3">{% trans "Propriétaire" %}</h3>
-        <div class="flex items-center gap-3">
-            {% if garage.owner.avatar %}
-            <img src="{{ garage.owner.avatar.url }}" alt="" class="w-10 h-10 rounded-full object-cover border-2 border-navy-500 flex-shrink-0">
-            {% else %}
-            <div class="w-10 h-10 rounded-full bg-navy-100 flex items-center justify-center text-lg font-bold text-navy-500 border-2 border-line-200 flex-shrink-0">
-                {{ garage.owner.display_name|first|upper }}
-            </div>
+    {% comment %}═════════ Contenu principal ═════════{% endcomment %}
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        {% comment %}Colonne principale (2/3){% endcomment %}
+        <div class="lg:col-span-2 space-y-6">
+
+            {% comment %}À propos{% endcomment %}
+            {% if garage.description %}
+                <div class="bg-white rounded-2xl shadow-card p-5 sm:p-6">
+                    <h2 class="font-display font-bold text-graphite-900 mb-3">{% trans "À propos" %}</h2>
+                    <p class="text-graphite-600 text-sm leading-relaxed whitespace-pre-wrap">{{ garage.description }}</p>
+                </div>
             {% endif %}
-            <div class="min-w-0">
-                <div class="font-bold text-sm text-navy-900 truncate">{{ garage.owner.display_name }}</div>
+
+            {% comment %}Services{% endcomment %}
+            {% if services %}
+                <div class="bg-white rounded-2xl shadow-card p-5 sm:p-6">
+                    <h2 class="font-display font-bold text-graphite-900 mb-4">{% trans "Services proposés" %}</h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        {% for service in services %}
+                            <div class="flex items-start gap-3 p-3 rounded-xl bg-steel-50/60 hover:bg-steel-50 transition-colors">
+                                <span class="w-8 h-8 rounded-lg bg-navy-50 text-navy-500 flex items-center justify-center flex-shrink-0">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                    </svg>
+                                </span>
+                                <div class="min-w-0 flex-1">
+                                    <div class="font-semibold text-sm text-graphite-900 truncate">{{ service.name }}</div>
+                                    <div class="font-mono text-[10px] uppercase tracking-wider text-graphite-500 mt-0.5">{{ service.get_category_display }}</div>
+                                    {% if service.price_min or service.price_max %}
+                                        <div class="font-semibold text-xs text-navy-500 mt-1 tabular-nums">
+                                            {% if service.price_min and service.price_max %}
+                                                {{ service.price_min|intcomma }} – {{ service.price_max|intcomma }} FCFA
+                                            {% elif service.price_min %}
+                                                {% trans "Dès" %} {{ service.price_min|intcomma }} FCFA
+                                            {% else %}
+                                                {% trans "Jusqu'à" %} {{ service.price_max|intcomma }} FCFA
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% comment %}Marques{% endcomment %}
+            {% if brands %}
+                <div class="bg-white rounded-2xl shadow-card p-5 sm:p-6">
+                    <h2 class="font-display font-bold text-graphite-900 mb-4">{% trans "Marques prises en charge" %}</h2>
+                    <div class="flex flex-wrap gap-2">
+                        {% for brand in brands %}
+                            <span class="inline-flex items-center gap-2 bg-steel-50 rounded-lg px-3 py-2">
+                                {% if brand.brand.logo %}
+                                    <img src="{{ brand.brand.logo.url }}" alt="" class="w-5 h-5 rounded object-cover">
+                                {% endif %}
+                                <span class="font-semibold text-xs text-graphite-900">{{ brand.brand.name }}</span>
+                            </span>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% comment %}Photos{% endcomment %}
+            {% if photos %}
+                <div class="bg-white rounded-2xl shadow-card p-5 sm:p-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="font-display font-bold text-graphite-900">{% trans "Photos" %}</h2>
+                        <span class="font-mono text-[10px] uppercase tracking-wider text-graphite-500">{{ photos.count }}</span>
+                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                        {% for photo in photos|slice:":6" %}
+                            <div class="relative rounded-xl overflow-hidden aspect-square bg-steel-50 group">
+                                <img src="{{ photo.image.url }}" alt="{{ photo.caption|default:'' }}"
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" loading="lazy">
+                                {% if photo.is_primary %}
+                                    <span class="absolute top-2 left-2 bg-navy-500 text-white text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded">
+                                        {% trans "Principale" %}
+                                    </span>
+                                {% endif %}
+                                {% if photo.caption %}
+                                    <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-graphite-900/90 to-transparent p-2">
+                                        <p class="text-white text-[11px] truncate">{{ photo.caption }}</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    {% if photos.count > 6 %}
+                        <div class="mt-3 text-center">
+                            <span class="inline-flex items-center gap-1 font-mono text-xs text-graphite-500">
+                                <span class="font-bold text-graphite-900">+{{ photos.count|add:"-6" }}</span>
+                                {% trans "autres" %}
+                            </span>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+        </div>
+
+        {% comment %}Colonne latérale (1/3){% endcomment %}
+        <aside class="lg:col-span-1 space-y-4">
+
+            {% comment %}Horaires{% endcomment %}
+            <div class="bg-white rounded-2xl shadow-card p-5">
+                <h3 class="font-mono text-[10px] uppercase tracking-wider text-graphite-500 mb-3">{% trans "Horaires" %}</h3>
+                <ul class="space-y-2 text-sm">
+                    <li class="flex justify-between items-center">
+                        <span class="text-graphite-600">{% trans "Lun – Ven" %}</span>
+                        <span class="font-mono text-xs font-semibold text-graphite-900 tabular-nums">
+                            {% if garage.opening_time %}{{ garage.opening_time|time:"H:i" }}{% else %}—{% endif %} – {% if garage.closing_time %}{{ garage.closing_time|time:"H:i" }}{% else %}—{% endif %}
+                        </span>
+                    </li>
+                    <li class="flex justify-between items-center">
+                        <span class="text-graphite-600">{% trans "Samedi" %}</span>
+                        <span class="font-mono text-xs font-semibold tabular-nums {% if garage.open_weekends %}text-graphite-900{% else %}text-graphite-400{% endif %}">
+                            {% if garage.open_weekends and garage.opening_time %}
+                                {{ garage.opening_time|time:"H:i" }} – {{ garage.closing_time|time:"H:i" }}
+                            {% else %}
+                                {% trans "Fermé" %}
+                            {% endif %}
+                        </span>
+                    </li>
+                    <li class="flex justify-between items-center">
+                        <span class="text-graphite-600">{% trans "Dimanche" %}</span>
+                        <span class="font-mono text-xs text-graphite-400">{% trans "Fermé" %}</span>
+                    </li>
+                </ul>
             </div>
-        </div>
-    </div>
-    {% endif %}
-</div>
 
-{% if request.user.is_authenticated and garage.owner == request.user %}
-<div class="card p-5 mb-6 bg-steel-50 border border-line-200">
-    <div class="flex items-center gap-3 mb-4">
-        <div class="w-9 h-9 rounded-xl bg-navy-500 flex items-center justify-center">
-            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-        </div>
-        <p class="font-display font-bold text-navy-900">{% trans "Votre garage" %}</p>
-    </div>
-    <form method="post" action="{% url 'garages:garage_availability' %}" class="flex items-center gap-3">
-        {% csrf_token %}
-        <select name="status" class="form-input flex-1 text-sm py-2" onchange="this.form.submit()">
-            <option value="AVAILABLE" {% if garage.availability_status == 'AVAILABLE' %}selected{% endif %}>
-                {% trans "Disponible" %}
-            </option>
-            <option value="UNAVAILABLE" {% if garage.availability_status == 'UNAVAILABLE' %}selected{% endif %}>
-                {% trans "Fermé" %}
-            </option>
-        </select>
-    </form>
-    {% if garage.is_verified %}
-    <div class="flex items-center gap-2 text-sm text-emerald-700 bg-white rounded-lg p-3 border border-line-200 mt-3">
-        <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        {% trans "Garage vérifié et certifié" %}
-    </div>
-    {% endif %}
-</div>
-{% endif %}
+            {% comment %}Propriétaire{% endcomment %}
+            {% if garage.owner %}
+                <div class="bg-white rounded-2xl shadow-card p-5">
+                    <h3 class="font-mono text-[10px] uppercase tracking-wider text-graphite-500 mb-3">{% trans "Gérant" %}</h3>
+                    <div class="flex items-center gap-3">
+                        {% if garage.owner.avatar %}
+                            <img src="{{ garage.owner.avatar.url }}" alt="" class="w-11 h-11 rounded-full object-cover flex-shrink-0">
+                        {% else %}
+                            <span class="w-11 h-11 rounded-full bg-navy-100 text-navy-600 flex items-center justify-center font-bold flex-shrink-0">
+                                {{ garage.owner.display_name|first|upper }}
+                            </span>
+                        {% endif %}
+                        <div class="min-w-0">
+                            <div class="font-bold text-sm text-graphite-900 truncate">{{ garage.owner.display_name }}</div>
+                            <div class="font-mono text-[10px] uppercase tracking-wider text-graphite-500 mt-0.5">{% trans "Gérant du garage" %}</div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
 
-{% if not request.user.is_authenticated %}
-<div class="bg-steel-50 rounded-xl p-5 text-center mb-6 border border-line-200">
-    <p class="text-graphite-600 text-sm mb-4">{% trans "Connectez-vous pour contacter ce garage." %}</p>
-    <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
-        <a href="{% url 'accounts:login' %}?next={{ request.path }}" class="btn bg-navy-500 hover:bg-navy-500/90 text-white text-sm px-6">
-            {% trans "Connexion" %}
-        </a>
-        <a href="{% url 'accounts:register' %}?next={{ request.path }}" class="btn bg-white border border-line-200 text-graphite-900 hover:bg-white/60 text-sm px-6">
-            {% trans "Inscription" %}
-        </a>
+            {% comment %}Contrôles propriétaire{% endcomment %}
+            {% if request.user.is_authenticated and garage.owner == request.user %}
+                <div class="bg-white rounded-2xl shadow-card p-5">
+                    <h3 class="font-mono text-[10px] uppercase tracking-wider text-graphite-500 mb-3">{% trans "Statut" %}</h3>
+                    <form method="post" action="{% url 'garages:garage_availability' %}">
+                        {% csrf_token %}
+                        <select name="status" class="form-input !py-2.5 text-sm" onchange="this.form.submit()">
+                            <option value="AVAILABLE" {% if garage.availability_status == 'AVAILABLE' %}selected{% endif %}>
+                                {% trans "Disponible" %}
+                            </option>
+                            <option value="UNAVAILABLE" {% if garage.availability_status == 'UNAVAILABLE' %}selected{% endif %}>
+                                {% trans "Fermé" %}
+                            </option>
+                        </select>
+                    </form>
+                    {% if garage.is_verified %}
+                        <div class="flex items-center gap-2 mt-3 text-xs text-emerald-700 bg-emerald-50 rounded-lg p-2.5">
+                            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            <span class="font-medium">{% trans "Garage vérifié et certifié" %}</span>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            {% comment %}Login prompt (visiteurs){% endcomment %}
+            {% if not request.user.is_authenticated %}
+                <div class="bg-navy-500 rounded-2xl p-5 text-white">
+                    <h3 class="font-display font-bold text-lg mb-1.5">{% trans "Contacter ce garage" %}</h3>
+                    <p class="text-white/70 text-sm mb-4 leading-relaxed">
+                        {% trans "Connectez-vous pour accéder aux coordonnées et envoyer un message." %}
+                    </p>
+                    <div class="grid grid-cols-2 gap-2">
+                        <a href="{% url 'accounts:login' %}?next={{ request.path }}"
+                           class="inline-flex items-center justify-center bg-white text-navy-900 hover:bg-navy-50 font-bold px-4 py-2.5 rounded-lg text-sm transition-colors">
+                            {% trans "Connexion" %}
+                        </a>
+                        <a href="{% url 'accounts:register' %}?next={{ request.path }}"
+                           class="inline-flex items-center justify-center bg-white/10 hover:bg-white/20 text-white font-bold px-4 py-2.5 rounded-lg text-sm transition-colors">
+                            {% trans "Inscription" %}
+                        </a>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% comment %}Partager{% endcomment %}
+            <button type="button"
+                    onclick="if(navigator.share){navigator.share({title:'{{ garage.name|escapejs }}',url:window.location.href});}else{navigator.clipboard.writeText(window.location.href);this.querySelector('span').textContent='{% trans "Lien copié" %}';}"
+                    class="w-full inline-flex items-center justify-center gap-2 bg-white hover:bg-steel-50 rounded-2xl shadow-card px-5 py-3.5 text-sm font-semibold text-graphite-700 transition-colors">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+                </svg>
+                <span>{% trans "Partager" %}</span>
+            </button>
+
+        </aside>
     </div>
 </div>
-{% endif %}
-
-<a href="{{ garage.get_absolute_url }}"
-   class="block w-full text-center py-3 bg-white border border-line-200 rounded-xl font-bold text-navy-900 text-sm hover:bg-steel-50 transition">
-    <svg class="w-4 h-4 inline mr-1.5 -mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/></svg>
-    {% trans "Partager" %}
-</a>
+{% endblock %}

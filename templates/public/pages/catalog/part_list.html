@@ -10,97 +10,194 @@
         <div class="absolute inset-0 bg-gradient-to-l from-navy-500/30 to-transparent"></div>
     </div>
     <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-        
-        <h1 class="font-display text-4xl sm:text-5xl font-bold text-white tracking-tight mb-3">{% trans "Trouver une pièce" %}</h1>
-        <p class="text-white/60 text-sm sm:text-base max-w-2xl">{% trans "Parcourez les pièces automobiles disponibles sur AutoLink" %}</p>
+        <h1 class="font-display text-4xl sm:text-5xl font-bold text-white tracking-tight mb-3">
+            {% trans "Trouver une pièce" %}
+        </h1>
+        <p class="text-white/80 text-sm sm:text-base max-w-2xl">
+            {% trans "Parcourez les pièces automobiles disponibles sur AutoLink" %}
+        </p>
     </div>
 </div>
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-12">
-    <!-- Filter card -->
-    <div class="bg-white rounded-2xl border border-line-200 shadow-card p-4 sm:p-6 mb-8">
-        <form method="get" class="space-y-4" role="search" aria-label="{% trans 'Recherche de pièces' %}">
-            <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none" aria-hidden="true">
-                    <svg class="w-5 h-5 text-graphite-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+    <!-- Barre de recherche + Filtres (TOUT SUR UNE SEULE LIGNE) -->
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-4 sm:p-5 mb-8">
+        <form method="get" class="space-y-4" id="search-form" role="search" aria-label="{% trans 'Recherche de pièces' %}">
+            <!-- Barre de recherche principale (avec bouton ✕) -->
+            <div class="relative flex items-center gap-2">
+                <div class="absolute left-4 flex items-center pointer-events-none">
+                    <svg class="w-5 h-5 text-graphite-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
                 </div>
-                <input type="text" name="q" value="{{ search_query }}"
-                       placeholder="{% trans 'Rechercher une pièce, modèle, référence...' %}"
-                       class="w-full pl-11 pr-4 py-3 border border-line-200 rounded-xl focus:ring-2 focus:ring-navy-500 focus:border-navy-500 outline-none transition-all duration-200 font-mono bg-steel-50/50 text-sm"
-                       aria-label="{% trans 'Rechercher une pièce' %}">
+                <input
+                    type="text"
+                    name="q"
+                    value="{{ search_query }}"
+                    placeholder="{% trans 'Rechercher une pièce, modèle, référence...' %}"
+                    class="flex-1 pl-12 pr-10 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-navy-500 focus:border-navy-500 outline-none transition-all bg-gray-50/50 text-sm"
+                    aria-label="{% trans 'Rechercher une pièce' %}"
+                    id="search-input">
+                <!-- Bouton ✕ pour vider la recherche -->
+                <button
+                    type="button"
+                    onclick="document.getElementById('search-input').value = ''; document.getElementById('search-form').submit();"
+                    class="absolute right-4 text-graphite-500 hover:text-graphite-700 transition-colors p-1"
+                    aria-label="{% trans 'Effacer la recherche' %}">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
             </div>
 
-            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
-                <select name="category" class="form-input !py-2.5 text-sm flex-1 sm:flex-none sm:w-auto" aria-label="{% trans 'Catégorie' %}">
+            <!-- Boutons Filtres et Réinitialiser (TOUT SUR UNE LIGNE) -->
+            <div class="flex items-center gap-2">
+                <!-- Bouton pour afficher/masquer les filtres -->
+                <button
+                    type="button"
+                    onclick="toggleFilters()"
+                    class="inline-flex items-center gap-2 px-4 py-2.5 bg-gray-50 border border-gray-200 text-graphite-700 rounded-lg text-sm font-semibold hover:bg-gray-100 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
+                    </svg>
+                    {% trans "Filtres" %}
+                </button>
+
+                <!-- Bouton Réinitialiser -->
+                <a
+                    href="{% url 'catalog:part_list' %}"
+                    class="inline-flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-graphite-700 rounded-lg text-sm font-semibold hover:bg-gray-50 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                    </svg>
+                    {% trans "Réinitialiser" %}
+                </a>
+            </div>
+
+            <!-- Filtres (masqués par défaut) -->
+            <div id="filters-container" class="hidden grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <select name="category" class="form-input !py-2.5 text-sm" aria-label="{% trans 'Catégorie' %}">
                     <option value="">{% trans "Toutes les catégories" %}</option>
                     {% for cat in categories %}
                     <option value="{{ cat.slug }}" {% if selected_category == cat.slug %}selected{% endif %}>{{ cat.name }}</option>
                     {% endfor %}
                 </select>
-                <select name="brand" class="form-input !py-2.5 text-sm flex-1 sm:flex-none sm:w-auto" aria-label="{% trans 'Marque' %}">
+                <select name="brand" class="form-input !py-2.5 text-sm" aria-label="{% trans 'Marque' %}">
                     <option value="">{% trans "Toutes les marques" %}</option>
                     {% for brand in brands %}
                     <option value="{{ brand.pk }}" {% if selected_brand == brand.pk|stringformat:"s" %}selected{% endif %}>{{ brand.name }}</option>
                     {% endfor %}
                 </select>
-                <select name="sort" class="form-input !py-2.5 text-sm flex-1 sm:flex-none sm:w-auto" aria-label="{% trans 'Trier par' %}">
+                <select name="sort" class="form-input !py-2.5 text-sm" aria-label="{% trans 'Trier par' %}">
                     <option value="-created_at" {% if sort == '-created_at' %}selected{% endif %}>{% trans "Plus récent" %}</option>
                     <option value="price" {% if sort == 'price' %}selected{% endif %}>{% trans "Prix croissant" %}</option>
                     <option value="-price" {% if sort == '-price' %}selected{% endif %}>{% trans "Prix décroissant" %}</option>
                     <option value="name" {% if sort == 'name' %}selected{% endif %}>{% trans "Nom" %}</option>
                 </select>
-                <button type="submit" class="btn bg-navy-500 hover:bg-navy-500/90 text-white !py-2.5 text-sm whitespace-nowrap shrink-0">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                    {% trans "Rechercher" %}
+                <button type="submit" class="btn bg-navy-500 hover:bg-navy-600 text-white !py-2.5 text-sm whitespace-nowrap">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                    </svg>
+                    {% trans "Appliquer" %}
                 </button>
             </div>
         </form>
     </div>
 
+    <!-- Résultat de la recherche -->
     <div class="flex items-center justify-between mb-5">
-        <h2 class="font-display text-lg font-bold text-navy-900">{{ parts.paginator.count }} {% trans "pièce(s) trouvée(s)" %}</h2>
+        <h2 class="font-display text-lg font-bold text-graphite-900">
+            {{ parts.paginator.count }} {% trans "pièce(s) trouvée(s)" %}
+        </h2>
     </div>
 
     {% if parts %}
+    <!-- Liste des pièces (5 colonnes sur desktop, 3 sur tablette, 2 sur mobile) -->
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4" role="list">
         {% for part in parts %}
-        <article class="card group" role="listitem">
+        <article class="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all group" role="listitem">
             <a href="{% url 'catalog:part_detail' slug=part.slug %}" class="block">
-                <div class="relative aspect-square overflow-hidden rounded-t-xl bg-steel-50">
+                <!-- Image de la pièce -->
+                <div class="relative aspect-square overflow-hidden rounded-t-xl bg-gray-50">
                     {% if part.photo %}
-                    <img src="{{ part.photo.url }}" alt="{{ part.name }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy">
+                    <img
+                        src="{{ part.photo.url }}"
+                        alt="{{ part.name }}"
+                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        loading="lazy">
                     {% else %}
-                    <div class="w-full h-full flex items-center justify-center text-graphite-500/30">
-                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                    <div class="w-full h-full flex items-center justify-center bg-gray-100">
+                        <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                        </svg>
                     </div>
                     {% endif %}
-                    
+
+                    <!-- Badge condition (Neuf/Occasion/Reconditionné) en haut à droite -->
                     <div class="absolute top-2 right-2">
                         {% if part.condition == 'NEW' %}
-                        <span class="badge bg-navy-800 text-white !px-2 !py-1">{% trans "Neuf" %}</span>
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-navy-800 text-white text-xs font-semibold rounded-md">
+                            {% trans "Neuf" %}
+                        </span>
                         {% elif part.condition == 'USED' %}
-                        <span class="badge bg-white text-graphite-600 border border-line-200 !px-2 !py-1">{% trans "Occasion" %}</span>
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-white text-graphite-600 border border-gray-200 text-xs font-semibold rounded-md">
+                            {% trans "Occasion" %}
+                        </span>
                         {% else %}
-                        <span class="badge bg-white text-graphite-600 border border-line-200 !px-2 !py-1">{% trans "Reconditionné" %}</span>
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-500/10 text-emerald-700 text-xs font-semibold rounded-md">
+                            {% trans "Reconditionné" %}
+                        </span>
                         {% endif %}
                     </div>
                 </div>
             </a>
-            <div class="p-3 sm:p-4">
+
+            <!-- Contenu textuel -->
+            <div class="p-4">
                 <a href="{% url 'catalog:part_detail' slug=part.slug %}" class="block">
-                    <h3 class="font-bold text-graphite-900 text-sm truncate group-hover:text-navy-500 transition-colors">{{ part.name }}</h3>
+                    <h3 class="font-bold text-graphite-900 text-sm truncate group-hover:text-navy-600 transition-colors">
+                        {{ part.name }}
+                    </h3>
                 </a>
-                {% if part.category %}
-                <p class="text-graphite-500 text-xs mt-0.5 truncate">{{ part.category.name }}</p>
-                {% endif %}
-                {% if part.brand %}
-                <p class="text-graphite-500/70 text-xs mt-0.5 truncate">{{ part.brand.name }}</p>
-                {% endif %}
-                {% if part.garage %}
-                <p class="text-graphite-500/70 text-xs mt-0.5 truncate">{{ part.garage.name }}</p>
-                {% endif %}
-                <div class="flex items-center justify-between mt-3 pt-2 border-t border-line-200">
-                    <span class="font-bold text-navy-600 text-base">{{ part.price|intcomma }} <span class="text-xs font-normal text-graphite-500">FCFA</span></span>
+
+                <!-- Catégorie et Marque -->
+                <div class="mt-1 space-y-0.5">
+                    {% if part.category %}
+                    <p class="text-graphite-500 text-xs truncate">{{ part.category.name }}</p>
+                    {% endif %}
+                    {% if part.brand %}
+                    <p class="text-graphite-500/70 text-xs truncate">{{ part.brand.name }}</p>
+                    {% endif %}
+                    {% if part.garage %}
+                    <p class="text-graphite-500/70 text-xs truncate">
+                        <svg class="w-3 h-3 inline -mt-0.5 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/>
+                        </svg>
+                        {{ part.garage.name }}
+                    </p>
+                    {% endif %}
+                </div>
+
+                <!-- Prix en bas -->
+                <div class="flex items-center justify-between mt-3 pt-2 border-t border-gray-100">
+                    <span class="font-bold text-navy-600 text-base">
+                        {{ part.price|intcomma }} <span class="text-xs font-normal text-graphite-500">FCFA</span>
+                    </span>
+                    {% if part.is_available %}
+                    <span class="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        {% trans "Disponible" %}
+                    </span>
+                    {% else %}
+                    <span class="inline-flex items-center gap-1 text-xs font-semibold text-gray-500">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        {% trans "Indisponible" %}
+                    </span>
+                    {% endif %}
                 </div>
             </div>
         </article>
@@ -108,33 +205,48 @@
     </div>
 
     {% if parts.has_other_pages %}
+    <!-- Pagination -->
     <nav class="mt-10 flex justify-center" aria-label="{% trans 'Pagination' %}">
         <div class="flex items-center gap-2">
             {% if parts.has_previous %}
-            <a href="?page={{ parts.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_brand %}&brand={{ selected_brand }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}"
-               class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 text-sm px-4 py-2" aria-label="{% trans 'Page précédente' %}">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            <a
+                href="?page={{ parts.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_brand %}&brand={{ selected_brand }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}"
+                class="inline-flex items-center gap-1 px-4 py-2 bg-white border border-gray-200 text-graphite-700 rounded-lg text-sm font-semibold hover:bg-gray-50 transition-colors"
+                aria-label="{% trans 'Page précédente' %}">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
                 <span class="hidden sm:inline">{% trans "Précédent" %}</span>
             </a>
             {% else %}
-            <span class="btn bg-white border border-line-200 text-graphite-900 text-sm px-4 py-2 opacity-50 cursor-not-allowed" aria-disabled="true">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            <span class="inline-flex items-center gap-1 px-4 py-2 bg-white border border-gray-200 text-graphite-400 rounded-lg text-sm font-semibold cursor-not-allowed">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
                 <span class="hidden sm:inline">{% trans "Précédent" %}</span>
             </span>
             {% endif %}
 
-            <span class="px-4 py-2 text-sm font-medium text-graphite-600 font-mono">{% trans "Page" %} {{ parts.number }} / {{ parts.paginator.num_pages }}</span>
+            <span class="px-4 py-2 text-sm font-medium text-graphite-600">
+                {% trans "Page" %} {{ parts.number }} / {{ parts.paginator.num_pages }}
+            </span>
 
             {% if parts.has_next %}
-            <a href="?page={{ parts.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_brand %}&brand={{ selected_brand }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}"
-               class="btn bg-white border border-line-200 text-graphite-900 hover:bg-steel-50 text-sm px-4 py-2" aria-label="{% trans 'Page suivante' %}">
+            <a
+                href="?page={{ parts.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_brand %}&brand={{ selected_brand }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}"
+                class="inline-flex items-center gap-1 px-4 py-2 bg-white border border-gray-200 text-graphite-700 rounded-lg text-sm font-semibold hover:bg-gray-50 transition-colors"
+                aria-label="{% trans 'Page suivante' %}">
                 <span class="hidden sm:inline">{% trans "Suivant" %}</span>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
             </a>
             {% else %}
-            <span class="btn bg-white border border-line-200 text-graphite-900 text-sm px-4 py-2 opacity-50 cursor-not-allowed" aria-disabled="true">
+            <span class="inline-flex items-center gap-1 px-4 py-2 bg-white border border-gray-200 text-graphite-400 rounded-lg text-sm font-semibold cursor-not-allowed">
                 <span class="hidden sm:inline">{% trans "Suivant" %}</span>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
             </span>
             {% endif %}
         </div>
@@ -142,14 +254,32 @@
     {% endif %}
 
     {% else %}
+    <!-- Aucun résultat -->
     <div class="text-center py-16">
-        <div class="w-16 h-16 mx-auto mb-5 rounded-2xl bg-steel-50 flex items-center justify-center">
-            <svg class="w-8 h-8 text-graphite-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <div class="w-16 h-16 mx-auto mb-5 rounded-xl bg-gray-50 flex items-center justify-center">
+            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
         </div>
-        <h2 class="font-display text-2xl font-bold text-navy-900 mb-2">{% trans "Aucune pièce trouvée" %}</h2>
-        <p class="text-graphite-600 mb-6 text-sm">{% trans "Essayez de modifier vos filtres ou votre recherche" %}</p>
-        <a href="{% url 'catalog:part_list' %}" class="btn bg-navy-500 hover:bg-navy-500/90 text-white text-sm">{% trans "Réinitialiser les filtres" %}</a>
+        <h2 class="font-display text-2xl font-bold text-graphite-900 mb-2">
+            {% trans "Aucune pièce trouvée" %}
+        </h2>
+        <p class="text-graphite-600 mb-6 text-sm">
+            {% trans "Essayez de modifier vos filtres ou votre recherche." %}
+        </p>
+        <a href="{% url 'catalog:part_list' %}" class="inline-flex items-center gap-2 bg-navy-500 hover:bg-navy-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+            {% trans "Réinitialiser les filtres" %}
+        </a>
     </div>
     {% endif %}
 </div>
+
+<!-- JavaScript pour les filtres -->
+<script>
+// Toggle les filtres
+function toggleFilters() {
+    const filtersContainer = document.getElementById('filters-container');
+    filtersContainer.classList.toggle('hidden');
+}
+</script>
 {% endblock %}
