@@ -8,6 +8,8 @@
     <title>{% block title %}{% trans "AutoLink" %}{% endblock %}</title>
     <meta name="description" content="{% block description %}{% trans "Plateforme AutoLink - Réparation automobile" %}{% endblock %}">
     <link rel="stylesheet" href="{% static 'css/output.css' %}">
+    <link rel="icon" href="/static/logo.jpg" type="image/x-icon">
+
     <meta name="csrf-token" content="{{ csrf_token }}">
     
     {% block extra_css %}{% endblock %}

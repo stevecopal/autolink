@@ -1,0 +1,96 @@
+{# templates/500.html — page d'erreur 500 pour la production (DEBUG=False) #}
+{# Extends public/base.html. Ne pas modifier sans vérifier la compatibilité.   #}
+{% extends "public/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Erreur serveur" %} — AutoLink{% endblock %}
+
+{% block description %}{% trans "Une erreur interne est survenue sur le serveur." %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* ── Prescription : écraser le thème public/base.html pour la page 404 ── */
+    body {
+        background: #000080 !important;
+        color: #ffffff !important;
+        font-family: 'IBM Plex Mono', 'Courier New', monospace !important;
+    }
+    .error-page {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+        text-align: center;
+    }
+    .error-code {
+        font-size: 8rem;
+        font-weight: bold;
+        color: #4F6EE0;
+        line-height: 1;
+        margin-bottom: 1rem;
+        letter-spacing: -0.05em;
+    }
+    .error-title {
+        font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #ffffff;
+        margin-bottom: 0.5rem;
+    }
+    .error-subtitle {
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 0.875rem;
+        color: rgba(255,255,255,0.55);
+        max-width: 320px;
+        margin-bottom: 2rem;
+        line-height: 1.6;
+    }
+    .error-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: #ffffff;
+        color: #000080;
+        font-family: 'IBM Plex Mono', monospace;
+        font-weight: bold;
+        font-size: 0.875rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 0.5rem;
+        text-decoration: none;
+        transition: background-color 0.2s ease;
+    }
+    .error-link:hover {
+        background: #e6e6f0;
+    }
+    .error-link svg {
+        width: 1rem;
+        height: 1rem;
+    }
+    .footer-note {
+        margin-top: 3rem;
+        font-size: 0.75rem;
+        color: rgba(255,255,255,0.3);
+    }
+    /* Masquer le navbar et le footer sur les pages d'erreur */
+    .navbar, .footer, .messages-container {
+        display: none !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="error-code">500</div>
+<h1 class="error-title">{% trans "Erreur serveur" %}</h1>
+<p class="error-subtitle">
+    {% trans "Une erreur interne est survenue. Notre équipe a été notifiée. Veuillez réessayer dans quelques instants." %}
+</p>
+<a href="/" class="error-link">
+    {% trans "Retour à l'accueil" %}
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+    </svg>
+</a>
+{% endblock %}
+

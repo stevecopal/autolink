@@ -1,8 +1,6 @@
-{% extends 'public/base.html' %}
 {% load humanize i18n %}
 
 {% block title %}{{ garage.name }} - AutoLink{% endblock %}
-{% block description %}{{ garage.name }} — {{ garage.neighborhood.name|default:garage.city.name }}{% endblock %}
 
 {% block content %}
 <div class="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
