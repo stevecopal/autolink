@@ -1,438 +1,127 @@
-{% load i18n %}
+{% load static i18n %}
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#1a365d">
+    <meta name="theme-color" content="#000080">
     <meta name="robots" content="noindex, nofollow">
     <title>{% trans "Connexion interrompue" %} - AutoLink</title>
-    <style>
-        :root {
-            --primary-color: #1a365d;
-            --primary-hover: #2a4a6d;
-            --primary-active: #0f2440;
-            --text-main: #1a202c;
-            --text-muted: #718096;
-            --bg-color: #ffffff;
-            --shadow-primary: rgba(26, 54, 93, 0.2);
-            --shadow-primary-hover: rgba(26, 54, 93, 0.3);
-        }
+    <meta name="description" content="{% trans "Vous êtes actuellement hors ligne. Vérifiez votre connexion Internet puis rechargez la page." %}">
 
-        *, *::before, *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        html {
-            -webkit-text-size-adjust: 100%;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            min-height: 100dvh;
-            margin: 0;
-            padding: 24px;
-            text-align: center;
-            overflow: hidden;
-        }
-
-        /* ── Card container ── */
-        .offline-card {
-            max-width: 420px;
-            width: 100%;
-            padding: 40px 32px;
-            animation: cardFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            opacity: 0;
-            transform: translateY(24px);
-        }
-
-        /* ── Icon container with pulse ── */
-        .icon-wrapper {
-            margin-bottom: 32px;
-            position: relative;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 96px;
-            height: 96px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, rgba(26, 54, 93, 0.06) 0%, rgba(26, 54, 93, 0.02) 100%);
-            animation: iconPulse 2.5s ease-in-out infinite;
-        }
-
-        .icon-wrapper::before {
-            content: '';
-            position: absolute;
-            inset: -4px;
-            border-radius: 50%;
-            border: 2px solid rgba(26, 54, 93, 0.08);
-            animation: ringPulse 2.5s ease-in-out infinite;
-        }
-
-        .icon-svg {
-            width: 48px;
-            height: 48px;
-            fill: none;
-            stroke: var(--primary-color);
-            stroke-width: 1.5;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
-        /* ── Typography ── */
-        .offline-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin: 0 0 12px 0;
-            color: var(--primary-color);
-            letter-spacing: -0.025em;
-            line-height: 1.3;
-        }
-
-        .offline-message {
-            font-size: 0.9375rem;
-            color: var(--text-muted);
-            line-height: 1.65;
-            margin: 0 0 40px 0;
-            max-width: 340px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        /* ── Retry button ── */
-        .retry-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background-color: var(--primary-color);
-            color: #ffffff;
-            border: none;
-            padding: 16px 48px;
-            font-size: 1rem;
-            font-weight: 600;
-            font-family: inherit;
-            border-radius: 50px;
-            cursor: pointer;
-            box-shadow: 0 4px 16px var(--shadow-primary);
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            position: relative;
-            outline: none;
-            min-width: 180px;
-            min-height: 56px;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-        }
-
-        .retry-btn:hover {
-            background-color: var(--primary-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px var(--shadow-primary-hover);
-        }
-
-        .retry-btn:active {
-            transform: translateY(1px);
-            box-shadow: 0 2px 8px var(--shadow-primary);
-            background-color: var(--primary-active);
-        }
-
-        .retry-btn:focus-visible {
-            outline: 3px solid var(--primary-color);
-            outline-offset: 3px;
-        }
-
-        /* ── Spinner animation on click ── */
-        .retry-btn .btn-text {
-            transition: opacity 0.2s ease;
-        }
-
-        .retry-btn.loading .btn-text {
-            opacity: 0;
-        }
-
-        .retry-btn .spinner {
-            position: absolute;
-            width: 22px;
-            height: 22px;
-            top: 50%;
-            left: 50%;
-            margin-top: -11px;
-            margin-left: -11px;
-            opacity: 0;
-            transition: opacity 0.2s ease;
-        }
-
-        .retry-btn.loading .spinner {
-            opacity: 1;
-        }
-
-        .retry-btn.loading {
-            pointer-events: none;
-        }
-
-        .spinner-circle {
-            fill: none;
-            stroke: rgba(255, 255, 255, 0.3);
-            stroke-width: 3;
-            stroke-linecap: round;
-            stroke-dasharray: 50;
-            stroke-dashoffset: 15;
-            transform-origin: center;
-            animation: spinnerRotate 0.8s linear infinite;
-        }
-
-        /* ── Network status indicator ── */
-        .status-dot {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: #e53e3e;
-            margin-right: 8px;
-            animation: statusBlink 1.5s ease-in-out infinite;
-            vertical-align: middle;
-        }
-
-        .status-text {
-            font-size: 0.8125rem;
-            color: var(--text-muted);
-            margin-top: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            animation: fadeInDelayed 0.5s ease-out 1s forwards;
-        }
-
-        /* ── Keyframe animations ── */
-        @keyframes cardFadeIn {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes iconPulse {
-            0%, 100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-            50% {
-                transform: scale(1.05);
-                opacity: 0.9;
-            }
-        }
-
-        @keyframes ringPulse {
-            0%, 100% {
-                transform: scale(1);
-                opacity: 0.6;
-            }
-            50% {
-                transform: scale(1.15);
-                opacity: 0;
-            }
-        }
-
-        @keyframes spinnerRotate {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        @keyframes statusBlink {
-            0%, 100% {
-                opacity: 1;
-            }
-            50% {
-                opacity: 0.3;
-            }
-        }
-
-        @keyframes fadeInDelayed {
-            to {
-                opacity: 1;
-            }
-        }
-
-        /* ── Reduced motion ── */
-        @media (prefers-reduced-motion: reduce) {
-            .offline-card,
-            .icon-wrapper,
-            .icon-wrapper::before,
-            .status-text {
-                animation: none;
-                opacity: 1;
-                transform: none;
-            }
-
-            .retry-btn {
-                transition: none;
-            }
-
-            .spinner-circle {
-                animation: spinnerRotate 0.8s linear infinite;
-            }
-
-            .status-dot {
-                animation: none;
-            }
-        }
-
-        /* ── Responsive ── */
-        @media (max-width: 480px) {
-            body {
-                padding: 20px 16px;
-            }
-
-            .offline-card {
-                padding: 32px 24px;
-            }
-
-            .icon-wrapper {
-                width: 80px;
-                height: 80px;
-            }
-
-            .icon-svg {
-                width: 40px;
-                height: 40px;
-            }
-
-            .offline-title {
-                font-size: 1.3125rem;
-            }
-
-            .offline-message {
-                font-size: 0.875rem;
-            }
-
-            .retry-btn {
-                padding: 14px 40px;
-                font-size: 0.9375rem;
-                width: 100%;
-                max-width: 280px;
-            }
-        }
-
-        @media (max-width: 360px) {
-            .offline-card {
-                padding: 28px 16px;
-            }
-
-            .retry-btn {
-                padding: 14px 32px;
-            }
-        }
-
-        /* ── Dark mode support ── */
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --bg-color: #0f1419;
-                --text-main: #e1e8ed;
-                --text-muted: #8899a6;
-            }
-
-            .icon-wrapper {
-                background: linear-gradient(135deg, rgba(26, 54, 93, 0.15) 0%, rgba(26, 54, 93, 0.05) 100%);
-            }
-
-            .icon-wrapper::before {
-                border-color: rgba(26, 54, 93, 0.2);
-            }
-        }
-    </style>
+    <link rel="icon" href="{% static 'logo.jpg' %}" type="image/x-icon">
+    <link rel="stylesheet" href="{% static 'css/output.css' %}">
 </head>
-<body>
-    <main class="offline-card" role="main" aria-live="polite">
-        <div class="icon-wrapper" aria-hidden="true">
-            <!-- Wifi disconnected SVG icon -->
-            <svg class="icon-svg" viewBox="0 0 24 24">
-                <path d="M12 20h.01"/>
-                <path d="M2 8.82a15 15 0 0 1 20 0"/>
-                <path d="M5 12.859a10 10 0 0 1 14 0"/>
-                <path d="M8.5 16.429a5 5 0 0 1 7 0"/>
-                <line x1="1" y1="1" x2="23" y2="23" stroke-width="2"/>
-            </svg>
-        </div>
+<body class="min-h-screen bg-steel-50 font-body text-graphite-900 antialiased">
 
-        <h1 class="offline-title">{% trans "Connexion interrompue" %}</h1>
+    <main class="min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+        <div class="w-full max-w-md">
 
-        <p class="offline-message">
-            {% trans "Veuillez activer vos données mobiles ou votre Wi-Fi, assurez-vous d'être bien connecté au réseau, puis tentez de recharger la page." %}
-        </p>
+            <!-- Carte -->
+            <div class="bg-white rounded-2xl border border-line-200 shadow-card px-6 py-10 sm:px-10 sm:py-12 text-center">
 
-        <button class="retry-btn" id="retry-btn" type="button" aria-label="{% trans 'Réessayer la connexion' %}">
-            <span class="btn-text">{% trans "Réessayer" %}</span>
-            <svg class="spinner" viewBox="0 0 24 24" aria-hidden="true">
-                <circle class="spinner-circle" cx="12" cy="12" r="10"/>
-            </svg>
-        </button>
+                <!-- Icône -->
+                <div class="mx-auto flex h-20 w-20 sm:h-24 sm:w-24 items-center justify-center rounded-full bg-navy-50 border border-navy-100 text-navy-500 animate-pulse-soft">
+                    <svg id="offline-icon" class="h-9 w-9 sm:h-11 sm:w-11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M12 20h.01"/>
+                        <path d="M2 8.82a15 15 0 0 1 20 0"/>
+                        <path d="M5 12.86a10 10 0 0 1 14 0"/>
+                        <path d="M8.5 16.43a5 5 0 0 1 7 0"/>
+                        <line x1="1" y1="1" x2="23" y2="23" stroke-width="2"/>
+                    </svg>
+                </div>
 
-        <div class="status-text" role="status">
-            <span class="status-dot" aria-hidden="true"></span>
-            <span>{% trans "Hors ligne" %}</span>
+                <!-- Message -->
+                <h1 class="mt-8 font-display text-2xl sm:text-3xl font-bold text-navy-900">
+                    {% trans "Connexion interrompue" %}
+                </h1>
+
+                <p class="mt-4 text-sm sm:text-base text-graphite-600 leading-relaxed">
+                    {% trans "Veuillez activer vos données mobiles ou votre Wi-Fi, vérifier que vous êtes bien connecté au réseau, puis rechargez la page." %}
+                </p>
+
+                <!-- Action -->
+                <button id="retry-btn"
+                        type="button"
+                        class="btn btn-primary w-full mt-8"
+                        aria-label="{% trans 'Réessayer la connexion' %}">
+                    <svg id="retry-icon" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M3 12a9 9 0 1 0 3-6.7L3 8"/>
+                        <path d="M3 3v5h5"/>
+                    </svg>
+                    <span id="retry-label">{% trans "Réessayer" %}</span>
+                    <span id="retry-spinner" class="hidden w-4 h-4 rounded-full border-2 border-white/40 border-t-white animate-spin" aria-hidden="true"></span>
+                </button>
+
+                <!-- État du réseau -->
+                <div class="mt-6 inline-flex items-center gap-2.5 rounded-lg bg-steel-50 border border-line-200 px-3 py-1.5 font-mono text-xs uppercase tracking-wider text-graphite-600"
+                     role="status"
+                     aria-live="polite">
+                    <span id="net-dot" class="w-2 h-2 rounded-full bg-red-500 animate-pulse-soft" aria-hidden="true"></span>
+                    <span id="net-label">{% trans "Hors ligne" %}</span>
+                </div>
+
+               
+            </div>
+
+           
         </div>
     </main>
 
     <script>
-    (function() {
+    (function () {
         'use strict';
 
         var btn = document.getElementById('retry-btn');
+        var label = document.getElementById('retry-label');
+        var spinner = document.getElementById('retry-spinner');
+        var icon = document.getElementById('retry-icon');
+        var dot = document.getElementById('net-dot');
+        var netLabel = document.getElementById('net-label');
+        var offlineIcon = document.getElementById('offline-icon');
+
+        if (!btn) { return; }
+
         var isLoading = false;
 
-        function handleRetry() {
-            if (isLoading) return;
+        // ── Nouvelle tentative de connexion ──
+        btn.addEventListener('click', function () {
+            if (isLoading) { return; }
             isLoading = true;
-            btn.classList.add('loading');
+
+            btn.disabled = true;
             btn.setAttribute('aria-busy', 'true');
+            btn.classList.add('opacity-70', 'pointer-events-none');
+            if (icon) { icon.classList.add('hidden'); }
+            if (spinner) { spinner.classList.remove('hidden'); }
+            if (label) { label.textContent = "{% trans 'Connexion en cours...' %}"; }
 
-            setTimeout(function() {
+            window.setTimeout(function () {
                 window.location.reload();
-            }, 800);
-        }
+            }, 700);
+        });
 
-        btn.addEventListener('click', handleRetry);
-
-        // Check network status and update indicator
+        // ── Indicateur réseau ──
         function updateStatus() {
-            var statusEl = document.querySelector('.status-text span:last-child');
-            var dotEl = document.querySelector('.status-dot');
-            if (!statusEl || !dotEl) return;
+            var online = navigator.onLine;
 
-            if (navigator.onLine) {
-                statusEl.textContent = '{% trans "En ligne" %}';
-                dotEl.style.backgroundColor = '#38a169';
-                dotEl.style.animation = 'none';
-            } else {
-                statusEl.textContent = '{% trans "Hors ligne" %}';
-                dotEl.style.backgroundColor = '#e53e3e';
-                dotEl.style.animation = '';
+            if (netLabel) {
+                netLabel.textContent = online ? "{% trans 'En ligne' %}" : "{% trans 'Hors ligne' %}";
+            }
+            if (dot) {
+                dot.classList.toggle('bg-emerald-500', online);
+                dot.classList.toggle('bg-red-500', !online);
+                dot.classList.toggle('animate-pulse-soft', !online);
+            }
+            if (offlineIcon) {
+                offlineIcon.classList.toggle('text-emerald-600', online);
+                offlineIcon.classList.toggle('text-navy-500', !online);
             }
         }
 
         window.addEventListener('online', updateStatus);
         window.addEventListener('offline', updateStatus);
         updateStatus();
-
-        // Keyboard accessibility
-        btn.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                handleRetry();
-            }
-        });
     })();
     </script>
 </body>

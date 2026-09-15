@@ -1,96 +1,57 @@
-{# templates/500.html — page d'erreur 500 pour la production (DEBUG=False) #}
-{# Extends public/base.html. Ne pas modifier sans vérifier la compatibilité.   #}
+{# templates/500.html — page d'erreur 500 en production (DEBUG=False) #}
+{# Étend public/base.html : aucune feuille de style locale, uniquement Tailwind. #}
 {% extends "public/base.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Erreur serveur" %} — AutoLink{% endblock %}
+{% block title %}{% trans "Erreur serveur" %} - AutoLink{% endblock %}
 
 {% block description %}{% trans "Une erreur interne est survenue sur le serveur." %}{% endblock %}
 
-{% block extra_css %}
-<style>
-    /* ── Prescription : écraser le thème public/base.html pour la page 404 ── */
-    body {
-        background: #000080 !important;
-        color: #ffffff !important;
-        font-family: 'IBM Plex Mono', 'Courier New', monospace !important;
-    }
-    .error-page {
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        padding: 2rem;
-        text-align: center;
-    }
-    .error-code {
-        font-size: 8rem;
-        font-weight: bold;
-        color: #4F6EE0;
-        line-height: 1;
-        margin-bottom: 1rem;
-        letter-spacing: -0.05em;
-    }
-    .error-title {
-        font-family: 'Space Grotesk', 'Segoe UI', sans-serif;
-        font-size: 1.5rem;
-        font-weight: 600;
-        color: #ffffff;
-        margin-bottom: 0.5rem;
-    }
-    .error-subtitle {
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 0.875rem;
-        color: rgba(255,255,255,0.55);
-        max-width: 320px;
-        margin-bottom: 2rem;
-        line-height: 1.6;
-    }
-    .error-link {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        background: #ffffff;
-        color: #000080;
-        font-family: 'IBM Plex Mono', monospace;
-        font-weight: bold;
-        font-size: 0.875rem;
-        padding: 0.75rem 1.5rem;
-        border-radius: 0.5rem;
-        text-decoration: none;
-        transition: background-color 0.2s ease;
-    }
-    .error-link:hover {
-        background: #e6e6f0;
-    }
-    .error-link svg {
-        width: 1rem;
-        height: 1rem;
-    }
-    .footer-note {
-        margin-top: 3rem;
-        font-size: 0.75rem;
-        color: rgba(255,255,255,0.3);
-    }
-    /* Masquer le navbar et le footer sur les pages d'erreur */
-    .navbar, .footer, .messages-container {
-        display: none !important;
-    }
-</style>
-{% endblock %}
-
 {% block content %}
-<div class="error-code">500</div>
-<h1 class="error-title">{% trans "Erreur serveur" %}</h1>
-<p class="error-subtitle">
-    {% trans "Une erreur interne est survenue. Notre équipe a été notifiée. Veuillez réessayer dans quelques instants." %}
-</p>
-<a href="/" class="error-link">
-    {% trans "Retour à l'accueil" %}
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-    </svg>
-</a>
-{% endblock %}
+<section class="flex items-center justify-center min-h-[70vh] bg-steel-50 px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+    <div class="w-full max-w-xl text-center animate-slide-up">
 
+        <!-- Statut -->
+        <span class="badge badge-error gap-1.5 px-3 py-1">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/>
+                <path d="M12 9v4"/>
+                <path d="M12 17h.01"/>
+            </svg>
+            {% trans "Erreur 500" %}
+        </span>
+
+        <!-- Code -->
+        <p class="mt-6 font-display text-6xl sm:text-7xl lg:text-8xl font-bold leading-none tracking-tight text-navy-500">
+            500
+        </p>
+
+        <!-- Message -->
+        <h1 class="mt-6 font-display text-2xl sm:text-3xl font-bold text-navy-900">
+            {% trans "Erreur serveur" %}
+        </h1>
+
+        <p class="mt-4 max-w-md mx-auto text-sm sm:text-base text-graphite-600 leading-relaxed">
+            {% trans "Une erreur interne est survenue. Notre équipe technique a été notifiée. Veuillez réessayer dans quelques instants." %}
+        </p>
+
+        <!-- Actions -->
+        <div class="mt-8 sm:mt-10 flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4">
+            <a href="{% url 'core:home' %}" class="btn btn-primary">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/>
+                </svg>
+                {% trans "Retour à l'accueil" %}
+            </a>
+            <a href="{% url 'support:ticket_create' %}" class="btn btn-outline">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                </svg>
+                {% trans "Contacter le support" %}
+            </a>
+        </div>
+
+        
+    </div>
+</section>
+{% endblock %}

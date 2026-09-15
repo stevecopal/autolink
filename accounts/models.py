@@ -28,7 +28,7 @@ class User(AbstractUser):
     phone = models.CharField(_('Téléphone'), max_length=20, blank=True)
     phone_verified = models.BooleanField(default=False)
     email_verified = models.BooleanField(default=False)
-    city = models.CharField(_('Ville'), max_length=100, blank=True)
+    city = models.CharField(_('Ville'), max_length=100, blank=True, null=True)
     neighborhood = models.CharField(_('Quartier'), max_length=100, blank=True)
     address = models.TextField(_('Adresse'), blank=True)
     latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)

@@ -1,37 +1,38 @@
-{# templates/404.html — page d'erreur 404 en production (DEBUG=False) #}
+{# templates/400.html — page d'erreur 400 (requête invalide) en production #}
+{# Rendu automatiquement par django.views.defaults.bad_request (ERROR_400_TEMPLATE_NAME). #}
 {# Étend public/base.html : aucune feuille de style locale, uniquement Tailwind. #}
 {% extends "public/base.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Page non trouvée" %} - AutoLink{% endblock %}
+{% block title %}{% trans "Requête invalide" %} - AutoLink{% endblock %}
 
-{% block description %}{% trans "La page que vous recherchez n'existe pas ou a été déplacée." %}{% endblock %}
+{% block description %}{% trans "La requête envoyée au serveur est invalide ou incomplète." %}{% endblock %}
 
 {% block content %}
 <section class="flex items-center justify-center min-h-[70vh] bg-steel-50 px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
     <div class="w-full max-w-xl text-center animate-slide-up">
 
         <!-- Statut -->
-        <span class="badge badge-error gap-1.5 px-3 py-1">
+        <span class="badge badge-warning gap-1.5 px-3 py-1">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true">
                 <circle cx="12" cy="12" r="10"/>
-                <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>
+                <path d="m4.9 4.9 14.2 14.2"/>
             </svg>
-            {% trans "Erreur 404" %}
+            {% trans "Erreur 400" %}
         </span>
 
         <!-- Code -->
         <p class="mt-6 font-display text-6xl sm:text-7xl lg:text-8xl font-bold leading-none tracking-tight text-navy-500">
-            404
+            400
         </p>
 
         <!-- Message -->
         <h1 class="mt-6 font-display text-2xl sm:text-3xl font-bold text-navy-900">
-            {% trans "Page non trouvée" %}
+            {% trans "Requête invalide" %}
         </h1>
 
         <p class="mt-4 max-w-md mx-auto text-sm sm:text-base text-graphite-600 leading-relaxed">
-            {% trans "La page que vous recherchez n'existe pas ou a été déplacée. Vérifiez l'adresse saisie, puis revenez à la page d'accueil." %}
+            {% trans "La requête envoyée au serveur est invalide ou incomplète. Vérifiez les informations saisies, puis réessayez." %}
         </p>
 
         <!-- Actions -->
@@ -46,11 +47,12 @@
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true">
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                 </svg>
-                {% trans "Signaler un problème" %}
+                {% trans "Contacter le support" %}
             </a>
         </div>
 
         
+
     </div>
 </section>
 {% endblock %}
