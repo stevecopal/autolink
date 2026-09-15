@@ -1,28 +1,42 @@
-const CACHE_NAME = 'autolink-v1';
-const ASSETS = [
-    '/',
-];
+const CACHE_NAME = 'autolink-offline-v1';
+const OFFLINE_URL = '/offline/';
 
-self.addEventListener('install', (e) => {
-    e.waitUntil(
-        caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(ASSETS);
+self.addEventListener('install', function(event) {
+    event.waitUntil(
+        caches.open(CACHE_NAME).then(function(cache) {
+            return cache.addAll([OFFLINE_URL]);
         })
     );
+    self.skipWaiting();
 });
 
-self.addEventListener('activate', (e) => {
-    e.waitUntil(
-        caches.keys().then((keys) => {
+self.addEventListener('activate', function(event) {
+    event.waitUntil(
+        caches.keys().then(function(cacheNames) {
             return Promise.all(
-                keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
+                cacheNames.filter(function(cacheName) {
+                    return cacheName !== CACHE_NAME;
+                }).map(function(cacheName) {
+                    return caches.delete(cacheName);
+                })
             );
         })
     );
+    self.clients.claim();
 });
 
-self.addEventListener('fetch', (e) => {
-    e.respondWith(
-        fetch(e.request).catch(() => caches.match(e.request))
-    );
+self.addEventListener('fetch', function(event) {
+    if (event.request.mode === 'navigate') {
+        event.respondWith(
+            fetch(event.request).catch(function() {
+                return caches.match(OFFLINE_URL);
+            })
+        );
+    } else {
+        event.respondWith(
+            fetch(event.request).catch(function() {
+                return caches.match(event.request);
+            })
+        );
+    }
 });

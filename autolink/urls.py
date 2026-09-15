@@ -21,6 +21,11 @@ urlpatterns = [
     path('', include('payments.urls')),
     path('', include('support.urls')),
     path('', include('search.urls')),
+    path(
+        "offline/",
+        TemplateView.as_view(template_name="offline.html"),
+        name="offline",
+    ),
 ]
 
 if settings.DEBUG:

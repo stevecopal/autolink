@@ -12,6 +12,7 @@ from .account_views import (
     notification_list_view,
     notification_mark_read_view,
     notification_mark_all_read_view,
+    notification_count_api,
 )
 
 __all__ = [
@@ -24,4 +25,5 @@ __all__ = [
     "notification_list_view",
     "notification_mark_read_view",
     "notification_mark_all_read_view",
+    "notification_count_api",
 ]

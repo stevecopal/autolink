@@ -617,6 +617,7 @@ def garage_delete_view(request, garage_id):
 def garage_dashboard_view(request):
     from accounts.models import User
     from payments.constants import GARAGE_ACTIVATION_AMOUNT, GARAGE_ACTIVATION_CURRENCY
+    from catalog.models import Part
 
     if request.user.role not in [User.Role.CLIENT, User.Role.ADMIN]:
         return redirect("garages:garage_create")
@@ -627,9 +628,14 @@ def garage_dashboard_view(request):
     if not garages.exists():
         return redirect("garages:garage_create")
 
-    garage = garages.first()
+    garage_id = request.GET.get("garage")
+    if garage_id:
+        garage = garages.filter(pk=garage_id).first()
+    else:
+        garage = garages.first()
 
-    from catalog.models import Part
+    if not garage:
+        return redirect("garages:garage_create")
 
     products = Part.objects.filter(garage=garage, is_active=True).select_related(
         "category"

@@ -7,6 +7,7 @@ from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum
+from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import gettext_lazy as _
@@ -172,3 +173,12 @@ def notification_mark_all_read_view(request):
             is_read=True
         )
     return redirect("accounts:notifications")
+
+
+@login_required
+def notification_count_api(request):
+    """Return unread notification count as JSON."""
+    if request.method != "GET":
+        return JsonResponse({"error": "Method not allowed"}, status=405)
+    count = Notification.unread_count(request.user)
+    return JsonResponse({"unread_count": count})

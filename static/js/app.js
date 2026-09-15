@@ -333,7 +333,7 @@
     async function checkNotifications() {
         if (!notifBadge) return;
         try {
-            var res = await fetch('/notifications/api/count/');
+            var res = await fetch('/compte/notifications/api/count/');
             if (!res.ok) return;
             var data = await res.json();
             if (data.unread_count > 0) {

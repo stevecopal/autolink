@@ -12,7 +12,7 @@
   document.head.insertAdjacentHTML('beforeend', `<style>
     #mobile-menu{
       position:fixed;inset:0;z-index:45;
-      background:#00002B;
+      background:#ffffff;
       transform-origin:top right;
       transform:perspective(1200px) rotateY(90deg);
       opacity:0;

@@ -10,6 +10,17 @@
         <div>
             <h1 class="text-2xl md:text-3xl font-bold text-gray-900">{{ garage.name }}</h1>
             <p class="text-gray-500 text-sm mt-1">{% trans "Tableau de bord" %}</p>
+            {% if garages|length > 1 %}
+            <form method="get" class="mt-2">
+                <label for="garage-select" class="sr-only">{% trans "Choisir un garage" %}</label>
+                <select id="garage-select" name="garage" onchange="this.form.submit()"
+                        class="text-sm border border-gray-300 rounded-lg px-3 py-1.5 bg-white text-gray-700 focus:ring-2 focus:ring-navy-500/20 focus:border-navy-500 outline-none">
+                    {% for g in garages %}
+                        <option value="{{ g.id }}" {% if g.id == garage.id %}selected{% endif %}>{{ g.name }}</option>
+                    {% endfor %}
+                </select>
+            </form>
+            {% endif %}
         </div>
         <div class="flex items-center gap-3">
             <form method="post" action="{% url 'garages:garage_availability' %}" class="flex items-center gap-2">
@@ -439,7 +450,7 @@
                 renderGateways(data.providers || []);
             } else {
                 showError(
-                    data.message || '{% trans "Impossible d\'initialiser le paiement." %}'
+                    data.message || "{{ 'Impossible d\'initialiser le paiement.'|escapejs }}"
                 );
             }
         })
@@ -472,7 +483,7 @@
 
             var gateway = selectedGateway.value;
             if (currentActiveGateways.indexOf(gateway) === -1) {
-                showError('{% trans "Ce moyen de paiement n\'est pas disponible." %}');
+                showError("{{ 'Ce moyen de paiement n\'est pas disponible.'|escapejs }}");
                 return;
             }
 
