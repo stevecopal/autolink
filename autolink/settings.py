@@ -99,7 +99,7 @@ else:
             default=config("DATABASE_URL", default=""),
             conn_max_age=600,
             conn_health_checks=True,
-            ssl_require=False,
+            ssl_require=config("DB_SSL_REQUIRE", default=False, cast=bool),
         )
     }
 

@@ -12,6 +12,7 @@ services:
       - SQL_HOST=postgres_db  # Pour le script entrypoint.sh
       - SQL_PORT=5432
       - DATABASE_URL=postgresql://${POSTGRES_USER:-autolink}:${POSTGRES_PASSWORD:-autolink@autolink}@postgres_db:5432/${POSTGRES_DB:-autolink_db}
+      - DB_SSL_REQUIRE=False
     volumes:
       - autolink_static:/app/staticfiles
       - autolink_media:/app/media
