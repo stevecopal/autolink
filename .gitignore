@@ -229,9 +229,13 @@ temp/
 
 # Docker local overrides
 docker-compose.override.yml
-
-# Docker environment files
 .env.docker
+
+# uv.lock is committed to ensure reproducible builds
+# (uv.lock is NOT ignored)
+
+# Collected static files (generated in Docker)
+staticfiles/
 
 
 # =========================================================

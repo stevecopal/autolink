@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  # ── Django App ──────────────────────────────────────────────
+  django_app:
+    build: .
+    container_name: autolink_django  # Nom réutilisé par Caddy central
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - DEBUG=False
+      - SQL_HOST=postgres_db  # Pour le script entrypoint.sh
+      - SQL_PORT=5432
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-autolink}:${POSTGRES_PASSWORD:-autolink@autolink}@postgres_db:5432/${POSTGRES_DB:-autolink_db}
+    volumes:
+      - autolink_static:/app/staticfiles
+      - autolink_media:/app/media
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+    networks:
+      - autolink_internal  # Pour parler à Postgres
+      - proxy-net          # Pour recevoir le trafic du Caddy central
+
+  # ── PostgreSQL (Isolé) ──────────────────────────────────────
+  postgres_db:
+    image: postgres:16-alpine
+    container_name: autolink_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-autolink}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-autolink@autolink}
+      POSTGRES_DB: ${POSTGRES_DB:-autolink_db}
+    volumes:
+      - autolink_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-autolink} -d ${POSTGRES_DB:-autolink_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - autolink_internal  # Uniquement dans le réseau privé
+
+volumes:
+  autolink_postgres_data:
+  autolink_static:
+    name: autolink_static  # Nom explicite du volume pour le Caddy central
+  autolink_media:
+    name: autolink_media   # Nom explicite du volume pour le Caddy central
+
+networks:
+  autolink_internal:
+    driver: bridge
+  proxy-net:
+    external: true

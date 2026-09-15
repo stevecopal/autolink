@@ -1,27 +1,30 @@
 """
 Django settings for autolink project.
+Production-ready configuration with SQLite (dev) / PostgreSQL (prod) switching.
 """
 
+import os
 from pathlib import Path
 
+import dj_database_url
 from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# ── Core ──────────────────────────────────────────────────────
 SECRET_KEY = config("SECRET_KEY", default="django-insecure-change-me-in-production")
 DEBUG = config("DEBUG", default=False, cast=bool)
 ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="*").split(",")
 CSRF_TRUSTED_ORIGINS = config("CSRF_TRUSTED_ORIGINS", default="").split(",")
 
-# Payment provider credentials — all stored in .env, never committed.
-
-# CamPay configuration
-CAMPAY_ENVIRONMENT = config("CAMPAY_ENVIRONMENT", default="DEV")  # DEV or PROD
+# ── Payment provider credentials ──────────────────────────────
+CAMPAY_ENVIRONMENT = config("CAMPAY_ENVIRONMENT", default="DEV")
 CAMPAY_APP_USERNAME = config("CAMPAY_APP_USERNAME", default="")
 CAMPAY_APP_PASSWORD = config("CAMPAY_APP_PASSWORD", default="")
 CAMPAY_WEBHOOK_SECRET = config("CAMPAY_WEBHOOK_SECRET", default="")
 SITE_URL = config("SITE_URL", default="http://localhost:8000")
 
+# ── Installed apps ────────────────────────────────────────────
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -45,9 +48,11 @@ INSTALLED_APPS = [
     "administration",
 ]
 
+# ── Middleware ─────────────────────────────────────────────────
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -80,19 +85,29 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "autolink.wsgi.application"
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+# ── Database ──────────────────────────────────────────────────
+if DEBUG:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": dj_database_url.config(
+            default=config("DATABASE_URL", default=""),
+            conn_max_age=600,
+            conn_health_checks=True,
+            ssl_require=True,
+        )
+    }
 
+# ── Auth ──────────────────────────────────────────────────────
 AUTH_USER_MODEL = "accounts.User"
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
-    },
+    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
@@ -105,6 +120,7 @@ AUTHENTICATION_BACKENDS = [
 
 SITE_ID = 1
 
+# ── Internationalization ──────────────────────────────────────
 LANGUAGE_CODE = "fr"
 TIME_ZONE = "Africa/Douala"
 USE_I18N = True
@@ -115,15 +131,25 @@ LANGUAGES = [
 ]
 LOCALE_PATHS = [BASE_DIR / "locale"]
 
+# ── Static & Media files ─────────────────────────────────────
 STATIC_URL = "/static/"
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
+STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
+# WhiteNoise: servir les statiques en prod (fallback si Caddy ne gère pas)
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage" if not DEBUG else "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
+
+# ── Misc Django ───────────────────────────────────────────────
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 LOGIN_URL = "/compte/connexion/"
@@ -132,6 +158,7 @@ LOGOUT_REDIRECT_URL = "core:home"
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
+# ── Logging ───────────────────────────────────────────────────
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -159,34 +186,38 @@ LOGGING = {
         },
         "autolink": {
             "handlers": ["console"],
-            "level": "DEBUG",
+            "level": "DEBUG" if DEBUG else "INFO",
             "propagate": False,
         },
     },
 }
 
-# Security settings
+# ── Security ──────────────────────────────────────────────────
 SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = "DENY"
 CSRF_COOKIE_HTTPONLY = True
 SESSION_COOKIE_HTTPONLY = True
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-
-# Force Django à comprendre qu'il est derrière le HTTPS de Ngrok
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-
-# Si vous utilisez django-allauth, force le HTTPS pour les redirections
 ACCOUNT_DEFAULT_HTTP_PROTOCOL = "https"
 
-# Cache configuration
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
+# ── Cache ─────────────────────────────────────────────────────
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
     }
 }
 
-# django-allauth configuration
+# ── django-allauth ────────────────────────────────────────────
 LOGIN_REDIRECT_URL = "core:home"
 ACCOUNT_LOGOUT_REDIRECT_URL = "core:home"
 ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
