@@ -92,9 +92,9 @@
         <a href="{% url 'search:nearby_page' %}" class="block px-4 py-3 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors" role="menuitem">{% trans "Trouvez un Mécaniciens à proximité" %}</a>
         <a href="{% url 'garages:garage_list' %}" class="block px-4 py-3 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors" role="menuitem">{% trans "Trouver un garage proche de vous" %}</a>
         <a href="{% url 'catalog:part_list' %}" class="block px-4 py-3 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors" role="menuitem">{% trans "Trouver une pièce pour votre vehicule" %}</a>
-        <a href="{% url 'core:contact' %}" class="block px-4 py-3 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors" role="menuitem">{% trans "Politique et regle de confidentialite " %}</a>
+        <a href="{% url 'core:policy' %}" class="block px-4 py-3 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors" role="menuitem">{% trans "Politique et regle de confidentialite " %}</a>
         <a href="{% url 'core:about' %}" class="block px-4 py-3 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors" role="menuitem">{% trans "À propos d'Autolink" %}</a>
-        <a href="{% url 'core:policy' %}" class="block px-4 py-3 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors" role="menuitem">{% trans "contactez-nous" %}</a>
+        <a href="{% url 'core:contact' %}" class="block px-4 py-3 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors" role="menuitem">{% trans "contactez-nous" %}</a>
 
         {% if user.is_authenticated %}
             <div class="pt-3 mt-2">
