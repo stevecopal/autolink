@@ -113,7 +113,7 @@ def _compute_why_stats():
     if garages_with_times.exists():
         avg_duration = (
             Garage.objects.filter(_get_garage_public_filter())
-            .filter(GarageService__duration_minutes__isnull=False)
+            .filter(services__duration_minutes__isnull=False)
             .values_list("services__duration_minutes", flat=True)
         )
         durations = [d for d in avg_duration if d is not None]
