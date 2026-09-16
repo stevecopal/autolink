@@ -4,17 +4,44 @@
 {% block title %}{% if is_edit %}{% trans "Modifier le garage" %}{% else %}{% trans "Ajouter un garage" %}{% endif %}{% endblock %}
 
 {% block content %}
-<div class="max-w-2xl mx-auto px-4 py-8">
-    <h1 class="text-2xl md:text-3xl font-bold text-navy-900 mb-6">{% if is_edit %}{% trans "Modifier le garage" %}{% else %}{% trans "Ajouter un garage" %}{% endif %}</h1>
+<div class="max-w-2xl mx-auto px-3 sm:px-4 py-6 md:py-8">
+    <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-navy-900 mb-4 md:mb-6">{% if is_edit %}{% trans "Modifier le garage" %}{% else %}{% trans "Ajouter un garage" %}{% endif %}</h1>
 
-    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-        <p class="text-sm text-blue-800">
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 md:p-4 mb-4 md:mb-6">
+        <p class="text-xs sm:text-sm text-blue-800">
             <strong>{% trans "Important" %} :</strong>
-            {% trans "Pour enregistrer correctement votre garage, vous devez être physiquement présent sur son emplacement. AutoLink utilisera la position actuelle de votre appareil afin d'enregistrer automatiquement les coordonnées du garage." %}
+            {% trans "Pour enregistrer correctement votre garage, vous devez être physiquement présent sur son emplacement." %}
         </p>
     </div>
 
-    <div class="card p-6">
+    {% comment %}Progress Steps{% endcomment %}
+    <div class="flex items-center justify-between mb-6 md:mb-8">
+        <div class="flex items-center gap-2 sm:gap-3">
+            <div id="step1-indicator" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-navy-500 text-white flex items-center justify-center font-bold text-xs sm:text-sm">1</div>
+            <div class="hidden sm:block">
+                <p class="text-sm font-semibold text-navy-900">{% trans "Identité" %}</p>
+                <p class="text-xs text-graphite-500">{% trans "Informations de base" %}</p>
+            </div>
+        </div>
+        <div class="flex-1 h-1 mx-2 sm:mx-4 bg-graphite-200 rounded" id="progress-line-1"></div>
+        <div class="flex items-center gap-2 sm:gap-3">
+            <div id="step2-indicator" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-graphite-200 text-graphite-500 flex items-center justify-center font-bold text-xs sm:text-sm">2</div>
+            <div class="hidden sm:block">
+                <p class="text-sm font-semibold text-graphite-500">{% trans "Contact & Lieu" %}</p>
+                <p class="text-xs text-graphite-500">{% trans "Coordonnées GPS" %}</p>
+            </div>
+        </div>
+        <div class="flex-1 h-1 mx-2 sm:mx-4 bg-graphite-200 rounded" id="progress-line-2"></div>
+        <div class="flex items-center gap-2 sm:gap-3">
+            <div id="step3-indicator" class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-graphite-200 text-graphite-500 flex items-center justify-center font-bold text-xs sm:text-sm">3</div>
+            <div class="hidden sm:block">
+                <p class="text-sm font-semibold text-graphite-500">{% trans "Horaires" %}</p>
+                <p class="text-xs text-graphite-500">{% trans "Heures & Documents" %}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="card p-4 sm:p-6">
         <form method="post" enctype="multipart/form-data" class="space-y-4" id="garage-form">
             {% csrf_token %}
 
@@ -26,10 +53,11 @@
             </div>
             {% endif %}
 
-            <div class="border-b border-line-200 pb-4 mb-4">
-                <h2 class="text-lg font-bold text-navy-900 mb-3">{% trans "Identité du garage" %}</h2>
+            {% comment %}Step 1: Identity{% endcomment %}
+            <div id="step1" class="step-content">
+                <h2 class="text-base sm:text-lg font-bold text-navy-900 mb-3 md:mb-4">{% trans "Identité du garage" %}</h2>
 
-                <div class="space-y-4">
+                <div class="space-y-3 sm:space-y-4">
                     <div>
                         <label class="form-label">{% trans "Nom du garage" %} *</label>
                         {{ form.name }}
@@ -55,127 +83,221 @@
                         {% endif %}
                     </div>
                 </div>
+
+                <div class="flex justify-end mt-4 sm:mt-6">
+                    <button type="button" onclick="nextStep(2)" class="btn bg-navy-500 hover:bg-navy-600 text-white text-sm sm:text-base">
+                        {% trans "Suivant" %}
+                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
 
-            <div class="border-b border-line-200 pb-4 mb-4">
-                <h2 class="text-lg font-bold text-navy-900 mb-3">{% trans "Contact" %}</h2>
+            {% comment %}Step 2: Contact & Location{% endcomment %}
+            <div id="step2" class="step-content" style="display:none;">
+                <h2 class="text-base sm:text-lg font-bold text-navy-900 mb-3 md:mb-4">{% trans "Contact & Localisation" %}</h2>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="space-y-3 sm:space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                        <div>
+                            <label class="form-label">{% trans "Téléphone" %} *</label>
+                            {{ form.phone }}
+                            {% if form.phone.errors %}
+                            <p class="form-error">{{ form.phone.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div>
+                            <label class="form-label">{% trans "WhatsApp" %} *</label>
+                            {{ form.whatsapp }}
+                            {% if form.whatsapp.errors %}
+                            <p class="form-error">{{ form.whatsapp.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
                     <div>
-                        <label class="form-label">{% trans "Téléphone" %} *</label>
-                        {{ form.phone }}
-                        {% if form.phone.errors %}
-                        <p class="form-error">{{ form.phone.errors.0 }}</p>
+                        <label class="form-label">{% trans "Email" %} *</label>
+                        {{ form.email }}
+                        {% if form.email.errors %}
+                        <p class="form-error">{{ form.email.errors.0 }}</p>
                         {% endif %}
                     </div>
 
                     <div>
-                        <label class="form-label">{% trans "WhatsApp" %} *</label>
-                        {{ form.whatsapp }}
-                        {% if form.whatsapp.errors %}
-                        <p class="form-error">{{ form.whatsapp.errors.0 }}</p>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <div class="mt-4">
-                    <label class="form-label">{% trans "Email" %} *</label>
-                    {{ form.email }}
-                    {% if form.email.errors %}
-                    <p class="form-error">{{ form.email.errors.0 }}</p>
-                    {% endif %}
-                </div>
-            </div>
-
-            <div class="border-b border-line-200 pb-4 mb-4">
-                <h2 class="text-lg font-bold text-navy-900 mb-3">{% trans "Localisation administrative" %}</h2>
-
-                <div>
-                    <label class="form-label">{% trans "Adresse" %} *</label>
-                    {{ form.address }}
-                    {% if form.address.errors %}
-                    <p class="form-error">{{ form.address.errors.0 }}</p>
-                    {% endif %}
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 py-5">
-                    <div>
-                        <label class="form-label">{% trans "Ville" %} *</label>
-                        {{ form.city }}
-                        {% if form.city.errors %}
-                        <p class="form-error">{{ form.city.errors.0 }}</p>
+                        <label class="form-label">{% trans "Adresse" %} *</label>
+                        {{ form.address }}
+                        {% if form.address.errors %}
+                        <p class="form-error">{{ form.address.errors.0 }}</p>
                         {% endif %}
                     </div>
 
-                    <div>
-                        <label class="form-label">{% trans "Quartier" %} *</label>
-                        {{ form.neighborhood }}
-                        {% if form.neighborhood.errors %}
-                        <p class="form-error">{{ form.neighborhood.errors.0 }}</p>
-                        {% endif %}
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                        <div>
+                            <label class="form-label">{% trans "Ville" %} *</label>
+                            {{ form.city }}
+                            {% if form.city.errors %}
+                            <p class="form-error">{{ form.city.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div>
+                            <label class="form-label">{% trans "Quartier" %} *</label>
+                            {{ form.neighborhood }}
+                            {% if form.neighborhood.errors %}
+                            <p class="form-error">{{ form.neighborhood.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="border-t border-line-200 pt-3 sm:pt-4 mt-3 sm:mt-4">
+                        <h3 class="text-sm font-bold text-navy-900 mb-3">{% trans "Position GPS" %}</h3>
+
+                        <div id="location-status" class="text-xs sm:text-sm text-graphite-500 mb-2">
+                            {% trans "Position non encore capturée." %}
+                        </div>
+
+                        <button type="button" id="get-location-btn" class="btn bg-blue-500 hover:bg-blue-500/90 text-white w-full text-sm sm:text-base">
+                            <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                            {% trans "Obtenir ma position" %}
+                        </button>
+
+                        <div id="location-info"></div>
+                        <span id="i18n-limit-warning" class="hidden">{% trans "Pour plus de précision, activez le GPS ou sortez à l'extérieur." %}</span>
+
+                        <div id="location-map" style="display:none;height:240px;border-radius:12px;overflow:hidden;position:relative;z-index:0;" class="mt-4 sm:h-80"></div>
+
+                        <div id="location-confirm" style="display:none;" class="mt-3 sm:mt-4">
+                            <p class="text-xs sm:text-sm text-green-700 font-medium">
+                                {% trans "Confirmez que vous êtes bien sur le lieu du garage." %}
+                            </p>
+                        </div>
+
+                        {{ form.latitude }}
+                        {{ form.longitude }}
+                        {{ form.gps_accuracy }}
                     </div>
                 </div>
-            </div>
 
-            <div class="border-b border-line-200 pb-4 mb-4">
-                <h2 class="text-lg font-bold text-navy-900 mb-3">{% trans "Justificatif" %}</h2>
-
-                <div>
-                    <label class="form-label">{% trans "Type de document" %} *</label>
-                    {{ doc_form.document_type }}
-                    {% if doc_form.document_type.errors %}
-                    <p class="form-error">{{ doc_form.document_type.errors.0 }}</p>
-                    {% endif %}
-                </div>
-
-                <div class="mt-4">
-                    <label class="form-label">{% trans "Document justificatif" %} *</label>
-                    <p class="text-xs text-graphite-500 mb-2">{% trans "PDF ou Word, max 5 Mo." %}</p>
-                    {{ doc_form.document }}
-                    {% if doc_form.document.errors %}
-                    <p class="form-error">{{ doc_form.document.errors.0 }}</p>
-                    {% endif %}
+                <div class="flex justify-between mt-4 sm:mt-6">
+                    <button type="button" onclick="prevStep(1)" class="btn btn-outline text-sm sm:text-base">
+                        <svg class="w-4 h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                        {% trans "Précédent" %}
+                    </button>
+                    <button type="button" onclick="nextStep(3)" class="btn bg-navy-500 hover:bg-navy-600 text-white text-sm sm:text-base">
+                        {% trans "Suivant" %}
+                        <svg class="w-4 h-4 ml-1 sm:ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </button>
                 </div>
             </div>
 
-            <div class="pb-4 mb-4">
-                <h2 class="text-lg font-bold text-navy-900 mb-3">{% trans "Position GPS" %}</h2>
+            {% comment %}Step 3: Working Hours & Documents{% endcomment %}
+            <div id="step3" class="step-content" style="display:none;">
+                <h2 class="text-base sm:text-lg font-bold text-navy-900 mb-3 md:mb-4">{% trans "Horaires & Justificatif" %}</h2>
 
-                <div id="location-status" class="text-sm text-graphite-500 mb-2">
-                    {% trans "Position non encore capturée." %}
+                <div class="space-y-3 sm:space-y-4">
+                    <div class="bg-graphite-50 rounded-xl p-3 sm:p-4">
+                        <h3 class="text-sm font-bold text-navy-900 mb-3">{% trans "Horaires de travail" %}</h3>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4">
+                            <div>
+                                <label class="form-label">{% trans "Heure d'ouverture" %}</label>
+                                {{ form.opening_time }}
+                                {% if form.opening_time.errors %}
+                                <p class="form-error">{{ form.opening_time.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+
+                            <div>
+                                <label class="form-label">{% trans "Heure de fermeture" %}</label>
+                                {{ form.closing_time }}
+                                {% if form.closing_time.errors %}
+                                <p class="form-error">{{ form.closing_time.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="space-y-2 sm:space-y-3">
+                            <div class="flex items-center gap-3 p-2.5 sm:p-3 rounded-lg bg-white border border-graphite-200">
+                                {{ form.open_weekends }}
+                                <div class="flex-1 min-w-0">
+                                    <label for="id_open_weekends" class="text-sm font-medium text-graphite-900 cursor-pointer flex items-center gap-2">
+                                        <svg class="w-4 h-4 sm:w-5 sm:h-5 text-amber-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                        </svg>
+                                        {% trans "Ouvert le samedi" %}
+                                    </label>
+                                    <p class="text-xs text-graphite-500 ml-6 sm:ml-7">{% trans "Mêmes horaires que Lun-Ven" %}</p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-3 p-2.5 sm:p-3 rounded-lg bg-white border border-graphite-200">
+                                {{ form.open_sunday }}
+                                <div class="flex-1 min-w-0">
+                                    <label for="id_open_sunday" class="text-sm font-medium text-graphite-900 cursor-pointer flex items-center gap-2">
+                                        <svg class="w-4 h-4 sm:w-5 sm:h-5 text-blue-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                        </svg>
+                                        {% trans "Ouvert le dimanche" %}
+                                    </label>
+                                    <p class="text-xs text-graphite-500 ml-6 sm:ml-7">{% trans "Mêmes horaires que Lun-Ven" %}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="schedule-preview" class="mt-3 sm:mt-4 p-2.5 sm:p-3 rounded-lg bg-white border border-graphite-200">
+                            <p class="text-xs font-bold text-graphite-700 mb-2">{% trans "Aperçu des horaires" %}</p>
+                            <div class="space-y-1 text-xs" id="schedule-list"></div>
+                        </div>
+                    </div>
+
+                    <div class="border-t border-line-200 pt-3 sm:pt-4">
+                        <h3 class="text-sm font-bold text-navy-900 mb-3">{% trans "Justificatif" %}</h3>
+
+                        <div>
+                            <label class="form-label">{% trans "Type de document" %} *</label>
+                            {{ doc_form.document_type }}
+                            {% if doc_form.document_type.errors %}
+                            <p class="form-error">{{ doc_form.document_type.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+
+                        <div class="mt-3 sm:mt-4">
+                            <label class="form-label">{% trans "Document justificatif" %} *</label>
+                            <p class="text-xs text-graphite-500 mb-2">{% trans "PDF ou Word, max 5 Mo." %}</p>
+                            {{ doc_form.document }}
+                            {% if doc_form.document.errors %}
+                            <p class="form-error">{{ doc_form.document.errors.0 }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
 
-                <button type="button" id="get-location-btn" class="btn bg-blue-500 hover:bg-blue-500/90 text-white w-full">
-                    <svg class="w-5 h-5 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                    </svg>
-                    {% trans "Obtenir ma position" %}
-                </button>
-
-                <div id="location-info"></div>
-
-                <!-- Textes traduits pour usage JS (évite les conflits d'apostrophes) -->
-                <span id="i18n-limit-warning" class="hidden">{% trans "Pour plus de précision, activez le GPS ou sortez à l'extérieur." %}</span>
-
-                <div id="location-map" style="display:none;height:320px;border-radius:12px;overflow:hidden;position:relative;z-index:0;" class="mt-4"></div>
-
-                <div id="location-confirm" style="display:none;" class="mt-4">
-                    <p class="text-sm text-green-700 font-medium">
-                        {% trans "Confirmez que vous êtes bien sur le lieu du garage." %}
-                    </p>
+                <div class="flex justify-between mt-4 sm:mt-6">
+                    <button type="button" onclick="prevStep(2)" class="btn btn-outline text-sm sm:text-base">
+                        <svg class="w-4 h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                        {% trans "Précédent" %}
+                    </button>
+                    <button type="submit" class="btn bg-emerald-500 hover:bg-emerald-600 text-white text-sm sm:text-base">
+                        <svg class="w-4 h-4 mr-1 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        {% if is_edit %}{% trans "Enregistrer" %}{% else %}{% trans "Soumettre" %}{% endif %}
+                    </button>
                 </div>
-
-                {{ form.latitude }}
-                {{ form.longitude }}
-                {{ form.gps_accuracy }}
             </div>
-
-            <button type="submit" class="btn bg-blue-500 hover:bg-blue-500/90 text-white w-full">
-                {% if is_edit %}{% trans "Enregistrer les modifications" %}{% else %}{% trans "Soumettre pour vérification" %}{% endif %}
-            </button>
         </form>
     </div>
 </div>
@@ -186,6 +308,73 @@
 (function() {
     'use strict';
 
+    var currentStep = 1;
+
+    // ─── Step Navigation ───────────────────────────────────────
+    window.nextStep = function(step) {
+        document.getElementById('step' + currentStep).style.display = 'none';
+        document.getElementById('step' + step).style.display = 'block';
+        currentStep = step;
+        updateProgress();
+    };
+
+    window.prevStep = function(step) {
+        document.getElementById('step' + currentStep).style.display = 'none';
+        document.getElementById('step' + step).style.display = 'block';
+        currentStep = step;
+        updateProgress();
+    };
+
+    function updateProgress() {
+        for (var i = 1; i <= 3; i++) {
+            var indicator = document.getElementById('step' + i + '-indicator');
+            if (i <= currentStep) {
+                indicator.className = 'w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-navy-500 text-white flex items-center justify-center font-bold text-xs sm:text-sm';
+            } else {
+                indicator.className = 'w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-graphite-200 text-graphite-500 flex items-center justify-center font-bold text-xs sm:text-sm';
+            }
+        }
+        document.getElementById('progress-line-1').className = currentStep >= 2
+            ? 'flex-1 h-1 mx-2 sm:mx-4 bg-navy-500 rounded' : 'flex-1 h-1 mx-2 sm:mx-4 bg-graphite-200 rounded';
+        document.getElementById('progress-line-2').className = currentStep >= 3
+            ? 'flex-1 h-1 mx-2 sm:mx-4 bg-navy-500 rounded' : 'flex-1 h-1 mx-2 sm:mx-4 bg-graphite-200 rounded';
+    }
+
+    // ─── Schedule Preview ──────────────────────────────────────
+    function updateSchedulePreview() {
+        var opening = document.getElementById('id_opening_time');
+        var closing = document.getElementById('id_closing_time');
+        var sat = document.getElementById('id_open_weekends');
+        var sun = document.getElementById('id_open_sunday');
+        var list = document.getElementById('schedule-list');
+        if (!opening || !closing || !sat || !sun || !list) return;
+
+        var o = opening.value || '--:--';
+        var c = closing.value || '--:--';
+        var range = o + ' – ' + c;
+
+        var days = [
+            { label: 'Lun – Ven', open: opening.value && closing.value },
+            { label: 'Samedi', open: sat.checked && opening.value && closing.value },
+            { label: 'Dimanche', open: sun.checked && opening.value && closing.value },
+        ];
+
+        var html = '';
+        days.forEach(function(d) {
+            var color = d.open ? 'text-emerald-600' : 'text-graphite-400';
+            var status = d.open ? range : '{% trans "Fermé" %}';
+            html += '<div class="flex justify-between"><span class="text-graphite-600">' + d.label + '</span><span class="font-mono font-semibold ' + color + '">' + status + '</span></div>';
+        });
+        list.innerHTML = html;
+    }
+
+    document.getElementById('id_opening_time')?.addEventListener('change', updateSchedulePreview);
+    document.getElementById('id_closing_time')?.addEventListener('change', updateSchedulePreview);
+    document.getElementById('id_open_weekends')?.addEventListener('change', updateSchedulePreview);
+    document.getElementById('id_open_sunday')?.addEventListener('change', updateSchedulePreview);
+    updateSchedulePreview();
+
+    // ─── City → Neighborhood cascade ───────────────────────────
     var citySelect = document.getElementById('id_city');
     var neighborhoodSelect = document.getElementById('id_neighborhood');
 
@@ -196,7 +385,6 @@
                 neighborhoodSelect.innerHTML = '<option value="">{% trans "Sélectionnez un quartier" %}</option>';
                 return;
             }
-
             fetch('/api/neighborhoods/' + cityId + '/')
                 .then(function(response) { return response.json(); })
                 .then(function(data) {
@@ -212,6 +400,7 @@
         });
     }
 
+    // ─── Geolocation ───────────────────────────────────────────
     var locationBtn = document.getElementById('get-location-btn');
     var locationStatus = document.getElementById('location-status');
     var locationInfo = document.getElementById('location-info');
@@ -221,35 +410,20 @@
     var lngInput = document.getElementById('id_longitude');
     var accInput = document.getElementById('id_gps_accuracy');
 
-    // Précision cible (mètres). En dessous, la position est considérée fiable.
     var TARGET_ACCURACY = 20;
-    // Timeout maximum avant de forcer la capture (10 secondes)
     var MAX_WAIT_MS = 10000;
     var watchId = null;
     var bestFix = null;
     var captureTimer = null;
-
     var map = null;
     var userMarker = null;
     var garageMarker = null;
     var accuracyCircle = null;
 
-    // 6 décimales = même precision que le DecimalField du modèle :
-    // la chaîne affichée, envoyée au formulaire et stockée en base est identique.
-    function fmtCoord(value) {
-        return value.toFixed(6);
-    }
+    function fmtCoord(value) { return value.toFixed(6); }
 
-    var btnIdle =
-        '<svg class="w-5 h-5 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">' +
-        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>' +
-        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>' +
-        '</svg> {% trans "Obtenir ma position" %}';
-    var btnRefresh =
-        '<svg class="w-5 h-5 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">' +
-        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>' +
-        '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>' +
-        '</svg> {% trans "Rafraîchir la position" %}';
+    var btnIdle = '<svg class="w-5 h-5 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg> {% trans "Obtenir ma position" %}';
+    var btnRefresh = '<svg class="w-5 h-5 mr-2 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg> {% trans "Rafraîchir la position" %}';
 
     function setLoading(loading, label) {
         locationBtn.disabled = loading;
@@ -257,150 +431,69 @@
     }
 
     function stopWatching() {
-        if (watchId !== null) {
-            navigator.geolocation.clearWatch(watchId);
-            watchId = null;
-        }
-        if (captureTimer !== null) {
-            clearTimeout(captureTimer);
-            captureTimer = null;
-        }
+        if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+        if (captureTimer !== null) { clearTimeout(captureTimer); captureTimer = null; }
     }
 
     function capturePosition() {
         if (!bestFix) return;
         stopWatching();
-
         var latText = fmtCoord(bestFix.lat);
         var lngText = fmtCoord(bestFix.lng);
-
-        // Une seule source de vérité : le même texte va dans l'input
-        // (donc en base) et dans la carte de vérification.
         latInput.value = latText;
         lngInput.value = lngText;
         accInput.value = bestFix.accuracy.toFixed(2);
-
         locationStatus.textContent = '{% trans "Position capturée avec succès." %}';
         locationStatus.className = 'text-sm text-green-600 font-medium mb-2';
-
-        locationInfo.innerHTML =
-            '<p class="text-sm text-graphite-600 mt-2">' +
-            '{% trans "Latitude" %} : ' + latText + '<br>' +
-            '{% trans "Longitude" %} : ' + lngText + '<br>' +
-            '{% trans "Précision" %} : ' + bestFix.accuracy.toFixed(1) + ' m' +
-            '</p>';
-
+        locationInfo.innerHTML = '<p class="text-sm text-graphite-600 mt-2">{% trans "Latitude" %} : ' + latText + '<br>{% trans "Longitude" %} : ' + lngText + '<br>{% trans "Précision" %} : ' + bestFix.accuracy.toFixed(1) + ' m</p>';
         locationConfirm.style.display = 'block';
         showVerificationMap(latText, lngText, bestFix.accuracy);
-
         setLoading(false, btnRefresh);
     }
 
     function showVerificationMap(latText, lngText, accuracy) {
         if (!locationMapEl || typeof L === 'undefined') return;
-
         var latlng = [parseFloat(latText), parseFloat(lngText)];
-
         locationMapEl.style.display = 'block';
         if (!map) {
             map = L.map(locationMapEl, { zoomControl: true, scrollWheelZoom: false });
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-                maxZoom: 19,
-            }).addTo(map);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '&copy; OpenStreetMap', maxZoom: 19 }).addTo(map);
         }
-
         map.setView(latlng, 18);
-
-        // Marqueur utilisateur (rouge)
         if (!userMarker) {
-            userMarker = L.marker(latlng, {
-                icon: L.divIcon({
-                    className: 'user-marker',
-                    html: '<div style="width:22px;height:22px;background:#EF4444;border:3px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>',
-                    iconSize: [22, 22],
-                    iconAnchor: [11, 11],
-                }),
-                zIndexOffset: 1000,
-            }).bindPopup('<strong>{% trans "Votre position actuelle" %}</strong>').addTo(map);
-        } else {
-            userMarker.setLatLng(latlng);
-        }
-
-        // Marqueur garage (vert) — MÊMES coordonnées que le marqueur utilisateur.
+            userMarker = L.marker(latlng, { icon: L.divIcon({ className: 'user-marker', html: '<div style="width:22px;height:22px;background:#EF4444;border:3px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.3);"></div>', iconSize: [22, 22], iconAnchor: [11, 11] }), zIndexOffset: 1000 }).bindPopup('<strong>{% trans "Votre position actuelle" %}</strong>').addTo(map);
+        } else { userMarker.setLatLng(latlng); }
         if (!garageMarker) {
-            garageMarker = L.marker(latlng, {
-                icon: L.divIcon({
-                    className: 'garage-marker',
-                    html: '<div style="width:28px;height:28px;background:#10B981;border:3px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;font-size:14px;">🔧</div>',
-                    iconSize: [28, 28],
-                    iconAnchor: [14, 14],
-                }),
-            }).bindPopup('<strong>{% trans "Position du garage enregistrée" %}</strong>').addTo(map);
-        } else {
-            garageMarker.setLatLng(latlng);
-        }
-
+            garageMarker = L.marker(latlng, { icon: L.divIcon({ className: 'garage-marker', html: '<div style="width:28px;height:28px;background:#10B981;border:3px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;font-size:14px;">🔧</div>', iconSize: [28, 28], iconAnchor: [14, 14] }) }).bindPopup('<strong>{% trans "Position du garage enregistrée" %}</strong>').addTo(map);
+        } else { garageMarker.setLatLng(latlng); }
         if (!accuracyCircle) {
-            accuracyCircle = L.circle(latlng, {
-                radius: accuracy,
-                color: '#EF4444',
-                weight: 1,
-                fillOpacity: 0.08,
-            }).addTo(map);
-        } else {
-            accuracyCircle.setLatLng(latlng);
-            accuracyCircle.setRadius(accuracy);
-        }
-
+            accuracyCircle = L.circle(latlng, { radius: accuracy, color: '#EF4444', weight: 1, fillOpacity: 0.08 }).addTo(map);
+        } else { accuracyCircle.setLatLng(latlng); accuracyCircle.setRadius(accuracy); }
         setTimeout(function() { map.invalidateSize(); }, 50);
     }
 
     function onWatch(position) {
-        var fix = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-            accuracy: position.coords.accuracy,
-        };
-        if (!bestFix || fix.accuracy < bestFix.accuracy) {
-            bestFix = fix;
-        }
+        var fix = { lat: position.coords.latitude, lng: position.coords.longitude, accuracy: position.coords.accuracy };
+        if (!bestFix || fix.accuracy < bestFix.accuracy) bestFix = fix;
         locationStatus.className = 'text-sm text-graphite-500 mb-2';
-        locationStatus.textContent =
-            '{% trans "Précision actuelle" %} : ' + Math.round(fix.accuracy) + ' m' +
-            ' — {% trans "meilleure" %} : ' + Math.round(bestFix.accuracy) + ' m';
-
-        if (bestFix.accuracy <= TARGET_ACCURACY) {
-            capturePosition();
-        }
+        locationStatus.textContent = '{% trans "Précision actuelle" %} : ' + Math.round(fix.accuracy) + ' m — {% trans "meilleure" %} : ' + Math.round(bestFix.accuracy) + ' m';
+        if (bestFix.accuracy <= TARGET_ACCURACY) capturePosition();
     }
 
     function onError(error) {
         if (error.code === error.TIMEOUT && bestFix) {
-            stopWatching();
-            capturePosition();
-            locationStatus.textContent =
-                '{% trans "Position capturée (précision limitée :" %} ' +
-                Math.round(bestFix.accuracy) + ' m). {% trans "Réessayez en extérieur pour plus de précision." %}';
+            stopWatching(); capturePosition();
+            locationStatus.textContent = '{% trans "Position capturée (précision limitée :" %} ' + Math.round(bestFix.accuracy) + ' m). {% trans "Réessayez en extérieur pour plus de précision." %}';
             locationStatus.className = 'text-sm text-blue-600 font-medium mb-2';
             return;
         }
-
         stopWatching();
         var msg = '';
         switch (error.code) {
-            case error.PERMISSION_DENIED:
-                msg = "{% trans "Accès à la localisation refusé. Veuillez autoriser la géolocalisation dans les paramètres de votre navigateur." %}";
-                break;
-            case error.POSITION_UNAVAILABLE:
-                msg = '{% trans "Position non disponible. Vérifiez que le GPS est activé." %}';
-                break;
-            case error.TIMEOUT:
-                msg = "{% trans "Délai d'attente dépassé. Veuillez vous placer à l'extérieur et réessayer." %}";
-                break;
-            default:
-                msg = '{% trans "Erreur de géolocalisation." %}';
-                break;
+            case error.PERMISSION_DENIED: msg = "{% trans "Accès à la localisation refusé." %}"; break;
+            case error.POSITION_UNAVAILABLE: msg = '{% trans "Position non disponible." %}'; break;
+            case error.TIMEOUT: msg = "{% trans "Délai d'attente dépassé." %}"; break;
+            default: msg = '{% trans "Erreur de géolocalisation." %}'; break;
         }
         locationStatus.textContent = msg;
         locationStatus.className = 'text-sm text-red-600 mb-2';
@@ -410,25 +503,16 @@
     if (locationBtn) {
         locationBtn.addEventListener('click', function() {
             if (!navigator.geolocation) {
-                locationStatus.textContent = "{% trans "La géolocalisation n'est pas supportée par votre navigateur." %}";
+                locationStatus.textContent = "{% trans "La géolocalisation n'est pas supportée." %}";
                 locationStatus.className = 'text-sm text-red-600 mb-2';
                 return;
             }
-
             bestFix = null;
-            setLoading(true,
-                '<svg class="w-5 h-5 mr-2 inline animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> {% trans "Recherche GPS de précision…" %}');
+            setLoading(true, '<svg class="w-5 h-5 mr-2 inline animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> {% trans "Recherche GPS…" %}');
             locationStatus.textContent = '{% trans "Recherche de votre position GPS… Restez immobile." %}';
             locationStatus.className = 'text-sm text-graphite-500 mb-2';
-
             stopWatching();
-            watchId = navigator.geolocation.watchPosition(
-                onWatch,
-                onError,
-                { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-            );
-
-            // Fallback : après MAX_WAIT_MS, capture la meilleure position obtenue
+            watchId = navigator.geolocation.watchPosition(onWatch, onError, { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 });
             captureTimer = setTimeout(function() {
                 if (watchId !== null && bestFix) {
                     var extMsg = document.getElementById('i18n-limit-warning').textContent;
@@ -437,22 +521,16 @@
                         : '{% trans "Position capturée avec succès." %}';
                     capturePosition();
                     locationStatus.textContent = warningMsg;
-                    locationStatus.className = bestFix.accuracy > 100
-                        ? 'text-sm text-blue-600 font-medium mb-2'
-                        : 'text-sm text-green-600 font-medium mb-2';
+                    locationStatus.className = bestFix.accuracy > 100 ? 'text-sm text-blue-600 font-medium mb-2' : 'text-sm text-green-600 font-medium mb-2';
                 }
             }, MAX_WAIT_MS);
         });
     }
 
-    // Sécurité : si l'utilisateur soumet pendant la recherche, on fige
-    // la meilleure position déjà reçue.
     var garageForm = document.getElementById('garage-form');
     if (garageForm) {
         garageForm.addEventListener('submit', function() {
-            if (!latInput.value && bestFix) {
-                capturePosition();
-            }
+            if (!latInput.value && bestFix) capturePosition();
         });
     }
 })();

@@ -36,9 +36,17 @@ def _opening_hours(garage):
     """Horaires au format schema.org, ex. « Mo-Sa 08:00-18:00 »."""
     if not (garage.opening_time and garage.closing_time):
         return None
-    days = "Mo-Su" if garage.open_weekends else "Mo-Sa"
     start = garage.opening_time.strftime("%H:%M")
     end = garage.closing_time.strftime("%H:%M")
+    # Build day range based on open days
+    if garage.open_weekends and garage.open_sunday:
+        days = "Mo-Su"
+    elif garage.open_weekends:
+        days = "Mo-Sa"
+    elif garage.open_sunday:
+        days = "Mo-Fr,Su"
+    else:
+        days = "Mo-Fr"
     return f"{days} {start}-{end}"
 
 

@@ -138,7 +138,8 @@ class Garage(models.Model):
 
     opening_time = models.TimeField(_("Heure d'ouverture"), null=True, blank=True)
     closing_time = models.TimeField(_("Heure de fermeture"), null=True, blank=True)
-    open_weekends = models.BooleanField(_("Ouvert le week-end"), default=False)
+    open_weekends = models.BooleanField(_("Ouvert le samedi"), default=False)
+    open_sunday = models.BooleanField(_("Ouvert le dimanche"), default=False)
 
     total_clients = models.PositiveIntegerField(default=0)
     total_orders = models.PositiveIntegerField(default=0)
@@ -177,13 +178,24 @@ class Garage(models.Model):
     def is_open_now(self):
         from django.utils import timezone
 
-        now = timezone.localtime().time()
-        if self.opening_time and self.closing_time:
-            if self.opening_time <= self.closing_time:
-                return self.opening_time <= now <= self.closing_time
-            else:
-                return now >= self.opening_time or now <= self.closing_time
-        return False
+        now = timezone.localtime()
+        current_day = now.weekday()  # 0=Monday, 5=Saturday, 6=Sunday
+        current_time = now.time()
+
+        if not (self.opening_time and self.closing_time):
+            return False
+
+        # Check if open on current day
+        if current_day == 6 and not self.open_sunday:
+            return False
+        if current_day == 5 and not self.open_weekends:
+            return False
+
+        # Check time range
+        if self.opening_time <= self.closing_time:
+            return self.opening_time <= current_time <= self.closing_time
+        else:
+            return current_time >= self.opening_time or current_time <= self.closing_time
 
     @property
     def is_available_for_search(self):

@@ -98,24 +98,35 @@
                                 <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse-soft"></span>
                                 {% trans "Ouvert" %}
                             </span>
+                        {% else %}
+                            <span class="inline-flex items-center gap-1 text-[10px] font-bold text-graphite-400">
+                                <span class="w-1.5 h-1.5 rounded-full bg-graphite-400"></span>
+                                {% trans "Fermé" %}
+                            </span>
                         {% endif %}
                     </div>
                     <ul class="space-y-1.5 text-xs">
                         <li class="flex justify-between items-center">
                             <span class="text-graphite-600">{% trans "Lun – Ven" %}</span>
                             <span class="font-mono font-semibold text-graphite-900 tabular-nums">
-                                {% if garage.opening_time %}{{ garage.opening_time|time:"H:i" }}{% else %}—{% endif %} – {% if garage.closing_time %}{{ garage.closing_time|time:"H:i" }}{% else %}—{% endif %}
+                                {% if garage.opening_time and garage.closing_time %}{{ garage.opening_time|time:"H:i" }} – {{ garage.closing_time|time:"H:i" }}{% else %}—{% endif %}
                             </span>
                         </li>
                         <li class="flex justify-between items-center">
                             <span class="text-graphite-600">{% trans "Samedi" %}</span>
-                            <span class="font-mono font-semibold tabular-nums {% if garage.open_weekends %}text-graphite-900{% else %}text-graphite-400{% endif %}">
-                                {% if garage.open_weekends and garage.opening_time %}{{ garage.opening_time|time:"H:i" }} – {{ garage.closing_time|time:"H:i" }}{% else %}{% trans "Fermé" %}{% endif %}
-                            </span>
+                            {% if garage.open_weekends and garage.opening_time and garage.closing_time %}
+                                <span class="font-mono font-semibold text-graphite-900 tabular-nums">{{ garage.opening_time|time:"H:i" }} – {{ garage.closing_time|time:"H:i" }}</span>
+                            {% else %}
+                                <span class="font-mono font-semibold text-graphite-400">{% trans "Fermé" %}</span>
+                            {% endif %}
                         </li>
                         <li class="flex justify-between items-center">
                             <span class="text-graphite-600">{% trans "Dimanche" %}</span>
-                            <span class="font-mono font-semibold text-graphite-400">{% trans "Fermé" %}</span>
+                            {% if garage.open_sunday and garage.opening_time and garage.closing_time %}
+                                <span class="font-mono font-semibold text-graphite-900 tabular-nums">{{ garage.opening_time|time:"H:i" }} – {{ garage.closing_time|time:"H:i" }}</span>
+                            {% else %}
+                                <span class="font-mono font-semibold text-graphite-400">{% trans "Fermé" %}</span>
+                            {% endif %}
                         </li>
                     </ul>
                 </div>

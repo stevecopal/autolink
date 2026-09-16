@@ -66,6 +66,10 @@ class GarageForm(forms.ModelForm):
             "latitude",
             "longitude",
             "gps_accuracy",
+            "opening_time",
+            "closing_time",
+            "open_weekends",
+            "open_sunday",
         ]
         widgets = {
             "name": forms.TextInput(
@@ -85,6 +89,30 @@ class GarageForm(forms.ModelForm):
                     "class": "form-input",
                     "rows": 2,
                     "placeholder": _("Adresse complète"),
+                }
+            ),
+            "opening_time": forms.TimeInput(
+                attrs={
+                    "class": "form-input",
+                    "type": "time",
+                },
+                format="%H:%M",
+            ),
+            "closing_time": forms.TimeInput(
+                attrs={
+                    "class": "form-input",
+                    "type": "time",
+                },
+                format="%H:%M",
+            ),
+            "open_weekends": forms.CheckboxInput(
+                attrs={
+                    "class": "form-checkbox",
+                }
+            ),
+            "open_sunday": forms.CheckboxInput(
+                attrs={
+                    "class": "form-checkbox",
                 }
             ),
         }
