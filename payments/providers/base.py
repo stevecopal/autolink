@@ -134,7 +134,8 @@ class CampayProvider:
         if status and status not in ("success", "successful", "ok"):
             error_msg = body.get("message") or body.get("detail") or "Erreur Campay inconnue"
             logger.error(
-                f"Campay Error: {error_msg} (Payload: {json.dumps(payload, indent=2)})"
+                "Campay Error: %s (Status: %s, Body: %s, Payload: %s)",
+                error_msg, body.get("status"), json.dumps(body, indent=2), json.dumps(payload, indent=2),
             )
             raise ProviderUnavailable(f"Erreur Campay: {error_msg}")
 
@@ -206,6 +207,7 @@ class CampayProvider:
             "from": normalized_phone,  # "2376XXXXXXXX" (indicatif pays, sans '+')
             "description": "Activation de votre garage sur AutoLink",
             "external_reference": payment.idempotency_key,  # Référence métier unique
+            "shortcode": gateway,  # "ORANGE_CM" ou "MTN_CM"
         }
 
         body = self._post("/collect/", payload)
