@@ -2113,6 +2113,11 @@ video {
   background-color: rgb(254 249 195 / var(--tw-bg-opacity, 1));
 }
 
+.bg-amber-500 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(245 158 11 / var(--tw-bg-opacity, 1));
+}
+
 .bg-\[radial-gradient\(ellipse_at_center\2c rgba\(0\2c 0\2c 128\2c 0\.4\)\2c transparent_70\%\)\] {
   background-image: radial-gradient(ellipse at center,rgba(0,0,128,0.4),transparent 70%);
 }

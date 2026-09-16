@@ -1,10 +1,13 @@
 from datetime import timedelta
 
+import mimetypes
+import os
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.core.paginator import Paginator
 from django.db.models import Avg, Count, Q, Sum
-from django.http import JsonResponse
+from django.http import FileResponse, Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
@@ -294,6 +297,25 @@ def admin_garage_verify_view(request, garage_id):
             "garage": garage,
             "verifications": verifications,
         },
+    )
+
+
+@user_passes_test(is_admin)
+def admin_garage_document_view(request, verification_id: str):
+    from garages.models import GarageVerification
+
+    verification = get_object_or_404(GarageVerification, pk=verification_id)
+    file_path = verification.document.path
+
+    if not os.path.exists(file_path):
+        raise Http404("Document introuvable.")
+
+    content_type, _ = mimetypes.guess_type(file_path)
+    return FileResponse(
+        open(file_path, "rb"),
+        content_type=content_type or "application/octet-stream",
+        as_attachment=False,
+        filename=os.path.basename(file_path),
     )
 
 

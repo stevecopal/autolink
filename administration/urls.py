@@ -14,6 +14,11 @@ urlpatterns = [
         views.admin_garage_verify_view,
         name="garage_verify",
     ),
+    path(
+        "garages/document/<uuid:verification_id>/",
+        views.admin_garage_document_view,
+        name="garage_document",
+    ),
     path("cities/", views.admin_cities_view, name="cities"),
     path("cities/create/", views.admin_city_create_view, name="city_create"),
     path("cities/<uuid:city_id>/edit/", views.admin_city_edit_view, name="city_edit"),

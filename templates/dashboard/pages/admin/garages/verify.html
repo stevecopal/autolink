@@ -255,22 +255,46 @@
         </section>
     {% endif %}
 
-    {% comment %}Historique des vérifications{% endcomment %}
+    {% comment %}Documents soumis{% endcomment %}
     {% if verifications %}
         <section class="bg-white rounded-xl shadow-card overflow-hidden">
             <header class="px-4 md:px-5 py-3.5 md:py-4 border-b border-line-200">
-                <h2 class="font-display font-bold text-graphite-900 text-sm md:text-base">{% trans "Historique des vérifications" %}</h2>
+                <h2 class="font-display font-bold text-graphite-900 text-sm md:text-base">{% trans "Documents soumis" %}</h2>
             </header>
             <ul class="divide-y divide-line-200">
                 {% for v in verifications %}
                     <li class="flex items-center gap-3 px-4 md:px-5 py-3">
-                        <span class="w-8 h-8 rounded-full bg-navy-100 text-navy-600 flex items-center justify-center text-xs font-bold flex-shrink-0">
-                            {{ v.verified_by.username|first|upper }}
+                        <span class="w-10 h-10 rounded-lg bg-navy-100 text-navy-600 flex items-center justify-center flex-shrink-0">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                            </svg>
                         </span>
                         <div class="min-w-0 flex-1">
-                            <div class="text-sm font-medium text-graphite-900 truncate">{{ v.verified_by.username }} · {{ v.document_type }}</div>
-                            <div class="text-xs text-graphite-500 truncate">{% if v.is_verified %}{% trans "Vérifié" %}{% else %}{% trans "Non vérifié" %}{% endif %} · {{ v.created_at|date:"d/m/Y H:i" }}</div>
+                            <div class="text-sm font-medium text-graphite-900">{{ v.get_document_type_display }}</div>
+                            <div class="text-xs text-graphite-500">
+                                {{ v.document.name|cut:"garages/verifications/" }}
+                                {% if v.is_verified %}
+                                    <span class="ml-2 inline-flex items-center text-emerald-600">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1"></span>{% trans "Vérifié" %}
+                                        {% if v.verified_by %} · {{ v.verified_by.username }}{% endif %}
+                                    </span>
+                                {% else %}
+                                    <span class="ml-2 inline-flex items-center text-amber-600">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500 mr-1"></span>{% trans "En attente" %}
+                                    </span>
+                                {% endif %}
+                            </div>
                         </div>
+                        <a href="{% url 'administration:garage_document' v.pk %}"
+                           target="_blank"
+                           class="btn btn-outline btn-sm flex-shrink-0"
+                           aria-label="{% trans 'Voir le document' %}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                            {% trans "Voir" %}
+                        </a>
                     </li>
                 {% endfor %}
             </ul>
