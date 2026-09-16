@@ -545,6 +545,11 @@ def garage_create_view(request):
                         "La position GPS est obligatoire. Veuillez autoriser la géolocalisation."
                     ),
                 )
+                if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                    return JsonResponse(
+                        {"errors": form.errors.get_json_data(), "non_field": messages.get_messages(request)},
+                        status=422,
+                    )
                 return render(
                     request,
                     "dashboard/pages/garage/form.html",
@@ -575,6 +580,9 @@ def garage_create_view(request):
                     document_type=doc_form.cleaned_data["document_type"],
                     document=doc_form.cleaned_data["document"],
                 )
+
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                return JsonResponse({"redirect": reverse("garages:garage_dashboard")})
 
             messages.success(
                 request, _("Garage enregistré. Il sera vérifié par notre équipe.")
