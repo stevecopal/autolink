@@ -209,3 +209,164 @@ document.addEventListener('DOMContentLoaded', function() {
     // Observe la section
     observer.observe(section);
 });
+
+
+/* =========================================================
+   Recherche de mécaniciens — contrôleur du bloc #search-controls
+   ========================================================= */
+document.addEventListener('DOMContentLoaded', () => {
+    const btn      = document.getElementById('find-nearby-btn');
+    const btnText  = document.getElementById('find-nearby-btn-text');
+    const statusEl = document.getElementById('search-status');
+    const progress = document.getElementById('search-progress');
+    const radiusEl = document.getElementById('radius-select');
+    const availEl  = document.getElementById('available-filter');
+
+    if (!btn) return; // sécurité si le bloc n'est pas sur la page
+
+    /* ---------- Libellés (traduits via data-attributes) ---------- */
+    const LABELS = {
+        idle:    btn.dataset.labelIdle    || 'Lancer la recherche',
+        loading: btn.dataset.labelLoading || 'Recherche en cours…',
+        success: btn.dataset.labelSuccess || 'Recherche terminée',
+    };
+
+    const ICONS = {
+        idle:    btn.querySelector('[data-icon="idle"]'),
+        loading: btn.querySelector('[data-icon="loading"]'),
+        success: btn.querySelector('[data-icon="success"]'),
+    };
+
+    /* ---------- Styles de la zone de statut ---------- */
+    const STATUS_STYLES = {
+        info:    'border-navy-500/20 bg-navy-500/5 text-navy-900',
+        success: 'border-emerald-200 bg-emerald-50 text-emerald-800',
+        error:   'border-red-200 bg-red-50 text-red-700',
+    };
+
+    const STATUS_ICONS = {
+        info: `<svg class="h-5 w-5 shrink-0 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                   <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+               </svg>`,
+        success: `<svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>`,
+        error: `<svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+                </svg>`,
+    };
+
+    /* ---------- Affiche / masque le message de statut ---------- */
+    function showStatus(message, type = 'info') {
+        if (!statusEl) return;
+        statusEl.className =
+            `mt-4 flex items-start gap-3 rounded-xl border px-4 py-3 text-sm font-medium transition-all duration-300 ${STATUS_STYLES[type] || STATUS_STYLES.info}`;
+        statusEl.innerHTML = `${STATUS_ICONS[type] || STATUS_ICONS.info}<span class="flex-1" data-status-text></span>`;
+        statusEl.querySelector('[data-status-text]').textContent = message;
+        statusEl.classList.remove('hidden');
+    }
+
+    function hideStatus() {
+        if (statusEl) statusEl.classList.add('hidden');
+    }
+
+    /* ---------- Change l'état visuel du bouton ---------- */
+    function setState(state) {
+        btn.dataset.state = state;
+        btn.disabled = state === 'loading';
+        btn.setAttribute('aria-busy', state === 'loading' ? 'true' : 'false');
+
+        if (btnText) btnText.textContent = LABELS[state] || LABELS.idle;
+
+        Object.entries(ICONS).forEach(([key, el]) => {
+            if (el) el.classList.toggle('hidden', key !== state);
+        });
+
+        if (progress) progress.classList.toggle('hidden', state !== 'loading');
+    }
+
+    /* ---------- (Optionnel) récupération de la position ---------- */
+    function getPosition() {
+        return new Promise((resolve) => {
+            if (!navigator.geolocation) return resolve(null);
+            navigator.geolocation.getCurrentPosition(
+                (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+                () => resolve(null),
+                { enableHighAccuracy: true, timeout: 8000 }
+            );
+        });
+    }
+
+    /* ---------- Requête réelle vers votre API ---------- */
+    async function fetchMechanics({ radius, available, coords }) {
+        const params = new URLSearchParams({ radius, available: available ? '1' : '0' });
+        if (coords) {
+            params.set('lat', coords.lat);
+            params.set('lng', coords.lng);
+        }
+
+        const response = await fetch(`/api/mechanics/search/?${params.toString()}`, {
+            headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        const data = await response.json();
+        return {
+            count: data.count ?? (data.results ? data.results.length : 0),
+            results: data.results || data,
+        };
+    }
+
+    /* ---------- Clic sur le bouton ---------- */
+    btn.addEventListener('click', async () => {
+        if (btn.disabled) return;
+
+        setState('loading');
+        showStatus('Recherche des mécaniciens autour de vous…', 'info');
+
+        try {
+            const radius    = radiusEl ? radiusEl.value : '5';
+            const available = availEl ? availEl.checked : false;
+            const coords    = await getPosition();
+
+            const { count, results } = await fetchMechanics({ radius, available, coords });
+
+            setState('success');
+
+            if (count > 0) {
+                showStatus(
+                    `${count} mécanicien${count > 1 ? 's' : ''} trouvé${count > 1 ? 's' : ''} dans un rayon de ${radius} km.`,
+                    'success'
+                );
+            } else {
+                showStatus(
+                    `Aucun mécanicien trouvé dans un rayon de ${radius} km. Essayez d'élargir votre recherche.`,
+                    'error'
+                );
+            }
+
+            // Permet à la liste de résultats d'écouter et de se mettre à jour
+            document.dispatchEvent(new CustomEvent('mechanics:results', {
+                detail: { count, results, radius: Number(radius), available, coords },
+            }));
+
+            // Retour à l'état initial après 2,5 s
+            setTimeout(() => {
+                if (btn.dataset.state === 'success') setState('idle');
+            }, 2500);
+
+        } catch (error) {
+            console.error('[Recherche mécaniciens]', error);
+            setState('idle');
+            showStatus("Une erreur est survenue pendant la recherche. Veuillez réessayer.", 'error');
+        }
+    });
+
+    /* ---------- Réinitialise le message si l'utilisateur change un filtre ---------- */
+    [radiusEl, availEl].forEach((el) => {
+        el?.addEventListener('change', () => {
+            if (btn.dataset.state === 'idle') hideStatus();
+        });
+    });
+});
