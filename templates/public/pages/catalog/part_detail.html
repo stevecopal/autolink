@@ -1,8 +1,18 @@
 {% extends 'public/base.html' %}
-{% load humanize i18n %}
+{% load humanize i18n seo_tags %}
 
-{% block title %}{{ part.name }} - AutoLink{% endblock %}
-{% block description %}{{ part.name }} — {{ part.price|intcomma }} FCFA chez {{ part.garage.name|default:'AutoLink' }}{% endblock %}
+{% block title %}{{ part.name }} — {{ part.price|intcomma }} FCFA | AutoLink{% endblock %}
+{% block description %}{{ part.name }} ({{ part.get_condition_display }}) à {{ part.price|intcomma }} FCFA{% if part.garage %} chez {{ part.garage.name }}{% endif %}{% if part.city %} à {{ part.city }}{% endif %}. Référence {{ part.reference_oem|default:"OEM" }}, disponibilité, stock et contact direct sur AutoLink.{% endblock %}
+
+{% block og_type %}product{% endblock %}
+{% block og_title %}{{ part.name }} — {{ part.price|intcomma }} FCFA{% endblock %}
+{% block og_description %}{{ part.name }} ({{ part.get_condition_display }}) à {{ part.price|intcomma }} FCFA{% if part.garage %} chez {{ part.garage.name }}{% endif %}. Contact direct sur AutoLink.{% endblock %}
+{% block og_image %}{% if part.photo %}{{ SEO_SITE_URL }}{{ part.photo.url }}{% else %}{{ SEO_DEFAULT_OG_IMAGE }}{% endif %}{% endblock %}
+
+{% block structured_data %}
+{% part_json_ld part %}
+{% breadcrumb_json_ld "Accueil" "/" "Pièces" "/pieces/" part.name "" %}
+{% endblock %}
 
 {% block content %}
 <div class="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-10">

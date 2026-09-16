@@ -1,7 +1,11 @@
 {% extends 'public/base.html' %}
-{% load i18n %}
+{% load i18n seo_tags %}
 
-{% block title %}{% trans "Politique et règles" %} - AutoLink{% endblock %}
+{% block title %}Politique et règles d'utilisation | AutoLink{% endblock %}
+{% block description %}Règles d'utilisation d'AutoLink : conditions pour les garages, les vendeurs de pièces et les automobilistes, vérification des annonces et politique de confidentialité.{% endblock %}
+{% block og_title %}Politique et règles d'utilisation | AutoLink{% endblock %}
+
+{% block structured_data %}{% breadcrumb_json_ld "Accueil" "/" "Politique et règles" "/politique-et-regles/" %}{% endblock %}
 
 {% block content %}
 <div class="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">

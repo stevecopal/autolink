@@ -1,7 +1,19 @@
 {% extends 'public/base.html' %}
-{% load humanize i18n static %}
+{% load humanize i18n static seo_tags %}
 
-{% block title %}{{ garage.name }} - AutoLink{% endblock %}
+{% block title %}{{ garage.name }} — Garage auto à {{ garage.city.name|default:"Cameroun" }} | AutoLink{% endblock %}
+
+{% block description %}{{ garage.name }}{% if garage.city %} à {{ garage.city.name }}{% endif %}{% if garage.neighborhood %} ({{ garage.neighborhood.name }}){% endif %} : {% for service in services|slice:":4" %}{{ service.name }}{% if not forloop.last %}, {% endif %}{% endfor %}. Adresse, horaires, téléphone et pièces disponibles sur AutoLink.{% endblock %}
+
+{% block robots %}{% if garage.is_publicly_available %}index, follow, max-image-preview:large{% else %}noindex, follow{% endif %}{% endblock %}
+{% block og_title %}{{ garage.name }} — Garage auto à {{ garage.city.name|default:"Cameroun" }} | AutoLink{% endblock %}
+{% block og_description %}{{ garage.name }}{% if garage.city %} à {{ garage.city.name }}{% endif %} : services, horaires et contact direct.{% endblock %}
+{% block og_image %}{% if garage.photo %}{{ SEO_SITE_URL }}{{ garage.photo.url }}{% else %}{{ SEO_DEFAULT_OG_IMAGE }}{% endif %}{% endblock %}
+
+{% block structured_data %}
+{% garage_json_ld garage %}
+{% breadcrumb_json_ld "Accueil" "/" "Garages" "/garages/" garage.name "" %}
+{% endblock %}
 
 {% block content %}
 <div class="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">

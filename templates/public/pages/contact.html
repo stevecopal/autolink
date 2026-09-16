@@ -1,7 +1,12 @@
 {% extends 'public/base.html' %}
-{% load i18n %}
+{% load i18n seo_tags %}
 
-{% block title %}{% trans "Contact" %} - AutoLink{% endblock %}
+{% block title %}Contact AutoLink — support et partenariats{% endblock %}
+{% block description %}Une question, un problème de paiement ou une demande de partenariat ? Contactez l'équipe AutoLink : nous répondons aux automobilistes, garages et vendeurs de pièces au Cameroun.{% endblock %}
+{% block og_title %}Contact AutoLink{% endblock %}
+{% block og_description %}Contactez l'équipe AutoLink pour toute question sur les garages, les pièces détachées ou les paiements.{% endblock %}
+
+{% block structured_data %}{% breadcrumb_json_ld "Accueil" "/" "Contact" "/contact/" %}{% endblock %}
 
 {% block content %}
 {# ============ PAGE HEADER ============ #}

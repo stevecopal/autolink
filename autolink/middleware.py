@@ -88,11 +88,45 @@ class RateLimitMiddleware(MiddlewareMixin):
 
 
 class SecurityHeadersMiddleware(MiddlewareMixin):
-    """Add additional security headers."""
+    """Add additional security headers and keep private areas out of search."""
+
+    #: Préfixes de chemins qui ne doivent jamais apparaître dans les résultats
+    #: de recherche (compte, support, administration, recherche interne…).
+    #: Les zones listées ici restent volontairement explorables quand elles sont
+    #: aussi bloquées dans robots.txt — le `noindex` sert de seconde barrière.
+    NOINDEX_PREFIXES = (
+        '/admin/',
+        '/administration/',
+        '/compte/',
+        '/accounts/',
+        '/paiement/',
+        '/paiements/',
+        '/payments/',
+        '/recu/',
+        '/messages/',
+        '/tickets/',
+        '/assistance/',
+        '/recherche/',
+        '/garages/creer/',
+        '/garages/mes-garages/',
+        '/garages/mon-dashboard/',
+        '/garages/services/',
+        '/garage/produits/',
+        '/categories/',
+        '/sw.js',
+        '/offline/',
+    )
 
     def process_response(self, request, response):
         response['X-Content-Type-Options'] = 'nosniff'
         response['X-Frame-Options'] = 'DENY'
         response['X-XSS-Protection'] = '1; mode=block'
         response['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+        if self._must_not_index(request.path):
+            response['X-Robots-Tag'] = 'noindex, nofollow'
         return response
+
+    def _must_not_index(self, path):
+        if '/api/' in path:
+            return True
+        return path.startswith(self.NOINDEX_PREFIXES)

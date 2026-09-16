@@ -1,7 +1,10 @@
 {% extends 'public/base.html' %}
 {% load i18n socialaccount %}
 
-{% block title %}{% trans "Inscription" %}{% endblock %}
+{% block title %}Créer un compte AutoLink{% endblock %}
+{% block description %}Créez gratuitement un compte AutoLink : inscrivez votre garage, publiez vos pièces détachées ou contactez les vendeurs au Cameroun.{% endblock %}
+{# Page d'inscription : jamais indexée. #}
+{% block robots %}noindex, nofollow{% endblock %}
 
 {% block content %}
 <div class="bg-steel-50 min-h-[60vh]">

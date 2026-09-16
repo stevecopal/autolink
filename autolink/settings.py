@@ -24,6 +24,16 @@ CAMPAY_APP_PASSWORD = config("CAMPAY_APP_PASSWORD", default="")
 CAMPAY_WEBHOOK_SECRET = config("CAMPAY_WEBHOOK_SECRET", default="")
 SITE_URL = config("SITE_URL", default="http://localhost:8000")
 
+# ── SEO ───────────────────────────────────────────────────────
+# URL publique canonique du site (sans slash final). Utilisée par les balises
+# canonical/OpenGraph, le sitemap et robots.txt. Ne pas confondre avec SITE_URL
+# qui peut contenir plusieurs URLs séparées par des virgules (paiements).
+PUBLIC_SITE_URL = config(
+    "PUBLIC_SITE_URL", default="https://autolink.cohub.site"
+).rstrip("/")
+GOOGLE_SITE_VERIFICATION = config("GOOGLE_SITE_VERIFICATION", default="")
+GOOGLE_ANALYTICS_ID = config("GOOGLE_ANALYTICS_ID", default="")
+
 # ── Installed apps ────────────────────────────────────────────
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -34,6 +44,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "django.contrib.humanize",
     "django.contrib.sites",
+    "django.contrib.sitemaps",
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
@@ -78,6 +89,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "django.template.context_processors.i18n",
+                "autolink.context_processors.seo",
             ],
         },
     },

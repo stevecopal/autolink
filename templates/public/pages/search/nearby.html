@@ -1,9 +1,13 @@
 {% extends 'public/base.html' %}
-{% load i18n static %}
+{% load i18n static seo_tags %}
 
-{% block title %}{% trans "Trouver un mécanicien à proximité" %} - AutoLink{% endblock %}
+{% block title %}Mécanicien et garage à proximité | AutoLink{% endblock %}
 
 {% block description %}{% trans "Recherchez les garages et mécaniciens vérifiés près de chez vous" %}{% endblock %}
+{% block og_title %}Mécanicien et garage à proximité | AutoLink{% endblock %}
+{% block og_description %}Localisez les garages et mécaniciens vérifiés autour de vous au Cameroun et contactez-les directement.{% endblock %}
+
+{% block structured_data %}{% breadcrumb_json_ld "Accueil" "/" "Recherche à proximité" "/a-proximite/" %}{% endblock %}
 
 {% block extra_css %}
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"

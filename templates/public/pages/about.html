@@ -1,7 +1,12 @@
 {% extends 'public/base.html' %}
-{% load i18n %}
+{% load i18n seo_tags %}
 
-{% block title %}{% trans "À propos" %} - AutoLink{% endblock %}
+{% block title %}À propos d'AutoLink — la plateforme auto camerounaise{% endblock %}
+{% block description %}AutoLink met en relation les automobilistes camerounais avec des garages vérifiés et des vendeurs de pièces détachées : découvrez notre mission, notre fonctionnement et nos engagements.{% endblock %}
+{% block og_title %}À propos d'AutoLink{% endblock %}
+{% block og_description %}La plateforme qui connecte les automobilistes camerounais aux garages vérifiés et aux vendeurs de pièces détachées.{% endblock %}
+
+{% block structured_data %}{% breadcrumb_json_ld "Accueil" "/" "À propos" "/a-propos/" %}{% endblock %}
 
 {% block content %}
 {# ============ PAGE HEADER ============ #}

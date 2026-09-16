@@ -1,7 +1,10 @@
 {% extends 'public/base.html' %}
 {% load i18n %}
 
-{% block title %}{% trans "Recherche" %}{% endblock %}
+{% block title %}Recherche sur AutoLink : garages et pièces{% endblock %}
+{% block description %}Résultats de recherche interne AutoLink (garages, pièces détachées). Utilisez la recherche pour trouver un garage vérifié ou une pièce près de chez vous.{% endblock %}
+{# Résultats de recherche interne : aucune valeur d'indexation (contenu dupliqué). #}
+{% block robots %}noindex, follow{% endblock %}
 
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-14">

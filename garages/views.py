@@ -25,6 +25,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_GET, require_POST
 
+from core.seo import absolute_url
 from .forms import GarageDocumentForm, GarageForm, GarageServiceForm
 from .models import Garage, GaragePhoto, GarageService, GarageVerification
 
@@ -71,10 +72,10 @@ def _get_base_garage_queryset():
     )
 
 
-def garage_list_view(request):
+def garage_list_view(request, city_slug=None, city_obj=None, city_has_garages=None):
     garages = _get_base_garage_queryset()
 
-    city = request.GET.get("city", "").strip()
+    city = city_slug or request.GET.get("city", "").strip()
     neighborhood = request.GET.get("neighborhood", "").strip()
     service_category = request.GET.get("service", "").strip()
     search = request.GET.get("q", "").strip()
@@ -161,6 +162,14 @@ def garage_list_view(request):
         neighborhoods = neighborhoods.filter(city__slug=city)
     neighborhoods = neighborhoods.distinct().order_by("name")
 
+    # ── Canonical : les listes filtrées sont consolidées vers leur page de
+    # référence (landing ville si la ville a une page, sinon /garages/).
+    seo_canonical = None
+    if city and not city_obj and cities.filter(slug=city).exists():
+        page_param = request.GET.get("page", "")
+        suffix = f"?page={page_param}" if page_param not in ("", "1") else ""
+        seo_canonical = absolute_url(f"/garages/ville/{city}/{suffix}")
+
     paginator = Paginator(garages, page_size)
     page = request.GET.get("page", 1)
 
@@ -187,6 +196,11 @@ def garage_list_view(request):
         "page_size": page_size,
         "nearby_garages": nearby_garages,
         "service_categories": GarageService.Category.choices,
+        # Renseigné uniquement par la landing ville (/garages/ville/<slug>/).
+        "city_obj": city_obj,
+        "city_has_garages": city_has_garages,
+        # URL canonique consolidée (voir plus haut).
+        "seo_canonical": seo_canonical,
     }
 
     if (
@@ -196,6 +210,27 @@ def garage_list_view(request):
         return render(request, "dashboard/includes/garage_list_items.html", context)
 
     return render(request, "public/pages/garages/list.html", context)
+
+
+def garage_city_view(request, city_slug):
+    """Landing locale : /garages/ville/<slug>/ (« garages à Douala »).
+
+    Une URL par ville, avec son propre titre / H1 / canonical : c'est la brique
+    SEO local principale. On réutilise `garage_list_view` (filtres, pagination,
+    tri) pour éviter toute duplication de code.
+    """
+    from core.models import City
+
+    city = get_object_or_404(City, slug=city_slug, is_active=True)
+    has_public_garages = Garage.objects.filter(
+        Garage.public_filter(), city=city
+    ).exists()
+    return garage_list_view(
+        request,
+        city_slug=city.slug,
+        city_obj=city,
+        city_has_garages=has_public_garages,
+    )
 
 
 @require_GET

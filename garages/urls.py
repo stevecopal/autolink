@@ -6,6 +6,7 @@ app_name = "garages"
 
 urlpatterns = [
     path("", views.garage_list_view, name="garage_list"),
+    path("ville/<slug:city_slug>/", views.garage_city_view, name="garage_city"),
     path("api/", views.garage_list_api, name="garage_list_api"),
     path(
         "api/search-suggestions/",

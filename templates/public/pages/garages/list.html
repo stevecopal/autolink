@@ -1,7 +1,19 @@
 {% extends 'public/base.html' %}
-{% load humanize i18n static %}
+{% load humanize i18n static seo_tags %}
 
-{% block title %}{% trans "Garages" %} - AutoLink{% endblock %}
+{% block title %}{% if city_obj %}Garages auto à {{ city_obj.name }} | AutoLink{% else %}Garages auto vérifiés au Cameroun | AutoLink{% endif %}{% endblock %}
+
+{% block description %}{% if city_obj %}Trouvez un garage automobile vérifié à {{ city_obj.name }} : mécanique, vidange, diagnostic, carrosserie. Contacts directs par téléphone ou WhatsApp, horaires et avis.{% else %}Parcourez les garages automobiles vérifiés au Cameroun : mécanique, carrosserie, diagnostic, entretien. Filtrez par ville, quartier et type de service.{% endif %}{% endblock %}
+
+{# Une ville sans garage public = page vide : jamais indexée (mais utile à l'internaute). #}
+{% block robots %}{% if city_obj and not city_has_garages %}noindex, follow{% else %}index, follow, max-image-preview:large{% endif %}{% endblock %}
+{% block canonical %}{{ seo_canonical|default:SEO_CANONICAL }}{% endblock %}
+{% block og_url %}{{ seo_canonical|default:SEO_CANONICAL }}{% endblock %}
+{% block og_title %}{% if city_obj %}Garages auto à {{ city_obj.name }} | AutoLink{% else %}Garages auto vérifiés au Cameroun | AutoLink{% endif %}{% endblock %}
+
+{% block structured_data %}
+{% breadcrumb_json_ld "Accueil" "/" "Garages" "/garages/" %}
+{% endblock %}
 
 {% block content %}
 {# ============ PAGE HEADER ============ #}
@@ -11,10 +23,10 @@
     </div>
     <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
         <h1 class="font-display text-4xl sm:text-5xl font-bold text-white tracking-tight mb-3">
-            {% trans "Trouver un garage" %}
+            {% if city_obj %}Garages auto à {{ city_obj.name }}{% else %}{% trans "Trouver un garage" %}{% endif %}
         </h1>
         <p class="text-white/80 text-sm sm:text-base max-w-2xl">
-            {% trans "Parcourez les garages automobiles disponibles sur AutoLink" %}
+            {% if city_obj %}Comparez les garages vérifiés à {{ city_obj.name }}{% if city_obj.region %} ({{ city_obj.region }}){% endif %} : services, horaires, contacts directs et pièces disponibles.{% else %}{% trans "Parcourez les garages automobiles disponibles sur AutoLink" %}{% endif %}
         </p>
     </div>
 </div>
