@@ -774,6 +774,14 @@ video {
   z-index: 100;
 }
 
+.z-\[200\] {
+  z-index: 200;
+}
+
+.z-\[9999\] {
+  z-index: 9999;
+}
+
 .order-1 {
   order: 1;
 }
@@ -2255,6 +2263,10 @@ video {
   background-color: rgb(0 0 0 / 0.6);
 }
 
+.bg-navy-900\/70 {
+  background-color: rgb(0 0 43 / 0.7);
+}
+
 .bg-\[radial-gradient\(ellipse_at_center\2c rgba\(0\2c 0\2c 128\2c 0\.4\)\2c transparent_70\%\)\] {
   background-image: radial-gradient(ellipse at center,rgba(0,0,128,0.4),transparent 70%);
 }
@@ -2721,6 +2733,10 @@ video {
 
 .text-right {
   text-align: right;
+}
+
+.align-middle {
+  vertical-align: middle;
 }
 
 .font-body {

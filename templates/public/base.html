@@ -497,6 +497,14 @@
 
     {% block extra_js %}{% endblock %}
 
+    <script>
+        window.AL_LOADING = {
+            title: "{% trans 'Chargement en cours…' %}",
+            subtitle: "{% trans 'Veuillez patienter un instant.' %}"
+        };
+    </script>
+    <script src="{% static 'js/loading.js' %}" defer></script>
+
     {% if SEO_GOOGLE_ANALYTICS_ID %}
     {# ── Google Analytics 4 (chargé uniquement si l'ID est configuré) ── #}
     <script async src="https://www.googletagmanager.com/gtag/js?id={{ SEO_GOOGLE_ANALYTICS_ID }}"></script>

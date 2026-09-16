@@ -157,6 +157,14 @@
     {% block extra_js %}{% endblock %}
 
     <script>
+        window.AL_LOADING = {
+            title: "{% trans 'Chargement en cours…' %}",
+            subtitle: "{% trans 'Veuillez patienter un instant.' %}"
+        };
+    </script>
+    <script src="{% static 'js/loading.js' %}" defer></script>
+
+    <script>
         window.OpenAdminDrawer = function() {
             const drawer = document.getElementById('admin-sidebar');
             const overlay = document.getElementById('admin-drawer-overlay');

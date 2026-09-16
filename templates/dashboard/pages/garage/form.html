@@ -22,25 +22,6 @@
         </div>
     </div>
 
-    <!-- ─── SUCCESS MODAL ───────────────────────────────────────── -->
-    <div id="garage-success-modal"
-         class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/60 backdrop-blur-sm">
-        <div class="bg-white rounded-2xl shadow-2xl p-8 sm:p-10 max-w-sm w-full mx-4 text-center">
-            <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-emerald-100 flex items-center justify-center">
-                <svg class="w-8 h-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-                </svg>
-            </div>
-            <h3 class="text-lg font-bold text-navy-900 mb-2">{% trans "Garage enregistré !" %}</h3>
-            <p class="text-sm text-graphite-500 mb-6">{% trans "Il sera vérifié par notre équipe." %}</p>
-            <a href="{% url 'garages:garage_dashboard' %}"
-               class="inline-block bg-emerald-500 hover:bg-emerald-600 text-white font-semibold px-6 py-2.5 rounded-xl transition-colors text-sm">
-                {% trans "Continuer" %}
-            </a>
-        </div>
-    </div>
-    <!-- ──────────────────────────────────────────────────────────── -->
-
     <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 md:p-4 mb-4 md:mb-6">
         <p class="text-xs sm:text-sm text-blue-800">
             <strong>{% trans "Important" %} :</strong>
@@ -568,7 +549,6 @@
 
             // Loading modal
             var loadingModal = document.getElementById('garage-loading-modal');
-            var successModal = document.getElementById('garage-success-modal');
             loadingModal.classList.remove('hidden');
             loadingModal.classList.add('flex');
 
@@ -587,13 +567,9 @@
                 return res.json().then(function(data) { throw new Error(JSON.stringify(data)); });
             })
             .then(function(data) {
-                loadingModal.classList.add('hidden');
-                loadingModal.classList.remove('flex');
-                successModal.classList.remove('hidden');
-                successModal.classList.add('flex');
-                successModal.querySelector('a').addEventListener('click', function() {
-                    window.location.href = data.redirect;
-                });
+                // Redirection complète : aucune confirmation à cliquer,
+                // l'overlay de chargement reste affiché jusqu'à la navigation.
+                window.location.href = (data && data.redirect) ? data.redirect : "{% url 'garages:garage_dashboard' %}";
             })
             .catch(function(err) {
                 loadingModal.classList.add('hidden');
