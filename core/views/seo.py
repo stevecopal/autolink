@@ -51,3 +51,8 @@ def robots_txt_view(request: HttpRequest) -> HttpResponse:
         "",
     ]
     return HttpResponse("\n".join(lines), content_type="text/plain; charset=utf-8")
+
+
+def google_verification(request):
+    content = "google-site-verification: googleb7f03ccc54822e60.html"
+    return HttpResponse(content, content_type="text/html")

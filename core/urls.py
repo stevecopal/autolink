@@ -1,13 +1,20 @@
 from django.urls import path
+
+from core.views.seo import google_verification
 from . import views
 
 app_name = 'core'
 
 urlpatterns = [
-    path('', views.home_view, name='home'),
-    path('recherche/', views.search_view, name='search'),
-    path('a-propos/', views.about_view, name='about'),
-    path('contact/', views.contact_view, name='contact'),
-    path('politique-et-regles/', views.policy_view, name='policy'),
-    path('api/neighborhoods/<uuid:city_id>/', views.neighborhoods_api, name='neighborhoods_api'),
+    path("", views.home_view, name="home"),
+    path("recherche/", views.search_view, name="search"),
+    path("a-propos/", views.about_view, name="about"),
+    path("contact/", views.contact_view, name="contact"),
+    path("politique-et-regles/", views.policy_view, name="policy"),
+    path(
+        "api/neighborhoods/<uuid:city_id>/",
+        views.neighborhoods_api,
+        name="neighborhoods_api",
+    ),
+    path("googleb7f03ccc54822e60.html", google_verification, name="google_verification"),
 ]
