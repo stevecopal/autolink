@@ -3144,6 +3144,10 @@ video {
   color: rgb(6 95 70 / var(--tw-text-opacity, 1));
 }
 
+.text-navy-900\/80 {
+  color: rgb(0 0 43 / 0.8);
+}
+
 .underline {
   text-decoration-line: underline;
 }
@@ -4957,6 +4961,16 @@ input[type="file"] {
   .sm\:px-4 {
     padding-left: 1rem;
     padding-right: 1rem;
+  }
+
+  .sm\:py-4 {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+  }
+
+  .sm\:py-6 {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
   }
 
   .sm\:pb-24 {

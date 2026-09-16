@@ -271,6 +271,19 @@ document.addEventListener('DOMContentLoaded', () => {
         if (statusEl) statusEl.classList.add('hidden');
     }
 
+    /* ---------- État de chargement global (overlay AutoLink) ---------- */
+    function showGlobalLoader(title) {
+        if (window.AutoLink && typeof window.AutoLink.showLoading === 'function') {
+            window.AutoLink.showLoading(title);
+        }
+    }
+
+    function hideGlobalLoader() {
+        if (window.AutoLink && typeof window.AutoLink.hideLoading === 'function') {
+            window.AutoLink.hideLoading();
+        }
+    }
+
     /* ---------- Change l'état visuel du bouton ---------- */
     function setState(state) {
         btn.dataset.state = state;
@@ -323,6 +336,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (btn.disabled) return;
 
         setState('loading');
+        showGlobalLoader('Recherche de mécaniciens à proximité…');
         showStatus('Recherche des mécaniciens autour de vous…', 'info');
 
         try {
@@ -333,6 +347,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const { count, results } = await fetchMechanics({ radius, available, coords });
 
             setState('success');
+            hideGlobalLoader();
 
             if (count > 0) {
                 showStatus(
@@ -358,6 +373,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         } catch (error) {
             console.error('[Recherche mécaniciens]', error);
+            hideGlobalLoader();
             setState('idle');
             showStatus("Une erreur est survenue pendant la recherche. Veuillez réessayer.", 'error');
         }

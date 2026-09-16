@@ -282,6 +282,19 @@
         searchStatus.classList.add('hidden');
     }
 
+    /* ---------- État de chargement global (overlay AutoLink) ---------- */
+    function showGlobalLoader(title) {
+        if (window.AutoLink && typeof window.AutoLink.showLoading === 'function') {
+            window.AutoLink.showLoading(title);
+        }
+    }
+
+    function hideGlobalLoader() {
+        if (window.AutoLink && typeof window.AutoLink.hideLoading === 'function') {
+            window.AutoLink.hideLoading();
+        }
+    }
+
     function showError(title, message, showRetry) {
         resultsContainer.style.display = 'none';
         errorState.classList.remove('hidden');
@@ -435,6 +448,7 @@
         })
         .then(function (data) {
             hideLoading();
+            hideGlobalLoader();
             isSearching = false;
 
             if (!data.success) {
@@ -456,6 +470,7 @@
         })
         .catch(function (error) {
             hideLoading();
+            hideGlobalLoader();
             isSearching = false;
             showError(
                 getText('error_title'),
@@ -473,6 +488,7 @@
 
         findBtn.disabled = true;
         findBtnText.textContent = getText('locating');
+        showGlobalLoader(getText('searching'));
 
         getUserPosition()
             .then(function (pos) {
@@ -483,6 +499,7 @@
             .catch(function (err) {
                 findBtn.disabled = false;
                 findBtnText.textContent = 'Trouver un mécanicien';
+                hideGlobalLoader();
                 handleGeoError(err);
             });
     });

@@ -325,12 +325,31 @@
 
     var currentStep = 1;
 
+    // ─── État de chargement global (overlay AutoLink) ──────────
+    function showGlobalLoading(title, subtitle) {
+        if (window.AutoLink && typeof window.AutoLink.showLoading === 'function') {
+            window.AutoLink.showLoading(title, subtitle);
+        }
+    }
+
+    function hideGlobalLoading() {
+        if (window.AutoLink && typeof window.AutoLink.hideLoading === 'function') {
+            window.AutoLink.hideLoading();
+        }
+    }
+
     // ─── Step Navigation ───────────────────────────────────────
     window.nextStep = function(step) {
+        // État de chargement le temps d'afficher l'étape suivante
+        showGlobalLoading();
         document.getElementById('step' + currentStep).style.display = 'none';
         document.getElementById('step' + step).style.display = 'block';
         currentStep = step;
         updateProgress();
+        // Masqué dès que la nouvelle étape est rendue
+        requestAnimationFrame(function() {
+            requestAnimationFrame(hideGlobalLoading);
+        });
     };
 
     window.prevStep = function(step) {
@@ -464,6 +483,7 @@
         locationConfirm.style.display = 'block';
         showVerificationMap(latText, lngText, bestFix.accuracy);
         setLoading(false, btnRefresh);
+        hideGlobalLoading();
     }
 
     function showVerificationMap(latText, lngText, accuracy) {
@@ -513,6 +533,7 @@
         locationStatus.textContent = msg;
         locationStatus.className = 'text-sm text-red-600 mb-2';
         setLoading(false, btnIdle);
+        hideGlobalLoading();
     }
 
     if (locationBtn) {
@@ -523,6 +544,7 @@
                 return;
             }
             bestFix = null;
+            showGlobalLoading('{% trans "Recherche GPS…" %}', '{% trans "Recherche de votre position GPS… Restez immobile." %}');
             setLoading(true, '<svg class="w-5 h-5 mr-2 inline animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> {% trans "Recherche GPS…" %}');
             locationStatus.textContent = '{% trans "Recherche de votre position GPS… Restez immobile." %}';
             locationStatus.className = 'text-sm text-graphite-500 mb-2';
