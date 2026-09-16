@@ -182,15 +182,11 @@ def home_view(request: HttpRequest) -> HttpResponse:
 
     # ── Villes ─────────────────────────────────────────────────────────
     cities_qs = City.objects.filter(
-        is_active=True, garages__approval_status=Garage.ApprovalStatus.APPROVED
-    ).annotate(
-        garages_count=Count(
-            "garages", filter=Q(garages__approval_status=Garage.ApprovalStatus.APPROVED)
-        )
-    ).filter(garages_count__gt=0)
+        is_active=True,
+    )
 
     cities_count = cities_qs.count()
-    cities = list(cities_qs.order_by("-garages_count")[:NUM_CITIES_HOMEPAGE])
+    cities = list(cities_qs)
 
     # ── Témoignages ────────────────────────────────────────────────────
     testimonials = list(
@@ -245,7 +241,7 @@ def home_view(request: HttpRequest) -> HttpResponse:
     # ── Carte SVG du Cameroun (villes géolocalisées) ───────────────────
     cities_for_map = list(
         cities_qs.filter(latitude__isnull=False, longitude__isnull=False)
-        .order_by("-garages_count")[:12]
+        .order_by("name")[:12]
     )
     cities_map = build_cities_map(cities_for_map)
 

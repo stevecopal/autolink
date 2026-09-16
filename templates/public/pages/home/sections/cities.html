@@ -24,13 +24,12 @@
                 <p class="text-white/55 text-sm sm:text-base leading-relaxed mb-8 max-w-md">
                     {% trans "De Douala à Maroua, en passant par Yaoundé, Bafoussam et Garoua : AutoLink vous connecte aux garages vérifiés de votre ville. Cliquez sur une ville pour voir les garages disponibles." %}
                 </p>
-                 <div class="mb-5 flex flex-wrap gap-2">
+                <div class="mb-5 flex flex-wrap gap-2">
                     {% for city in cities %}
-                        <a href="{% url 'garages:garage_list' %}?city={{ city.name }}"
-                            class="group inline-flex items-center gap-2 bg-white/[0.05] hover:bg-white/[0.1] border border-white/[0.08] hover:border-navy-300/40 rounded-full pl-2.5 pr-3 py-1.5 transition-colors duration-200">
-                            <span class="w-1.5 h-1.5 rounded-full bg-navy-300 group-hover:bg-emerald-400 transition-colors"></span>
-                            <span class="text-white/85 group-hover:text-white text-xs font-medium">{{ city.name }}</span>
-                        </a>
+                        <span class="inline-flex items-center gap-2 bg-white/[0.05] border border-white/[0.08] rounded-full pl-2.5 pr-3 py-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+                            <span class="text-white/85 text-xs font-medium">{{ city.name }}</span>
+                        </span>
                     {% endfor %}
                 </div>
 
