@@ -1,5 +1,5 @@
 {% extends 'public/base.html' %}
-{% load i18n seo_tags %}
+{% load i18n static seo_tags %}
 
 {% block title %}Politique et règles d'utilisation | AutoLink{% endblock %}
 {% block description %}Règles d'utilisation d'AutoLink : conditions pour les garages, les vendeurs de pièces et les automobilistes, vérification des annonces et politique de confidentialité.{% endblock %}
@@ -8,19 +8,32 @@
 {% block structured_data %}{% breadcrumb_json_ld "Accueil" "/" "Politique et règles" "/politique-et-regles/" %}{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
-    <div class="mb-8">
-      
-        <h1 class="text-2xl sm:text-3xl font-bold text-navy-900 mb-2">{% trans "Politique et règles d'AutoLink" %}</h1>
-        <p class="text-graphite-600 text-sm">{% trans "Dernière mise à jour : Janvier 2026" %}</p>
+{# ============ PAGE HEADER : bandeau détail automobile ============ #}
+<div class="relative isolate overflow-hidden bg-navy-900">
+    <img src="{% static 'img/disk-brake2.jpg' %}"
+         alt=""
+         class="absolute inset-0 w-full h-full object-cover object-center"
+         fetchpriority="high"
+         decoding="async"
+         aria-hidden="true">
+    <div class="absolute inset-0 scrim-diagonal" aria-hidden="true"></div>
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_80%_15%,rgba(242,96,12,0.28),transparent_58%)]" aria-hidden="true"></div>
+
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24">
+        <span class="eyebrow eyebrow-light mb-6">{% trans "Politique" %}</span>
+        <h1 class="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-[-0.02em] leading-[1.03] mb-5 max-w-3xl">
+            {% trans "Politique et règles d'AutoLink" %}
+        </h1>
+        <p class="text-white/70 font-mono text-sm sm:text-base">{% trans "Dernière mise à jour : Janvier 2026" %}</p>
     </div>
+</div>
 
-   
-    <div class="space-y-6">
+<div class="max-w-4xl mx-auto px-4 sm:px-6 py-14 sm:py-20">
+    <div class="space-y-6 sm:space-y-8">
 
-        <section id="presentation" class="card p-6 sm:p-8">
-            <h2 class="text-xl font-bold text-navy-900 mb-4">{% trans "1. Présentation d'AutoLink" %}</h2>
-            <div class="space-y-4 text-graphite-600 text-sm leading-relaxed">
+        <section id="presentation" class="bg-white rounded-3xl border border-line-200 shadow-soft p-6 sm:p-9">
+            <h2 class="font-display text-2xl sm:text-3xl font-bold text-navy-900 mb-5">{% trans "1. Présentation d'AutoLink" %}</h2>
+            <div class="space-y-4 text-graphite-600 text-base leading-relaxed">
                 <p>
                     {% trans "AutoLink est une plateforme numérique automobile mise en place au Cameroun, conçue pour connecter les automobilistes avec les professionnels de l'automobile : garages mécaniques, vendeurs de pièces détachées et prestataires de services automobiles." %}
                 </p>
@@ -33,14 +46,14 @@
             </div>
         </section>
 
-        <section id="fonctionnement" class="card p-6 sm:p-8">
-            <h2 class="text-xl font-bold text-navy-900 mb-4">{% trans "2. Comment fonctionne AutoLink" %}</h2>
-            <div class="space-y-4 text-graphite-600 text-sm leading-relaxed">
+        <section id="fonctionnement" class="bg-white rounded-3xl border border-line-200 shadow-soft p-6 sm:p-9">
+            <h2 class="font-display text-2xl sm:text-3xl font-bold text-navy-900 mb-5">{% trans "2. Comment fonctionne AutoLink" %}</h2>
+            <div class="space-y-4 text-graphite-600 text-base leading-relaxed">
                 <p>{% trans "AutoLink repose sur un écosystème simple et efficace qui profite à trois types d'utilisateurs :" %}</p>
 
-                <div class="p-4 rounded-xl bg-steel-50 border border-line-200">
-                    <h3 class="font-bold text-navy-900 mb-2">{% trans "Les automobilistes (clients)" %}</h3>
-                    <ul class="space-y-1.5 ml-4">
+                <div class="p-5 rounded-2xl bg-steel-50 border border-line-200">
+                    <h3 class="font-bold text-navy-900 mb-3 text-lg">{% trans "Les automobilistes (clients)" %}</h3>
+                    <ul class="space-y-2 ml-4">
                         <li>• {% trans "Rechercher des garages à proximité selon leur localisation" %}</li>
                         <li>• {% trans "Consulter les services proposés par chaque garage" %}</li>
                         <li>• {% trans "Consulter les pièces automobiles compatibles avec leur véhicule" %}</li>
@@ -49,9 +62,9 @@
                     </ul>
                 </div>
 
-                <div class="p-4 rounded-xl bg-steel-50 border border-line-200">
-                    <h3 class="font-bold text-navy-900 mb-2">{% trans "Les garages professionnels" %}</h3>
-                    <ul class="space-y-1.5 ml-4">
+                <div class="p-5 rounded-2xl bg-steel-50 border border-line-200">
+                    <h3 class="font-bold text-navy-900 mb-3 text-lg">{% trans "Les garages professionnels" %}</h3>
+                    <ul class="space-y-2 ml-4">
                         <li>• {% trans "Créer un profil professionnel vérifié par l'équipe AutoLink" %}</li>
                         <li>• {% trans "Publier leurs services et tarifs" %}</li>
                         <li>• {% trans "Mettre en vente des pièces automobiles avec photos et descriptions" %}</li>
@@ -60,9 +73,9 @@
                     </ul>
                 </div>
 
-                <div class="p-4 rounded-xl bg-steel-50 border border-line-200">
-                    <h3 class="font-bold text-navy-900 mb-2">{% trans "L'administration AutoLink" %}</h3>
-                    <ul class="space-y-1.5 ml-4">
+                <div class="p-5 rounded-2xl bg-steel-50 border border-line-200">
+                    <h3 class="font-bold text-navy-900 mb-3 text-lg">{% trans "L'administration AutoLink" %}</h3>
+                    <ul class="space-y-2 ml-4">
                         <li>• {% trans "Vérifier l'identité et les qualifications des garages" %}</li>
                         <li>• {% trans "Assurer le support client et la résolution des litiges" %}</li>
                         <li>• {% trans "Garantir la sécurité des transactions" %}</li>
@@ -72,46 +85,61 @@
             </div>
         </section>
 
-        <section id="localisation" class="card p-6 sm:p-8">
-            <h2 class="text-xl font-bold text-navy-900 mb-4">{% trans "3. Pourquoi nous avons besoin de votre position" %}</h2>
-            <div class="space-y-4 text-graphite-600 text-sm leading-relaxed">
+        <section id="localisation" class="bg-white rounded-3xl border border-line-200 shadow-soft p-6 sm:p-9">
+            <h2 class="font-display text-2xl sm:text-3xl font-bold text-navy-900 mb-5">{% trans "3. Pourquoi nous avons besoin de votre position" %}</h2>
+            <div class="space-y-4 text-graphite-600 text-base leading-relaxed">
                 <p>
                     {% trans "AutoLink utilise les données de localisation de votre appareil uniquement pour vous offrir une meilleure expérience. Voici précisément pourquoi nous en avons besoin :" %}
                 </p>
 
-                <div class="p-4 rounded-xl bg-navy-500/10 border border-navy-500/20">
-                    <h3 class="font-bold text-navy-900 mb-2 flex items-center gap-2">
-                        <span class="text-navy-500"></span> {% trans "Trouver les garages les plus proches" %}
+                <div class="p-5 rounded-2xl bg-navy-50 border border-navy-100">
+                    <h3 class="font-bold text-navy-900 mb-2 flex items-center gap-2 text-lg">
+                        <span class="text-accent-500">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        </span>
+                        {% trans "Trouver les garages les plus proches" %}
                     </h3>
                     <p>{% trans "Lorsque vous recherchez un garage, votre position nous permet de vous afficher en priorité les établissements situés à proximité, classés par distance. Cela vous évite de parcourir inutilement des kilomètres pour un service disponible dans votre quartier." %}</p>
                 </div>
 
-                <div class="p-4 rounded-xl bg-navy-500/10 border border-navy-500/20">
-                    <h3 class="font-bold text-navy-900 mb-2 flex items-center gap-2">
-                        <span class="text-navy-500"></span> {% trans "Calculer les distances et itinéraires" %}
+                <div class="p-5 rounded-2xl bg-navy-50 border border-navy-100">
+                    <h3 class="font-bold text-navy-900 mb-2 flex items-center gap-2 text-lg">
+                        <span class="text-accent-500">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"/></svg>
+                        </span>
+                        {% trans "Calculer les distances et itinéraires" %}
                     </h3>
                     <p>{% trans "Votre position nous permet de calculer la distance exacte entre vous et le garage sélectionné, et de vous fournir un itinéraire pour vous y rendre. Le calcul se fait en kilomètres en utilisant la formule de Haversine." %}</p>
                 </div>
 
-                <div class="p-4 rounded-xl bg-navy-500/10 border border-navy-500/20">
-                    <h3 class="font-bold text-navy-900 mb-2 flex items-center gap-2">
-                        <span class="text-navy-500"></span> {% trans "Assistance routière en cas de panne" %}
+                <div class="p-5 rounded-2xl bg-navy-50 border border-navy-100">
+                    <h3 class="font-bold text-navy-900 mb-2 flex items-center gap-2 text-lg">
+                        <span class="text-accent-500">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/></svg>
+                        </span>
+                        {% trans "Assistance routière en cas de panne" %}
                     </h3>
                     <p>{% trans "En cas de panne, votre position exacte est transmise au garage le plus proche afin qu'il puisse intervenir rapidement. Sans cette information, l'assistance routière ne pourrait pas fonctionner efficacement." %}</p>
                 </div>
 
-                <div class="p-4 rounded-xl bg-navy-500/10 border border-navy-500/20">
-                    <h3 class="font-bold text-navy-900 mb-2 flex items-center gap-2">
-                        <span class="text-navy-500"></span> {% trans "Livraison de pièces" %}
+                <div class="p-5 rounded-2xl bg-navy-50 border border-navy-100">
+                    <h3 class="font-bold text-navy-900 mb-2 flex items-center gap-2 text-lg">
+                        <span class="text-accent-500">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 2a2 2 0 114 0m6 0a2 2 0 104 0m-4 2a2 2 0 114 0"/></svg>
+                        </span>
+                        {% trans "Livraison de pièces" %}
                     </h3>
                     <p>{% trans "Si vous commandez une pièce pour livraison, votre position permet d'estimer les frais de livraison et le délai estimé d'acheminement." %}</p>
                 </div>
 
-                <div class="p-4 rounded-xl bg-steel-50 border border-line-200">
-                    <h3 class="font-bold text-emerald-700 mb-2 flex items-center gap-2">
-                        <span class="text-emerald-600"></span> {% trans "Engagement de confidentialité" %}
+                <div class="p-5 rounded-2xl bg-emerald-50 border border-emerald-200">
+                    <h3 class="font-bold text-emerald-700 mb-3 flex items-center gap-2 text-lg">
+                        <span class="text-emerald-600">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                        </span>
+                        {% trans "Engagement de confidentialité" %}
                     </h3>
-                    <ul class="space-y-1.5 ml-4 text-emerald-700">
+                    <ul class="space-y-2 ml-4 text-emerald-700">
                         <li>• {% trans "Votre position n'est jamais partagée avec des tiers à des fins commerciales" %}</li>
                         <li>• {% trans "Les données de localisation sont utilisées uniquement pendant votre session active" %}</li>
                         <li>• {% trans "Vous pouvez révoquer l'accès à votre position à tout moment via les paramètres de votre appareil" %}</li>
@@ -122,11 +150,11 @@
             </div>
         </section>
 
-        <section id="compte" class="card p-6 sm:p-8">
-            <h2 class="text-xl font-bold text-navy-900 mb-4">{% trans "4. Création de compte et responsabilités" %}</h2>
-            <div class="space-y-4 text-graphite-600 text-sm leading-relaxed">
+        <section id="compte" class="bg-white rounded-3xl border border-line-200 shadow-soft p-6 sm:p-9">
+            <h2 class="font-display text-2xl sm:text-3xl font-bold text-navy-900 mb-5">{% trans "4. Création de compte et responsabilités" %}</h2>
+            <div class="space-y-4 text-graphite-600 text-base leading-relaxed">
                 <p>{% trans "L'utilisation d'AutoLink nécessite la création d'un compte. En créant un compte, vous vous engagez à :" %}</p>
-                <ul class="space-y-1.5 ml-4">
+                <ul class="space-y-2 ml-4">
                     <li>• {% trans "Fournir des informations exactes et à jour" %}</li>
                     <li>• {% trans "Maintenir la confidentialité de vos identifiants de connexion" %}</li>
                     <li>• {% trans "Ne pas créer de comptes multiples pour manipuler les transactions" %}</li>
@@ -137,11 +165,11 @@
             </div>
         </section>
 
-        <section id="garages" class="card p-6 sm:p-8">
-            <h2 class="text-xl font-bold text-navy-900 mb-4">{% trans "5. Règles applicables aux garages" %}</h2>
-            <div class="space-y-4 text-graphite-600 text-sm leading-relaxed">
+        <section id="garages" class="bg-white rounded-3xl border border-line-200 shadow-soft p-6 sm:p-9">
+            <h2 class="font-display text-2xl sm:text-3xl font-bold text-navy-900 mb-5">{% trans "5. Règles applicables aux garages" %}</h2>
+            <div class="space-y-4 text-graphite-600 text-base leading-relaxed">
                 <p>{% trans "Les garages souhaitant opérer sur AutoLink doivent respecter les règles suivantes :" %}</p>
-                <ul class="space-y-1.5 ml-4">
+                <ul class="space-y-2 ml-4">
                     <li>• {% trans "Fournir les documents de vérification nécessaires (registre de commerce, pièce d'identité, photo du local)" %}</li>
                     <li>• {% trans "Maintenir des informations exactes sur leurs services et tarifs" %}</li>
                     <li>• {% trans "Répondre aux demandes des clients dans des délais raisonnables" %}</li>
@@ -154,11 +182,11 @@
             </div>
         </section>
 
-        <section id="paiements" class="card p-6 sm:p-8">
-            <h2 class="text-xl font-bold text-navy-900 mb-4">{% trans "6. Paiements" %}</h2>
-            <div class="space-y-4 text-graphite-600 text-sm leading-relaxed">
+        <section id="paiements" class="bg-white rounded-3xl border border-line-200 shadow-soft p-6 sm:p-9">
+            <h2 class="font-display text-2xl sm:text-3xl font-bold text-navy-900 mb-5">{% trans "6. Paiements" %}</h2>
+            <div class="space-y-4 text-graphite-600 text-base leading-relaxed">
                 <p>{% trans "AutoLink facilite les paiements entre clients et garages tout en garantissant la sécurité :" %}</p>
-                <ul class="space-y-1.5 ml-4">
+                <ul class="space-y-2 ml-4">
                     <li>• {% trans "Les paiements sont sécurisés via Mobile Money (MTN MoMo, Orange Money)" %}</li>
                     <li>• {% trans "En cas de litige, l'administration AutoLink intervient comme médiateur" %}</li>
                     <li>• {% trans "Les demandes de remboursement sont traitées sous 48 à 72 heures ouvrées" %}</li>
@@ -166,11 +194,11 @@
             </div>
         </section>
 
-        <section id="pieces" class="card p-6 sm:p-8">
-            <h2 class="text-xl font-bold text-navy-900 mb-4">{% trans "7. Pièces et compatibilité" %}</h2>
-            <div class="space-y-4 text-graphite-600 text-sm leading-relaxed">
+        <section id="pieces" class="bg-white rounded-3xl border border-line-200 shadow-soft p-6 sm:p-9">
+            <h2 class="font-display text-2xl sm:text-3xl font-bold text-navy-900 mb-5">{% trans "7. Pièces et compatibilité" %}</h2>
+            <div class="space-y-4 text-graphite-600 text-base leading-relaxed">
                 <p>{% trans "AutoLink met l'accent sur la compatibilité des pièces pour éviter les achats inutiles :" %}</p>
-                <ul class="space-y-1.5 ml-4">
+                <ul class="space-y-2 ml-4">
                     <li>• {% trans "Chaque pièce est associée aux véhicules compatibles (marque, modèle, année)" %}</li>
                     <li>• {% trans "Les références OEM sont affichées pour faciliter la vérification" %}</li>
                     <li>• {% trans "L'état de la pièce (Neuf, Occasion, Reconditionné) est clairement indiqué" %}</li>
@@ -181,14 +209,14 @@
             </div>
         </section>
 
-        <section id="donnees" class="card p-6 sm:p-8">
-            <h2 class="text-xl font-bold text-navy-900 mb-4">{% trans "8. Données personnelles et confidentialité" %}</h2>
-            <div class="space-y-4 text-graphite-600 text-sm leading-relaxed">
+        <section id="donnees" class="bg-white rounded-3xl border border-line-200 shadow-soft p-6 sm:p-9">
+            <h2 class="font-display text-2xl sm:text-3xl font-bold text-navy-900 mb-5">{% trans "8. Données personnelles et confidentialité" %}</h2>
+            <div class="space-y-4 text-graphite-600 text-base leading-relaxed">
                 <p>{% trans "AutoLink s'engage à protéger vos données personnelles conformément à la réglementation en vigueur :" %}</p>
 
-                <div class="p-4 rounded-xl bg-steel-50 border border-line-200">
-                    <h3 class="font-bold text-navy-900 mb-2">{% trans "Données collectées" %}</h3>
-                    <ul class="space-y-1.5 ml-4">
+                <div class="p-5 rounded-2xl bg-steel-50 border border-line-200">
+                    <h3 class="font-bold text-navy-900 mb-3 text-lg">{% trans "Données collectées" %}</h3>
+                    <ul class="space-y-2 ml-4">
                         <li>• {% trans "Nom, prénom, adresse email, numéro de téléphone" %}</li>
                         <li>• {% trans "Photo de profil (optionnelle)" %}</li>
                         <li>• {% trans "Informations sur les véhicules enregistrés" %}</li>
@@ -196,9 +224,9 @@
                     </ul>
                 </div>
 
-                <div class="p-4 rounded-xl bg-steel-50 border border-line-200">
-                    <h3 class="font-bold text-navy-900 mb-2">{% trans "Utilisation des données" %}</h3>
-                    <ul class="space-y-1.5 ml-4">
+                <div class="p-5 rounded-2xl bg-steel-50 border border-line-200">
+                    <h3 class="font-bold text-navy-900 mb-3 text-lg">{% trans "Utilisation des données" %}</h3>
+                    <ul class="space-y-2 ml-4">
                         <li>• {% trans "Fourniture et amélioration des services de la plateforme" %}</li>
                         <li>• {% trans "Personnalisation de votre expérience (garages à proximité, pièces compatibles)" %}</li>
                         <li>• {% trans "Communication relative à votre compte (confirmations, mises à jour)" %}</li>
@@ -206,9 +234,9 @@
                     </ul>
                 </div>
 
-                <div class="p-4 rounded-xl bg-steel-50 border border-line-200">
-                    <h3 class="font-bold text-navy-900 mb-2">{% trans "Vos droits" %}</h3>
-                    <ul class="space-y-1.5 ml-4">
+                <div class="p-5 rounded-2xl bg-steel-50 border border-line-200">
+                    <h3 class="font-bold text-navy-900 mb-3 text-lg">{% trans "Vos droits" %}</h3>
+                    <ul class="space-y-2 ml-4">
                         <li>• {% trans "Accéder à vos données personnelles stockées" %}</li>
                         <li>• {% trans "Demander la rectification de données inexactes" %}</li>
                         <li>• {% trans "Demander la suppression de votre compte et de vos données" %}</li>
@@ -219,11 +247,11 @@
             </div>
         </section>
 
-        <section id="interdits" class="card p-6 sm:p-8">
-            <h2 class="text-xl font-bold text-navy-900 mb-4">{% trans "9. Comportements interdits" %}</h2>
-            <div class="space-y-4 text-graphite-600 text-sm leading-relaxed">
+        <section id="interdits" class="bg-white rounded-3xl border border-line-200 shadow-soft p-6 sm:p-9">
+            <h2 class="font-display text-2xl sm:text-3xl font-bold text-navy-900 mb-5">{% trans "9. Comportements interdits" %}</h2>
+            <div class="space-y-4 text-graphite-600 text-base leading-relaxed">
                 <p>{% trans "Les comportements suivants sont strictement interdits sur AutoLink :" %}</p>
-                <ul class="space-y-1.5 ml-4">
+                <ul class="space-y-2 ml-4">
                     <li>• {% trans "Publier des contenus offensants, discriminatoires ou illégaux" %}</li>
                     <li>• {% trans "Créer de faux comptes ou usurper l'identité d'un tiers" %}</li>
                     <li>• {% trans "Tenter de pirater, compromettre ou surcharger la plateforme" %}</li>
@@ -235,17 +263,17 @@
             </div>
         </section>
 
-        <section id="responsabilite" class="card p-6 sm:p-8">
-            <h2 class="text-xl font-bold text-navy-900 mb-4">{% trans "10. Limitation de responsabilité" %}</h2>
-            <div class="space-y-4 text-graphite-600 text-sm leading-relaxed">
+        <section id="responsabilite" class="bg-white rounded-3xl border border-line-200 shadow-soft p-6 sm:p-9">
+            <h2 class="font-display text-2xl sm:text-3xl font-bold text-navy-900 mb-5">{% trans "10. Limitation de responsabilité" %}</h2>
+            <div class="space-y-4 text-graphite-600 text-base leading-relaxed">
                 <p>{% trans "AutoLink agit en tant qu'intermédiaire technique entre les automobilistes et les garages. Notre responsabilité se limite à :" %}</p>
-                <ul class="space-y-1.5 ml-4">
+                <ul class="space-y-2 ml-4">
                     <li>• {% trans "La mise à disposition de la plateforme et de ses fonctionnalités" %}</li>
                     <li>• {% trans "La vérification des garages inscrits" %}</li>
                     <li>• {% trans "La médiation en cas de litige signalé" %}</li>
                 </ul>
                 <p>{% trans "AutoLink ne peut être tenu responsable de :" %}</p>
-                <ul class="space-y-1.5 ml-4">
+                <ul class="space-y-2 ml-4">
                     <li>• {% trans "La qualité réelle des pièces vendues par les garages" %}</li>
                     <li>• {% trans "Les dommages causés lors de l'installation de pièces" %}</li>
                     <li>• {% trans "Les retards de livraison imputables aux transporteurs" %}</li>
@@ -254,7 +282,6 @@
             </div>
         </section>
 
-        
     </div>
 </div>
 {% endblock %}

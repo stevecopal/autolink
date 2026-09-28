@@ -108,6 +108,11 @@ body {
   min-height: 2rem;
 }
 
+.btn-xl {
+  @apply px-8 py-4 text-base rounded-2xl;
+  min-height: 3.5rem;
+}
+
 .btn-primary {
   @apply bg-navy-500 hover:bg-navy-600 text-white shadow-sm;
 }
@@ -118,6 +123,121 @@ body {
 
 .btn-danger {
   @apply bg-red-500 hover:bg-red-600 text-white;
+}
+
+/* ============================================================
+   Direction artistique AutoLink — premium / automobile
+   ============================================================ */
+
+/* Sur-titre technique (bleu nuit + orange) */
+.eyebrow {
+  @apply inline-flex items-center gap-3 font-mono text-[11px] font-semibold uppercase tracking-[0.24em];
+}
+
+.eyebrow::before {
+  content: "";
+  width: 2.25rem;
+  height: 2px;
+  background: currentColor;
+  opacity: 0.6;
+}
+
+.eyebrow-accent {
+  color: #f2600c;
+}
+
+.eyebrow-light {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Boutons de la nouvelle direction artistique */
+.btn-accent {
+  @apply bg-accent-500 hover:bg-accent-600 text-white shadow-glow;
+}
+
+.btn-dark {
+  @apply bg-navy-900 hover:bg-navy-800 text-white shadow-soft;
+}
+
+.btn-white {
+  @apply bg-white hover:bg-navy-50 text-navy-900 shadow-soft;
+}
+
+.btn-glass {
+  @apply bg-white/[0.08] hover:bg-white/[0.16] text-white border border-white/20 backdrop-blur-sm;
+}
+
+/* Cadres média : grands visuels, coins arrondis, ombre discrète */
+.media {
+  position: relative;
+  overflow: hidden;
+}
+
+.media > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.media-rounded {
+  @apply rounded-2xl sm:rounded-[2rem] shadow-soft;
+}
+
+/* Voiles de lisibilité posés sur les photos */
+.scrim-bottom {
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 43, 0.94) 0%,
+    rgba(0, 0, 43, 0.72) 35%,
+    rgba(0, 0, 43, 0.35) 70%,
+    rgba(0, 0, 43, 0.15) 100%
+  );
+}
+
+.scrim-diagonal {
+  background: linear-gradient(
+    115deg,
+    rgba(0, 0, 43, 0.95) 0%,
+    rgba(0, 0, 43, 0.85) 38%,
+    rgba(0, 0, 43, 0.55) 68%,
+    rgba(0, 0, 43, 0.3) 100%
+  );
+}
+
+.scrim-left {
+  background: linear-gradient(
+    to right,
+    rgba(0, 0, 43, 0.92) 0%,
+    rgba(0, 0, 43, 0.6) 45%,
+    rgba(0, 0, 43, 0.1) 100%
+  );
+}
+
+.scrim-soft {
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 43, 0.75) 0%,
+    rgba(0, 0, 43, 0.25) 55%,
+    rgba(0, 0, 43, 0.05) 100%
+  );
+}
+
+/* Séparateurs graphiques discrets */
+.hairline {
+  height: 1px;
+  background: linear-gradient(90deg, rgba(0, 0, 128, 0.25), rgba(242, 96, 12, 0.35), transparent);
+}
+
+/* Pleine largeur depuis un conteneur */
+.bleed-x {
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+}
+
+/* Panneau "verre" posé sur une photo */
+.glass-panel {
+  @apply bg-white/[0.08] border border-white/15 backdrop-blur-md rounded-2xl;
 }
 
 /* ============================================================

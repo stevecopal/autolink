@@ -43,6 +43,19 @@ module.exports = {
         line: {
           200: "#D7DCE1",
         },
+        // Accent principal : orange automobile
+        accent: {
+          50: "#FFF3EC",
+          100: "#FFE3D2",
+          200: "#FFC3A1",
+          300: "#FF9C66",
+          400: "#FF7A33",
+          500: "#F2600C",
+          600: "#D94F06",
+          700: "#B23E07",
+          800: "#8E330D",
+          900: "#742C0E",
+        },
       },
       borderRadius: {
         xl: "0.75rem",
@@ -55,6 +68,9 @@ module.exports = {
         elevated:
           "0 10px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.08)",
         nav: "0 2px 10px 0 rgb(0 0 0 / 0.2)",
+        soft: "0 24px 70px -34px rgba(0, 0, 43, 0.45)",
+        lift: "0 32px 90px -40px rgba(0, 0, 43, 0.55)",
+        glow: "0 18px 45px -18px rgba(242, 96, 12, 0.55)",
       },
       animation: {
         "fade-in": "fadeIn 0.3s ease-in-out",

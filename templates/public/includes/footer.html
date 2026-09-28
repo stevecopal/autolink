@@ -1,21 +1,25 @@
 {% load i18n %}
-<footer class="bg-navy-900 text-white" role="contentinfo">
-    <div class="border-t border-white/10"></div>
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
+<footer class="bg-navy-900 text-white relative overflow-hidden" role="contentinfo">
+    <div class="absolute inset-0 opacity-[0.05]" aria-hidden="true">
+        <div class="absolute inset-0" style="background-image: linear-gradient(rgba(255,255,255,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.4) 1px, transparent 1px); background-size: 44px 44px;"></div>
+    </div>
+    <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-accent-500/60 via-navy-500/40 to-transparent" aria-hidden="true"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-24">
         <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-8">
             <!-- Brand -->
-            <div class="lg:col-span-4">
-                <a href="{% url 'core:home' %}" class="flex items-center gap-2.5 mb-5" aria-label="AutoLink">
-                   
-                    <span class="text-xl font-display font-bold tracking-tight">Auto<span class="text-navy-300">Link</span></span>
+            <div class="lg:col-span-4 col-span-2">
+                <a href="{% url 'core:home' %}" class="flex items-center gap-3 mb-6" aria-label="AutoLink">
+                    
+                    <span class="text-2xl font-display font-bold tracking-tight">Auto<span class="text-accent-400">Link</span></span>
                 </a>
-                <p class="text-white/55 text-sm leading-relaxed max-w-xs">{% trans "La plateforme automobile de confiance au Cameroun." %}</p>
+                <p class="text-white/60 text-base leading-relaxed max-w-xs">{% trans "La plateforme automobile de confiance au Cameroun." %}</p>
             </div>
 
             <!-- Services -->
             <div class="lg:col-span-2">
-                <h4 class="font-display font-bold text-sm uppercase tracking-wider text-white/40 mb-5">{% trans "Services" %}</h4>
-                <ul class="space-y-3">
+                <h4 class="font-display font-bold text-xs uppercase tracking-[0.2em] text-accent-400 mb-5">{% trans "Services" %}</h4>
+                <ul class="space-y-3.5">
                     <li><a href="{% url 'garages:garage_list' %}" class="text-white/60 hover:text-white text-sm transition-colors duration-200">{% trans "Trouver un garage" %}</a></li>
                     <li><a href="{% url 'catalog:part_list' %}" class="text-white/60 hover:text-white text-sm transition-colors duration-200">{% trans "Trouver une pièce" %}</a></li>
                     <li><a href="{% url 'search:nearby_page' %}" class="text-white/60 hover:text-white text-sm transition-colors duration-200">{% trans "Mécaniciens à proximité" %}</a></li>
@@ -25,8 +29,8 @@
 
             <!-- Account -->
             <div class="lg:col-span-2">
-                <h4 class="font-display font-bold text-sm uppercase tracking-wider text-white/40 mb-5">{% trans "Compte" %}</h4>
-                <ul class="space-y-3">
+                <h4 class="font-display font-bold text-xs uppercase tracking-[0.2em] text-accent-400 mb-5">{% trans "Compte" %}</h4>
+                <ul class="space-y-3.5">
                     <li><a href="{% url 'accounts:register' %}" class="text-white/60 hover:text-white text-sm transition-colors duration-200">{% trans "S'inscrire" %}</a></li>
                     <li><a href="{% url 'accounts:login' %}" class="text-white/60 hover:text-white text-sm transition-colors duration-200">{% trans "Connexion" %}</a></li>
                     <li><a href="{% url 'accounts:profile' %}" class="text-white/60 hover:text-white text-sm transition-colors duration-200">{% trans "Mon profil" %}</a></li>
@@ -35,19 +39,17 @@
 
             <!-- Contact -->
             <div class="lg:col-span-4">
-                <h4 class="font-display font-bold text-sm uppercase tracking-wider text-white/40 mb-5">{% trans "Nous contacter" %}</h4>
-                <ul class="space-y-3">
+                <h4 class="font-display font-bold text-xs uppercase tracking-[0.2em] text-accent-400 mb-5">{% trans "Nous contacter" %}</h4>
+                <ul class="space-y-3.5">
                     <li><a href="{% url 'core:contact' %}" class="text-white/60 hover:text-white text-sm transition-colors duration-200">{% trans "Contact" %}</a></li>
                     <li><a href="{% url 'core:about' %}" class="text-white/60 hover:text-white text-sm transition-colors duration-200">{% trans "À propos" %}</a></li>
                     <li><a href="{% url 'core:policy' %}" class="text-white/60 hover:text-white text-sm transition-colors duration-200">{% trans "Politique et règles" %}</a></li>
-                    
                 </ul>
             </div>
         </div>
 
-        <div class="mt-8 pt-8flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p class="text-white/35 text-sm font-mono">&copy; 2026 AutoLink. {% trans "Tous droits réservés." %}</p>
-            
+        <div class="mt-12 pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p class="text-white/40 text-sm font-mono">&copy; 2026 AutoLink. {% trans "Tous droits réservés." %}</p>
         </div>
     </div>
 </footer>

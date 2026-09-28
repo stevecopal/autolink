@@ -1,86 +1,105 @@
-{% load i18n %}
-<section class="bg-navy-900 py-16 sm:py-20 lg:py-24">
+{% load i18n static %}
+<section class="relative bg-navy-900 overflow-hidden py-20 sm:py-24 lg:py-28" aria-labelledby="why-heading">
     <!-- Fond subtil avec grille légère -->
-    <div class="absolute inset-0 opacity-[0.03]" aria-hidden="true">
+    <div class="absolute inset-0 opacity-[0.05]" aria-hidden="true">
         <div class="absolute inset-0" style="background-image: linear-gradient(rgba(255,255,255,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.3) 1px, transparent 1px); background-size: 60px 60px;"></div>
     </div>
+    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_15%_0%,rgba(242,96,12,0.22),transparent_55%)]" aria-hidden="true"></div>
 
     <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <!-- En-tête -->
-        <div class="max-w-3xl mx-auto text-center mb-12 sm:mb-16">
-           
-            <h2 id="why-heading" class="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-white tracking-tight leading-[1.05] mb-5">
-                {% trans "Pourquoi AutoLink change la donne" %}
-            </h2>
-            <p class="text-white/60 text-sm sm:text-base leading-relaxed max-w-xl mx-auto">
-                {% trans "Nous avons construit la plateforme que nous aurions voulu utiliser : vérifiée, transparente, pensée pour le terrain camerounais." %}
-            </p>
+
+        <!-- Bloc titre + grand visuel "confiance" -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
+            <!-- Visuel : mécanicien vérifié -->
+            <div class="lg:col-span-5 reveal">
+                <div class="relative -mx-4 sm:mx-0 overflow-hidden sm:rounded-[2rem] shadow-lift">
+                    <div class="media aspect-[4/5] sm:aspect-[4/3] lg:aspect-[4/5]">
+                        <img src="{% static 'img/mechanic-hood.jpg' %}"
+                             alt=""
+                             loading="lazy"
+                             decoding="async"
+                             aria-hidden="true">
+                    </div>
+                    <div class="absolute inset-0 scrim-soft" aria-hidden="true"></div>
+                    <div class="absolute bottom-4 left-4 sm:bottom-6 sm:left-6 flex items-center gap-2.5 px-4 py-2.5 rounded-xl bg-white/95 backdrop-blur-sm shadow-soft">
+                        <svg class="w-4 h-4 text-accent-500" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                        <span class="font-bold text-xs text-navy-900 tracking-wide">{% trans "Vérifié" %}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Texte -->
+            <div class="lg:col-span-7 reveal">
+                <span class="block w-14 h-1 bg-accent-500 rounded-full mb-7" aria-hidden="true"></span>
+                <h2 id="why-heading" class="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-[-0.02em] leading-[1.03] mb-6">
+                    {% trans "Pourquoi AutoLink change la donne" %}
+                </h2>
+                <p class="text-white/65 text-base sm:text-lg leading-relaxed max-w-2xl">
+                    {% trans "Nous avons construit la plateforme que nous aurions voulu utiliser : vérifiée, transparente, pensée pour le terrain camerounais." %}
+                </p>
+            </div>
         </div>
 
-        <!-- 3 cartes avec espacement optimal (gap-6) -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- 3 arguments -->
+        <div class="mt-14 lg:mt-20 grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-7">
             <!-- Argument 1 : Vérification -->
-            <div class="reveal bg-white rounded-xl border border-gray-200 p-6 sm:p-8 shadow-sm">
+            <div class="reveal bg-white rounded-3xl p-7 sm:p-9 shadow-lift">
                 <div class="flex items-center gap-4 mb-6">
-                    <div class="w-12 h-12 bg-navy-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <svg class="w-6 h-6 text-navy-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="w-[3.25rem] h-[3.25rem] bg-navy-900 rounded-2xl flex items-center justify-center flex-shrink-0">
+                        <svg class="w-6 h-6 text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
                         </svg>
                     </div>
-                    <div>
-                        <div class="text-4xl sm:text-5xl font-bold text-gray-900 tabular-nums">
-                            {{ why_verification_pct|default:100 }}%
-                        </div>
-                        <div class="text-sm text-gray-500 uppercase tracking-wider mt-1">
-                            {% trans "Garages vérifiés" %}
-                        </div>
-                    </div>
                 </div>
-                <p class="text-gray-600 text-sm leading-relaxed">
+                <div class="font-display text-5xl sm:text-6xl font-bold text-navy-900 tabular-nums tracking-tight mb-2">
+                    {{ why_verification_pct|default:100 }}<span class="text-accent-500">%</span>
+                </div>
+                <div class="text-sm font-mono uppercase tracking-wider text-graphite-500 mb-4">
+                    {% trans "Garages vérifiés" %}
+                </div>
+                <p class="text-graphite-600 text-base leading-relaxed">
                     {% trans "Chaque garage est visité et vérifié avant d'apparaître sur la plateforme. Photos réelles, services réels, prix réels." %}
                 </p>
             </div>
 
             <!-- Argument 2 : Vitesse -->
-            <div class="reveal bg-white rounded-xl border border-gray-200 p-6 sm:p-8 shadow-sm" style="transition-delay: 100ms;">
+            <div class="reveal bg-white rounded-3xl p-7 sm:p-9 shadow-lift" style="transition-delay: 100ms;">
                 <div class="flex items-center gap-4 mb-6">
-                    <div class="w-12 h-12 bg-navy-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <svg class="w-6 h-6 text-navy-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="w-[3.25rem] h-[3.25rem] bg-navy-900 rounded-2xl flex items-center justify-center flex-shrink-0">
+                        <svg class="w-6 h-6 text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                     </div>
-                    <div>
-                        <div class="text-4xl sm:text-5xl font-bold text-gray-900 tabular-nums">
-                            {{ why_avg_response_time|default:5 }} {% trans "mins" %}
-                        </div>
-                        <div class="text-sm text-gray-500 uppercase tracking-wider mt-1">
-                            {% trans "Temps de réponse" %}
-                        </div>
-                    </div>
                 </div>
-                <p class="text-gray-600 text-sm leading-relaxed">
+                <div class="font-display text-5xl sm:text-6xl font-bold text-navy-900 tabular-nums tracking-tight mb-2">
+                    {{ why_avg_response_time|default:5 }} <span class="text-accent-500 text-3xl sm:text-4xl">{% trans "mins" %}</span>
+                </div>
+                <div class="text-sm font-mono uppercase tracking-wider text-graphite-500 mb-4">
+                    {% trans "Temps de réponse" %}
+                </div>
+                <p class="text-graphite-600 text-base leading-relaxed">
                     {% trans "Les garages répondent en moins d'une heure en moyenne. Plus de téléphone dans le vide, plus d'attente interminable." %}
                 </p>
             </div>
 
             <!-- Argument 3 : Économies -->
-            <div class="reveal bg-white rounded-xl border border-gray-200 p-6 sm:p-8 shadow-sm" style="transition-delay: 200ms;">
+            <div class="reveal bg-white rounded-3xl p-7 sm:p-9 shadow-lift" style="transition-delay: 200ms;">
                 <div class="flex items-center gap-4 mb-6">
-                    <div class="w-12 h-12 bg-navy-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                        <svg class="w-6 h-6 text-navy-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="w-[3.25rem] h-[3.25rem] bg-navy-900 rounded-2xl flex items-center justify-center flex-shrink-0">
+                        <svg class="w-6 h-6 text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                         </svg>
                     </div>
-                    <div>
-                        <div class="text-4xl sm:text-5xl font-bold text-gray-900 tabular-nums">
-                            {{ why_savings_pct|default:20 }}%
-                        </div>
-                        <div class="text-sm text-gray-500 uppercase tracking-wider mt-1">
-                            {% trans "Économies moyennes" %}
-                        </div>
-                    </div>
                 </div>
-                <p class="text-gray-600 text-sm leading-relaxed">
+                <div class="font-display text-5xl sm:text-6xl font-bold text-navy-900 tabular-nums tracking-tight mb-2">
+                    {{ why_savings_pct|default:20 }}<span class="text-accent-500">%</span>
+                </div>
+                <div class="text-sm font-mono uppercase tracking-wider text-graphite-500 mb-4">
+                    {% trans "Économies moyennes" %}
+                </div>
+                <p class="text-graphite-600 text-base leading-relaxed">
                     {% trans "En comparant les prix affichés avant d'appeler, nos utilisateurs économisent en moyenne sur leurs réparations." %}
                 </p>
             </div>

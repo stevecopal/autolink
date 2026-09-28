@@ -1,65 +1,56 @@
 {% load i18n %}
-<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24" aria-labelledby="how-heading">
-    <div class="max-w-2xl mb-12 sm:mb-16">
-        <h2 id="how-heading" class="font-display text-3xl sm:text-4xl lg:text-5xl font-bold text-graphite-900 tracking-tight leading-[1.05]">
-            {% trans "En trois étapes simples," %}<br>
-            <span class="text-navy-500">{% trans "Trouvez votre garage." %}</span>
-        </h2>
-    </div>
+<section class="bg-white" aria-labelledby="how-heading">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-24 lg:py-28">
 
-    <div class="space-y-15 sm:space-y-15">
-        <!-- Étape 1 -->
-        <div class="step-container step-1 opacity-0">
-            <div class="flex items-start gap-4 sm:gap-5">
-                <div class="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-navy-500 to-navy-700 flex items-center justify-center shadow-lg">
-                    <span class="font-mono text-lg sm:text-xl font-bold text-white">01</span>
-                </div>
-                <div class="flex-1 pt-1 sm:pt-2">
-                    <h3 class="font-display font-bold text-lg sm:text-xl text-graphite-900 mb-2">{% trans "Entrez votre position" %}</h3>
-                    <p class="text-graphite-500 text-sm sm:text-base leading-relaxed">
+        {% comment %}En-tête{% endcomment %}
+        <div class="max-w-3xl mb-14 sm:mb-16 lg:mb-20">
+            <span class="eyebrow eyebrow-accent mb-6">{% trans "Comment ça marche" %}</span>
+            <h2 id="how-heading" class="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-graphite-900 tracking-[-0.02em] leading-[1.03]">
+                {% trans "En trois étapes simples," %}<br>
+                <span class="text-navy-500">{% trans "Trouvez votre garage." %}</span>
+            </h2>
+            <div class="hairline mt-8 w-40"></div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-8">
+            <!-- Étape 1 -->
+            <div class="step-container step-1 opacity-0">
+                <article class="relative h-full bg-white rounded-3xl border border-line-200 shadow-soft p-7 sm:p-9 overflow-hidden transition-shadow duration-300 hover:shadow-lift">
+                    <span class="absolute top-4 right-6 font-display text-6xl font-bold text-navy-500/[0.07] select-none" aria-hidden="true">01</span>
+                   
+                    <h3 class="font-display font-bold text-xl sm:text-2xl text-graphite-900 mb-3">{% trans "Entrez votre position" %}</h3>
+                    <p class="text-graphite-500 text-base sm:text-lg leading-relaxed">
                         {% trans "Saisissez votre ville ou activez la géolocalisation. AutoLink vous affiche instantanément les garages vérifiés les plus proches de vous." %}
                     </p>
-                </div>
+                </article>
             </div>
-        </div><br>
 
-        <!-- Étape 2 -->
-        <div class="step-container step-2 opacity-0">
-            <div class="flex items-start gap-4 sm:gap-5">
-                <div class="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center shadow-lg">
-                    <span class="font-mono text-lg sm:text-xl font-bold text-white">02</span>
-                </div>
-                <div class="flex-1 pt-1 sm:pt-2">
-                    <h3 class="font-display font-bold text-lg sm:text-xl text-graphite-900 mb-2">{% trans "Comparez les garages" %}</h3>
-                    <p class="text-graphite-500 text-sm sm:text-base leading-relaxed">
+            <!-- Étape 2 -->
+            <div class="step-container step-2 opacity-0">
+                <article class="relative h-full bg-white rounded-3xl border border-line-200 shadow-soft p-7 sm:p-9 overflow-hidden transition-shadow duration-300 hover:shadow-lift">
+                    <span class="absolute top-4 right-6 font-display text-6xl font-bold text-navy-500/[0.07] select-none" aria-hidden="true">02</span>
+                    
+                    <h3 class="font-display font-bold text-xl sm:text-2xl text-graphite-900 mb-3">{% trans "Comparez les garages" %}</h3>
+                    <p class="text-graphite-500 text-base sm:text-lg leading-relaxed">
                         {% trans "Consultez les avis vérifiés, les services proposés, les prix et les distances. Trouvez le garage idéal en un coup d'œil." %}
                     </p>
-                </div>
+                </article>
             </div>
-        </div><br>
 
-        <!-- Étape 3 -->
-        <div class="step-container step-3 opacity-0">
-            <div class="flex items-start gap-4 sm:gap-5">
-                <div class="flex-shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center shadow-lg">
-                    <span class="font-mono text-lg sm:text-xl font-bold text-white">03</span>
-                </div>
-                <div class="flex-1 pt-1 sm:pt-2">
-                    <h3 class="font-display font-bold text-lg sm:text-xl text-graphite-900 mb-2">{% trans "Contactez en 1 clic" %}</h3>
-                    <p class="text-graphite-500 text-sm sm:text-base leading-relaxed">
-                        {% trans "Envoyez un message direct ou appelez le garage. Réservez votre rendez-vous sans attendre." %}
-                    </p>
-                    <div class="flex items-center gap-2 text-xs sm:text-sm text-navy-500 font-semibold mt-3">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
-                        {% if why_avg_response_time %}
-                            {% trans "Réponse en" %} {{ why_avg_response_time }} {% trans "min" %}
-                        {% else %}
-                            {% trans "Réponse rapide" %}
-                        {% endif %}
+            <!-- Étape 3 -->
+            <div class="step-container step-3 opacity-0">
+                <article class="relative h-full bg-navy-900 text-white rounded-3xl shadow-lift p-7 sm:p-9 overflow-hidden">
+                    <span class="absolute top-4 right-6 font-display text-6xl font-bold text-white/[0.08] select-none" aria-hidden="true">03</span>
+                    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(242,96,12,0.28),transparent_60%)]" aria-hidden="true"></div>
+                    <div class="relative">
+                        
+                        <h3 class="font-display font-bold text-xl sm:text-2xl text-white mb-3">{% trans "Contactez en 1 clic" %}</h3>
+                        <p class="text-white/70 text-base sm:text-lg leading-relaxed">
+                            {% trans "Envoyez un message direct ou appelez le garage. Réservez votre rendez-vous sans attendre." %}
+                        </p>
+                        
                     </div>
-                </div>
+                </article>
             </div>
         </div>
     </div>
