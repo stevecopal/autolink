@@ -42,21 +42,14 @@
     <div class="absolute inset-0 scrim-diagonal" aria-hidden="true"></div>
     <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_80%_20%,rgba(242,96,12,0.30),transparent_58%)]" aria-hidden="true"></div>
 
-    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24">
-        <span class="eyebrow eyebrow-light mb-6">{% trans "Réseau AutoLink" %}</span>
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24" style="text-shadow: 0 2px 16px rgba(0,0,43,0.55);">
         <h1 class="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-[-0.02em] leading-[1.03] mb-5 max-w-3xl">
             {% trans "Trouver un garage à proximité" %}
         </h1>
         <p class="text-white/75 text-base sm:text-lg max-w-2xl leading-relaxed">
             {% trans "Localisez les garages vérifiés et disponibles autour de vous" %}
         </p>
-        <p class="text-accent-300 font-mono text-xs sm:text-sm mt-4 flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-            </svg>
-            {% trans "Le GPS de votre appareil sera utilisé pour vous localiser précisément" %}
-        </p>
+        
     </div>
 </div>
 
@@ -84,13 +77,20 @@
 
         {# ---------- Filtres ---------- #}
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-                <label for="radius-select" class="mb-2 block text-sm font-bold text-navy-900">
+            {# Rayon de recherche #}
+            <div class="rounded-2xl border border-line-200 bg-steel-50 p-4 sm:p-5">
+                <label for="radius-select" class="mb-3 flex items-center gap-2.5 text-sm font-bold text-navy-900">
+                    <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-navy-900 text-accent-400">
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2v3m0 14v3M22 12h-3M5 12H2m15.07-7.07l-2.12 2.12M9.05 14.95l-2.12 2.12m0-10.14l2.12 2.12m5.9 5.9l2.12 2.12"/>
+                        </svg>
+                    </span>
                     {% trans "Rayon de recherche" %}
                 </label>
                 <select
                     id="radius-select"
-                    class="form-input w-full !py-3 text-sm !rounded-xl"
+                    class="form-input w-full !py-3.5 text-sm !rounded-xl !border-line-200 font-bold text-navy-900"
                     aria-label="{% trans 'Rayon de recherche' %}"
                 >
                     <option value="1">{% trans "1 km" %}</option>
@@ -101,17 +101,26 @@
                 </select>
             </div>
 
-            <div class="flex items-end">
-                <label
-                    for="available-filter"
-                    class="flex w-full cursor-pointer items-center gap-3 rounded-xl border border-line-200 bg-white px-4 py-3 text-sm font-medium text-navy-900 transition-colors duration-200 hover:bg-accent-50"
-                >
-                    <input
-                        type="checkbox"
-                        id="available-filter"
-                        class="h-4 w-4 rounded border-line-200 text-accent-500 accent-accent-500 focus:ring-accent-500"
-                    >
-                    <span>{% trans "Uniquement les disponibles" %}</span>
+            {# Filtre disponibilité (switch) #}
+            <div class="rounded-2xl border border-line-200 bg-steel-50 p-4 sm:p-5 flex">
+                <label for="available-filter" class="flex w-full items-center justify-between gap-4 cursor-pointer">
+                    <span class="flex items-center gap-2.5 text-sm font-bold text-navy-900 min-w-0">
+                        <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-navy-900 text-accent-400">
+                            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                        </span>
+                        <span class="truncate">{% trans "Uniquement les disponibles" %}</span>
+                    </span>
+                    <span class="relative inline-flex h-6 w-11 shrink-0 items-center">
+                        <input
+                            type="checkbox"
+                            id="available-filter"
+                            class="peer sr-only"
+                        >
+                        <span class="absolute inset-0 rounded-full bg-graphite-500/30 transition-colors duration-200 peer-checked:bg-accent-500 peer-focus-visible:ring-4 peer-focus-visible:ring-accent-500/40" aria-hidden="true"></span>
+                        <span class="relative ml-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform duration-200 peer-checked:translate-x-5" aria-hidden="true"></span>
+                    </span>
                 </label>
             </div>
         </div>

@@ -10,6 +10,7 @@
     // ==========================================
     var findBtn = document.getElementById('find-nearby-btn');
     var findBtnText = document.getElementById('find-nearby-btn-text');
+    var searchProgress = document.getElementById('search-progress');
     var radiusSelect = document.getElementById('radius-select');
     var availableFilter = document.getElementById('available-filter');
     var searchStatus = document.getElementById('search-status');
@@ -266,20 +267,90 @@
     // ==========================================
     // États UI
     // ==========================================
-    function showLoading(message) {
-        searchStatus.classList.remove('hidden');
-        searchStatus.innerHTML =
-            '<div class="flex items-center gap-3 text-navy-600">' +
-                '<svg class="animate-spin w-5 h-5 text-navy-500 search-pulse" fill="none" viewBox="0 0 24 24">' +
-                    '<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>' +
-                    '<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 4.373 0 12h4z"></path>' +
-                '</svg>' +
-                '<span class="text-sm font-medium">' + message + '</span>' +
-            '</div>';
+    var STATUS_STYLES = {
+        info:    'border-navy-500/20 bg-navy-500/5 text-navy-900',
+        success: 'border-emerald-200 bg-emerald-50 text-emerald-800',
+        error:   'border-red-200 bg-red-50 text-red-700',
+    };
+
+    var STATUS_ICONS = {
+        info: '<svg class="h-5 w-5 shrink-0 animate-spin" fill="none" viewBox="0 0 24 24" aria-hidden="true">' +
+              '<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>' +
+              '<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>' +
+              '</svg>',
+        success: '<svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">' +
+                 '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>' +
+                 '</svg>',
+        error: '<svg class="h-5 w-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">' +
+               '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4.5c-.77-.833-2.694-.833-3.464 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"/>' +
+               '</svg>',
+    };
+
+    function getButtonLabels() {
+        return {
+            idle:    (findBtn && findBtn.dataset.labelIdle)    || 'Lancer la recherche',
+            loading: (findBtn && findBtn.dataset.labelLoading) || 'Recherche en cours…',
+            success: (findBtn && findBtn.dataset.labelSuccess) || 'Recherche terminée',
+        };
     }
 
-    function hideLoading() {
-        searchStatus.classList.add('hidden');
+    /* ---------- État visuel du bouton (icônes, libellé, progression) ---------- */
+    function setState(state) {
+        if (!findBtn) return;
+
+        findBtn.dataset.state = state;
+        findBtn.disabled = state === 'loading';
+        findBtn.setAttribute('aria-busy', state === 'loading' ? 'true' : 'false');
+
+        var labels = getButtonLabels();
+        if (findBtnText) findBtnText.textContent = labels[state] || labels.idle;
+
+        ['idle', 'loading', 'success'].forEach(function (key) {
+            var icon = findBtn.querySelector('[data-icon="' + key + '"]');
+            if (icon) icon.classList.toggle('hidden', key !== state);
+        });
+
+        if (searchProgress) searchProgress.classList.toggle('hidden', state !== 'loading');
+    }
+
+    /* ---------- Message de statut sous les filtres ---------- */
+    function showStatus(message, type) {
+        if (!searchStatus) return;
+        type = type || 'info';
+        searchStatus.className =
+            'mt-4 flex items-start gap-3 rounded-xl border px-4 py-3 text-sm font-medium transition-all duration-300 ' +
+            (STATUS_STYLES[type] || STATUS_STYLES.info);
+        searchStatus.innerHTML =
+            (STATUS_ICONS[type] || STATUS_ICONS.info) +
+            '<span class="flex-1"></span>';
+        searchStatus.querySelector('span').textContent = message;
+        searchStatus.classList.remove('hidden');
+    }
+
+    function hideStatus() {
+        if (searchStatus) searchStatus.classList.add('hidden');
+    }
+
+    /* ---------- Scroll automatique vers la carte des résultats ---------- */
+    function scrollToMap() {
+        var target = document.getElementById('nearby-map') || document.getElementById('results-container');
+        if (!target) return;
+
+        var reduceMotion = typeof window.matchMedia === 'function' &&
+            window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+        try {
+            target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'center' });
+        } catch (e) {
+            target.scrollIntoView();
+        }
+
+        // Leaflet a besoin d'être recalibré une fois la carte visible
+        if (map) {
+            setTimeout(function () {
+                map.invalidateSize();
+            }, reduceMotion ? 0 : 450);
+        }
     }
 
     /* ---------- État de chargement global (overlay AutoLink) ---------- */
@@ -415,12 +486,13 @@
         }
 
         showError(title, message, showRetry);
+        showStatus(message, 'error');
     }
 
     // ==========================================
     // Recherche API
     // ==========================================
-    function searchNearby(position) {
+    function searchNearby(position, fromButton) {
         if (isSearching) return;
         isSearching = true;
 
@@ -428,7 +500,8 @@
         var radius = radiusSelect.value;
         var available = availableFilter.checked ? '1' : '';
 
-        showLoading(getText('searching'));
+        if (fromButton) setState('loading');
+        showStatus(getText('searching'), 'info');
 
         var url = '/api/nearby/?lat=' + encodeURIComponent(position.lat) +
                   '&lng=' + encodeURIComponent(position.lng) +
@@ -447,16 +520,14 @@
             return response.json();
         })
         .then(function (data) {
-            hideLoading();
             hideGlobalLoader();
             isSearching = false;
 
             if (!data.success) {
-                showError(
-                    getText('error_title'),
-                    (data.errors && data.errors[0]) || getText('generic_error'),
-                    true
-                );
+                if (fromButton) setState('idle');
+                var apiMessage = (data.errors && data.errors[0]) || getText('generic_error');
+                showError(getText('error_title'), apiMessage, true);
+                showStatus(apiMessage, 'error');
                 return;
             }
 
@@ -467,16 +538,36 @@
             renderResults(data.results);
 
             resultsCount.textContent = data.total + ' résultat' + (data.total > 1 ? 's' : '');
+
+            if (data.total > 0) {
+                showStatus(getText('results_found').replace('{count}', data.total), 'success');
+            } else {
+                showStatus(getText('no_results') + ' ' + getText('try_radius'), 'error');
+            }
+
+            if (fromButton) {
+                setState('success');
+                // On laisse le DOM se peindre avant de scroller sur la carte
+                requestAnimationFrame(function () {
+                    scrollToMap();
+                });
+                setTimeout(function () {
+                    if (findBtn.dataset.state === 'success') setState('idle');
+                }, 2500);
+            } else if (map) {
+                map.invalidateSize();
+            }
         })
         .catch(function (error) {
-            hideLoading();
             hideGlobalLoader();
             isSearching = false;
+            if (fromButton) setState('idle');
             showError(
                 getText('error_title'),
                 getText('generic_error'),
                 true
             );
+            showStatus(getText('generic_error'), 'error');
         });
     }
 
@@ -486,19 +577,16 @@
     findBtn.addEventListener('click', function () {
         if (isSearching) return;
 
-        findBtn.disabled = true;
-        findBtnText.textContent = getText('locating');
+        setState('loading');
+        if (findBtnText) findBtnText.textContent = getText('locating');
         showGlobalLoader(getText('searching'));
 
         getUserPosition()
             .then(function (pos) {
-                findBtn.disabled = false;
-                findBtnText.textContent = getText('searching');
-                searchNearby(pos);
+                searchNearby(pos, true);
             })
             .catch(function (err) {
-                findBtn.disabled = false;
-                findBtnText.textContent = 'Trouver un mécanicien';
+                setState('idle');
                 hideGlobalLoader();
                 handleGeoError(err);
             });
@@ -506,13 +594,13 @@
 
     radiusSelect.addEventListener('change', function () {
         if (currentUserPosition) {
-            searchNearby(currentUserPosition);
+            searchNearby(currentUserPosition, false);
         }
     });
 
     availableFilter.addEventListener('change', function () {
         if (currentUserPosition) {
-            searchNearby(currentUserPosition);
+            searchNearby(currentUserPosition, false);
         }
     });
 

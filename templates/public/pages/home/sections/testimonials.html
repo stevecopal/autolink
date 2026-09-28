@@ -1,57 +1,206 @@
 {% load i18n %}
-<section class="bg-white" aria-labelledby="testimonials-heading">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-24 lg:py-28 overflow-hidden">
-        <div class="max-w-3xl mb-12 sm:mb-16">
-            <span class="eyebrow eyebrow-accent mb-6">{% trans "Confiance" %}</span>
-            <h2 id="testimonials-heading" class="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-graphite-900 tracking-[-0.02em] leading-[1.03]">
+<section class="bg-steel-50 overflow-hidden" aria-labelledby="testimonials-heading">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 sm:pt-20 lg:pt-24">
+        <div class="max-w-3xl mb-10 sm:mb-12 reveal">
+            <span class="eyebrow eyebrow-accent mb-5">{% trans "Confiance" %}</span>
+            <h2 id="testimonials-heading" class="font-display text-4xl sm:text-5xl font-bold text-graphite-900 tracking-[-0.02em] leading-[1.05]">
                 {% trans "Ils utilisent et font confiance a  AutoLink." %}
             </h2>
-            <div class="hairline mt-8 w-40"></div>
+            <div class="hairline mt-6 w-32"></div>
+        </div>
+    </div>
+
+    {% if testimonials %}
+    {# ============ Carrousel de témoignages (boucle infinie : clone du dernier avant + clone du premier après) ============ #}
+    <div class="pb-16 sm:pb-20 lg:pb-24">
+        <div id="t-viewport" class="relative overflow-hidden py-4 select-none" aria-roledescription="{% trans 'carrousel' %}">
+            <div id="t-track" class="flex items-stretch transition-transform duration-500 ease-out will-change-transform" style="transform: translateX(0px);">
+                {% with clone_num=testimonials|length %}
+                {% with t=testimonials|last num=testimonials|length clone=1 %}
+                {% include "public/pages/home/sections/_testimonial_card.html" %}
+                {% endwith %}
+                {% for t in testimonials %}
+                {% include "public/pages/home/sections/_testimonial_card.html" with num=forloop.counter %}
+                {% endfor %}
+                {% with t=testimonials|first num=1 clone=1 %}
+                {% include "public/pages/home/sections/_testimonial_card.html" %}
+                {% endwith %}
+                {% endwith %}
+            </div>
         </div>
 
-    <div class="testimonials-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 lg:gap-7" data-testimonials-grid>
-        {% for t in testimonials %}
-            <article class="testimonial-card reveal relative bg-white rounded-3xl border border-line-200 p-6 sm:p-8 hover:shadow-lift transition-shadow duration-300 flex flex-col"
-                     data-float-delay="{{ forloop.counter0 }}">
+        {# ============ Navigation : précédent / compteur / suivant ============ #}
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 sm:mt-10 flex items-center justify-between">
+            <button
+                type="button"
+                id="t-prev"
+                class="t-nav w-12 h-12 rounded-full border border-line-200 bg-white flex items-center justify-center text-graphite-900 hover:border-navy-900 hover:bg-navy-900 hover:text-white transition-colors focus:outline-none focus-visible:ring-4 focus-visible:ring-navy-900/20"
+                aria-label="{% trans 'Témoignage précédent' %}">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M15 19l-7-7 7-7"/>
+                </svg>
+            </button>
 
-                {% comment %}Guillemet décoratif{% endcomment %}
-                <span class="absolute top-4 right-6 font-display text-6xl leading-none text-accent-500/15 select-none" aria-hidden="true">&rdquo;</span>
-
-                {% comment %}Étoiles{% endcomment %}
-                <div class="flex items-center gap-1 mb-4 sm:mb-5">
-                    {% for i in "12345" %}
-                        <svg class="w-4 h-4 sm:w-5 sm:h-5 text-accent-500" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/>
-                        </svg>
-                    {% endfor %}
-                </div>
-
-                {% comment %}Citation{% endcomment %}
-                <blockquote class="text-graphite-900 text-base sm:text-lg leading-relaxed mb-6 flex-1">
-                    <span class="hidden sm:inline">« {{ t.quote|truncatechars:180 }} »</span>
-                    <span class="sm:hidden">« {{ t.quote|truncatechars:90 }} »</span>
-                </blockquote>
-
-                {% comment %}Auteur{% endcomment %}
-                <div class="flex items-center gap-3 pt-5 border-t border-line-200">
-                    <div class="w-11 h-11 rounded-full bg-navy-900 flex items-center justify-center font-bold text-accent-400 text-sm flex-shrink-0">
-                        {{ t.name|first|upper }}
-                    </div>
-                    <div class="min-w-0">
-                        <div class="font-bold text-graphite-900 text-sm truncate">{{ t.name }}</div>
-                    </div>
-                </div>
-            </article>
-        {% empty %}
-            <div class="sm:col-span-2 md:col-span-3 text-center py-14">
-                <div class="w-14 h-14 mx-auto mb-4 rounded-2xl bg-steel-50 flex items-center justify-center text-graphite-500">
-                    <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                    </svg>
-                </div>
-                <p class="text-base text-graphite-500">{% trans "Aucun témoignage pour l'instant. Soyez le premier à partager votre expérience !" %}</p>
+            <div class="font-mono text-sm tabular-nums" aria-live="polite">
+                <span id="t-current" class="font-bold text-graphite-900">01</span>
+                <span class="text-graphite-500 mx-1">/</span>
+                <span id="t-total" class="text-graphite-500">01</span>
             </div>
-        {% endfor %}
+
+            <button
+                type="button"
+                id="t-next"
+                class="t-nav w-12 h-12 rounded-full border border-line-200 bg-white flex items-center justify-center text-graphite-900 hover:border-navy-900 hover:bg-navy-900 hover:text-white transition-colors focus:outline-none focus-visible:ring-4 focus-visible:ring-navy-900/20"
+                aria-label="{% trans 'Témoignage suivant' %}">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 5l7 7-7 7"/>
+                </svg>
+            </button>
+        </div>
     </div>
+    {% else %}
+    {# ============ État vide ============ #}
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-20 lg:pb-24">
+        <div class="text-center py-14 rounded-3xl border border-dashed border-line-200 bg-white/60">
+            <div class="w-14 h-14 mx-auto mb-4 rounded-2xl bg-white border border-line-200 flex items-center justify-center text-graphite-500/60">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                </svg>
+            </div>
+            <p class="text-base text-graphite-500">{% trans "Aucun témoignage pour l'instant. Soyez le premier à partager votre expérience !" %}</p>
+        </div>
     </div>
+    {% endif %}
 </section>
+
+<style>
+    #t-track .t-card {
+        transform: scale(0.84) translateY(10px);
+        opacity: 0.9;
+        z-index: 1;
+        box-shadow: 0 6px 20px -12px rgba(0, 0, 43, 0.25);
+        transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.5s ease, opacity 0.5s ease, border-color 0.5s ease;
+    }
+    #t-track .t-card.is-active {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+        z-index: 10;
+        border-color: #d7dce1;
+        box-shadow: 0 34px 60px -28px rgba(0, 0, 43, 0.45);
+    }
+    #t-track.t-no-transition {
+        transition: none !important;
+    }
+    #t-track.t-no-transition .t-card {
+        transition: none !important;
+    }
+    @media (prefers-reduced-motion: reduce) {
+        #t-track,
+        #t-track .t-card {
+            transition: none !important;
+        }
+    }
+</style>
+
+<script>
+(function () {
+    var viewport = document.getElementById('t-viewport');
+    var track = document.getElementById('t-track');
+    if (!viewport || !track) return;
+
+    var cards = Array.prototype.slice.call(track.querySelectorAll('.t-card'));
+    // Structure : [clone du dernier] + [cartes réelles] + [clone du premier]
+    var realTotal = cards.length - 2;
+    if (realTotal < 1) return;
+
+    var pos = 1; // position dans le track (1 = premier témoignage réel)
+    var animating = false;
+    var currentEl = document.getElementById('t-current');
+    var totalEl = document.getElementById('t-total');
+    var prevBtn = document.getElementById('t-prev');
+    var nextBtn = document.getElementById('t-next');
+    var DURATION = 520;
+
+    function pad(n) { return (n < 10 ? '0' : '') + n; }
+
+    if (totalEl) totalEl.textContent = pad(realTotal);
+    if (realTotal < 2) {
+        document.querySelectorAll('.t-nav').forEach(function (b) { b.style.display = 'none'; });
+    }
+
+    function displayIndex(p) {
+        return (((p - 1) % realTotal) + realTotal) % realTotal;
+    }
+
+    function render() {
+        cards.forEach(function (card, i) {
+            var dist = Math.abs(i - pos);
+            card.classList.toggle('is-active', i === pos);
+            card.style.zIndex = String(10 - Math.min(dist, 9));
+        });
+
+        var card = cards[pos];
+        var offset = card.offsetLeft + card.offsetWidth / 2;
+        var vw = viewport.clientWidth;
+        track.style.transform = 'translateX(' + (vw / 2 - offset) + 'px)';
+
+        if (currentEl) currentEl.textContent = pad(displayIndex(pos) + 1);
+    }
+
+    function snapTo(p) {
+        track.classList.add('t-no-transition');
+        pos = p;
+        render();
+        void track.offsetWidth; // reflow : applique la position sans transition
+        track.classList.remove('t-no-transition');
+        animating = false;
+    }
+
+    function move(delta) {
+        if (animating || realTotal < 2) return;
+        pos += delta;
+        render();
+        if (pos < 0 || pos > realTotal + 1) { // garde-fou
+            snapTo(displayIndex(pos) + 1);
+            return;
+        }
+        if (pos === 0 || pos === realTotal + 1) {
+            // Atterrissage sur un clone : après l'animation, rebond discret sur la carte réelle
+            animating = true;
+            setTimeout(function () {
+                snapTo(pos === 0 ? realTotal : 1);
+            }, DURATION);
+        }
+    }
+
+    if (prevBtn) prevBtn.addEventListener('click', function () { move(-1); });
+    if (nextBtn) nextBtn.addEventListener('click', function () { move(1); });
+
+    // Navigation au clavier
+    viewport.addEventListener('keydown', function (e) {
+        if (e.key === 'ArrowLeft') { e.preventDefault(); move(-1); }
+        if (e.key === 'ArrowRight') { e.preventDefault(); move(1); }
+    });
+
+    // Swipe tactile
+    var startX = null;
+    viewport.addEventListener('touchstart', function (e) {
+        startX = e.touches[0].clientX;
+    }, { passive: true });
+    viewport.addEventListener('touchend', function (e) {
+        if (startX === null) return;
+        var dx = e.changedTouches[0].clientX - startX;
+        if (Math.abs(dx) > 50) {
+            move(dx < 0 ? 1 : -1);
+        }
+        startX = null;
+    }, { passive: true });
+
+    window.addEventListener('resize', function () {
+        if (!animating) render();
+    });
+    render();
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { if (!animating) render(); });
+    window.addEventListener('load', function () { if (!animating) render(); });
+})();
+</script>

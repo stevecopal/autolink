@@ -20,7 +20,7 @@
     <div class="absolute inset-0 scrim-diagonal" aria-hidden="true"></div>
     <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_82%_15%,rgba(242,96,12,0.30),transparent_58%)]" aria-hidden="true"></div>
 
-    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24">
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24" style="text-shadow: 0 2px 16px rgba(0,0,43,0.55);">
         <span class="eyebrow eyebrow-light mb-6">{% trans "Pièces compatibles" %}</span>
         <h1 class="font-display text-4xl sm:text-5xl lg:text-6xl font-bold text-white tracking-[-0.02em] leading-[1.03] mb-5 max-w-3xl">
             {% trans "Trouver une pièce" %}
@@ -32,10 +32,11 @@
 </div>
 
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 sm:pb-24">
-    <!-- Barre de recherche + Filtres -->
+    <!-- ============ Recherche + Filtres ============ -->
     <div class="bg-white rounded-3xl border border-line-200 shadow-lift p-5 sm:p-7 -mt-10 relative z-10 mb-10">
         <form method="get" class="space-y-4" id="search-form" role="search" aria-label="{% trans 'Recherche de pièces' %}">
-            <!-- Barre de recherche principale (avec bouton ✕) -->
+
+            <!-- Barre de recherche principale -->
             <div class="relative flex items-center gap-2">
                 <div class="absolute left-5 flex items-center pointer-events-none">
                     <svg class="w-5 h-5 text-graphite-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -47,7 +48,7 @@
                     name="q"
                     value="{{ search_query }}"
                     placeholder="{% trans 'Rechercher une pièce, modèle, référence...' %}"
-                    class="flex-1 !pl-14 pr-12 !py-4 border border-line-200 rounded-2xl focus:ring-2 focus:ring-accent-500 focus:border-accent-500 outline-none transition-all bg-steel-50/60 text-base"
+                    class="flex-1 !pl-14 pr-12 !py-4 border border-line-200 rounded-2xl focus:ring-2 focus:ring-accent-500 focus:border-accent-500 outline-none transition-all bg-steel-50/60 text-base text-graphite-900 placeholder:text-graphite-500"
                     aria-label="{% trans 'Rechercher une pièce' %}"
                     id="search-input">
                 <button
@@ -61,60 +62,87 @@
                 </button>
             </div>
 
-            <!-- Boutons Filtres et Réinitialiser -->
-            <div class="flex items-center gap-3">
+            <!-- Filtres / Réinitialiser -->
+            <div class="flex flex-wrap items-center gap-3">
                 <button
                     type="button"
                     onclick="toggleFilters()"
+                    aria-expanded="false"
+                    aria-controls="filters-container"
+                    id="filters-toggle"
                     class="inline-flex items-center gap-2 px-5 py-3 bg-navy-900 text-white rounded-xl text-sm font-bold hover:bg-accent-500 transition-colors">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/>
                     </svg>
                     {% trans "Filtres" %}
+                    <svg class="w-3.5 h-3.5 transition-transform duration-200" id="filters-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/>
+                    </svg>
                 </button>
 
                 <a
                     href="{% url 'catalog:part_list' %}"
                     class="inline-flex items-center gap-2 px-5 py-3 bg-white border border-line-200 text-graphite-600 rounded-xl text-sm font-bold hover:border-navy-500 hover:text-navy-500 transition-colors">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
                     </svg>
                     {% trans "Réinitialiser" %}
                 </a>
+
+               
             </div>
 
-            <!-- Filtres (masqués par défaut) -->
-            <div id="filters-container" class="hidden grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <select name="category" class="form-input !py-3 !rounded-xl text-sm" aria-label="{% trans 'Catégorie' %}">
-                    <option value="">{% trans "Toutes les catégories" %}</option>
-                    {% for cat in categories %}
-                    <option value="{{ cat.slug }}" {% if selected_category == cat.slug %}selected{% endif %}>{{ cat.name }}</option>
-                    {% endfor %}
-                </select>
-                <select name="brand" class="form-input !py-3 !rounded-xl text-sm" aria-label="{% trans 'Marque' %}">
-                    <option value="">{% trans "Toutes les marques" %}</option>
-                    {% for brand in brands %}
-                    <option value="{{ brand.pk }}" {% if selected_brand == brand.pk|stringformat:"s" %}selected{% endif %}>{{ brand.name }}</option>
-                    {% endfor %}
-                </select>
-                <select name="sort" class="form-input !py-3 !rounded-xl text-sm" aria-label="{% trans 'Trier par' %}">
-                    <option value="-created_at" {% if sort == '-created_at' %}selected{% endif %}>{% trans "Plus récent" %}</option>
-                    <option value="price" {% if sort == 'price' %}selected{% endif %}>{% trans "Prix croissant" %}</option>
-                    <option value="-price" {% if sort == '-price' %}selected{% endif %}>{% trans "Prix décroissant" %}</option>
-                    <option value="name" {% if sort == 'name' %}selected{% endif %}>{% trans "Nom" %}</option>
-                </select>
-                <button type="submit" class="btn bg-accent-500 hover:bg-accent-600 text-white !py-3 !rounded-xl text-sm whitespace-nowrap">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                    </svg>
-                    {% trans "Appliquer" %}
-                </button>
+            <!-- Filtres dépliés -->
+            <div id="filters-container" class="hidden border-t border-line-200 pt-5">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div>
+                        <label for="filter-category" class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-graphite-500">
+                            {% trans "Catégorie" %}
+                        </label>
+                        <select id="filter-category" name="category" class="form-input !py-3 !rounded-xl text-sm !border-line-200" aria-label="{% trans 'Catégorie' %}">
+                            <option value="">{% trans "Toutes les catégories" %}</option>
+                            {% for cat in categories %}
+                            <option value="{{ cat.slug }}" {% if selected_category == cat.slug %}selected{% endif %}>{{ cat.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label for="filter-brand" class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-graphite-500">
+                            {% trans "Marque" %}
+                        </label>
+                        <select id="filter-brand" name="brand" class="form-input !py-3 !rounded-xl text-sm !border-line-200" aria-label="{% trans 'Marque' %}">
+                            <option value="">{% trans "Toutes les marques" %}</option>
+                            {% for brand in brands %}
+                            <option value="{{ brand.pk }}" {% if selected_brand == brand.pk|stringformat:"s" %}selected{% endif %}>{{ brand.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label for="filter-sort" class="mb-1.5 block text-xs font-bold uppercase tracking-wide text-graphite-500">
+                            {% trans "Trier par" %}
+                        </label>
+                        <select id="filter-sort" name="sort" class="form-input !py-3 !rounded-xl text-sm !border-line-200" aria-label="{% trans 'Trier par' %}">
+                            <option value="-created_at" {% if sort == '-created_at' %}selected{% endif %}>{% trans "Plus récent" %}</option>
+                            <option value="price" {% if sort == 'price' %}selected{% endif %}>{% trans "Prix croissant" %}</option>
+                            <option value="-price" {% if sort == '-price' %}selected{% endif %}>{% trans "Prix décroissant" %}</option>
+                            <option value="name" {% if sort == 'name' %}selected{% endif %}>{% trans "Nom" %}</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button type="submit" class="btn w-full bg-accent-500 hover:bg-accent-600 text-white !py-3 !rounded-xl text-sm whitespace-nowrap">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                            </svg>
+                            {% trans "Appliquer" %}
+                        </button>
+                    </div>
+                </div>
             </div>
         </form>
     </div>
 
-    <!-- Résultat de la recherche -->
-    <div class="flex items-end justify-between mb-7 gap-4">
+    <!-- ============ Résultats ============ -->
+    <div id="results" class="flex items-end justify-between mb-7 gap-4 scroll-mt-24">
         <h2 class="font-display text-2xl sm:text-3xl font-bold text-navy-900 tracking-tight">
             {{ parts.paginator.count }} <span class="text-graphite-500 font-medium text-lg sm:text-xl">{% trans "pièce(s) trouvée(s)" %}</span>
         </h2>
@@ -122,90 +150,80 @@
     </div>
 
     {% if parts %}
-    <!-- Liste des pièces -->
+    <!-- Grille des pièces -->
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 lg:gap-6" role="list">
         {% for part in parts %}
-        <article class="bg-white rounded-2xl border border-line-200 shadow-soft hover:shadow-lift hover:-translate-y-1 transition-all duration-300 group overflow-hidden" role="listitem">
-            <a href="{% url 'catalog:part_detail' slug=part.slug %}" class="block h-full">
-                <!-- Image de la pièce -->
-                <div class="relative aspect-square overflow-hidden bg-steel-50">
-                    {% if part.photo %}
-                    <img
-                        src="{{ part.photo.url }}"
-                        alt="{{ part.name }}"
-                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                        loading="lazy"
-                        decoding="async">
-                    {% else %}
-                    <div class="w-full h-full flex items-center justify-center bg-steel-50">
-                        <svg class="w-12 h-12 text-graphite-500/30" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-                        </svg>
-                    </div>
-                    {% endif %}
+        <article class="bg-white rounded-2xl border border-line-200 shadow-soft hover:shadow-lift hover:-translate-y-1 transition-all duration-300 group overflow-hidden flex flex-col" role="listitem">
+            <a href="{% url 'catalog:part_detail' slug=part.slug %}" class="relative block aspect-square overflow-hidden bg-steel-50">
+                {% if part.photo %}
+                <img
+                    src="{{ part.photo.url }}"
+                    alt="{{ part.name }}"
+                    class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    loading="lazy"
+                    decoding="async">
+                {% else %}
+                <span class="absolute inset-0 flex items-center justify-center bg-steel-50" aria-hidden="true">
+                    <svg class="w-12 h-12 text-graphite-500/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                    </svg>
+                </span>
+                {% endif %}
 
-                    <!-- Badge condition (Neuf/Occasion/Reconditionné) en haut à droite -->
-                    <div class="absolute top-2.5 right-2.5">
-                        {% if part.condition == 'NEW' %}
-                        <span class="inline-flex items-center px-2.5 py-1 bg-navy-900 text-white text-xs font-bold rounded-lg shadow-sm">
-                            {% trans "Neuf" %}
-                        </span>
-                        {% elif part.condition == 'USED' %}
-                        <span class="inline-flex items-center px-2.5 py-1 bg-white text-graphite-600 border border-line-200 text-xs font-bold rounded-lg shadow-sm">
-                            {% trans "Occasion" %}
-                        </span>
-                        {% else %}
-                        <span class="inline-flex items-center px-2.5 py-1 bg-accent-500 text-white text-xs font-bold rounded-lg shadow-sm">
-                            {% trans "Reconditionné" %}
-                        </span>
-                        {% endif %}
-                    </div>
-                </div>
+                <!-- Badge condition -->
+                {% if part.condition == 'NEW' %}
+                <span class="absolute top-2.5 right-2.5 inline-flex items-center px-2.5 py-1 bg-navy-900 text-white text-[11px] font-bold rounded-lg shadow-sm">
+                    {% trans "Neuf" %}
+                </span>
+                {% elif part.condition == 'USED' %}
+                <span class="absolute top-2.5 right-2.5 inline-flex items-center px-2.5 py-1 bg-white text-graphite-600 border border-line-200 text-[11px] font-bold rounded-lg shadow-sm">
+                    {% trans "Occasion" %}
+                </span>
+                {% else %}
+                <span class="absolute top-2.5 right-2.5 inline-flex items-center px-2.5 py-1 bg-accent-500 text-white text-[11px] font-bold rounded-lg shadow-sm">
+                    {% trans "Reconditionné" %}
+                </span>
+                {% endif %}
             </a>
 
-            <!-- Contenu textuel -->
-            <div class="p-4">
+            <!-- Nom + infos + prix -->
+            <div class="p-4 flex flex-col flex-1">
+                {% if part.brand %}
+                <span class="font-mono text-[10px] uppercase tracking-wider text-accent-600 font-bold mb-1.5 truncate">{{ part.brand.name }}</span>
+                {% endif %}
+
                 <a href="{% url 'catalog:part_detail' slug=part.slug %}" class="block">
-                    <h3 class="font-display font-bold text-navy-900 text-sm sm:text-base leading-snug line-clamp-2 group-hover:text-accent-600 transition-colors">
+                    <h3 class="font-display font-bold text-graphite-900 text-sm sm:text-base leading-snug line-clamp-2 group-hover:text-accent-600 transition-colors">
                         {{ part.name }}
                     </h3>
                 </a>
 
-                <!-- Catégorie et Marque -->
-                <div class="mt-2 space-y-1">
-                    {% if part.category %}
-                    <p class="text-graphite-500 text-xs truncate">{{ part.category.name }}</p>
-                    {% endif %}
-                    {% if part.brand %}
-                    <p class="text-graphite-500/80 text-xs truncate">{{ part.brand.name }}</p>
-                    {% endif %}
-                    {% if part.garage %}
-                    <p class="text-graphite-500/80 text-xs truncate">
-                        <svg class="w-3 h-3 inline -mt-0.5 mr-1 text-accent-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/>
-                        </svg>
-                        {{ part.garage.name }}
-                    </p>
-                    {% endif %}
-                </div>
+                {% if part.category %}
+                <p class="text-graphite-500 text-xs truncate mt-1.5">{{ part.category.name }}</p>
+                {% endif %}
 
-                <!-- Prix en bas -->
-                <div class="flex items-center justify-between gap-2 mt-4 pt-3 border-t border-line-200/70">
-                    <span class="font-display font-bold text-navy-500 text-base">
-                        {{ part.price|intcomma }} <span class="text-xs font-semibold text-graphite-500">FCFA</span>
+                {% if part.garage %}
+                <p class="text-graphite-500/80 text-xs truncate mt-1">
+                    <svg class="w-3 h-3 inline -mt-0.5 mr-1 text-accent-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/>
+                    </svg>
+                    {{ part.garage.name }}
+                </p>
+                {% endif %}
+
+                <!-- Prix + disponibilité -->
+                <div class="mt-auto pt-3.5 border-t border-line-200 flex items-center justify-between gap-2">
+                    <span class="font-display font-bold text-navy-900 text-base sm:text-lg tabular-nums leading-none">
+                        {{ part.price|intcomma }}<span class="text-[11px] font-mono font-medium text-graphite-500 ml-1">FCFA</span>
                     </span>
                     {% if part.is_available %}
-                    <span class="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
+                    <span class="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 shrink-0">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         {% trans "Disponible" %}
                     </span>
                     {% else %}
-                    <span class="inline-flex items-center gap-1 text-[11px] font-bold text-graphite-500">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                        </svg>
+                    <span class="inline-flex items-center gap-1 text-[11px] font-bold text-graphite-500 shrink-0">
+                        <span class="w-1.5 h-1.5 rounded-full bg-graphite-500/40"></span>
                         {% trans "Indisponible" %}
                     </span>
                     {% endif %}
@@ -224,14 +242,14 @@
                 href="?page={{ parts.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if selected_category %}&category={{ selected_category }}{% endif %}{% if selected_brand %}&brand={{ selected_brand }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}"
                 class="inline-flex items-center gap-2 px-5 py-3 bg-white border border-line-200 text-graphite-600 rounded-xl text-sm font-bold hover:border-navy-500 hover:text-navy-500 transition-colors"
                 aria-label="{% trans 'Page précédente' %}">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                 </svg>
                 <span class="hidden sm:inline">{% trans "Précédent" %}</span>
             </a>
             {% else %}
             <span class="inline-flex items-center gap-2 px-5 py-3 bg-white border border-line-200 text-graphite-500 rounded-xl text-sm font-bold cursor-not-allowed">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                 </svg>
                 <span class="hidden sm:inline">{% trans "Précédent" %}</span>
@@ -248,14 +266,14 @@
                 class="inline-flex items-center gap-2 px-5 py-3 bg-white border border-line-200 text-graphite-600 rounded-xl text-sm font-bold hover:border-navy-500 hover:text-navy-500 transition-colors"
                 aria-label="{% trans 'Page suivante' %}">
                 <span class="hidden sm:inline">{% trans "Suivant" %}</span>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                 </svg>
             </a>
             {% else %}
             <span class="inline-flex items-center gap-2 px-5 py-3 bg-white border border-line-200 text-graphite-500 rounded-xl text-sm font-bold cursor-not-allowed">
                 <span class="hidden sm:inline">{% trans "Suivant" %}</span>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
                 </svg>
             </span>
@@ -287,10 +305,13 @@
 
 <!-- JavaScript pour les filtres -->
 <script>
-// Toggle les filtres
 function toggleFilters() {
-    const filtersContainer = document.getElementById('filters-container');
-    filtersContainer.classList.toggle('hidden');
+    var filtersContainer = document.getElementById('filters-container');
+    var toggleBtn = document.getElementById('filters-toggle');
+    var chevron = document.getElementById('filters-chevron');
+    var isOpen = filtersContainer.classList.toggle('hidden') === false;
+    if (toggleBtn) toggleBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+    if (chevron) chevron.style.transform = isOpen ? 'rotate(180deg)' : '';
 }
 </script>
 {% endblock %}
